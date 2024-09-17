@@ -1,0 +1,7 @@
+{
+	"files.exclude": {
+		"**/backup": true,
+		"**/backups": true
+	},
+	"java.configuration.updateBuildConfiguration": "interactive"
+}

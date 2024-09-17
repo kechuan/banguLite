@@ -1,0 +1,42 @@
+name: flutter_bangumi
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  cached_network_image: ^3.4.1
+  dio: ^5.6.0
+  easy_refresh: ^3.4.0
+  ff_annotation_route_core: ^2.0.7
+  ff_annotation_route_library: ^3.0.0
+  flutter:
+    sdk: flutter
+  flutter_svg: ^2.0.10+1
+  infinite_carousel: ^1.1.1
+  path_provider: ^2.1.4
+  provider: ^6.1.2
+  skeletonizer: ^1.4.2
+  sliver_tools: ^0.2.12
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.12
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: MiSansFont
+      fonts:
+        - asset: assets/fonts/MiSans-Regular.ttf
+        
+  assets:
+    - assets/icons/time_sort_new.svg
+    - assets/icons/time_sort_old.svg
+    
+    
