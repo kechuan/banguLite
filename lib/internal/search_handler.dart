@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bangumi/internal/request_client.dart';
-import 'package:flutter_bangumi/models/bangumi_details.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/bangumi_details.dart';
 
 Future<List<BangumiDetails>> searchHandler(String query) async {
 

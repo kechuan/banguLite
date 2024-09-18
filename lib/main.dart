@@ -3,11 +3,11 @@
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bangumi/flutter_bangumi_routes.dart';
-import 'package:flutter_bangumi/internal/request_client.dart';
-import 'package:flutter_bangumi/models/providers/bangumi_model.dart';
-import 'package:flutter_bangumi/models/providers/index_model.dart';
-import 'package:flutter_bangumi/routes/flutter_bangumi_route.dart';
+import 'package:bangu_lite/flutter_bangumi_routes.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/providers/bangumi_model.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/routes/flutter_bangumi_route.dart';
 import 'package:provider/provider.dart';
 
 void main() {

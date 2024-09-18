@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bangumi/internal/convert.dart';
-import 'package:flutter_bangumi/models/comment_details.dart';
-import 'package:flutter_bangumi/widgets/fragments/cached_image_loader.dart';
+import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 
 class CommentTile extends StatelessWidget {
   const CommentTile({

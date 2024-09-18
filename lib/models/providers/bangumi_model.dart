@@ -2,8 +2,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bangumi/internal/request_client.dart';
-import 'package:flutter_bangumi/models/bangumi_details.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/bangumi_details.dart';
 
 
 class BangumiModel extends ChangeNotifier {

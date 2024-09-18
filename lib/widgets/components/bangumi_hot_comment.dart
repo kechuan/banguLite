@@ -1,10 +1,10 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bangumi/flutter_bangumi_routes.dart';
+import 'package:bangu_lite/flutter_bangumi_routes.dart';
 
-import 'package:flutter_bangumi/models/comment_details.dart';
-import 'package:flutter_bangumi/models/providers/comment_model.dart';
-import 'package:flutter_bangumi/widgets/fragments/comment_tile.dart';
+import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/providers/comment_model.dart';
+import 'package:bangu_lite/widgets/fragments/comment_tile.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -208,15 +208,17 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
                             if(commentModel.commentsData.keys.contains(
                               providerContext.read<CommentModel>().commentLength %10 == 0 ?
-                              providerContext.read<CommentModel>().commentLength ~/10 :
+                              providerContext.read<CommentModel>().commentLength ~/10:
                               providerContext.read<CommentModel>().commentLength ~/10 + 1
                             )){
                               providerContext.read<CommentModel>().notifyListeners();
                             }
         
                             else{
-                              commentModel.currentPageIndex = commentModel.commentLength~/10 - 1;
-                              providerContext.read<CommentModel>().loadComments(widget.id,isReverse: isOldCommentSort.value);
+                              commentModel.currentPageIndex = isOldCommentSort.value ? commentModel.commentLength~/10 - 1 : 1;
+                              providerContext.read<CommentModel>().loadComments(widget.id,isReverse: isOldCommentSort.value).then((_){
+                                commentModel.changePage(commentModel.currentPageIndex);
+                              });
                             }
                             
                           }, 

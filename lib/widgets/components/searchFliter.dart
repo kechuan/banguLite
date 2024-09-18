@@ -2,10 +2,10 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bangumi/internal/convert.dart';
-import 'package:flutter_bangumi/internal/event_bus.dart';
-import 'package:flutter_bangumi/internal/request_client.dart';
-import 'package:flutter_bangumi/widgets/fragments/date_range_select.dart';
+import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/widgets/fragments/date_range_select.dart';
 
 class Searchfliter extends StatefulWidget {
   const Searchfliter({super.key});

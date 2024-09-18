@@ -2,11 +2,11 @@
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bangumi/internal/max_number_input_formatter.dart';
-import 'package:flutter_bangumi/models/providers/bangumi_model.dart';
+import 'package:bangu_lite/internal/max_number_input_formatter.dart';
+import 'package:bangu_lite/models/providers/bangumi_model.dart';
 
-import 'package:flutter_bangumi/models/providers/comment_model.dart';
-import 'package:flutter_bangumi/widgets/components/bangumi_comments.dart';
+import 'package:bangu_lite/models/providers/comment_model.dart';
+import 'package:bangu_lite/widgets/components/bangumi_comments.dart';
 import 'package:provider/provider.dart';
 
 @FFRoute(name: '/moreComment')
@@ -52,8 +52,14 @@ class MoreCommentsPage extends StatelessWidget  {
 
                         backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.9),
                         
-                        child: SizedBox(
-                          height: MediaQuery.sizeOf(context).height/3,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.sizeOf(context).height/3 > 200 ? MediaQuery.sizeOf(context).height/3 : 200,
+                            maxWidth: MediaQuery.sizeOf(context).width/3 > 300 ? MediaQuery.sizeOf(context).width/3 : 300,
+                            minHeight: 200,
+                            minWidth: 300
+                          ),
+                          
                           child: Padding(
                             padding: const EdgeInsets.all(12),
                             child: Column(
@@ -64,7 +70,7 @@ class MoreCommentsPage extends StatelessWidget  {
                                 const Text("跳转到页面..",style: TextStyle(fontSize: 24)),
                             
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding: const EdgeInsets.symmetric(vertical: 6),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
@@ -121,8 +127,6 @@ class MoreCommentsPage extends StatelessWidget  {
                                   ),
                                 ),
                           
-                          
-                            
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [

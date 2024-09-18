@@ -1,9 +1,9 @@
 
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bangumi/delegates/wrapSliverPersistentHeaderDelegate.dart';
-import 'package:flutter_bangumi/widgets/index_landscape.dart';
-import 'package:flutter_bangumi/widgets/index_portial.dart';
+import 'package:bangu_lite/delegates/wrapSliverPersistentHeaderDelegate.dart';
+import 'package:bangu_lite/widgets/index_landscape.dart';
+import 'package:bangu_lite/widgets/index_portial.dart';
 
 
 @FFRoute(name: '/index')

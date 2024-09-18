@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bangumi/catalogs/bangumi_calendar_page.dart';
-import 'package:flutter_bangumi/catalogs/bangumi_sort_page.dart';
-import 'package:flutter_bangumi/delegates/search_delegates.dart';
+import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
+import 'package:bangu_lite/catalogs/bangumi_sort_page.dart';
+import 'package:bangu_lite/delegates/search_delegates.dart';
 
 class IndexLandscape extends StatelessWidget {
   const IndexLandscape({

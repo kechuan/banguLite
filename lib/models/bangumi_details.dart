@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bangumi/internal/convert.dart';
+import 'package:bangu_lite/internal/convert.dart';
 
 class BangumiDetails {
 

@@ -2,9 +2,10 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bangumi/internal/request_client.dart';
-import 'package:flutter_bangumi/models/comment_details.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 
 class CommentModel extends ChangeNotifier {
   CommentModel();
@@ -72,7 +73,8 @@ class CommentModel extends ChangeNotifier {
 
     //pageIndex Convert
     if(isReverse){
-      pageIndex = totalPageCount - (pageIndex-1);
+      //pageIndex = totalPageCount - (pageIndex-1);
+      pageIndex = totalPageCount - (pageIndex);
     }
 
     //aliveKeepPage Judge. must notifier at First then disposed.
@@ -145,7 +147,10 @@ class CommentModel extends ChangeNotifier {
     debugPrint("ID $id: $pageIndex parse start, commentStamp: ${DateTime.now()}");
 
     //data Get
-    final detailInformation = await HttpApiClient.client.get(
+
+    try{
+
+      final detailInformation = await HttpApiClient.client.get(
       BangumiUrls.comment(id),
       queryParameters: BangumiQuerys.commentQuery
 
@@ -160,12 +165,25 @@ class CommentModel extends ChangeNotifier {
         commentsData[pageIndex] = CommentDetails.loadCommentResponse(detailInformation);
       }
 
+      else{
+        debugPrint("wrong!");
+      }
+
       
       debugPrint("comment: ID $id: $pageIndex parse done, commentStamp: ${DateTime.now()}");
 
 
       if(id!=0) commentID = id;
       notifyListeners();
+
+    }
+
+    on DioException catch(e){
+      debugPrint(e.toString());
+    }
+
+
+      
 
   }
 

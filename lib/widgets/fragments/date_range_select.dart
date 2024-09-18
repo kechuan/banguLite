@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bangumi/internal/event_bus.dart';
-import 'package:flutter_bangumi/internal/max_number_input_formatter.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/max_number_input_formatter.dart';
 
 class DateRangeSelect extends StatelessWidget {
   const DateRangeSelect({

@@ -2,9 +2,8 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bangumi/delegates/search_delegates.dart';
-import 'package:flutter_bangumi/models/bangumi_details.dart';
-
+import 'package:bangu_lite/delegates/search_delegates.dart';
+import 'package:bangu_lite/models/bangumi_details.dart';
 
 
 class BangumiDetailIntro extends StatelessWidget {
@@ -23,7 +22,6 @@ class BangumiDetailIntro extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -32,21 +30,7 @@ class BangumiDetailIntro extends StatelessWidget {
               //Pic
               Expanded(
                 flex: 2,
-                child: Column(
-                  children: [
-                    BuildDetailImages(detailImageUrl: bangumiDetails.coverUri),
-
-                    //Container(
-                    //    constraints: const BoxConstraints(
-                    //      maxWidth: 200,
-                    //      maxHeight: 100
-                    //    ),
-                    //    decoration: BoxDecoration(
-                    //      border: Border.all(width: 1)
-                    //    ),
-                    //  )
-                  ],
-                )
+                child: BuildDetailImages(detailImageUrl: bangumiDetails.coverUri)
               ),
       
               //Info
@@ -103,29 +87,10 @@ class BangumiDetailIntro extends StatelessWidget {
                         ),
                         trailing: IconButton(onPressed: (){}, icon: const Icon(Icons.star_outline)),
                       ),
+
+                      BuildInfoBox(informationList: bangumiDetails.informationList),
                   
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("总集数: ${bangumiDetails.informationList["eps"]}",style: const TextStyle(fontWeight: FontWeight.bold),),
-                            Text("更新日期: ${bangumiDetails.informationList["air_weekday"]}",style: const TextStyle(fontWeight: FontWeight.bold),)
-                          ],
-                        ),
-                      ),
 
-                      //ratingBox when.
-
-                      //Container(
-                      //  constraints: const BoxConstraints(
-                      //    maxWidth: 200,
-                      //    maxHeight: 100
-                      //  ),
-                      //  decoration: BoxDecoration(
-                      //    border: Border.all(width: 1)
-                      //  ),
-                      //)
 
                     ],
                   ),
@@ -198,42 +163,11 @@ class BangumiDetailIntro extends StatelessWidget {
                       ),
                     ],
                   ),
-                  trailing: IconButton(onPressed: (){}, icon: Icon(Icons.star_outline)),
+                  trailing: IconButton(onPressed: (){}, icon:  Icon(Icons.star_outline)),
                 ),
-            
-                Row(
-
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("总集数: ${bangumiDetails.informationList["eps"]}",style: const TextStyle(fontWeight: FontWeight.bold),),
-                          Text("更新日期: ${bangumiDetails.informationList["air_weekday"]}",style: const TextStyle(fontWeight: FontWeight.bold),)
-                        ],
-                      ),
-                    ),
 
 
-                    //Container(
-                    //    constraints: const BoxConstraints(
-                    //      maxWidth: 200,
-                    //      maxHeight: 80
-                    //    ),
-                    //    decoration: BoxDecoration(
-                    //      border: Border.all(width: 1)
-                    //    ),
-                    //  )
-
-
-                    
-
-
-                  ],
-                ),
+                BuildInfoBox(informationList: bangumiDetails.informationList),
 
                 //tags
                 BuildTags(tagsList: bangumiDetails.tagsList)
@@ -365,3 +299,28 @@ class BuildDetailImages extends StatelessWidget {
   }
 }
 
+class BuildInfoBox extends StatelessWidget{
+
+  const BuildInfoBox({
+    super.key,
+    required this.informationList
+  });
+
+  final Map<String, String> informationList;
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("总集数: ${informationList["eps"]}",style: const TextStyle(fontWeight: FontWeight.bold),),
+          Text("更新日期: ${informationList["air_weekday"]}",style: const TextStyle(fontWeight: FontWeight.bold),)
+        ],
+      ),
+    );
+  }
+  
+}

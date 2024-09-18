@@ -4,8 +4,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_bangumi/internal/convert.dart';
-import 'package:flutter_bangumi/models/providers/index_model.dart';
+import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:provider/provider.dart';
 
 

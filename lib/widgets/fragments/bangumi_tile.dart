@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bangumi/widgets/fragments/cached_image_loader.dart';
+import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 
 class BangumiTile extends ListTile {
   const BangumiTile({

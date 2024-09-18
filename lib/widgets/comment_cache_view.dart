@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bangumi/models/providers/comment_model.dart';
-import 'package:flutter_bangumi/widgets/fragments/comment_tile.dart';
+import 'package:bangu_lite/models/providers/comment_model.dart';
+import 'package:bangu_lite/widgets/fragments/comment_tile.dart';
 import 'package:provider/provider.dart';
 
 

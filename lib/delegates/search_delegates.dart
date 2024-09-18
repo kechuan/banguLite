@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bangumi/flutter_bangumi_routes.dart';
-import 'package:flutter_bangumi/internal/convert.dart';
-import 'package:flutter_bangumi/internal/search_handler.dart';
-import 'package:flutter_bangumi/models/bangumi_details.dart';
-import 'package:flutter_bangumi/widgets/fragments/bangumi_tile.dart';
+import 'package:bangu_lite/flutter_bangumi_routes.dart';
+import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/search_handler.dart';
+import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class CustomSearchDelegate extends SearchDelegate<String>{
