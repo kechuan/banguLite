@@ -1,16 +1,17 @@
 enum WeekDay{
 
-  sun("日"),
-  mon("一"),
-  tues("二"),
-  weds("三"),
-  thur("四"),
-  fri("五"),
-  sat("六");
+  mon("一",1),
+  tues("二",2),
+  weds("三",3),
+  thur("四",4),
+  fri("五",5),
+  sat("六",6),
+  sun("日",7);
 
   final String dayText;
+  final int dayIndex;
   
-  const WeekDay(this.dayText);
+  const WeekDay(this.dayText,this.dayIndex);
 }
 
 
@@ -35,6 +36,14 @@ enum Season{
   final int month;
 
   const Season(this.seasonText,this.month);
+}
+
+String? convertAmps(String? originalString){
+  if(originalString?.contains("&amp;") ?? false){
+   return originalString?.replaceAll("&amp;", "&");
+  }
+
+  return originalString;
 }
 
 

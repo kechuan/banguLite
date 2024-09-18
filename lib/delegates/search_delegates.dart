@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bangumi/flutter_bangumi_routes.dart';
+import 'package:flutter_bangumi/internal/convert.dart';
 import 'package:flutter_bangumi/internal/search_handler.dart';
 import 'package:flutter_bangumi/models/bangumi_details.dart';
 import 'package:flutter_bangumi/widgets/fragments/bangumi_tile.dart';
@@ -84,9 +85,8 @@ class CustomSearchDelegate extends SearchDelegate<String>{
                         itemCount: searchData.length,
                         itemBuilder: (_, index) {
                           
-                          //前端处理法
-                          if(searchData[index].name!.contains("&amp;")) searchData[index].name!.replaceAll("&amp;", "&");
-
+                          //前端处理法convertAmps(bangumiDetails.name);
+                          searchData[index].name = convertAmps(searchData[index].name);
 
                           return ListTile(
                             title: Text(searchData[index].name!),

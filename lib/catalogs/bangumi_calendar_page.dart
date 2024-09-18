@@ -90,39 +90,7 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
                   return CustomScrollView(
                     physics: physic, //需要传递physic进去触发easyRefresh的回调
                     slivers: [
-                      
-                      //SliverSafeArea(
-                      //  sliver: SliverAppBar(
-                          
-                      //    floating: true,
-                      //    leadingWidth: 12,
-                      //    title: const Text("MainPage"),
-                      //    //flexibleSpace: SizedBox.expand(
-                      //    //  child: DecoratedBox(
-                      //    //    decoration: BoxDecoration(
-                      //    //      border: Border(
-                      //    //        bottom: Divider.createBorderSide(context) 
-                      //    //      )
-                      //    //    )
-                      //    //  ),
-                      //    //),
-                      //    leading: const SizedBox.shrink(),
-                      //    actions: [
-                      //      Padding(
-                      //        padding: const EdgeInsets.symmetric(horizontal: 12),
-                      //        child: IconButton(
-                      //          onPressed: ()=> showSearch(
-                      //            context: context,
-                      //            delegate: CustomSearchDelegate()
-                      //          ),
-                      //          icon: const Icon(Icons.search)),
-                      //      )
-                      //    ],
-                          
-                          
-                      //  ),
-                      //),
-  
+
                       MultiSliver(
                         pushPinnedChildren: true,
                         children: [
@@ -299,7 +267,8 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
                                   child: Row(
                                     children: [
                                   
-                                      Text("星期${WeekDay.values[selectedDay%7].dayText}",style: const TextStyle(fontSize: 18)),
+                                      //Text("星期${WeekDay.values[selectedDay].dayText}",style: const TextStyle(fontSize: 18)),
+                                      Text("星期${WeekDay.values[selectedDay - 1].dayText}",style: const TextStyle(fontSize: 18)),
                                   
                                       child!
                                   
@@ -314,7 +283,8 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
                           
                                     if(calendarBangumis.isEmpty) return const SizedBox.shrink();
   
-                                    List<BangumiDetails> currentDayBangumi = calendarBangumis.values.elementAt(max(0,selectedDay - 1));
+                                    //List<BangumiDetails> currentDayBangumi = calendarBangumis.values.elementAt(max(1,selectedDay));
+                                    List<BangumiDetails> currentDayBangumi = calendarBangumis.values.elementAt(selectedDay-1);
                           
                                     return Center(
                                       child: Padding(

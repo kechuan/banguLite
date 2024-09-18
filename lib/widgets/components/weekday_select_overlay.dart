@@ -140,22 +140,22 @@ class WeekDaySelectOverlay{
                                 itemBuilder: (_,index){
                                   return DecoratedBox(
                                     decoration: BoxDecoration(
-                                      border: WeekDay.values[index%7].index == DateTime.now().weekday ? 
+                                      border: WeekDay.values[index].dayIndex == DateTime.now().weekday ? 
                                       Border.all(width: 1.5,color:  const Color.fromARGB(255, 220, 194, 156)) :
                                       null
                                     ),
                                     child: ListTile(
                                       selectedTileColor: const Color.fromARGB(255, 147, 220, 149),
-                                      selected: index == context.read<IndexModel>().selectedWeekDay,
+                                      selected: index == context.read<IndexModel>().selectedWeekDay - 1,
                                       title: Text(WeekDay.values[index].dayText),
                                       onTap: () {
 
                                         opacityListenable.value = 0.0;
 
-                                        debugPrint("weekDaySelect click:$index");
+                                        debugPrint("weekDaySelect click:${index+1}");
                                         
  
-                                        context.read<IndexModel>().updateSelectedWeekDay(index);
+                                        context.read<IndexModel>().updateSelectedWeekDay(index+1);
                                       },
                                       
                                     ),

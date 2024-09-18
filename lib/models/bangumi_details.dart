@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bangumi/internal/convert.dart';
 
 class BangumiDetails {
 
@@ -105,7 +106,7 @@ class BangumiDetails {
            currentBangumi["name_cn"] ?? "暂无名称";
 
           //前端处理法
-          if(bangumiDetails.name!.contains("&amp;")) bangumiDetails.name = bangumiDetails.name!.replaceAll("&amp;", "&");
+          bangumiDetails.name = convertAmps(bangumiDetails.name);
 
           if(currentBangumi["rating"]!=null){
             bangumiDetails.ratingList = {
