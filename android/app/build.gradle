@@ -50,7 +50,9 @@ android {
           reset()
 
           // 逗号分隔列表的形式指定 Gradle 应针对哪些 ABI 生成 APK。只与 reset() 结合使用，以指定确切的 ABI 列表。
-          include "armeabi-v7a", "arm64-v8a"
+          // include "armeabi-v7a", "arm64-v8a"
+          include "arm64-v8a","armeabi-v7a"
+          //v7a疑似不支持 Impeller 引擎?
 
           // 是否生成通用的apk，也就是包含所有ABI的apk。如果设为 true，那么除了按 ABI 生成的 APK 之外，Gradle 还会生成一个通用 APK。
           universalApk false

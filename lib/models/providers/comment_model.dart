@@ -17,16 +17,16 @@ class CommentModel extends ChangeNotifier {
   int commentLength = 0;
   int currentPageIndex = 1;
 
-  void resetProp(){
+  //void resetProp(){
 
-    commentID = 0;
-    commentLength = 0;
-    currentPageIndex = 1;
-    commentsData.clear();
+  //  commentID = 0;
+  //  commentLength = 0;
+  //  currentPageIndex = 1;
+  //  commentsData.clear();
 
-    debugPrint("comments is clear:$commentsData");
+  //  debugPrint("comments is clear:$commentsData");
     
-  }
+  //}
 
   void changePage(int newcurrentPageIndex){
     currentPageIndex = newcurrentPageIndex;
@@ -111,17 +111,17 @@ class CommentModel extends ChangeNotifier {
 
         //此时为新替换
 
-          WidgetsBinding.instance.addPostFrameCallback((timestamp){
+          //WidgetsBinding.instance.addPostFrameCallback((timestamp){
 
-            if(commentID != 0 && id != commentID){
-              debugPrint("$pageIndex: it is new ID. update");
-              commentID = id;
-              resetProp(); //ready Reload
+          //  if(commentID != 0 && id != commentID){
+          //    debugPrint("$pageIndex: it is new ID. update");
+          //    commentID = id;
+          //    resetProp(); //ready Reload
 
-              notifyListeners();
-            }
+          //    notifyListeners();
+          //  }
 
-          });
+          //});
 
         
 

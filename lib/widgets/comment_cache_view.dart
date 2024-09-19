@@ -24,56 +24,43 @@ class CachePage extends StatefulWidget {
 
 class _CachePageState extends State<CachePage> with AutomaticKeepAliveClientMixin {
 
-  int disactivePageRange = 3;
+  final int disactivePageRange = 3; //差值为3
 
   bool judgeDisactive(){
 
     final commentModel = context.read<CommentModel>();
 
-    //if((commentModel.currentPageIndex).abs() - widget.currentPageIndex+1.abs() >= 3 || (commentModel.currentPageIndex).abs() - widget.currentPageIndex+1.abs() <= -3 ){
-    //  debugPrint("rebuild: [${widget.currentPageIndex+1}] it should be disposed, data remove;"); 
-    //  commentModel.commentsData.remove(widget.currentPageIndex+1);
-    //  debugPrint("data:${commentModel.commentsData.keys}");
-    //  return false;
-
-    //  //待追加jumpPage逻辑
-    //}
-
-    //else{
-    //  return true;
-    //}
-
-    
+    //判断页面是否为disactive状态: 透过 其在Model里的 currentPageIndex 与当前Page的相差值判断
 
     if(commentModel.currentPageIndex.compareTo(widget.currentPageIndex+1) == 1){
       
       if(commentModel.currentPageIndex>=(widget.currentPageIndex+1)+disactivePageRange){
         debugPrint("rebuild: [${widget.currentPageIndex+1}] it should be disposed, data remove;"); 
-        commentModel.commentsData.remove(widget.currentPageIndex+1);
+        commentModel.commentsData.remove(widget.currentPageIndex+1); //移除 以腾出内存
         debugPrint("data:${commentModel.commentsData.keys}");
         
-        return false;
+        return true;
       }
     }
 
     else if(commentModel.currentPageIndex.compareTo(widget.currentPageIndex+1) == -1){
       if(commentModel.currentPageIndex<=(widget.currentPageIndex+1)-disactivePageRange){
         debugPrint("rebuild: [${widget.currentPageIndex+1}] it should be disposed");
-        commentModel.commentsData.remove(widget.currentPageIndex+1);
+        commentModel.commentsData.remove(widget.currentPageIndex+1); //移除 以腾出内存
 
         
         debugPrint("data:${commentModel.commentsData}");
         
-        return false;
+        return true;
       }
     }
 
-    return true;
+    return false; // == 0 的情况 即是 Comment页面与UI当前浏览匹配 为活跃
   }
 
   @override 
   void dispose(){
-    debugPrint("${widget.currentPageIndex+1} was disposed");
+    debugPrint("${widget.currentPageIndex+1} was disposed"); //并在UI方面也将其移除
     super.dispose();
   }
   
@@ -196,7 +183,7 @@ class _CachePageState extends State<CachePage> with AutomaticKeepAliveClientMixi
   }
 
   @override
-  bool get wantKeepAlive => judgeDisactive();
+  bool get wantKeepAlive => !judgeDisactive(); //Disactive => !wantKeepAlive
 
 }
 

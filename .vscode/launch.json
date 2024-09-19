@@ -7,7 +7,7 @@
 		{
 			"name": "flutter_bangumi",
 			"request": "launch",
-			"type": "dart"
+			"type": "dart",
 		},
 		{
 			"name": "flutter_bangumi (profile mode)",

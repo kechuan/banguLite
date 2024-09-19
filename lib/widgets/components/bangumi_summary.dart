@@ -117,9 +117,11 @@ class BangumiSummary extends StatelessWidget {
       child: 
         SizedBox(
           width: double.infinity,
-          child: SelectableText(
-            summary ?? "no Data",
-            style: const TextStyle(overflow: TextOverflow.ellipsis,fontSize: 16),          
+          child: Center(
+            child: SelectableText(
+              summary ?? "no Data",
+              style: const TextStyle(overflow: TextOverflow.ellipsis,fontSize: 16),          
+            ),
           ),
         )
         

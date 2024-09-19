@@ -43,20 +43,24 @@ class _CommentViewState extends State<CommentView> with SingleTickerProviderStat
 
     commentController.addListener((){
 
-      //长距离的animateToPage会加载太多东西
-      if((commentController.index - widget.commentPageController.page!.toInt()).abs() >= 5){
         widget.commentPageController.jumpToPage(
           commentController.index, 
         );
-      }
 
-      else{
-        widget.commentPageController.animateToPage(
-          commentController.index, 
-          duration: const Duration(milliseconds: 300), 
-          curve: Curves.linear
-        );
-      }
+      ////长距离的animateToPage会加载太多东西
+      //if((commentController.index - widget.commentPageController.page!.toInt()).abs() >= 5){
+      //  widget.commentPageController.jumpToPage(
+      //    commentController.index, 
+      //  );
+      //}
+
+      //else{
+      //  widget.commentPageController.animateToPage(
+      //    commentController.index, 
+      //    duration: const Duration(milliseconds: 300), 
+      //    curve: Curves.linear
+      //  );
+      //}
 
       
       
@@ -81,7 +85,7 @@ class _CommentViewState extends State<CommentView> with SingleTickerProviderStat
 
     final commentModel = context.read<CommentModel>();
 
-    //数据预装载
+    //数据预装载 最大期望3页
     unawaited(
       Future.wait(
         [
@@ -106,13 +110,16 @@ class _CommentViewState extends State<CommentView> with SingleTickerProviderStat
           child: EasyRefresh(
             child: TabBar(
               controller: commentController,
+              //onTap: (value) {
+              //  debugPrint("value:$value");
+              //},
               isScrollable: true,
               tabs: [
                 ...List.generate(
                   widget.totalPageLength,
                   (index) => SizedBox(
                     height: 60,
-                    width: MediaQuery.sizeOf(context).width/(widget.totalPageLength).clamp(1, 6),
+                    width: MediaQuery.sizeOf(context).width/(widget.totalPageLength).clamp(1, 6), //最多存在6个
                     child: Center(child: Text("${index+1}"))
                   )
                 )
@@ -129,7 +136,12 @@ class _CommentViewState extends State<CommentView> with SingleTickerProviderStat
 
           context.read<CommentModel>().changePage(newPageIndex+1);
 
+          debugPrint("redirect commentController:${newPageIndex+1}");
+          
+          //用于解决移动端允许拖拽commentPage以响应上方的tabController
+          //但是它会令 tabController本身被受限 其本质原因是animateToPage。
           if(newPageIndex != commentController.index){
+            debugPrint("redirect commentController:$newPageIndex");
             commentController.animateTo(newPageIndex);
           }
 
