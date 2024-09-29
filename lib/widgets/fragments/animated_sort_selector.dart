@@ -1,21 +1,22 @@
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:flutter/material.dart';
 
 class AnimatedSortSelector extends StatelessWidget {
   const AnimatedSortSelector({
     super.key,
     
-    required this.currentIndexPage,
-    required this.selectedIndexPage,
+    required this.currentType,
+    required this.selectedType,
 
-    
     this.labelText,
     this.labelIcon,
 
     this.onTap,
   });
 
-  final int currentIndexPage;
-  final int selectedIndexPage;
+
+  final SortType currentType;
+  final SortType selectedType;
 
   final String? labelText;
   final IconData? labelIcon;
@@ -28,9 +29,9 @@ class AnimatedSortSelector extends StatelessWidget {
       children: [
         
         AnimatedContainer(
-          color: currentIndexPage == selectedIndexPage ? const Color(0xffd1e5f4)  : null,
-          height: currentIndexPage == selectedIndexPage ? 25 : 35,
-          width: currentIndexPage == selectedIndexPage ? 25 : 35,
+          color: currentType == selectedType ? const Color(0xffd1e5f4)  : null,
+          height: currentType == selectedType ? 30 : 40,
+          width: currentType == selectedType ? 30 : 40,
           duration: const Duration(milliseconds: 150),
           curve: Curves.linear,
           child: InkResponse(
@@ -59,9 +60,9 @@ class AnimatedSortSelector extends StatelessWidget {
               child: child,
             );
           },
-          child: currentIndexPage == selectedIndexPage ? 
+          child: currentType == selectedType ? 
            Padding(
-            padding: const EdgeInsets.only(top: 3),
+            padding: const EdgeInsets.only(top: 8),
             child: Text( labelText ?? "测试",style: const TextStyle(fontSize: 12)),
           ) : 
           const SizedBox.shrink(),

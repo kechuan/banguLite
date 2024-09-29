@@ -13,20 +13,9 @@ class CommentModel extends ChangeNotifier {
   final Map<int,List<CommentDetails>> commentsData = {}; 
 
   //commentPage
-  int commentID = 0;
+  //int commentID = 0;
   int commentLength = 0;
   int currentPageIndex = 1;
-
-  //void resetProp(){
-
-  //  commentID = 0;
-  //  commentLength = 0;
-  //  currentPageIndex = 1;
-  //  commentsData.clear();
-
-  //  debugPrint("comments is clear:$commentsData");
-    
-  //}
 
   void changePage(int newcurrentPageIndex){
     currentPageIndex = newcurrentPageIndex;
@@ -104,29 +93,14 @@ class CommentModel extends ChangeNotifier {
 
       else{
 
-        if(id == commentID){
-          debugPrint("$pageIndex: data already loaded");
+        debugPrint("$pageIndex: data already loaded");
           return;
-        }
 
-        //此时为新替换
+        //if(id == commentID){
+          
+        //}
 
-          //WidgetsBinding.instance.addPostFrameCallback((timestamp){
-
-          //  if(commentID != 0 && id != commentID){
-          //    debugPrint("$pageIndex: it is new ID. update");
-          //    commentID = id;
-          //    resetProp(); //ready Reload
-
-          //    notifyListeners();
-          //  }
-
-          //});
-
-        
-
-
-        return; 
+        //return; 
       }
 
     }
@@ -173,7 +147,7 @@ class CommentModel extends ChangeNotifier {
       debugPrint("comment: ID $id: $pageIndex parse done, commentStamp: ${DateTime.now()}");
 
 
-      if(id!=0) commentID = id;
+      //if(id!=0) commentID = id;
       notifyListeners();
 
     }

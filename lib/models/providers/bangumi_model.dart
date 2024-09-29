@@ -27,7 +27,7 @@ class BangumiModel extends ChangeNotifier {
       final detailInformation = await HttpApiClient.client.get("${BangumiUrls.subject}/$bangumiID");
 
       if(detailInformation.data!=null){
-        bangumiDetails = BangumiDetails.loadDetailsData(detailInformation);
+        bangumiDetails = loadDetailsData(detailInformation);
       }
 
     }

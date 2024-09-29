@@ -11,7 +11,7 @@ import 'package:bangu_lite/widgets/index_portial.dart';
 class BangumiIndexPage extends StatelessWidget {
   BangumiIndexPage({super.key});
 
-  final ValueNotifier<int> selectedPageIndexNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<int> selectedPageIndexNotifier = ValueNotifier<int>(1);
 
   @override
   Widget build(BuildContext context) {

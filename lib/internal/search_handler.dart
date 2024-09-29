@@ -39,12 +39,16 @@ Future<List<BangumiDetails>> searchHandler(String query) async {
 Future<List<BangumiDetails>> sortSearchHandler(
   String keyword,
   {
+    
+
     List<String>? airDateRange,
     List<String>? rankRange,
     List<String>? ratingRange,
-    int? searchOffset,
 
-    List<String>? tagsList
+    int? searchOffset,
+    List<String>? tagsList,
+    
+    String? sortType,
   }
   ) async {
 
@@ -56,7 +60,7 @@ Future<List<BangumiDetails>> sortSearchHandler(
 
     data: BangumiDatas.sortData
       ..['keyword'] = keyword
-
+      ..['sort'] = sortType ?? ""
       ..['filter'] = {
         "type": [2],
         "tag": [...?tagsList],

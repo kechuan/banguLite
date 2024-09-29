@@ -62,6 +62,12 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
   }
 
   @override
+  void deactivate() {
+    debugPrint("clanderPage is deactive");
+    super.deactivate();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return EasyRefresh.builder(
       header: const MaterialHeader(),
@@ -244,7 +250,7 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
                       Selector<IndexModel, int>(
                         selector: (_, indexModel) => indexModel.selectedWeekDay,
                         shouldRebuild: (previous, next){
-                          debugPrint("receive rebuild ${previous}/${next}");
+                          debugPrint("receive rebuild $previous/$next");
                           return previous!=next;
                         },
                         builder: (_, weekday, child) {
@@ -276,6 +282,10 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
                                   ),
                                 ),
                               ),
+
+
+
+                              
                           
                               SliverToBoxAdapter(
                                 child: Builder(
@@ -283,125 +293,222 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
                           
                                     if(calendarBangumis.isEmpty) return const SizedBox.shrink();
   
-                                    //List<BangumiDetails> currentDayBangumi = calendarBangumis.values.elementAt(max(1,selectedDay));
                                     List<BangumiDetails> currentDayBangumi = calendarBangumis.values.elementAt(selectedDay-1);
-                          
+
+
+                                    int mainAxisShowCount = 3;
+                                    
+                                    if(MediaQuery.orientationOf(context) == Orientation.landscape){
+                                      mainAxisShowCount = 4;
+                                    }
+
+                                    if(MediaQuery.sizeOf(context).width < (200*3) - (200/2) ){
+                                      mainAxisShowCount = 2;
+                                    }
+
                                     return Center(
                                       child: Padding(
                                         padding: const EdgeInsets.all(18),
-                                        child: Wrap(
-                                          spacing: 24,
-                                          runSpacing: 16,
-                                          children: [
+
+                                        child: GridView.builder( 
+                                            shrinkWrap: true, 
+                                            //Vertical view was given unbounded height 
                                         
-                                            ...List.generate(
-                                              calendarBangumis.values.elementAt(max(0,selectedDay - 1)).length,
-                                              (currentBangumi){
-  
-                                                return Column(
+                                            //此原因是因为 你即不给滚动视图限制空间 它内部也无法第一时间得知它自己多高所报的错误
+                                            
+                                            //解决方案两种 
+                                            //第一种就是给整个滚动空间高度约束 也令它滚动 sizedBox height 500之类的
+                                            //第二种就是给 shrinkWrap: true, 属性 让它自己计算它自己的高度 然后它自己给自己一个约束 这个道理和 intrinsicHeight是差不多的。。
+                                        
+                                        
+                                            itemCount: calendarBangumis.values.elementAt(max(0,selectedDay - 1)).length,
+                                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: mainAxisShowCount,
+                                              mainAxisExtent: 200,
+                                              crossAxisSpacing: 16,
+                                              mainAxisSpacing: 32
+                                              
+                                            ),
+                                            itemBuilder: (_,currentBangumiIndex){
+                                             return GridTile(
+                                        
+                                              footer: ListTile(
+                                                title: Center(
+                                                  child: Text(
+                                                    currentDayBangumi[currentBangumiIndex].name ?? "loading",
+                                                    maxLines: 2,
+                                                    style: const TextStyle(fontSize: 16,color: Colors.white),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                )
+                                              ),
+                                            
+                                              child: Stack(
                                                   children: [
+                                                                                  
+                                                    Positioned.fill(
+                                                      child: CachedImageLoader(imageUrl: currentDayBangumi[currentBangumiIndex].coverUri!),
+                                                    ),
+                                                                                  
+                                                    Positioned.fill(
+                                                      child: DecoratedBox(
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(16),
+                                                          gradient: const LinearGradient(
+                                                            begin:Alignment.bottomCenter,
+                                                            end:Alignment(0, 0.2),
+                                                            
+                                                            colors:[Color.fromARGB(255, 35, 35, 35),Colors.transparent]
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ),
+                                                                                              
+                                                    
+                                                    Positioned.fill(
+                                                      child: InkResponse(
+                                                        containedInkWell: true,
+                                                        hoverColor: Colors.transparent,
+                                                        highlightColor: Colors.transparent,
+                                                        onTap: () {
+                                                          if(currentDayBangumi[currentBangumiIndex].name!=null){
+                                                
+                                                            context.read<BangumiModel>().routesIDList.add(currentDayBangumi[currentBangumiIndex].id!);
+                                                
+                                                            Navigator.pushNamed(
+                                                              context,
+                                                              Routes.subjectDetail,
+                                                              arguments: {"bangumiID":currentDayBangumi[currentBangumiIndex].id},
+                                                            );
+                                                          }
+                                                        },
+                                                      )
+                                                    )
+                                                
+                                                  ],
+                                                ),
+                                        
+                                            );
+                                          }
+                                        )
+
+
+
+
+                                        //child: Wrap(
+                                        //  spacing: 24,
+                                        //  runSpacing: 16,
+                                        //  children: [
+                                        
+                                        //    ...List.generate(
+                                        //      calendarBangumis.values.elementAt(max(0,selectedDay - 1)).length,
+                                        //      (currentBangumi){
+  
+                                        //        return Column(
+                                        //          children: [
                                                                                                   
-                                                    Container(
-                                                      constraints: BoxConstraints(
-                                                        //minWidth: 120,
-                                                        //默认期望 一个列表里显示4个 空间不足时显示 2/3个
-                                                        maxWidth: MediaQuery.sizeOf(context).width > 600 ? 
-                                                        (MediaQuery.sizeOf(context).width/5 < 120 ? 120 : MediaQuery.sizeOf(context).width/5) :
-                                                        (MediaQuery.sizeOf(context).width/3) < 100 ? 120 : MediaQuery.sizeOf(context).width/2 - 48, //48 = 2*Wrap(spacing)
+                                        //            Container(
+                                        //              constraints: BoxConstraints(
+                                        //                //minWidth: 120,
+                                        //                //默认期望 一个列表里显示4个 空间不足时显示 2/3个
+                                        //                maxWidth: MediaQuery.sizeOf(context).width > 600 ? 
+                                        //                (MediaQuery.sizeOf(context).width/5 < 120 ? 120 : MediaQuery.sizeOf(context).width/5) :
+                                        //                (MediaQuery.sizeOf(context).width/3) < 100 ? 120 : MediaQuery.sizeOf(context).width/2 - 48, //48 = 2*Wrap(spacing)
                                                                                 
-                                                        minHeight: 80,
-                                                        maxHeight: MediaQuery.sizeOf(context).height/4 < 80 ? 80 : MediaQuery.sizeOf(context).height/4,
-                                                      ),
-                                                      child: Stack(
-                                                        children: [
+                                        //                minHeight: 80,
+                                        //                maxHeight: MediaQuery.sizeOf(context).height/4 < 80 ? 80 : MediaQuery.sizeOf(context).height/4,
+                                        //              ),
+                                        //              child: Stack(
+                                        //                children: [
                                                                                         
-                                                          Positioned.fill(
-                                                            child: CachedImageLoader(imageUrl: currentDayBangumi[currentBangumi].coverUri!),
-                                                          ),
+                                        //                  Positioned.fill(
+                                        //                    child: CachedImageLoader(imageUrl: currentDayBangumi[currentBangumi].coverUri!),
+                                        //                  ),
                                                                                         
-                                                          Positioned.fill(
-                                                            child: DecoratedBox(
-                                                              decoration: BoxDecoration(
-                                                                borderRadius: BorderRadius.circular(16),
-                                                                gradient: const LinearGradient(
-                                                                  begin:Alignment.bottomCenter,
-                                                                  end:Alignment(0, 0.2),
+                                        //                  Positioned.fill(
+                                        //                    child: DecoratedBox(
+                                        //                      decoration: BoxDecoration(
+                                        //                        borderRadius: BorderRadius.circular(16),
+                                        //                        gradient: const LinearGradient(
+                                        //                          begin:Alignment.bottomCenter,
+                                        //                          end:Alignment(0, 0.2),
                                                                   
-                                                                  colors:[Color.fromARGB(255, 35, 35, 35),Colors.transparent]
-                                                                ),
-                                                              ),
-                                                            )
-                                                          ),
+                                        //                          colors:[Color.fromARGB(255, 35, 35, 35),Colors.transparent]
+                                        //                        ),
+                                        //                      ),
+                                        //                    )
+                                        //                  ),
                                                                                                     
                                                           
-                                                          Positioned.fill(
-                                                            child: InkResponse(
-                                                              containedInkWell: true,
-                                                              hoverColor: Colors.transparent,
-                                                              highlightColor: Colors.transparent,
-                                                              onTap: () {
-                                                                if(currentDayBangumi[currentBangumi].name!=null){
+                                        //                  Positioned.fill(
+                                        //                    child: InkResponse(
+                                        //                      containedInkWell: true,
+                                        //                      hoverColor: Colors.transparent,
+                                        //                      highlightColor: Colors.transparent,
+                                        //                      onTap: () {
+                                        //                        if(currentDayBangumi[currentBangumi].name!=null){
 
-                                                                  context.read<BangumiModel>().routesIDList.add(currentDayBangumi[currentBangumi].id!);
+                                        //                          context.read<BangumiModel>().routesIDList.add(currentDayBangumi[currentBangumi].id!);
 
-                                                                  Navigator.pushNamed(
-                                                                    context,
-                                                                    Routes.subjectDetail,
-                                                                    arguments: {"bangumiID":currentDayBangumi[currentBangumi].id},
-                                                                  );
-                                                                }
-                                                              },
-                                                            )
-                                                          )
+                                        //                          Navigator.pushNamed(
+                                        //                            context,
+                                        //                            Routes.subjectDetail,
+                                        //                            arguments: {"bangumiID":currentDayBangumi[currentBangumi].id},
+                                        //                          );
+                                        //                        }
+                                        //                      },
+                                        //                    )
+                                        //                  )
                                                       
-                                                        ],
-                                                      ),
-                                                    ),
+                                        //                ],
+                                        //              ),
+                                        //            ),
                                                                                                   
-                                                    Container(
-                                                      constraints: BoxConstraints(
-                                                        //minWidth: 120,
+                                        //            Container(
+                                        //              constraints: BoxConstraints(
+                                        //                //minWidth: 120,
                                                         
-                                                        //默认期望 一个列表里显示4个 空间不足时显示 2/3个
-                                                        maxWidth: MediaQuery.sizeOf(context).width > 600 ? 
-                                                        (MediaQuery.sizeOf(context).width/5 < 120 ? 120 : MediaQuery.sizeOf(context).width/5) :
-                                                        (MediaQuery.sizeOf(context).width/3) < 100 ? 120 : MediaQuery.sizeOf(context).width/2 - 48, //48 = 2*Wrap(spacing)
+                                        //                //默认期望 一个列表里显示4个 空间不足时显示 2/3个
+                                        //                maxWidth: MediaQuery.sizeOf(context).width > 600 ? 
+                                        //                (MediaQuery.sizeOf(context).width/5 < 120 ? 120 : MediaQuery.sizeOf(context).width/5) :
+                                        //                (MediaQuery.sizeOf(context).width/3) < 100 ? 120 : MediaQuery.sizeOf(context).width/2 - 48, //48 = 2*Wrap(spacing)
                                                                                 
-                                                        //minHeight: 80,
-                                                        //maxHeight: MediaQuery.sizeOf(context).height/4 < 80 ? 80 : MediaQuery.sizeOf(context).height/4,
-                                                        maxHeight: 80,
-                                                      ),
-                                                      decoration: const BoxDecoration(
-                                                          //border: Border.all(width: 2)
-                                                          //border: Border(
-                                                          //  bottom: BorderSide(width: 1,color: Colors.lightGreen),
-                                                          //  left: BorderSide(width: 1,color: Colors.lightGreen),
-                                                          //  right: BorderSide(width: 1,color: Colors.lightGreen),
-                                                          //)
-                                                        ),
+                                        //                //minHeight: 80,
+                                        //                //maxHeight: MediaQuery.sizeOf(context).height/4 < 80 ? 80 : MediaQuery.sizeOf(context).height/4,
+                                        //                maxHeight: 80,
+                                        //              ),
+                                        //              decoration: const BoxDecoration(
+                                        //                  //border: Border.all(width: 2)
+                                        //                  //border: Border(
+                                        //                  //  bottom: BorderSide(width: 1,color: Colors.lightGreen),
+                                        //                  //  left: BorderSide(width: 1,color: Colors.lightGreen),
+                                        //                  //  right: BorderSide(width: 1,color: Colors.lightGreen),
+                                        //                  //)
+                                        //                ),
                                                       
-                                                      child: ListTile(
-                                                        title: Center(
-                                                          child: Text(
-                                                            currentDayBangumi[currentBangumi].name ?? "loading",
-                                                            maxLines: 2,
-                                                            style: const TextStyle(fontSize: 16,color: Colors.black),
-                                                            overflow: TextOverflow.ellipsis,
-                                                          ),
-                                                        )
-                                                      ),
-                                                    )
+                                        //              child: ListTile(
+                                        //                title: Center(
+                                        //                  child: Text(
+                                        //                    currentDayBangumi[currentBangumi].name ?? "loading",
+                                        //                    maxLines: 2,
+                                        //                    style: const TextStyle(fontSize: 16,color: Colors.black),
+                                        //                    overflow: TextOverflow.ellipsis,
+                                        //                  ),
+                                        //                )
+                                        //              ),
+                                        //            )
                                                                                                   
                                                                                                   
-                                                  ],
-                                                );
+                                        //          ],
+                                        //        );
   
-                                              }
-                                            ) 
+                                        //      }
+                                        //    ) 
                                             
                                             
-                                          ],
-                                        ),
+                                        //  ],
+                                        //),
+                                      
                                       ),
                                     );
                                   }

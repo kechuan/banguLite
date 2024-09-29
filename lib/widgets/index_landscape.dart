@@ -1,3 +1,4 @@
+import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
 import 'package:bangu_lite/catalogs/bangumi_sort_page.dart';
@@ -27,15 +28,6 @@ class IndexLandscape extends StatelessWidget {
               
               leading: railLeading!,
 
-              //trailing: Padding(
-              //  padding: const EdgeInsets.only(top: 300),
-              //  child: IconButton(
-              //    onPressed: ()=> showSearch(
-              //      context: context,
-              //      delegate: CustomSearchDelegate()
-              //    ),
-              //    icon: const Icon(Icons.search)),
-              //),
               destinations: const [
         
                 NavigationRailDestination(
@@ -45,10 +37,17 @@ class IndexLandscape extends StatelessWidget {
                 ),
         
                 NavigationRailDestination(
-                  icon: Icon(Icons.receipt_long_rounded),
-                  selectedIcon: Icon(Icons.receipt_long),
+                  icon: Icon(Icons.filter_alt_outlined),
+                  selectedIcon: Icon(Icons.filter_alt),
                   label: Text('筛选')
                 ),
+
+                NavigationRailDestination(
+                  icon: Icon(Icons.rss_feed_outlined),
+                  selectedIcon: Icon(Icons.rss_feed),
+                  label: Text('订阅')
+                ),
+
 
               ],
               onDestinationSelected: (newIndex) => selectedPageIndexNotifier.value = newIndex,
@@ -62,6 +61,7 @@ class IndexLandscape extends StatelessWidget {
                 children: const [
                   BangumiCalendarPage(),
                   BangumiSortPage(),
+                  BangumiStarPage()
                 ],
               ),
             )

@@ -31,7 +31,7 @@ class IndexModel extends ChangeNotifier {
     await HttpApiClient.client.get(BangumiUrls.calendar).then((response){
       debugPrint("timestamp: ${DateTime.now()} calendar get");
 
-      calendarBangumis = BangumiDetails.loadCalendarData(response,animeFliter: true);
+      calendarBangumis = loadCalendarData(response,animeFliter: true);
       //dataTime = DateTime.now();
 
       debugPrint("timestamp: ${DateTime.now()} calendar done");

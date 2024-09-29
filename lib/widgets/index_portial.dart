@@ -1,3 +1,4 @@
+import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
 import 'package:bangu_lite/catalogs/bangumi_sort_page.dart';
@@ -50,6 +51,7 @@ class IndexPortial extends StatelessWidget {
             children: const [
               BangumiCalendarPage(),
               BangumiSortPage(),
+              BangumiStarPage()
             ],
           ),
           bottomNavigationBar: NavigationBar(
@@ -62,10 +64,18 @@ class IndexPortial extends StatelessWidget {
               ),
       
               NavigationDestination(
-                icon: Icon(Icons.receipt_long_rounded),
-                selectedIcon: Icon(Icons.receipt_long),
+                icon: Icon(Icons.filter_alt_outlined),
+                selectedIcon: Icon(Icons.filter_alt),
                 label: "筛选",
               ),
+
+              NavigationDestination(
+                icon: Icon(Icons.rss_feed_outlined),
+                selectedIcon: Icon(Icons.rss_feed),
+                label: "订阅",
+              )
+
+              
 
             ],
             onDestinationSelected: (newIndex)=> selectedPageIndexNotifier.value = newIndex,

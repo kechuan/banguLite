@@ -19,57 +19,12 @@ class BangumiDetails {
   
   //recommand by ep
 
-  static BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
-
-    Map<String,dynamic> bangumiData = bangumiDetailResponse.data;
-    final BangumiDetails bangumiDetails = BangumiDetails();
-
-      bangumiDetails.coverUri = bangumiData["images"]["large"];
-      bangumiDetails.summary = bangumiData["summary"];
-
-      bangumiDetails.name = bangumiData["name_cn"].isNotEmpty ? bangumiData["name_cn"] : bangumiData["name"];
-      bangumiDetails.id = bangumiData["id"];
-
-      debugPrint("rating:${bangumiData["rating"]["total"]}");
-
-      bangumiDetails.ratingList = {
-        "total": bangumiData["rating"]["total"] ?? 0,
-        "score": bangumiData["rating"]["score"] ?? 0,
-        "rank": bangumiData["rating"]["rank"], //返回的是一个数值0
-      };
-
-      bangumiDetails.informationList = {
-        "eps":bangumiData["eps"].toString(),
-        "alias":bangumiData["name_cn"].isNotEmpty ? bangumiData["name"] : "",
-      };
-
-      for(Map currentInfoMation in bangumiData["infobox"]){
-        if(currentInfoMation["key"] != "放送星期") continue;
-        if(currentInfoMation["key"] == "放送星期"){
-          bangumiDetails.informationList.addAll({
-            "air_weekday": currentInfoMation["value"].toString()
-          });
-        }
-      }
-
-      debugPrint("${bangumiData["name_cn"]} => ${bangumiData["name"]}");
-
-
-      for(int tagIndex = 0; tagIndex<min(8,bangumiData["tags"].length); tagIndex++){
-        bangumiDetails.tagsList.addAll({
-          bangumiData["tags"][tagIndex]["name"].toString():bangumiData["tags"][tagIndex]["count"]
-        });
-      }
-
-      debugPrint("bangumiDetails.informationList:${bangumiDetails.informationList}");
-
-      debugPrint("model parse done:${DateTime.now()}. reloadInformation");
-
-    return bangumiDetails;
-  }
-
   //期望获取的是每日的所有番剧 然后加个遮罩 背景cover 前置显示name/Rank
-  static Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarResponse,{bool? animeFliter}){
+  
+
+}
+
+Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarResponse,{bool? animeFliter}){
 
     Map<String,List<BangumiDetails>> weekCalender = {};
     List<BangumiDetails> popularBangumis = [];
@@ -145,7 +100,56 @@ class BangumiDetails {
     return weekCalender;
   }
 
-}
+
+  BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
+
+    Map<String,dynamic> bangumiData = bangumiDetailResponse.data;
+    final BangumiDetails bangumiDetails = BangumiDetails();
+
+      bangumiDetails.coverUri = bangumiData["images"]["large"];
+      bangumiDetails.summary = bangumiData["summary"];
+
+      bangumiDetails.name = bangumiData["name_cn"].isNotEmpty ? bangumiData["name_cn"] : bangumiData["name"];
+      bangumiDetails.id = bangumiData["id"];
+
+      debugPrint("rating:${bangumiData["rating"]["total"]}");
+
+      bangumiDetails.ratingList = {
+        "total": bangumiData["rating"]["total"] ?? 0,
+        "score": bangumiData["rating"]["score"] ?? 0,
+        "rank": bangumiData["rating"]["rank"], //返回的是一个数值0
+      };
+
+      bangumiDetails.informationList = {
+        "eps":bangumiData["eps"].toString(),
+        "alias":bangumiData["name_cn"].isNotEmpty ? bangumiData["name"] : "",
+      };
+
+      for(Map currentInfoMation in bangumiData["infobox"]){
+        if(currentInfoMation["key"] != "放送星期") continue;
+        if(currentInfoMation["key"] == "放送星期"){
+          bangumiDetails.informationList.addAll({
+            "air_weekday": currentInfoMation["value"].toString()
+          });
+        }
+      }
+
+      debugPrint("${bangumiData["name_cn"]} => ${bangumiData["name"]}");
+
+
+      for(int tagIndex = 0; tagIndex<min(8,bangumiData["tags"].length); tagIndex++){
+        bangumiDetails.tagsList.addAll({
+          bangumiData["tags"][tagIndex]["name"].toString():bangumiData["tags"][tagIndex]["count"]
+        });
+      }
+
+      debugPrint("bangumiDetails.informationList:${bangumiDetails.informationList}");
+
+      debugPrint("model parse done:${DateTime.now()}. reloadInformation");
+
+    return bangumiDetails;
+  }
+
 
 //设想 Map追加最后一列 高人气: 实际上则是把评分高于某个阈值(8.0)添加进去 直到15个为止 如不满则放宽(7.5)
 

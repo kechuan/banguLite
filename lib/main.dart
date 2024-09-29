@@ -1,5 +1,6 @@
 
 
+import 'package:bangu_lite/internal/hive.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/routes/flutter_bangumi_route.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
 
   if (kReleaseMode) {
       debugPrint = (String? message, {int? wrapWidth}) {};
@@ -18,6 +19,7 @@ void main() {
 
   //Dio初始化
   HttpApiClient.init();
+  await MyHive.init();
 
   runApp(const MainApp());
 

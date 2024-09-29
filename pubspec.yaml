@@ -15,11 +15,14 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_svg: ^2.0.10+1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
   infinite_carousel: ^1.1.1
   path_provider: ^2.1.4
   provider: ^6.1.2
   skeletonizer: ^1.4.2
   sliver_tools: ^0.2.12
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:

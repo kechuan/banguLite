@@ -170,6 +170,8 @@ class WeekDaySelectOverlay{
                   ),
                   ),
               ),
+            
+              
             ]
           ),
         );
@@ -180,3 +182,35 @@ class WeekDaySelectOverlay{
 
 }
 
+class MyCustomPainter extends CustomPainter{
+  @override
+  void paint(Canvas canvas, Size size) {
+
+    //canvas.drawCircle(centerPoint, radius, paint)
+    //canvas.drawPoints(pointMode, points, paint)
+
+    Paint orangePainter =  Paint()
+      ..color = Colors.orange
+      ..strokeWidth = 12
+      ..style = PaintingStyle.fill
+    ;
+
+    canvas.drawLine(
+      Offset(0,size.height/2),
+      Offset(size.width,size.height/2),
+      orangePainter
+    );
+
+
+
+
+    //canvas.drawOval(Rect.fromCenter(center: size.center(Offset.zero), width: 12, height: 12), orangePainter);
+
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+
+}

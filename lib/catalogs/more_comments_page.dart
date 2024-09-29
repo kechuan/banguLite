@@ -1,8 +1,7 @@
 
+import 'package:bangu_lite/widgets/warp_page_dialog.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:bangu_lite/internal/max_number_input_formatter.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 
 import 'package:bangu_lite/models/providers/comment_model.dart';
@@ -41,120 +40,28 @@ class MoreCommentsPage extends StatelessWidget  {
                     context: context,
                     builder: (_){
 
+                      final commentModel = context.read<CommentModel>();
+
                       final FixedExtentScrollController pageSelectorController = 
-                      FixedExtentScrollController(initialItem: context.read<CommentModel>().currentPageIndex - 1);
+                      FixedExtentScrollController(initialItem: commentModel.currentPageIndex - 1);
 
                       final TextEditingController jumpPageEditingController = TextEditingController();
 
-                      final commentTotalPage = convertTotalToPage(context.read<CommentModel>().commentLength, 10);
+                      return WarpPageDialog(
+                        pageSelectorController: pageSelectorController,
+                        jumpPageEditingController: jumpPageEditingController,
+                        commentTotalPage: convertTotalToPage(commentModel.commentLength, 10),
+                        onConfirmPressed: () {
+                          Navigator.of(context).pop();
 
-                      return Dialog(
+                          final int newPageIndex = (int.tryParse(jumpPageEditingController.text) ?? pageSelectorController.selectedItem);
 
-                        backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.9),
-                        
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxHeight: MediaQuery.sizeOf(context).height/3 > 200 ? MediaQuery.sizeOf(context).height/3 : 200,
-                            maxWidth: MediaQuery.sizeOf(context).width/3 > 300 ? MediaQuery.sizeOf(context).width/3 : 300,
-                            minHeight: 200,
-                            minWidth: 300
-                          ),
-                          
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                            
-                                const Text("跳转到页面..",style: TextStyle(fontSize: 24)),
-                            
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 6),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-
-                                      SizedBox(
-                                        height: 120,
-                                        width: 150,
-                                        child: ListWheelScrollView.useDelegate(
-                                          
-                                          itemExtent: 50,
-                                          controller: pageSelectorController,
-                                          physics: const FixedExtentScrollPhysics(),
-                                          childDelegate: ListWheelChildBuilderDelegate(
-                                            childCount: commentTotalPage,
-                                            builder: (_,index){
-                                              return Column(
-                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                children: [
-                                                  Text("${index+1}"),
-                                                  const Divider(height: 1)
-                                                ],
-                                              );
-                                            }
-                                          ),
-                                      
-                                        ),
-                                      ),
-                                    
-                                      DecoratedBox(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(width: 0.5)
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 60,
-                                              child: TextField(
-                                                controller: jumpPageEditingController,
-                                                textAlign: TextAlign.center,
-                                                inputFormatters: [
-                                                  FilteringTextInputFormatter.deny(RegExp(r'^0$'),replacementString: '1'),
-                                                  FilteringTextInputFormatter.digitsOnly,
-                                                  MaxValueFormatter(commentTotalPage),
-                                                  
-                                                ],
-                                              ),
-                                            ),
-                                            Text("/$commentTotalPage 页")
-                                          ],
-                                        ),
-                                      )
-
-                                    ],
-                                  ),
-                                ),
-                          
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        TextButton(
-                                          onPressed: ()=> Navigator.of(context).pop(),
-                                          child: const Text("取消",style: TextStyle(fontSize: 16),)
-                                        ),
-                                        TextButton(
-                                          onPressed: (){
-                                            Navigator.of(context).pop();
-
-                                            commentPageController.jumpToPage( (int.tryParse(jumpPageEditingController.text) ?? pageSelectorController.selectedItem) - 1 );
-                                          },
-                                          child: const Text("确定",style: TextStyle(fontSize: 16),)
-                                        )
-                                      ]
-                                    )
-                                  ],
-                                )
-                              
-                              
-                              ],
-                            ),
-                          ),
-                        ),
+                          commentModel.changePage(newPageIndex);
+                          commentPageController.jumpToPage(newPageIndex);
+                        },
                       );
+
+                      
                     }
                   );
                 },
@@ -165,7 +72,7 @@ class MoreCommentsPage extends StatelessWidget  {
           ),
           
           body: FutureBuilder(
-            future: context.read<CommentModel>().getCommentLength(subjectID),
+            future: context.read<CommentModel>().getCommentLength(subjectID), //代价比较低
             builder: (_,snapshot) {
               switch(snapshot.connectionState){
           

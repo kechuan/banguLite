@@ -1,10 +1,11 @@
 import 'dart:math';
 
+import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/hive.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/delegates/search_delegates.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
-
 
 class BangumiDetailIntro extends StatelessWidget {
   const BangumiDetailIntro({
@@ -14,178 +15,222 @@ class BangumiDetailIntro extends StatelessWidget {
 
   final BangumiDetails bangumiDetails;
 
+  
+
   @override
   Widget build(BuildContext context) {
 
-    if(MediaQuery.orientationOf(context) == Orientation.portrait){
+    final ValueNotifier<bool> isStaredNotifier = ValueNotifier(MyHive.starBangumisDataBase.containsKey(bangumiDetails.id));
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      if(MediaQuery.orientationOf(context) == Orientation.portrait){
+        return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
 
-              //Pic
-              Expanded(
-                flex: 2,
-                child: BuildDetailImages(detailImageUrl: bangumiDetails.coverUri)
-              ),
-      
-              //Info
-              Expanded(
-                flex: 3,
-                child: Padding(
-                  padding: const EdgeInsets.only(left:12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                  
-                    //detail——rating
-                    children: [
+                children: [
+
+                  //Pic
+                  Expanded(
+                    flex: 2,
+                    child: BuildDetailImages(
+                      detailImageUrl: bangumiDetails.coverUri,
+                      imageID: bangumiDetails.id
+                    )
+                  ),
           
-                      ListTile(
-                        title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                                
-                            Text(bangumiDetails.informationList["alias"] ?? ""),
-                                
-                            Wrap(
-                              spacing: 12,
-                              
-                              alignment: WrapAlignment.spaceBetween,
+                  //Info
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left:12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                      
+                        //detail——rating
+                        children: [
+              
+                          ListTile(
+                            title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                            
-                                Text(bangumiDetails.ratingList["rank"]!=0 ? 'Rank #${bangumiDetails.ratingList["rank"]}' : ""),
-                      
+                                    
+                                Text(bangumiDetails.informationList["alias"] ?? ""),
+                                    
                                 Wrap(
-                                  alignment:WrapAlignment.spaceBetween,
+                                  spacing: 12,
+                                  
+                                  alignment: WrapAlignment.spaceBetween,
                                   children: [
-                      
-                                    Text(
-                                      "Score ${bangumiDetails.ratingList["score"]?.toDouble()}",
-                                      style: TextStyle(
-                                        color: Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*((bangumiDetails.ratingList["score"] ?? 0)/10).toInt()), 0, 1),
-                                        fontWeight: FontWeight.bold
-                                      )
+                                                
+                                    Text(bangumiDetails.ratingList["rank"]!=0 ? 'Rank #${bangumiDetails.ratingList["rank"]}' : ""),
+                          
+                                    Wrap(
+                                      alignment:WrapAlignment.spaceBetween,
+                                      children: [
+                          
+                                        Text(
+                                          "Score ${bangumiDetails.ratingList["score"]?.toDouble()}",
+                                          style: TextStyle(
+                                            color: Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*((bangumiDetails.ratingList["score"] ?? 0)/10).toInt()), 0, 1),
+                                            fontWeight: FontWeight.bold
+                                          )
+                                        ),
+                          
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                                          child: Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey),),
+                                        ),
+                          
+                          
+                                      ],
                                     ),
-                      
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                                      child: Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey),),
-                                    ),
-                      
-                      
+                            
                                   ],
                                 ),
-                        
                               ],
                             ),
-                          ],
-                        ),
-                        trailing: IconButton(onPressed: (){}, icon: const Icon(Icons.star_outline)),
-                      ),
+                            trailing: IconButton(
+                              onPressed: (){
 
-                      BuildInfoBox(informationList: bangumiDetails.informationList),
-                  
+                                //manage Function
 
+                                if(isStaredNotifier.value){
+                                  MyHive.starBangumisDataBase.delete(bangumiDetails.id);
+                                  isStaredNotifier.value = false;
+                                }
 
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+                                else{
+                                  MyHive.starBangumisDataBase.put(
+                                    bangumiDetails.id!, {
+                                      "name": bangumiDetails.name,
+                                      "coverUri": bangumiDetails.coverUri,
+                                      "eps": bangumiDetails.informationList["eps"],
+                                      "score": bangumiDetails.ratingList["score"],
+                                    }
+                                  );
 
-          ConstrainedBox(
-            constraints: const BoxConstraints.tightFor(width: double.infinity),
-            child: BuildTags(tagsList: bangumiDetails.tagsList)
-          ),
-        ],
-      );
-    }
+                                  isStaredNotifier.value = true;
+                                }
 
-    //landsacape
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-
-        Expanded(child: BuildDetailImages(detailImageUrl: bangumiDetails.coverUri)),
-        
-        //Info
-        Expanded(
-          flex: 3,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-            
-              //detail——rating
-              children: [
-    
-                ListTile(
-                  title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-    
-                      Text(bangumiDetails.informationList["alias"] ?? ""),
-    
-                      Wrap(
-                        //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        alignment: WrapAlignment.spaceBetween,
-                        children: [
-                                      
-                          Text(bangumiDetails.ratingList["rank"]!=0 ? 'Rank #${bangumiDetails.ratingList["rank"]}' : ""),
+                                bus.emit("star");
+                                
+                              
+                            }, icon: ValueListenableBuilder(
+                              valueListenable: isStaredNotifier,
+                              builder: (_,isStared,child){
+                                return isStared ? const Icon(Icons.star) : const Icon(Icons.star_outline);
+                              }
+                            )
                             
-                          Row(
-                            children: [
-                              Text(
-                                "Score ${bangumiDetails.ratingList["score"]?.toDouble()}",
-                                style: TextStyle(
-                                  color: Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*((bangumiDetails.ratingList["score"] ?? 0)/10).toInt()), 0, 1),
-                                  fontWeight: FontWeight.bold
-                                )
-                              ),
-                                      
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 6),
-                                child: Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey),),
-                              ),
-                                      
-                            ],
+                           ),
                           ),
-                                      
+
+                          BuildInfoBox(informationList: bangumiDetails.informationList),
+                      
+
+
                         ],
                       ),
-                    ],
+                    ),
                   ),
-                  trailing: IconButton(onPressed: (){}, icon:  Icon(Icons.star_outline)),
-                ),
+                ],
+              ),
 
+              ConstrainedBox(
+                constraints: const BoxConstraints.tightFor(width: double.infinity),
+                child: BuildTags(tagsList: bangumiDetails.tagsList)
+              ),
+            ],
+          );
+      }
+        //landscape
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
 
-                BuildInfoBox(informationList: bangumiDetails.informationList),
-
-                //tags
-                BuildTags(tagsList: bangumiDetails.tagsList)
+            Expanded(child: BuildDetailImages(detailImageUrl: bangumiDetails.coverUri,imageID: bangumiDetails.id)),
+            
+            //Info
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                 
+                  //detail——rating
+                  children: [
+        
+                    ListTile(
+                      title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+        
+                          Text(bangumiDetails.informationList["alias"] ?? ""),
+        
+                          Wrap(
+                            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            alignment: WrapAlignment.spaceBetween,
+                            children: [
+                                          
+                              Text(bangumiDetails.ratingList["rank"]!=0 ? 'Rank #${bangumiDetails.ratingList["rank"]}' : ""),
+                                
+                              Row(
+                                children: [
+                                  Text(
+                                    "Score ${bangumiDetails.ratingList["score"]?.toDouble()}",
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*((bangumiDetails.ratingList["score"] ?? 0)/10).toInt()), 0, 1),
+                                      fontWeight: FontWeight.bold
+                                    )
+                                  ),
+                                          
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                                    child: Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey),),
+                                  ),
+                                          
+                                ],
+                              ),
+                                          
+                            ],
+                          ),
+                        ],
+                      ),
+                      trailing: IconButton(onPressed: (){}, icon:  Icon(Icons.star_outline)),
+                    ),
 
-              ],
+
+                    BuildInfoBox(informationList: bangumiDetails.informationList),
+
+                    //tags
+                    BuildTags(tagsList: bangumiDetails.tagsList)
+                    
+
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
-    
-        ],
-      );
+        
+            ],
+        );
 
+
+
+    //return OrientationBuilder(
+    //  builder: (_,orientation){
+
+
+    //  }
+    //);
+
+    
   }
 }
-
-
-
 
 class BuildTags extends StatelessWidget {
   const BuildTags({
@@ -241,10 +286,12 @@ class BuildTags extends StatelessWidget {
 class BuildDetailImages extends StatelessWidget {
   const BuildDetailImages({
     super.key,
-    this.detailImageUrl
+    this.detailImageUrl,
+    this.imageID
   });
 
   final String? detailImageUrl;
+  final int? imageID;
 
   @override
   Widget build(BuildContext context) {
@@ -255,9 +302,10 @@ class BuildDetailImages extends StatelessWidget {
         imageUrl: detailImageUrl!,
         imageBuilder: (_,imageProvider){
           
-          //ColorScheme.fromImageProvider(provider: imageProvider).then((coverScheme){ 感觉不是很有用
-          //  debugPrint("parse Picture:${coverScheme.primary}");
-          //});
+          ColorScheme.fromImageProvider(provider: imageProvider).then((coverScheme){
+            debugPrint("parse Picture:${coverScheme.primary}");
+            bus.emit("imageColor",{imageID!:coverScheme.primary});
+          });
       
           return Container(
             constraints:  BoxConstraints(

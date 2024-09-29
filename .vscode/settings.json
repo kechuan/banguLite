@@ -3,5 +3,6 @@
 		"**/backup": true,
 		"**/backups": true
 	},
-	"java.configuration.updateBuildConfiguration": "interactive"
+	"java.configuration.updateBuildConfiguration": "interactive",
+	"commentTranslate.hover.enabled": true
 }

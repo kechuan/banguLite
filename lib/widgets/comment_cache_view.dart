@@ -202,12 +202,12 @@ class WaitingBuilder extends StatelessWidget {
     final commentModel = context.read<CommentModel>();
 
     return FutureBuilder(
+      //通知等待时间——10s
       future: Future.delayed(const Duration(seconds: 10)).then((value){
         if(commentModel.commentsData[currentIndex]!.isEmpty){
           commentModel.commentsData.remove(currentIndex);
         }
-      }), //15s(debug模式)后还停留在该loading页面 则提示应需要重新加载
-      //future: context.read<CommentModel>().loadComments(widget.id,page: widget.currentPageIndex+1),
+      }),
       builder: (_,snapshot) {
         switch(snapshot.connectionState){
     
@@ -218,10 +218,16 @@ class WaitingBuilder extends StatelessWidget {
               highlightColor: Colors.transparent,
               hoverColor: Colors.transparent,
               onTap: () {
-                debugPrint("$currentIndex: rePull data");
-                context.read<CommentModel>().commentsData.remove(currentIndex);
 
-                context.read<CommentModel>().loadComments(
+                debugPrint("$currentIndex: rePull data");
+
+                final commentModel = context.read<CommentModel>();
+
+                //reset Page Status.
+                
+                commentModel.commentsData.remove(currentIndex);
+                commentModel.changePage(currentIndex);
+                commentModel.loadComments(
                   subjectID,
                   pageIndex: currentIndex,
                 );

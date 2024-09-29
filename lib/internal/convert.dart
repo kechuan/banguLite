@@ -16,9 +16,9 @@ enum WeekDay{
 
 
 enum SortType{
-  date("日期"),
-  rank("排名"),
-  grid("窗格");
+  rank("rank"),
+  heat("heat"),
+  score("score");
 
   final String sortType;
 

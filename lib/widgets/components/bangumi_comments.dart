@@ -136,7 +136,7 @@ class _CommentViewState extends State<CommentView> with SingleTickerProviderStat
 
           context.read<CommentModel>().changePage(newPageIndex+1);
 
-          debugPrint("redirect commentController:${newPageIndex+1}");
+          debugPrint("PageView Changed:${newPageIndex+1}");
           
           //用于解决移动端允许拖拽commentPage以响应上方的tabController
           //但是它会令 tabController本身被受限 其本质原因是animateToPage。
