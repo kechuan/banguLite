@@ -14,6 +14,13 @@ enum WeekDay{
   const WeekDay(this.dayText,this.dayIndex);
 }
 
+enum ViewType{
+  listView(),
+  gridView();
+
+  const ViewType();
+
+}
 
 enum SortType{
   rank("rank"),
@@ -38,14 +45,13 @@ enum Season{
   const Season(this.seasonText,this.month);
 }
 
-String? convertAmps(String? originalString){
+String? convertAmpsSymbol(String? originalString){
   if(originalString?.contains("&amp;") ?? false){
    return originalString?.replaceAll("&amp;", "&");
   }
 
   return originalString;
 }
-
 
 String convertDigitNumString(int originalnumber, {int? numberBits}){
 
@@ -69,4 +75,10 @@ String convertDigitNumString(int originalnumber, {int? numberBits}){
   }
 
   return originalnumber.toString();
+}
+
+int convertTotalCommentPage(int totalComments, int pageRange){
+return  totalComments % pageRange == 0 ?
+        totalComments~/pageRange :
+        totalComments~/pageRange + 1;
 }

@@ -2,6 +2,7 @@
 
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/widgets/fragments/animated_wave_footer.dart';
+import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:bangu_lite/models/bangumi_details.dart';
 import 'package:bangu_lite/widgets/components/search_fliter.dart';
 import 'package:bangu_lite/widgets/fragments/animated_sort_selector.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
 
 class BangumiSortPage extends StatefulWidget {
@@ -24,12 +26,15 @@ class BangumiSortPage extends StatefulWidget {
 
 class _BangumiSortPageState extends State<BangumiSortPage> {
 
-  final GlobalKey<SliverAnimatedListState> messageStreamKey = GlobalKey();
+  final GlobalKey<SliverAnimatedListState> messageListStreamKey = GlobalKey<SliverAnimatedListState>();
+  final GlobalKey<AnimatedGridState> messageGridStreamKey = GlobalKey<AnimatedGridState>();
+
   final ScrollController sortScrollController = ScrollController();
 
-  final ValueNotifier<String> appBarTitle = ValueNotifier<String>("");
+  final ValueNotifier<ViewType> viewTypeNotifier = ValueNotifier<ViewType>(ViewType.listView);
   final ValueNotifier<SortType> browserSortTypeNotifier = ValueNotifier<SortType>(SortType.rank);
 
+  final ValueNotifier<String> appBarTitleNotifier = ValueNotifier<String>("");
   final ValueNotifier<bool> fliterShowNotifier = ValueNotifier<bool>(false);
   final ValueNotifier<int> loadCountNotifier = ValueNotifier<int>(0);
 
@@ -41,14 +46,10 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
 
     bus.on('sortSubmit',(arg){
       assert(arg is Map<String,dynamic>);
-
       debugPrint("recived sortSubmit: $arg");
-
       loadNewData(arg);
-
     });
     super.initState();
-
 
   }
 
@@ -57,7 +58,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
 
     return EasyRefresh.builder(
       scrollController: sortScrollController,
-      header: const MaterialHeader(),
+      //header: const MaterialHeader(),
       footer: const MaterialFooter(),
 
       onLoad: () {
@@ -73,7 +74,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
               
               final double scrollOffset = notification.metrics.pixels;
               //debugPrint("NotificationListener:$scrollOffset");
-              scrollOffset >= 95 ? appBarTitle.value = "筛选动画" : appBarTitle.value = "";
+              scrollOffset >= 95 ? appBarTitleNotifier.value = "筛选动画" : appBarTitleNotifier.value = "";
               return true;
             },
             
@@ -120,6 +121,35 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                                       ),
                                     ),
                                   ),
+
+
+                                  Container(
+                                    height: 35,
+                                    decoration: const BoxDecoration(
+                                      border: Border(right: BorderSide(width: 1.5))
+                                    ),
+                                    child: InkResponse(
+                                      containedInkWell: true,
+                                      highlightColor: Colors.transparent,
+                                      radius: 12,
+                                      onTap: (){
+                                        viewTypeNotifier.value ==  ViewType.gridView ? 
+                                        viewTypeNotifier.value = ViewType.listView :
+                                        viewTypeNotifier.value = ViewType.gridView ;
+                                      },
+                                      child: ValueListenableBuilder(
+                                        valueListenable: viewTypeNotifier,
+                                        builder: (_,viewType,child) {
+                                          return  Padding(
+                                            padding: const EdgeInsets.only(right: 16),
+                                            child:  viewType == ViewType.gridView ? 
+                                                    const Icon(Icons.grid_view,size: 35) : 
+                                                    const Icon(Icons.format_list_bulleted,size: 35),
+                                          );
+                                        }
+                                      ),
+                                    ),
+                                  ),
                                                   
                                   AnimatedSortSelector(
                                     currentType: browserSortTypeNotifier.value,
@@ -159,7 +189,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                                       loadNewData(currentSearchConfig);
                                       
                                     },
-                                    labelIcon: Icons.grid_view,
+                                    labelIcon: Icons.arrow_outward_sharp,
                                     labelText: "分数",
                                   )
                                                   
@@ -199,63 +229,92 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                     );
                   }
                 ),
-          
+
+
                 ValueListenableBuilder(
-                  valueListenable: loadCountNotifier,
-                  builder: (_,loadCount,sliverList) {
-                    //debugPrint("loadCount:$loadCount");
+                  valueListenable: viewTypeNotifier,
+                  builder: (_,viewType,child){
 
-                    return SliverOffstage(
-                      offstage: loadCount == 0,
-                      sliver: sliverList!
-                    );
-                  },
-
-                  child: SliverAnimatedList(
-                    key: messageStreamKey,
-                    initialItemCount: messageList.isEmpty ? 1 : messageList.length,
                     
-                    itemBuilder: (_, index, animation) {
+                    
+                    return ValueListenableBuilder(
+                      valueListenable: loadCountNotifier,
+                      builder: (_,loadCount,child) {
+                        return SliverStack(
+                          children: [
+                        
+                            SliverOffstage(
+                              offstage: viewType != ViewType.listView || loadCount == 0,
+                              sliver: SliverAnimatedList(
+                                key: messageListStreamKey,
+                                initialItemCount: messageList.isEmpty ? 1 : messageList.length,
+                                
+                                itemBuilder: (_, index, animation) {
+                        
+                                  debugPrint("index:$index");
+                              
+                                  if(messageList.isEmpty){
+                                    return const Center(child: Text("没有搜索到内容.."));
+                                  }
+                                      
+                                  if(index>messageList.length - 1){
+                                    debugPrint("prevent strangeOverFlow rebuild");
+                                    return const SizedBox.shrink();
+                                  }
+                        
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: BangumiListTile(
+                                      bangumiTitle: messageList[index].name,
+                                      imageUrl: messageList[index].coverUri,
+                                      imageSize: const Size(100,150),
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                            Routes.subjectDetail,
+                                          arguments: {"bangumiID":messageList[index].id}
+                                        );
+                                      },
+                              
+                              
+                                    )
+                              
+                                  
+                                  );
+                                  
+                                  },
+                              ),
+                            ),
 
-                      debugPrint("index:$index");
-                  
-                      if(messageList.isEmpty){
-                        return const Center(child: Text("没有搜索到内容.."));
+
+
+                        
+                            SliverOffstage(
+                              offstage: viewType != ViewType.gridView || loadCount == 0,
+                              sliver: SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: NotificationListener<ScrollUpdateNotification>(
+                                    onNotification: (notification) => true,
+                                    child: BangutileGridView(
+                                      keyDeliver: messageGridStreamKey,
+                                      bangumiLists: messageList,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                        
+                          ],
+                        );
                       }
-      
-                      if(index>messageList.length - 1){
-                        debugPrint("prevent strangeOverFlow rebuild");
-                        return const SizedBox.shrink();
-                      }
-      
-                      
-                  
-                      return FadeTransition(
-                        opacity: animation,
-                        child: BangumiTile(
-                          bangumiTitle: messageList[index].name,
-                          imageUrl: messageList[index].coverUri,
-                          imageSize: const Size(100,150),
-                          onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                                Routes.subjectDetail,
-                              arguments: {"bangumiID":messageList[index].id}
-                            );
-                          },
-                  
-                  
-                        )
-                  
-                      
-                      );
-                      
-                      },
-                  ),
+                    );
+
+                  }
                 ),
+      
           
                 const SliverPadding(padding: EdgeInsets.only(bottom: 60)),
-
                 
                 SliverToBoxAdapter(
                   child: ValueListenableBuilder(
@@ -296,10 +355,10 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
           ),
           floatingActionButton: 
             ValueListenableBuilder(
-              valueListenable: appBarTitle,
-              builder: (_,appBarTitleContent,child) {
+              valueListenable: appBarTitleNotifier,
+              builder: (_,appBarTitleNotifierContent,child) {
                 return AnimatedOpacity(
-                  opacity: appBarTitleContent.isEmpty ? 0 : 1,
+                  opacity: appBarTitleNotifierContent.isEmpty ? 0 : 1,
                   duration: const Duration(milliseconds: 150),
                   child: child!
                 );
@@ -310,7 +369,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                     onPressed: (){
                       messageList.length > 30 ?
                       sortScrollController.jumpTo(0) :
-                      sortScrollController.animateTo(0,duration: const Duration(milliseconds: 300), curve: Curves.bounceIn);
+                      sortScrollController.animateTo(0,duration: const Duration(milliseconds: 300), curve: Curves.linear);
                     },
                     child: const Icon(Icons.arrow_upward)
                   ),
@@ -339,7 +398,6 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
 
     int recordLength = messageList.length;
 
-    
 
     sortSearchHandler(
       keyword,
@@ -359,11 +417,18 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
 
       //debugPrint("bangumiSort: ${messageList}");
 
-      messageStreamKey.currentState?.insertAllItems(
+      messageListStreamKey.currentState?.insertAllItems(
         recordLength == 0 ? 0 : recordLength - 1 ,
         messageList.length - recordLength,
         duration: const Duration(milliseconds: 500)
       );
+
+      messageGridStreamKey.currentState?.insertAllItems(
+        recordLength == 0 ? 0 : recordLength - 1 ,
+        messageList.length - recordLength,
+        duration: const Duration(milliseconds: 500)
+      );
+
 
       loadCountNotifier.value+=1;
 
@@ -371,7 +436,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
         if(bangumiDetails.isEmpty) return;
 
         sortScrollController.animateTo(
-          sortScrollController.position.pixels + (166*3), // BangumiTile的iconSize是150 加上padding就是 166
+          sortScrollController.position.pixels + (166*3), // BangumiListTile的iconSize是150 加上padding就是 166
           //sortScrollController.position.maxScrollExtent, //直接滚到底部
           duration: const Duration(milliseconds: 150),  
           //滚动实际效果和动画时间相关。越长实际滚的offset越低 这实在太离谱了
@@ -386,7 +451,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
     loadCountNotifier.value=0;
     messageList.clear();
 
-    messageStreamKey.currentState?.removeAllItems(
+    messageListStreamKey.currentState?.removeAllItems(
       (_,animation){
         return FadeTransition(
           opacity: animation.drive(Tween<double>(begin: 1, end:0)),

@@ -116,7 +116,7 @@ class _BangumiStarPageState extends State<BangumiStarPage> {
               );
             }
         
-            return BangumiTile(
+            return BangumiListTile(
               imageSize: const Size(100, 150),
               bangumiTitle: hiveStarMap.values.elementAt(index)?["name"],
               imageUrl: hiveStarMap.values.elementAt(index)?["coverUri"],

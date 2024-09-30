@@ -1,9 +1,11 @@
 
+import 'dart:async';
+
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/delegates/wrapSliverPersistentHeaderDelegate.dart';
 import 'package:bangu_lite/widgets/index_landscape.dart';
 import 'package:bangu_lite/widgets/index_portial.dart';
+import 'package:flutter/services.dart';
 
 
 @FFRoute(name: '/index')
@@ -11,68 +13,49 @@ import 'package:bangu_lite/widgets/index_portial.dart';
 class BangumiIndexPage extends StatelessWidget {
   BangumiIndexPage({super.key});
 
-  final ValueNotifier<int> selectedPageIndexNotifier = ValueNotifier<int>(1);
+  final ValueNotifier<int> selectedPageIndexNotifier = ValueNotifier<int>(0);
+
+  
 
   @override
   Widget build(BuildContext context) {
-    return OrientationBuilder(
-      builder: (_,orientation){
-        return orientation == Orientation.portrait ?
-        IndexPortial(selectedPageIndexNotifier: selectedPageIndexNotifier) :
-        IndexLandscape(selectedPageIndexNotifier: selectedPageIndexNotifier);
-      }
-    );
-  }
-}
+    bool readyQuitFlag = false;
 
-class DatePersistentHeader extends StatelessWidget{
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (popStatus, result) async {
+        debugPrint("popStaus:$popStatus, result:$result");
 
-  const DatePersistentHeader({
-    super.key,
-    this.title,
-    this.rowChild = const SizedBox.shrink(),
-    this.focusNode
-  });
+        if(!readyQuitFlag){
 
-  final String? title;
+          readyQuitFlag = true;
 
-  final Widget rowChild;
+          Future.delayed(const Duration(seconds: 3)).then((value){
+            ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+            readyQuitFlag = false;
+          });
 
-  final FocusNode? focusNode;
-  
-  @override
-  Widget build(BuildContext context){
-
-    return SliverPersistentHeader(
-      floating:true,
-      delegate: WrapSliverPersistentHeaderDelegate(
-        minExtent: 30,
-        maxExtent: 30,
-        onBuild: (_,shrinkOffset,overlapsContent){
-
-          if(overlapsContent) {
-            if(focusNode!=null){
-              debugPrint("$shrinkOffset");
-              if(shrinkOffset==30.0){
-                focusNode!.unfocus();
-              }
-            }
-            
-            return const SizedBox.shrink();
-          }
-
-          return Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Text(title??"",style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              ),
-              rowChild
-            ],
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor:Color.fromARGB(255, 140, 205, 244),
+              content: Text("再返回一次以退出"),
+            )
           );
+          
         }
-      )
-    );
 
+        else{
+          await SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+        }
+
+      },
+      child: OrientationBuilder(
+        builder: (_,orientation){
+          return orientation == Orientation.portrait ?
+          IndexPortial(selectedPageIndexNotifier: selectedPageIndexNotifier) :
+          IndexLandscape(selectedPageIndexNotifier: selectedPageIndexNotifier);
+        }
+      ),
+    );
   }
 }

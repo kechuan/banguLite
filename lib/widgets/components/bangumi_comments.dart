@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
-import 'package:bangu_lite/widgets/comment_cache_view.dart';
+import 'package:bangu_lite/widgets/views/comment_cache_view.dart';
 import 'package:provider/provider.dart';
 
 class CommentView extends StatefulWidget {

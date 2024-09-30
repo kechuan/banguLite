@@ -1,4 +1,5 @@
 
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/flutter_bangumi_routes.dart';
 
@@ -206,11 +207,13 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                         
                             isOldCommentSort.value = !isOldCommentSort.value;
 
-                            if(commentModel.commentsData.keys.contains(
-                              providerContext.read<CommentModel>().commentLength %10 == 0 ?
-                              providerContext.read<CommentModel>().commentLength ~/10:
-                              providerContext.read<CommentModel>().commentLength ~/10 + 1
-                            )){
+                            if(
+                              commentModel.commentsData.keys.contains(
+                                convertTotalCommentPage(
+                                  providerContext.read<CommentModel>().commentLength, 
+                                  10
+                              ))
+                            ){
                               providerContext.read<CommentModel>().notifyListeners();
                             }
         

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/widgets/fragments/comment_tile.dart';
@@ -24,7 +25,7 @@ class CachePage extends StatefulWidget {
 
 class _CachePageState extends State<CachePage> with AutomaticKeepAliveClientMixin {
 
-  final int disactivePageRange = 3; //差值为3
+  static const int disactivePageRange = 3; //差值为3
 
   bool judgeDisactive(){
 
@@ -35,20 +36,21 @@ class _CachePageState extends State<CachePage> with AutomaticKeepAliveClientMixi
     if(commentModel.currentPageIndex.compareTo(widget.currentPageIndex+1) == 1){
       
       if(commentModel.currentPageIndex>=(widget.currentPageIndex+1)+disactivePageRange){
-        debugPrint("rebuild: [${widget.currentPageIndex+1}] it should be disposed, data remove;"); 
-        commentModel.commentsData.remove(widget.currentPageIndex+1); //移除 以腾出内存
-        debugPrint("data:${commentModel.commentsData.keys}");
         
+        commentModel.commentsData.remove(widget.currentPageIndex+1); //移除 以腾出内存
+
+        debugPrint("rebuild: [${widget.currentPageIndex+1}] it should be disposed"); 
+        debugPrint("data:${commentModel.commentsData.keys}");
         return true;
       }
     }
 
     else if(commentModel.currentPageIndex.compareTo(widget.currentPageIndex+1) == -1){
       if(commentModel.currentPageIndex<=(widget.currentPageIndex+1)-disactivePageRange){
-        debugPrint("rebuild: [${widget.currentPageIndex+1}] it should be disposed");
+        
         commentModel.commentsData.remove(widget.currentPageIndex+1); //移除 以腾出内存
 
-        
+        debugPrint("rebuild: [${widget.currentPageIndex+1}] it should be disposed");
         debugPrint("data:${commentModel.commentsData}");
         
         return true;
@@ -78,103 +80,82 @@ class _CachePageState extends State<CachePage> with AutomaticKeepAliveClientMixi
         final commentModel = context.read<CommentModel>();
 
         debugPrint("recived notify ${widget.currentPageIndex+1}"); 
-        //被触发dispose的时候 shouldRebuild 被执行了两次!
-        //也就是说 build的过程 也被执行了两次
-
-        //而 dispose时 reboot状态下 直接回true
-        // if(commentModel.currentPageIndex == widget.currentPageIndex+1) return true;
-
-
-
-          //数据存在时 return false;取消rebuild
-          //if(commentModel.currentPageIndex == widget.currentPageIndex+1){
-          //  if(commentModel.commentsData[widget.currentPageIndex+1]!=null && commentModel.commentsData[widget.currentPageIndex+1]!.isNotEmpty){
-          //    return true;
-          //  }
-          //}
 
         if(commentModel.currentPageIndex == widget.currentPageIndex+1) return true;
 
-        updateKeepAlive();
-
-        //刷新页面且 真的在当前页面时 rebuild
-        return !wantKeepAlive;
+        //每次被通知更新的时候 先检查当前的页面是否还在alive范围内
+        updateKeepAlive(); 
+        return !wantKeepAlive; //如果发现不在alive范围内 rebuild => dispose.
         
       },
       builder: (_, currentPageIndex, __){
         
-        //注意 这里的build过程 会被发生两次 因此必须要做好重复请求直接 return; 的准备
-        //因为tabbar的申金原因 会使得
         final commentModel = context.read<CommentModel>();
-
         final currentPageComments = commentModel.commentsData[widget.currentPageIndex+1];
 
-        if(currentPageComments!=null){
+        //Status:Pending
+        if(currentPageComments == null){
+          //空数据 null 加载 尝试触发notifiedRebuild
+          debugPrint("null!: reLoading ${widget.currentPageIndex+1}");
+          commentModel.loadComments(widget.id,pageIndex: widget.currentPageIndex+1);
 
-          //正常加载
-          if(currentPageComments.isNotEmpty){
-            debugPrint("widget.currentPageIndex: ${widget.currentPageIndex+1} loadData");
-            //isDataLoaded = true;
+          //等待notfiyListener通知 再过一遍 commentModel.commentsData[currentPageIndex]!=null 检查
+          return WaitingBuilder(currentIndex: widget.currentPageIndex+1, subjectID: widget.id);
+        }
 
-            WidgetsBinding.instance.addPostFrameCallback((timestamp){
-              context.read<CommentModel>().loadComments(
-                widget.id,
-                pageIndex: min(
-                  widget.currentPageIndex+2,
-                  commentModel.commentLength % 10 == 0 ?
-                  commentModel.commentLength~/10 :
-                  commentModel.commentLength~/10 + 1
-                )
-
-              );
-            });
-
-            int? itemCount = currentPageComments.length;
-
-            return ListView.separated(
-              itemCount: itemCount == 0 ? 1 : itemCount,
-              itemBuilder: (_, index){
-
-                if(itemCount == 0){
-                  return const Center(child: Text("空空如也..."));
-                }
-
-                return CommentTile(
-                  commentData: currentPageComments[itemCount-1 - index]
-                );
-
-              },
-              separatorBuilder: (_, index) => const Divider(height: 2),
-            );
-          }
-
+        //Status:Activing
+        if(currentPageComments.isEmpty){
           //只给占位符时 [] 则说明数据已经在处理中 应多等一会.
           //如果超时 则应直接remove掉key 当作此页未进行加载
-          else{
-            debugPrint("waiting ${widget.currentPageIndex+1}");
 
-            return WaitingBuilder(
-              subjectID: widget.id,
-              currentIndex: widget.currentPageIndex,
-            );
-
-          }
-
+          debugPrint("waiting ${widget.currentPageIndex+1}");
+          return WaitingBuilder(
+            subjectID: widget.id,
+            currentIndex: widget.currentPageIndex,
+          );
         }
-
-        else{
-
-          debugPrint("null!: reLoading ${widget.currentPageIndex+1}");
-          
-          //空数据 null 加载 尝试触发notifiedRebuild
-          commentModel.loadComments(widget.id,pageIndex: widget.currentPageIndex+1);
         
-          //等待notfiyListener通知 再过一遍 commentModel.commentsData[currentPageIndex]!=null 检查
+        //Status:done
+        if(currentPageComments.isNotEmpty){
+          debugPrint("widget.currentPageIndex: ${widget.currentPageIndex+1} loadData");
+          //isDataLoaded = true;
 
-          return WaitingBuilder(currentIndex: widget.currentPageIndex+1, subjectID: widget.id);
+          WidgetsBinding.instance.addPostFrameCallback((timestamp){
+            context.read<CommentModel>().loadComments(
+              widget.id,
+              pageIndex: min(
+                widget.currentPageIndex+2,
+                convertTotalCommentPage(commentModel.commentLength,10)
+              )
 
-          
+            );
+          });
+
+
+
+          int? itemCount = currentPageComments.length;
+
+          return ListView.separated(
+            itemCount: itemCount == 0 ? 1 : itemCount,
+            itemBuilder: (_, index){
+
+              if(itemCount == 0){
+                return const Center(child: Text("空空如也..."));
+              }
+
+              return CommentTile(
+                commentData: currentPageComments[itemCount-1 - index]
+              );
+
+            },
+            separatorBuilder: (_, index) => const Divider(height: 2),
+          );
         }
+
+
+        return const SizedBox.shrink();
+
+       
         
       }
     );
@@ -183,7 +164,7 @@ class _CachePageState extends State<CachePage> with AutomaticKeepAliveClientMixi
   }
 
   @override
-  bool get wantKeepAlive => !judgeDisactive(); //Disactive => !wantKeepAlive
+  bool get wantKeepAlive => !judgeDisactive(); //Disactive == !wantKeepAlive
 
 }
 

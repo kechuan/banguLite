@@ -31,7 +31,7 @@ class MyHive {
 
       //filesDir = Directory('storage/emulated/0/Download/flusic');
       //指向 /data/data/<package_name>/files
-      filesDir = await getApplicationDocumentsDirectory();
+      filesDir = await getApplicationCacheDirectory();
     }
     
     else{

@@ -17,7 +17,9 @@ void main() async {
       debugPrint = (String? message, {int? wrapWidth}) {};
     }
 
-  //Dio初始化
+  // path_provider 初始化需要
+  WidgetsFlutterBinding.ensureInitialized();
+
   HttpApiClient.init();
   await MyHive.init();
 

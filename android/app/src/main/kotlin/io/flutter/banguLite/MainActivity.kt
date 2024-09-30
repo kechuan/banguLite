@@ -1,4 +1,4 @@
-package com.example.flutter_bangumi
+package io.flutter.banguLite
 
 import io.flutter.embedding.android.FlutterActivity
 

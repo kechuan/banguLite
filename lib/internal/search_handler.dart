@@ -39,8 +39,6 @@ Future<List<BangumiDetails>> searchHandler(String query) async {
 Future<List<BangumiDetails>> sortSearchHandler(
   String keyword,
   {
-    
-
     List<String>? airDateRange,
     List<String>? rankRange,
     List<String>? ratingRange,

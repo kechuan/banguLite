@@ -85,8 +85,8 @@ class CustomSearchDelegate extends SearchDelegate<String>{
                         itemCount: searchData.length,
                         itemBuilder: (_, index) {
                           
-                          //前端处理法convertAmps(bangumiDetails.name);
-                          searchData[index].name = convertAmps(searchData[index].name);
+                          //前端处理法convertAmpsSymbol(bangumiDetails.name);
+                          searchData[index].name = convertAmpsSymbol(searchData[index].name);
 
                           return ListTile(
                             title: Text(searchData[index].name!),
@@ -166,7 +166,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
                         isLoading.value = false;
                       });
 
-                      return BangumiTile(
+                      return BangumiListTile(
                         imageSize: const Size(100, 150),
                         bangumiTitle: searchData[index].name!,
                         imageUrl: searchData[index].coverUri,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 
-class BangumiTile extends ListTile {
-  const BangumiTile({
+class BangumiListTile extends ListTile {
+  const BangumiListTile({
     super.key,
     //super.title,
 
@@ -67,6 +67,74 @@ class BangumiTile extends ListTile {
       trailing: trailing,
       onTap: onTap,
     
+    );
+  }
+}
+
+class BangumiGridTile extends StatelessWidget {
+    const BangumiGridTile({
+      super.key,
+      
+      this.imageUrl,
+      this.bangumiTitle,
+      this.onTap, 
+      
+    });
+
+    final String? imageUrl;
+    final String? bangumiTitle;
+
+    final void Function()? onTap;
+  
+  @override
+  Widget build(BuildContext context) {
+
+    return GridTile(
+        
+      footer: ListTile(
+        title: Center(
+          child: Text(
+            bangumiTitle ?? "loading",
+            maxLines: 2,
+            style: const TextStyle(fontSize: 16,color: Colors.white),
+            overflow: TextOverflow.ellipsis,
+          ),
+        )
+      ),
+    
+      child: Stack(
+          children: [
+                                          
+            Positioned.fill(
+              child: CachedImageLoader(imageUrl: imageUrl),
+            ),
+                                          
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: const LinearGradient(
+                    begin:Alignment.bottomCenter,
+                    end:Alignment(0, 0.2),
+                    
+                    colors:[Color.fromARGB(255, 35, 35, 35),Colors.transparent]
+                  ),
+                ),
+              )
+            ),
+                                                      
+            Positioned.fill(
+              child: InkResponse(
+                containedInkWell: true,
+                hoverColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                onTap: onTap,
+              )
+            )
+        
+          ],
+        ),
+
     );
   }
 }

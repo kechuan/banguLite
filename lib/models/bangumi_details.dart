@@ -61,7 +61,7 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
            currentBangumi["name_cn"] ?? "暂无名称";
 
           //前端处理法
-          bangumiDetails.name = convertAmps(bangumiDetails.name);
+          bangumiDetails.name = convertAmpsSymbol(bangumiDetails.name);
 
           if(currentBangumi["rating"]!=null){
             bangumiDetails.ratingList = {
