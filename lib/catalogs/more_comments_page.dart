@@ -44,7 +44,7 @@ class MoreCommentsPage extends StatelessWidget  {
 
                       final FixedExtentScrollController pageSelectorController = 
                       FixedExtentScrollController(initialItem: commentModel.currentPageIndex - 1);
-
+ 
                       final TextEditingController jumpPageEditingController = TextEditingController();
 
                       return WarpPageDialog(
@@ -56,8 +56,8 @@ class MoreCommentsPage extends StatelessWidget  {
 
                           final int newPageIndex = (int.tryParse(jumpPageEditingController.text) ?? pageSelectorController.selectedItem);
 
-                          commentModel.changePage(newPageIndex);
-                          commentPageController.jumpToPage(newPageIndex);
+                          commentModel.changePage(newPageIndex - 1);
+                          commentPageController.jumpToPage(newPageIndex - 1);
                         },
                       );
 

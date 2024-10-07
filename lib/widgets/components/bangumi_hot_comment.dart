@@ -40,12 +40,8 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
         commentFuture ??= providerContext.read<CommentModel>().loadComments(widget.id);
 
-        return Container(
+        return Padding(
           padding: const EdgeInsets.all(12),
-          constraints:  BoxConstraints(
-            maxHeight: MediaQuery.sizeOf(context).height * 2/3,
-            maxWidth: MediaQuery.sizeOf(context).width,
-          ),
           child: Selector<CommentModel, List<CommentDetails>>(
             selector: (_, commentModel){
         
@@ -88,53 +84,55 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
         
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    
                     children: [
                       
                       child!,
                       
-                      Expanded(
-                        child: Skeletonizer(
-                          enabled: commentListData.isEmpty,
-                          child: ListView.separated(
-                            itemCount: commentListData.isEmpty ? 3 : commentListData.length,
-                            separatorBuilder: (_, index) => const Divider(height: 2),
-                            itemBuilder: (_,index){
-                              
-                              //原本获取过来的数据是 Offset: 390 391 392 ... 400 这样给你展示的 所以默认状态下会变成越滚动越晚的消息
-                              //但一般人们的信息习惯是优先看到消息最新(晚)的消息才对 所以排序得更改一下
-                              int recentOrderIndex = (commentListData.length-1) - index;
+                      Skeletonizer(
+                        enabled: commentListData.isEmpty,
+                        child: ListView.separated(
+                          physics: const ScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: commentListData.isEmpty ? 3 : commentListData.length,
+                          separatorBuilder: (_, index) => const Divider(height: 2),
+                          itemBuilder: (_,index){
                             
-                              if(commentListData.isEmpty){
-                                return const ListTile(
-                                  title: Text("骨架似乎无法识别修饰类的改变。只能使用现有的Widget"),
-                                  subtitle:  Padding(
-                                    padding: EdgeInsets.only(top:16),
-                                    child: Text(
-                                      "你说的对 但是BangumiLite是一个我用于练手的项目, 你将扮演一个刚从GetX思维迁移过来的人\n 。品尽由于 Provider依赖的inheritedWidget 所导致的多重rebuild问题,导致你不得不在FutureLoader的处理上返回状态 而不是结果。"
-                                    ),
+                            //原本获取过来的数据是 Offset: 390 391 392 ... 400 这样给你展示的 所以默认状态下会变成越滚动越晚的消息
+                            //但一般人们的信息习惯是优先看到消息最新(晚)的消息才对 所以排序得更改一下
+                            int recentOrderIndex = (commentListData.length-1) - index;
+                          
+                            if(commentListData.isEmpty){
+                              return const ListTile(
+                                title: Text("骨架似乎无法识别修饰类的改变。只能使用现有的Widget"),
+                                subtitle:  Padding(
+                                  padding: EdgeInsets.only(top:16),
+                                  child: Text(
+                                    "你说的对 但是BangumiLite是一个我用于练手的项目, 你将扮演一个刚从GetX思维迁移过来的人\n 。品尽由于 Provider依赖的inheritedWidget 所导致的多重rebuild问题,导致你不得不在FutureLoader的处理上返回状态 而不是结果。"
                                   ),
-                                  leading: Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 8),
-                                    child: Icon(
-                                      Icons.circle,
-                                      size: 48,
-                                    ),
-                                  )
-                                );
-                              }
-                              
-                              //无评论的显示状态
-                              if(commentListData.length == 1 && commentListData[0].userId == 0){
-                                return const Center(
-                                  child: Text("该番剧暂无人评论..."),
-                                );
-                              }
-        
-                              return CommentTile(commentData: commentListData[recentOrderIndex]);
+                                ),
+                                leading: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                                  child: Icon(
+                                    Icons.circle,
+                                    size: 48,
+                                  ),
+                                )
+                              );
                             }
-                          ),
+                            
+                            //无评论的显示状态
+                            if(commentListData.length == 1 && commentListData[0].userId == 0){
+                              return const Center(
+                                child: Text("该番剧暂无人评论..."),
+                              );
+                            }
+                              
+                            return CommentTile(commentData: commentListData[recentOrderIndex]);
+                          }
                         ),
                       ),
+                      
                             
                     ],
                   );
@@ -160,23 +158,17 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                           ),
                           child: Padding(
                             padding: const EdgeInsets.only(right: 12),
+                            
                             child: TextButton(
 
                               onPressed: (){
 
                                 final commentModel = providerContext.read<CommentModel>();
 
-                              //                         if(commentListData.length == 1 && commentListData[0].userId == 0){
-                              //  return const Center(
-                              //    child: Text("该番剧暂无人评论..."),
-                              //  );
-                              //}
-
                                 if(commentModel.commentsData.values.first.length == 1 && commentModel.commentsData.values.first[0].userId == 0){
                                   debugPrint("no comment");
                                   return;
                                 }
-
 
                                 Navigator.pushNamed(
                                   providerContext,
@@ -189,55 +181,60 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                           ),
                         ),
         
-                        const Padding(
-                          padding: EdgeInsets.only(left: 16,right: 4), // right:4 + right:12
-                        ),
+                        //const Padding(
+                        //  padding: EdgeInsets.only(left: 16,right: 4), // right:4 + right:12
+                        //),
 
-                        InkResponse(
-                          radius: 16,
-                          hoverDuration: const Duration(milliseconds: 200),
-                          splashColor: const Color.fromARGB(255, 117, 117, 117),
-                          highlightColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          onTap: (){
-                            debugPrint("change way");
-                            //providerContext.read<CommentModel>().toggleAutoRebuildStatus();
-        
-                            final commentModel = providerContext.read<CommentModel>();
-                        
-                            isOldCommentSort.value = !isOldCommentSort.value;
-
-                            if(
-                              commentModel.commentsData.keys.contains(
-                                convertTotalCommentPage(
-                                  providerContext.read<CommentModel>().commentLength, 
-                                  10
-                              ))
-                            ){
-                              providerContext.read<CommentModel>().notifyListeners();
-                            }
-        
-                            else{
-                              commentModel.currentPageIndex = isOldCommentSort.value ? commentModel.commentLength~/10 - 1 : 1;
-                              providerContext.read<CommentModel>().loadComments(widget.id,isReverse: isOldCommentSort.value).then((_){
-                                commentModel.changePage(commentModel.currentPageIndex);
-                              });
-                            }
-                            
-                          }, 
-                          child: ValueListenableBuilder(
-                            valueListenable: isOldCommentSort,
-                            builder: (_,isOldCommentSort,child) {
-                              return SvgPicture.asset(
-                                'assets/icons/time_sort_old.svg',
-                                semanticsLabel: "从旧到新排序",
-                                height: 32,
-                                width: 32,
-                                color: isOldCommentSort ?Colors.black : null,
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16),
+                          child: InkResponse(
+                            radius: 16,
+                            hoverDuration: const Duration(milliseconds: 200),
+                            splashColor: const Color.fromARGB(255, 117, 117, 117),
+                            highlightColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            onTap: (){
+                              debugPrint("change way");
+                              //providerContext.read<CommentModel>().toggleAutoRebuildStatus();
+                                  
+                              final commentModel = providerContext.read<CommentModel>();
+                          
+                              isOldCommentSort.value = !isOldCommentSort.value;
+                          
+                              if(
+                                commentModel.commentsData.keys.contains(
+                                  convertTotalCommentPage(
+                                    providerContext.read<CommentModel>().commentLength, 
+                                    10
+                                ))
+                              ){
+                                providerContext.read<CommentModel>().notifyListeners();
+                              }
+                                  
+                              else{
                                 
-                              );
-                            }
-                          )
+                                commentModel.currentPageIndex = isOldCommentSort.value ? convertTotalCommentPage(commentModel.commentLength,10) : 1;
+                                
+                                providerContext.read<CommentModel>().loadComments(widget.id,isReverse: isOldCommentSort.value).then((_){
+                                  commentModel.changePage(commentModel.currentPageIndex);
+                                });
+                              }
+                              
+                            }, 
+                            child: ValueListenableBuilder(
+                              valueListenable: isOldCommentSort,
+                              builder: (_,isOldCommentSort,child) {
+                                return SvgPicture.asset(
+                                  'assets/icons/time_sort_old.svg',
+                                  semanticsLabel: "从旧到新排序",
+                                  height: 32,
+                                  width: 32,
+                                  color: isOldCommentSort ?Colors.black : null,
+                                  
+                                );
+                              }
+                            )
+                          ),
                         ),
                       
                       ],

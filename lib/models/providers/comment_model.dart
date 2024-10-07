@@ -110,6 +110,8 @@ class CommentModel extends ChangeNotifier {
 
 
     //data Get
+
+    //2024.10.01 update 官方数据似乎终于把 1 放到 最新的数据 而非最旧的数据了。
     try{
 
       final detailInformation = await HttpApiClient.client.get(
@@ -117,10 +119,18 @@ class CommentModel extends ChangeNotifier {
       queryParameters: BangumiQuerys.commentQuery
 
       // 末数 比如 55-50 => 5 这样就不会请求一整页的数据 而是请求残余页的条目数
-      ..["limit"] = min(pageRange , (commentLength - (pageRange)*(pageIndex)).abs()) 
+      ..["limit"] = min(pageRange , (commentLength - (pageRange)*(pageIndex - 1)).abs()) 
       ..["offset"] =  isReverse ?
-                      commentLength - (pageRange*(pageIndex-1)) : //要反向的话得从0开始算起offset
-                      pageRange > commentLength ? 0 : (commentLength - (pageRange)*(pageIndex)).abs()
+                      (pageRange)*(pageIndex - 1) > commentLength ? commentLength - pageRange : (pageRange)*(pageIndex - 1) :
+                      pageRange > commentLength ? 0 : (pageRange)*(pageIndex - 1).abs()
+
+      //old Data
+      //..["limit"] = min(pageRange , (commentLength - (pageRange)*(pageIndex)).abs()) 
+      //..["offset"] =  isReverse ?
+      //commentLength - (pageRange*(pageIndex-1)) : //要反向的话得从0开始算起offset
+      //pageRange > commentLength ? 0 : (commentLength - (pageRange)*(pageIndex)).abs()
+
+                
     );
 
       if(detailInformation.data!=null){

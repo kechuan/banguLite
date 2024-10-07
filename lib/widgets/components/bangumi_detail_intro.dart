@@ -34,9 +34,11 @@ class BangumiDetailIntro extends StatelessWidget {
                   //Pic
                   Expanded(
                     flex: 2,
-                    child: BuildDetailImages(
-                      detailImageUrl: bangumiDetails.coverUri,
-                      imageID: bangumiDetails.id
+                    child: FittedBox(
+                      child: BuildDetailImages(
+                        detailImageUrl: bangumiDetails.coverUri,
+                        imageID: bangumiDetails.id
+                      ),
                     )
                   ),
           
@@ -151,7 +153,7 @@ class BangumiDetailIntro extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            Expanded(child: BuildDetailImages(detailImageUrl: bangumiDetails.coverUri,imageID: bangumiDetails.id)),
+            Expanded(child: FittedBox(child: BuildDetailImages(detailImageUrl: bangumiDetails.coverUri,imageID: bangumiDetails.id))),
             
             //Info
             Expanded(
@@ -350,7 +352,7 @@ class BuildDetailImages extends StatelessWidget {
                 image: imageProvider,
                 fit: BoxFit.contain,
               ),
-              borderRadius: BorderRadius.circular(24)
+              borderRadius: BorderRadius.circular(16)
             ),
           );
         },
@@ -358,7 +360,7 @@ class BuildDetailImages extends StatelessWidget {
         
           return Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(16),
               color: Colors.grey,
             ),
       

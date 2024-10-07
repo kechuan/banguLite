@@ -41,49 +41,49 @@ class BangutileGridView extends StatelessWidget {
 
 
     if(keyDeliver is GlobalKey<AnimatedGridState>){
-      return SizedBox(
-        height: 600,
-        child: AnimatedGrid(
-          physics: const ScrollPhysics(),
-          initialItemCount: bangumiLists.length,
-          key: keyDeliver,
-          itemBuilder: (_,currentBangumiIndex,animation){
-            
-            debugPrint("gridIndex:$currentBangumiIndex");
 
-            if(currentBangumiIndex> bangumiLists.length - 1){
-              debugPrint("prevent strangeOverFlow rebuild");
-              return const SizedBox.shrink();
-            }
-            
-            return FadeTransition(
-              opacity: animation,
-                child:  BangumiGridTile(
-                  bangumiTitle: bangumiLists[currentBangumiIndex].name,
-                  imageUrl: bangumiLists[currentBangumiIndex].coverUri,
-                  onTap: () {
-                    if(bangumiLists[currentBangumiIndex].name!=null){
-                  
-                      context.read<BangumiModel>().routesIDList.add(bangumiLists[currentBangumiIndex].id!);
+        SingleChildScrollView(
+          child: AnimatedGrid(
+            physics: const ScrollPhysics(),
+            initialItemCount: bangumiLists.length,
+            key: keyDeliver,
+            itemBuilder: (_,currentBangumiIndex,animation){
+              
+              debugPrint("gridIndex:$currentBangumiIndex");
           
-                      Navigator.pushNamed(
-                        context,
-                        Routes.subjectDetail,
-                        arguments: {"bangumiID":bangumiLists[currentBangumiIndex].id},
-                      );
-                    }
-                  },
-                )
-                
-                
-                
-            );
+              if(currentBangumiIndex> bangumiLists.length - 1){
+                debugPrint("prevent strangeOverFlow rebuild");
+                return const SizedBox.shrink();
+              }
+              
+              return FadeTransition(
+                opacity: animation,
+                  child:  BangumiGridTile(
+                    bangumiTitle: bangumiLists[currentBangumiIndex].name,
+                    imageUrl: bangumiLists[currentBangumiIndex].coverUri,
+                    onTap: () {
+                      if(bangumiLists[currentBangumiIndex].name!=null){
+                    
+                        context.read<BangumiModel>().routesIDList.add(bangumiLists[currentBangumiIndex].id!);
             
-          },
-          gridDelegate: gridDelegate
-            
-        ),
-      );
+                        Navigator.pushNamed(
+                          context,
+                          Routes.subjectDetail,
+                          arguments: {"bangumiID":bangumiLists[currentBangumiIndex].id},
+                        );
+                      }
+                    },
+                  )
+                  
+                  
+                  
+              );
+              
+            },
+            gridDelegate: gridDelegate
+              
+          ),
+        );
 
     }
 

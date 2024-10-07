@@ -97,31 +97,30 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                           
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-          
-                              const Text("筛选动画"),
+
+                              InkResponse(
+                                hoverColor: Colors.transparent,
+                                splashColor: Colors.transparent,
+                                child: const Wrap(
+                                  
+                                  crossAxisAlignment : WrapCrossAlignment.center,
+                                  spacing: 12,
+                                  children:  [
+                                
+                                    Text("筛选动画"),
+                                
+                                    Icon(Icons.filter_list,size: 35),
+                                  ],
+                                ),
+                                onTap: () => fliterShowNotifier.value = !fliterShowNotifier.value,
+                              ),
                            
                               Wrap(
                                 crossAxisAlignment: WrapCrossAlignment.center,
                                 spacing: 16,
                                 children: [
           
-                                  Container(
-                                    height: 35,
-                                    decoration: const BoxDecoration(
-                                      border: Border(right: BorderSide(width: 1.5))
-                                    ),
-                                    child: InkResponse(
-                                      containedInkWell: true,
-                                      highlightColor: Colors.transparent,
-                                      radius: 12,
-                                      onTap: ()=> fliterShowNotifier.value = !fliterShowNotifier.value,
-                                      child: const Padding(
-                                        padding:  EdgeInsets.only(right: 16),
-                                        child:  Icon(Icons.filter_list,size: 35),
-                                      ),
-                                    ),
-                                  ),
-
+                                  
 
                                   Container(
                                     height: 35,
@@ -229,7 +228,6 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                     );
                   }
                 ),
-
 
                 ValueListenableBuilder(
                   valueListenable: viewTypeNotifier,
