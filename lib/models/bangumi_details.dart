@@ -7,19 +7,37 @@ import 'package:bangu_lite/internal/convert.dart';
 
 class BangumiDetails {
 
-  int? id;
-  String? coverUri;
-  String? name;
+	int? id;
+	String? coverUri;
+	String? name;
 
-  String? summary;
-  Map<String,String> informationList = {};
-  Map<String,int> tagsList = {};
-  Map<String,dynamic> questionList = {};
-  Map<String,num> ratingList = {};
-  
-  //recommand by ep
+	String? summary;
+	Map<String,String> informationList = {};
+	Map<String,int> tagsList = {};
+	//  Map<String,dynamic> questionList = {};
 
-  //期望获取的是每日的所有番剧 然后加个遮罩 背景cover 前置显示name/Rank
+	Map<String,num> ratingList = {
+		"total": 0,
+		"score": 0.0,
+		"rank": 0.0,
+	};
+
+	Map<String,dynamic> epsInformationList = { 
+      "airdate": "2024-11-30",
+      "name": "知",
+      "name_cn": "",
+      "duration": "00:25:00",
+      "desc": "ピャスト伯の死から数ヶ月――バデーニは膨大な観測記録を基に「地動説」の完成に没頭し、オクジーはヨレンタから文字を教わり自身の心境を綴るようになる。が、バデーニはオクジーのその行動に一切の価値を認めず、進まない研究に苛立ちを隠せずにいた。\r\n一方、同地区の教会では司教が異端審問官を増員し、いよいよ異端への弾圧を強めようとしていた。",
+      "ep": 10,
+      "sort": 10,
+      "id": 1390988,
+      "subject_id": 389156,
+      "comment": 1,
+      "type": 0,
+      "disc": 0,
+      "duration_seconds": 1500
+
+	};
   
 
 }
@@ -70,10 +88,26 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
               "rank": currentBangumi["rank"] ?? 0.0,
             };
 
-            if(currentBangumi["rating"]["score"] > 7.0 && currentBangumi["rating"]["total"] > 500){
+			//debugPrint("date:${currentBangumi["date"]}");
+
+            if(
+				judgeInSeasonBangumi(currentBangumi["air_date"]) &&
+				currentBangumi["rating"]["score"] > 7.0 && 
+				currentBangumi["rating"]["total"] > 500
+			){
               popularBangumis.add(bangumiDetails);
             }
           }
+
+		  //rankBox 要素
+		  /*
+			"count": {
+				"1": 3,
+				"2": 1,
+				...
+				}
+			*/
+		//  "rankBox": currentBangumi["count"] ?? 0.0,
 
           weekdayBangumis.add(bangumiDetails);
 
@@ -101,37 +135,63 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
   }
 
 
-  BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
+BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
 
     Map<String,dynamic> bangumiData = bangumiDetailResponse.data;
+
+    //debugPrint("currentBangumiData: ${bangumiData}");
+
     final BangumiDetails bangumiDetails = BangumiDetails();
 
       bangumiDetails.coverUri = bangumiData["images"]["large"];
       bangumiDetails.summary = bangumiData["summary"];
-
       bangumiDetails.name = bangumiData["name_cn"].isNotEmpty ? bangumiData["name_cn"] : bangumiData["name"];
       bangumiDetails.id = bangumiData["id"];
 
-      debugPrint("rating:${bangumiData["rating"]["total"]}");
+    //  debugPrint("rating:${bangumiData["rating"]["total"]}");
 
       bangumiDetails.ratingList = {
         "total": bangumiData["rating"]["total"] ?? 0,
         "score": bangumiData["rating"]["score"] ?? 0,
-        "rank": bangumiData["rating"]["rank"], //返回的是一个数值0
+        "rank": bangumiData["rating"]["rank"] ?? 0, //返回的是一个数值0
       };
+
+	 //info collect
 
       bangumiDetails.informationList = {
         "eps":bangumiData["eps"].toString(),
         "alias":bangumiData["name_cn"].isNotEmpty ? bangumiData["name"] : "",
       };
+	
+      for(Map currentInformation in bangumiData["infobox"]){
 
-      for(Map currentInfoMation in bangumiData["infobox"]){
-        if(currentInfoMation["key"] != "放送星期") continue;
-        if(currentInfoMation["key"] == "放送星期"){
-          bangumiDetails.informationList.addAll({
-            "air_weekday": currentInfoMation["value"].toString()
-          });
-        }
+        if(
+			currentInformation["key"] != "放送星期" &&
+			currentInformation["key"] != "放送开始"
+		) continue;
+
+		switch(currentInformation["key"]){
+			case "放送开始": {
+				bangumiDetails.informationList.addAll({
+					"air_date": bangumiData["date"].toString()
+				});
+				break;
+			}
+
+			case "放送星期": {
+				bangumiDetails.informationList.addAll({
+					"air_weekday": currentInformation["value"].toString()
+				});
+				break;
+			}
+		}
+
+		if(
+			bangumiDetails.informationList["air_date"] != null && 
+			bangumiDetails.informationList["air_weekday"] != null
+		) break;
+
+
       }
 
       debugPrint("${bangumiData["name_cn"]} => ${bangumiData["name"]}");
@@ -149,7 +209,3 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
 
     return bangumiDetails;
   }
-
-
-//设想 Map追加最后一列 高人气: 实际上则是把评分高于某个阈值(8.0)添加进去 直到15个为止 如不满则放宽(7.5)
-

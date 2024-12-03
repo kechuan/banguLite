@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
-import 'package:bangu_lite/widgets/fragments/comment_tile.dart';
+import 'package:bangu_lite/widgets/fragments/bangumi_comment_tile.dart';
 import 'package:provider/provider.dart';
 
 
@@ -143,8 +143,9 @@ class _CachePageState extends State<CachePage> with AutomaticKeepAliveClientMixi
                 return const Center(child: Text("空空如也..."));
               }
 
-              return CommentTile(
-                commentData: currentPageComments[itemCount-1 - index]
+              return BangumiCommentTile(
+                //commentData: currentPageComments[itemCount-1 - index]
+                commentData: currentPageComments[index]
               );
 
             },

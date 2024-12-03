@@ -74,9 +74,6 @@ class IndexPortial extends StatelessWidget {
                 selectedIcon: Icon(Icons.rss_feed),
                 label: "订阅",
               )
-
-              
-
             ],
             onDestinationSelected: (newIndex)=> selectedPageIndexNotifier.value = newIndex,
           ),

@@ -9,6 +9,7 @@ import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/widgets.dart';
 
 import '../catalogs/bangumi_detail_page.dart';
+import '../catalogs/bangumi_ep_page.dart';
 import '../catalogs/bangumi_index_page.dart';
 import '../catalogs/more_comments_page.dart';
 
@@ -55,6 +56,22 @@ FFRouteSettings getRouteSettings({
           bangumiID: asT<int>(
             safeArguments['bangumiID'],
           )!,
+        ),
+      );
+    case '/subjectEp':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => BangumiEpPage(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
+          subjectID: asT<int>(
+            safeArguments['subjectID'],
+          )!,
+          epIndex: asT<int?>(
+            safeArguments['epIndex'],
+          ),
         ),
       );
     default:

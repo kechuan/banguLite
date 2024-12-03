@@ -71,7 +71,7 @@ class IndexLandscape extends StatelessWidget {
       },
       child: 
 
-       Padding(           
+       Padding( 
         padding: const EdgeInsets.only(top: 50),
         child: Column(
           children: [

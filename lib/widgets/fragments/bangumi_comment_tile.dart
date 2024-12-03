@@ -3,8 +3,8 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 
-class CommentTile extends StatelessWidget {
-  const CommentTile({
+class BangumiCommentTile extends StatelessWidget {
+  const BangumiCommentTile({
     super.key,
     required this.commentData
   });
@@ -29,7 +29,8 @@ class CommentTile extends StatelessWidget {
               child: CachedImageLoader(imageUrl: commentData.avatarUri!)
             ) : 
                 
-            const FlutterLogo(),
+            //const FlutterLogo(),
+            Image.asset("asset/icons/icon.png"),
         
             Text(commentData.nickName ?? "nameID",style: const TextStyle(color: Colors.blue)),
           ],

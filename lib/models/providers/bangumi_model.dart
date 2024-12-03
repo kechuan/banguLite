@@ -15,6 +15,8 @@ class BangumiModel extends ChangeNotifier {
 
   BangumiDetails? bangumiDetails;
 
+  
+
   final Set<int> routesIDList = {}; //用于记录存放当前路由支上有多少个ID。
 
   Future<BangumiDetails?> loadDetails(int newID,{bool? refresh}) async {

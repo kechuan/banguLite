@@ -15,8 +15,6 @@ class BangumiIndexPage extends StatelessWidget {
 
   final ValueNotifier<int> selectedPageIndexNotifier = ValueNotifier<int>(0);
 
-  
-
   @override
   Widget build(BuildContext context) {
     bool readyQuitFlag = false;
@@ -37,8 +35,8 @@ class BangumiIndexPage extends StatelessWidget {
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              backgroundColor:Color.fromARGB(255, 140, 205, 244),
-              content: Text("再返回一次以退出"),
+              backgroundColor:Color.fromARGB(240, 99, 188, 243),
+              content: Text("再返回一次以退出",style: TextStyle(color: Colors.black)),
             )
           );
           

@@ -82,3 +82,40 @@ return  totalComments % pageRange == 0 ?
         totalComments~/pageRange :
         totalComments~/pageRange + 1;
 }
+
+bool judgeInSeasonBangumi(String? bangumiAirDate){
+
+  if(bangumiAirDate == null) return false;
+
+  List<String> dateSegments = bangumiAirDate.split("-");
+
+  int bangumiYear = int.parse(dateSegments[0]);
+  int bangumiMonth = int.parse(dateSegments[1]);
+
+  if((bangumiYear - DateTime.now().year).abs() <= 1){
+    if(
+        (DateTime.now().month - bangumiMonth).abs() <= 2 || 
+        (DateTime.now().month - bangumiMonth).abs() >= 10
+    ) return true;
+  }
+
+  return false;
+
+}
+
+int convertAiredEps(String? bangumiAirDate){
+	if(bangumiAirDate == null) return 0;
+
+	List<String> dateSegments = bangumiAirDate.split("-");
+
+	int bangumiYear = int.parse(dateSegments[0]);
+	int bangumiMonth = int.parse(dateSegments[1]);
+	int bangumiDay = int.parse(dateSegments[2]);
+
+	int residualDateTime = (DateTime.now().millisecondsSinceEpoch - DateTime(bangumiYear,bangumiMonth,bangumiDay).millisecondsSinceEpoch);
+
+	//放送开始附带一集 因此+1
+	int airedEps =  residualDateTime ~/ const Duration(days: 7).inMilliseconds;
+
+	return airedEps;
+}

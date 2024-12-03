@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
@@ -42,28 +43,9 @@ class _CommentViewState extends State<CommentView> with SingleTickerProviderStat
     );
 
     commentController.addListener((){
-
         widget.commentPageController.jumpToPage(
           commentController.index, 
         );
-
-      ////长距离的animateToPage会加载太多东西
-      //if((commentController.index - widget.commentPageController.page!.toInt()).abs() >= 5){
-      //  widget.commentPageController.jumpToPage(
-      //    commentController.index, 
-      //  );
-      //}
-
-      //else{
-      //  widget.commentPageController.animateToPage(
-      //    commentController.index, 
-      //    duration: const Duration(milliseconds: 300), 
-      //    curve: Curves.linear
-      //  );
-      //}
-
-      
-      
     });
 
     super.initState();
@@ -86,13 +68,14 @@ class _CommentViewState extends State<CommentView> with SingleTickerProviderStat
     final commentModel = context.read<CommentModel>();
 
     //数据预装载 最大期望3页
+    int loadPageCount = convertTotalCommentPage(widget.totalPageLength,10);
+
     unawaited(
       Future.wait(
-        [
-          commentModel.loadComments(widget.subjectID,pageIndex: 1),
-          commentModel.loadComments(widget.subjectID,pageIndex: min(widget.totalPageLength~/10,2)),
-          commentModel.loadComments(widget.subjectID,pageIndex: min(widget.totalPageLength~/10,3)),
-        ]
+        List.generate(
+          min(3,loadPageCount),
+          (index) => commentModel.loadComments(widget.subjectID,pageIndex: index+1),
+        )
       )
     );
 
@@ -114,16 +97,15 @@ class _CommentViewState extends State<CommentView> with SingleTickerProviderStat
               //  debugPrint("value:$value");
               //},
               isScrollable: true,
-              tabs: [
-                ...List.generate(
+              tabs: 
+                List.generate(
                   widget.totalPageLength,
                   (index) => SizedBox(
                     height: 60,
                     width: MediaQuery.sizeOf(context).width/(widget.totalPageLength).clamp(1, 6), //最多存在6个
                     child: Center(child: Text("${index+1}"))
                   )
-                )
-              ],
+                ),
             ),
           ),
         ),
@@ -169,7 +151,7 @@ class CommentLoading extends StatelessWidget {
           appBar: AppBar(
             leading: const SizedBox.shrink(),  
             flexibleSpace: const TabBar(
-              tabs:  [
+              tabs: [
                 SizedBox(
                   height: 60,
                   child: Center(child: Text("1"))

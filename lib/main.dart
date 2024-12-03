@@ -1,14 +1,17 @@
 
 
+import 'dart:io';
+
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/flutter_bangumi_routes.dart';
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/routes/flutter_bangumi_route.dart';
+import 'package:bangu_lite/routes/bangu_lite_route.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -22,6 +25,14 @@ void main() async {
 
   HttpApiClient.init();
   await MyHive.init();
+
+  if(Platform.isAndroid){
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent
+      )
+    );
+  }
 
   runApp(const MainApp());
 

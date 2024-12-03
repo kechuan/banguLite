@@ -10,15 +10,18 @@ class CommentDetails {
   String? comment;
   int? commentTimeStamp;
   int? rate;
+  
+}
 
-  static List<CommentDetails> loadCommentResponse(Response commentDetailResponse) {
 
-    List<CommentDetails> commentDetailsList = [];
+List<CommentDetails> loadCommentResponse(Response commentDetailResponse) {
+
+    final List<CommentDetails> commentDetailsList = [];
 
     Map<String,dynamic> commentResponse = commentDetailResponse.data;
     
 
-    List commentResponseList = commentResponse["list"]; //不要试图给请求假设类型 Map也不行!!
+    List commentResponseList = commentResponse["data"]; //不要试图给请求假设类型 Map也不行!!
 
 
     for(var currentComment in commentResponseList){
@@ -26,14 +29,15 @@ class CommentDetails {
       //debugPrint("${currentComment.runtimeType}, $currentComment");
 
       final CommentDetails commentDetails = CommentDetails();
-
-      commentDetails.avatarUri = currentComment["user"]["avatar"]["medium"];
-      commentDetails.userId = currentComment["user"]["id"];
-      commentDetails.nickName = currentComment["user"]["nickname"];
-
-      commentDetails.comment = currentComment["comment"];
-      commentDetails.rate = currentComment["rate"];
-      commentDetails.commentTimeStamp = currentComment["updatedAt"];
+      
+        commentDetails
+          ..avatarUri = currentComment["user"]["avatar"]["medium"]
+          ..userId = currentComment["user"]["id"]
+          ..nickName = currentComment["user"]["nickname"]
+          ..comment = currentComment["comment"]
+          ..rate = currentComment["rate"]
+          ..commentTimeStamp = currentComment["updatedAt"]
+        ;
       
       commentDetailsList.add(commentDetails);
 
@@ -44,8 +48,4 @@ class CommentDetails {
     return commentDetailsList;
 
   }
-
-  
-}
-
 

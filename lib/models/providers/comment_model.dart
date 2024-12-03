@@ -24,8 +24,6 @@ class CommentModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  //多重rebuild问题:  我需要区分 自动rebuild触发的loadComments 与 我真正想要触发的loadComments问题
-
   Future<void> getCommentLength(int subjectID) async {
     await HttpApiClient.client.get(
       BangumiUrls.comment(subjectID),
@@ -37,17 +35,17 @@ class CommentModel extends ChangeNotifier {
     });
   }
 
-  Future<void> loadComments(int id,{int pageIndex = 1,bool isReverse = false, int pageRange = 10}) async {
+  Future<void> loadComments(int subjectID,{int pageIndex = 1,bool isReverse = false, int pageRange = 10}) async {
 
-    if(id == 0) return;
+    if(subjectID == 0) return;
 
     //first effect loaded.
     if(commentLength==0){
-      await getCommentLength(id);
+      await getCommentLength(subjectID);
 
       //empty comment handler.
       if(commentLength == 0){
-        debugPrint("comment ID $id: was empty!");
+        debugPrint("comment subjectID $subjectID: was empty!");
 
         //因为 null/[] 已经被用来占用为 标志位了 无数据返回部分就以这种形式进行处理
         commentsData.addAll({
@@ -77,7 +75,8 @@ class CommentModel extends ChangeNotifier {
 
     //judge request start
 
-    /*数据有3个状态 null,[],[...]  null => [] => [...] (Reset => null)
+    /*
+      数据有3个状态 null,[],[...]  null => [] => [...] (Reset => null)
       null请求时 直接变为[] 意为activing
       []再被请求时 直接return; 相当于completer的使用方式
       当[]变为[...]时 通知notified
@@ -106,7 +105,7 @@ class CommentModel extends ChangeNotifier {
       debugPrint("pageIndex $pageIndex comment was inited.");
     }
 
-    debugPrint("ID $id: $pageIndex parse start, commentStamp: ${DateTime.now()}");
+    debugPrint("subjectID $subjectID: $pageIndex parse start, commentStamp: ${DateTime.now()}");
 
 
     //data Get
@@ -115,7 +114,7 @@ class CommentModel extends ChangeNotifier {
     try{
 
       final detailInformation = await HttpApiClient.client.get(
-      BangumiUrls.comment(id),
+      BangumiUrls.comment(subjectID),
       queryParameters: BangumiQuerys.commentQuery
 
       // 末数 比如 55-50 => 5 这样就不会请求一整页的数据 而是请求残余页的条目数
@@ -134,7 +133,7 @@ class CommentModel extends ChangeNotifier {
     );
 
       if(detailInformation.data!=null){
-        commentsData[pageIndex] = CommentDetails.loadCommentResponse(detailInformation);
+        commentsData[pageIndex] = loadCommentResponse(detailInformation);
       }
 
       else{
@@ -147,7 +146,7 @@ class CommentModel extends ChangeNotifier {
       }
 
       
-      debugPrint("comment: ID $id: $pageIndex parse done, commentStamp: ${DateTime.now()}");
+      debugPrint("comment: subjectID $subjectID: $pageIndex parse done, commentStamp: ${DateTime.now()}");
 
 
       //if(id!=0) commentID = id;
@@ -156,15 +155,10 @@ class CommentModel extends ChangeNotifier {
     }
 
     on DioException catch(e){
-      debugPrint(e.toString());
+      debugPrint("Request Error:${e.toString()}");
     }
 
-
-      
-
   }
-
-
 
   @override
   void notifyListeners() {

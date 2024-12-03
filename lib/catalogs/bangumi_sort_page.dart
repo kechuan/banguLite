@@ -7,7 +7,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:bangu_lite/flutter_bangumi_routes.dart';
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
@@ -67,7 +67,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
       },
       
       //onRefresh: (){},
-      childBuilder: (_,physic){ // scroll Action by: CustomScrollView . just sync notice the physicAction.
+      childBuilder: (_,physic){ // scroll Action by: CustomScrollView. just sync notice the physicAction.
         return Scaffold(
           body: NotificationListener<ScrollUpdateNotification>(
             onNotification: (notification) {
@@ -120,8 +120,6 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                                 spacing: 16,
                                 children: [
           
-                                  
-
                                   Container(
                                     height: 35,
                                     decoration: const BoxDecoration(
@@ -233,8 +231,6 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                   valueListenable: viewTypeNotifier,
                   builder: (_,viewType,child){
 
-                    
-                    
                     return ValueListenableBuilder(
                       valueListenable: loadCountNotifier,
                       builder: (_,loadCount,child) {
@@ -269,7 +265,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                                       onTap: () {
                                         Navigator.pushNamed(
                                           context,
-                                            Routes.subjectDetail,
+                                          Routes.subjectDetail,
                                           arguments: {"bangumiID":messageList[index].id}
                                         );
                                       },

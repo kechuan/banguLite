@@ -16,6 +16,11 @@ class IndexModel extends ChangeNotifier {
 
   int selectedWeekDay = DateTime.now().weekday;
 
+  Future<void> reloadCalendar(){
+    loadFuture = null;
+    return loadCalendar();
+  }
+
   Future<void> loadCalendar() async {
 
     if(loadFuture!=null){

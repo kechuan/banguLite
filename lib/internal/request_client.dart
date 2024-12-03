@@ -24,11 +24,13 @@ class BangumiUrls {
   static const String baseUrl = "https://api.bgm.tv";
 
   //static String get subject => '$baseUrl/subject';
-  static String get subject => '$baseUrl/v0/subjects';
-
   static String get calendar => '$baseUrl/calendar';
 
+  static String get subject => '$baseUrl/v0/subjects';
+  static String get eps => '$baseUrl/v0/episodes';
+
   static String get search => '$baseUrl/search/subject';
+
 
   static const String bangumiSubjectSort = '$baseUrl/v0/search/subjects';
 
@@ -36,6 +38,7 @@ class BangumiUrls {
   static const String newUrl = "https://next.bgm.tv";
 
   static String comment(int subjectID) => '$newUrl/p1/subjects/$subjectID/comments';
+  static String epComment(int epID) => '$newUrl/p1/subjects/-/episode/$epID/comments';
 
 }
 
@@ -49,8 +52,11 @@ class BangumiQuerys {
   };
 
 
-  static Map<String,dynamic> commentQuery = {"limit":10,"offset":0},
-                             sortQuery =  {"limit":10,"offset":0};
+  static Map<String,int>  commentQuery = {"limit":10,"offset":0},
+                          sortQuery = {"limit":10,"offset":0},
+                          epQuery = {"subject_id":0,"limit":100,"offset":0}
+                          ;
+                             
 
   //神奇的数据装载。。 rank方面的数据 还不如拆分成 minRank & maxRank 。。
 }

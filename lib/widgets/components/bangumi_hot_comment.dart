@@ -1,11 +1,12 @@
 
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/widgets/fragments/skeleton_listtile_template.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/flutter_bangumi_routes.dart';
+import 'package:bangu_lite/bangu_lite_routes.dart';
 
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
-import 'package:bangu_lite/widgets/fragments/comment_tile.dart';
+import 'package:bangu_lite/widgets/fragments/bangumi_comment_tile.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -100,25 +101,10 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                             
                             //原本获取过来的数据是 Offset: 390 391 392 ... 400 这样给你展示的 所以默认状态下会变成越滚动越晚的消息
                             //但一般人们的信息习惯是优先看到消息最新(晚)的消息才对 所以排序得更改一下
-                            int recentOrderIndex = (commentListData.length-1) - index;
+                            
                           
                             if(commentListData.isEmpty){
-                              return const ListTile(
-                                title: Text("骨架似乎无法识别修饰类的改变。只能使用现有的Widget"),
-                                subtitle:  Padding(
-                                  padding: EdgeInsets.only(top:16),
-                                  child: Text(
-                                    "你说的对 但是BangumiLite是一个我用于练手的项目, 你将扮演一个刚从GetX思维迁移过来的人\n 。品尽由于 Provider依赖的inheritedWidget 所导致的多重rebuild问题,导致你不得不在FutureLoader的处理上返回状态 而不是结果。"
-                                  ),
-                                ),
-                                leading: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 8),
-                                  child: Icon(
-                                    Icons.circle,
-                                    size: 48,
-                                  ),
-                                )
-                              );
+                              return const SkeletonListtileTemplate();
                             }
                             
                             //无评论的显示状态
@@ -128,7 +114,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                               );
                             }
                               
-                            return CommentTile(commentData: commentListData[recentOrderIndex]);
+                            return BangumiCommentTile(commentData: commentListData[index]);
                           }
                         ),
                       ),

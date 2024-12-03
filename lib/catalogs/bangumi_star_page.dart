@@ -1,4 +1,4 @@
-import 'package:bangu_lite/flutter_bangumi_routes.dart';
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';

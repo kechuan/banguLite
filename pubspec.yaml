@@ -29,6 +29,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^4.0.0
   build_runner: ^2.4.12
+  flutter_launcher_icons: ^0.14.1
 
 flutter:
   uses-material-design: true
@@ -41,5 +42,22 @@ flutter:
   assets:
     - assets/icons/time_sort_new.svg
     - assets/icons/time_sort_old.svg
-    
-    
+    - assets/icons/icon.png
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/icon.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  #web:
+  #  generate: true
+  #  image_path: "path/to/image.png"
+  #  background_color: "#hexcode"
+  #  theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/icons/icon.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  #macos:
+  #  generate: true
+  #  image_path: "path/to/image.png"

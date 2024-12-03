@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/flutter_bangumi_routes.dart';
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';

@@ -22,7 +22,7 @@ class MoreCommentsPage extends StatelessWidget  {
 
     final PageController commentPageController = PageController();
     
-
+    //给每个番剧页面都单独拉一个 CommentProvider 避免互相跳转之间打架
     return ChangeNotifierProvider(
       create: (_) => CommentModel(),
       builder: (context,child) {
@@ -54,7 +54,7 @@ class MoreCommentsPage extends StatelessWidget  {
                         onConfirmPressed: () {
                           Navigator.of(context).pop();
 
-                          final int newPageIndex = (int.tryParse(jumpPageEditingController.text) ?? pageSelectorController.selectedItem);
+                          final int newPageIndex = (int.tryParse(jumpPageEditingController.text) ?? pageSelectorController.selectedItem + 1);
 
                           commentModel.changePage(newPageIndex - 1);
                           commentPageController.jumpToPage(newPageIndex - 1);
@@ -72,7 +72,8 @@ class MoreCommentsPage extends StatelessWidget  {
           ),
           
           body: FutureBuilder(
-            future: context.read<CommentModel>().getCommentLength(subjectID), //代价比较低
+            future: context.read<CommentModel>().getCommentLength(subjectID), 
+            //代价比较低 所以就不专门设立Completer或者State了
             builder: (_,snapshot) {
               switch(snapshot.connectionState){
           

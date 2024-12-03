@@ -5,7 +5,7 @@ import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 
-import 'package:bangu_lite/flutter_bangumi_routes.dart';
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
@@ -67,7 +67,9 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
   Widget build(BuildContext context) {
     return EasyRefresh.builder(
       header: const MaterialHeader(),
-      onRefresh: ()=> calendarLoadFuture = context.read<IndexModel>().loadCalendar(),
+      //onRefresh: ()=> calendarLoadFuture = context.read<IndexModel>().loadCalendar(),
+      onRefresh: ()=> calendarLoadFuture = context.read<IndexModel>().reloadCalendar(),
+      
       childBuilder: (_,physic){
 
         if(calendarLoadFuture==null){
@@ -111,7 +113,7 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
                               height: 60,
                               child: const Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text("本周热番",style: TextStyle(fontSize: 24)
+                                child: Text("本季热番",style: TextStyle(fontSize: 24)
                               ))
                             )
                           ),
@@ -243,7 +245,7 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
                       Selector<IndexModel, int>(
                         selector: (_, indexModel) => indexModel.selectedWeekDay,
                         shouldRebuild: (previous, next){
-                          debugPrint("receive rebuild $previous/$next");
+                          debugPrint("receive rebuild day:$previous => $next");
                           return previous!=next;
                         },
                         builder: (_, weekday, child) {

@@ -8,7 +8,6 @@ import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_intro.dart';
 import 'package:bangu_lite/widgets/components/bangumi_hot_comment.dart';
 import 'package:bangu_lite/widgets/components/bangumi_summary.dart';
-//import 'package:bangu_lite/widgets/components/search_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
