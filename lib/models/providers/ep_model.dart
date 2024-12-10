@@ -1,5 +1,7 @@
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/eps_info.dart';
 import 'package:flutter/material.dart';
 
 class EpModel extends ChangeNotifier{
@@ -7,196 +9,144 @@ class EpModel extends ChangeNotifier{
   EpModel({
     required this.subjectID,
     required this.selectedEp,
-  });
+  }){
+    getEpsInformation();
+  }
 
   int subjectID;
   int selectedEp;
   
-
-  final List epsData = [];
-
-  final Map<int,List<EpCommentDetails>> epCommentData = {
-    1:[
-        EpCommentDetails()
-          ..userId = 402032
-          ..comment = "猫猫的过去全删了啊(bgm38)这段的猫猫直接崩溃掉嘞(bgm38)\n感觉这段还挺重要的，怎么连猫猫是芙蕾雅捡来的和被芙蕾雅主动扔了都没提(bgm38)"
-          ..avatarUri = "https://lain.bgm.tv/pic/user/l/000/40/20/402032.jpg?r=1671767546&hd=1"
-          ..nickName = "hikki-"
-          ..sign = "天の光は全て星だ"
-          ..commentTimeStamp = 1731590849
-
-          ..repliedComment = [
-
-
-            EpCommentDetails()
-              ..userId = 123456
-              ..comment = "这是一段回复语句"
-              ..avatarUri = "https://lain.bgm.tv/pic/user/l/000/40/20/402032.jpg?r=1671767546&hd=1"
-              ..nickName = "kechuan"
-              ..sign = "这是一段回复签名"
-              ..commentTimeStamp = 1731854334,
-
-                      EpCommentDetails()
-              ..userId = 123456
-              ..comment = "这是一段回复语句"
-              ..avatarUri = "https://lain.bgm.tv/pic/user/l/000/40/20/402032.jpg?r=1671767546&hd=1"
-              ..nickName = "kechuan"
-              ..sign = "这是一段回复签名"
-              ..commentTimeStamp = 1731854334,
-
-                        EpCommentDetails()
-              ..userId = 123456
-              ..comment = "这是一段回复语句"
-              ..avatarUri = "https://lain.bgm.tv/pic/user/l/000/40/20/402032.jpg?r=1671767546&hd=1"
-              ..nickName = "kechuan"
-              ..sign = "这是一段回复签名"
-              ..commentTimeStamp = 1731854334,
-          ]
-
-        ,
-
-        EpCommentDetails()
-          ..userId = 402032
-          ..comment = "这是第二段评论"
-          ..avatarUri = "https://lain.bgm.tv/pic/user/l/000/40/20/402032.jpg?r=1671767546&hd=1"
-          ..nickName = "test2"
-          ..sign = "天の光は全て星だ"
-          ..commentTimeStamp = 1731590849
-
-          ..repliedComment = [
-
-
-            EpCommentDetails()
-              ..userId = 123456
-              ..comment = "这是一段回复语句"
-              ..avatarUri = "https://lain.bgm.tv/pic/user/l/000/40/20/402032.jpg?r=1671767546&hd=1"
-              ..nickName = "kechuan"
-              ..sign = "这是一段回复签名"
-              ..commentTimeStamp = 1731854334,
-
-            EpCommentDetails()
-              ..userId = 123456
-              ..comment = "这是一段回复语句"
-              ..avatarUri = "https://lain.bgm.tv/pic/user/l/000/40/20/402032.jpg?r=1671767546&hd=1"
-              ..nickName = "kechuan"
-              ..sign = "这是一段回复签名"
-              ..commentTimeStamp = 1731854334,
-
-            EpCommentDetails()
-              ..userId = 123456
-              ..comment = "这是一段回复语句"
-              ..avatarUri = "https://lain.bgm.tv/pic/user/l/000/40/20/402032.jpg?r=1671767546&hd=1"
-              ..nickName = "kechuan"
-              ..sign = "这是一段回复签名"
-              ..commentTimeStamp = 1731854334,
-          ]
-
-      ]
-  }; 
-
-  
-
+  final Map<int,EpsInfo> epsData = {};
+  final Map<int,List<EpCommentDetails>> epCommentData = {}; 
 
   void updateSelectedEp(int newEp){
     if(newEp == selectedEp) return;
 
     selectedEp = newEp;
     notifyListeners();
+
+	  if(epCommentData[selectedEp] == null) loadEp();
   }
 
+	Future<void> getEpsInformation({int? offset}) async {
 
-  //limit > 100 的条件判断 when...
-  Future<void> getEpsInformation() async {
+    int requestOffset = (offset ?? 0)*100;
+    int requestLimit = 100;
 
-    await HttpApiClient.client.get(
-      BangumiUrls.eps,
+
+    if(epsData.isNotEmpty){
+      if(offset==null) return; //内部有数据时再次请求且不携带 offset值 则视为重复获取.因为永远都是 1~100 先会触发
+
+      //假设条件1: offset:2 
+      // 如果 301~400 未加载 则开始加载它 同时 
+      // 如果 300 也未加载 那么则需要同时加载 201~300
+      // 这样 在打开301的时候 理应同时触发 201~400 的加载任务
+      if(epsData[(offset*100)+1] != null && epsData[(offset*100)] != null) return;
+
+      //那怎么办呢 自适应调整offset和limit了吧
+
+       if(epsData[(offset*100)+1] == null && epsData[(offset*100)] == null){
+        requestOffset -= 100;
+        requestLimit = 200;
+      }
+        
+    }
+
+    if(epsData[requestOffset+1]!= null){
+      debugPrint("loading Info ${requestOffset+1}~${requestOffset+100}");
+      return;
+    }
+   
+    //get Start. 占位符
+    epsData[requestOffset+1] = EpsInfo();
+
+    
+   
+  
+		await HttpApiClient.client.get(
+      BangumiAPIUrls.eps,
       queryParameters: 
         BangumiQuerys.epQuery
-          //..["limit"] = 100
+          ..["offset"] = requestOffset
+          ..["limit"] = requestLimit
           ..["subject_id"] = subjectID
+          
     ).then((response){
-      if(response.data != null && response.data["data"] != null){
+
+        if(response.data != null && response.data["data"] != null){
         
-        List epsDataList = response.data["data"];
+          List<EpsInfo> currentRangeEpsData = loadEpsData(response);
 
-        epsData.addAll((epsDataList));
+          int? epOffset = currentRangeEpsData[0].epIndex;
 
-        notifyListeners(); //阶段一
-
-        debugPrint("${epsDataList.length}");
-      }
-    });
-
-  }
-
-  Future<void> loadEps() async{
-
-    //或者只接收 epIndex 也行 详细信息查找 EpsInformation 的 EpId 就可以了
-
-      if(epsData.isEmpty){
-        await getEpsInformation();
-        if(epsData.isEmpty) return;
-        debugPrint("eps info Load done.");
-      }
-    
-      await HttpApiClient.client.get(
-        BangumiUrls.epComment(epsData[selectedEp-1]["id"]),
-        
-      ).then((response){
-        if(response.data != null){
-
-          List epCommentList = response.data;
-
-          List<EpCommentDetails> currentEpCommentList = [];
-
-          for(Map currentEpCommentMap in epCommentList){
-            EpCommentDetails currentEpComment = EpCommentDetails();
-
-            currentEpComment
-            ..comment = currentEpCommentMap["content"]
-            ..commentTimeStamp = currentEpCommentMap["createdAt"]
-              ..userId = currentEpCommentMap["user"]["id"]
-              ..avatarUri = currentEpCommentMap["user"]["avatar"]["large"]
-              ..nickName = currentEpCommentMap["user"]["nickname"]
-              ..sign = currentEpCommentMap["user"]["sign"]
-            ;
-
-              if(currentEpCommentMap["replies"].isNotEmpty){
-
-                List<EpCommentDetails> currentEpCommentRepliedList = [];
-
-                for(Map currentEpCommentMap in currentEpCommentMap["replies"]){
-                  EpCommentDetails currentEpRepliedComment = EpCommentDetails();
-
-                  currentEpRepliedComment
-                  ..comment = currentEpCommentMap["content"]
-                  ..commentTimeStamp = currentEpCommentMap["createdAt"]
-                    ..userId = currentEpCommentMap["user"]["id"]
-                    ..avatarUri = currentEpCommentMap["user"]["avatar"]["large"]
-                    ..nickName = currentEpCommentMap["user"]["nickname"]
-                    ..sign = currentEpCommentMap["user"]["sign"]
-                  ;
-
-                  currentEpCommentRepliedList.add(currentEpRepliedComment);
-               
-                }
-
-                currentEpComment.repliedComment = currentEpCommentRepliedList;
-
-              }
-
-            currentEpCommentList.add(currentEpComment);
+          if(epOffset!=null){
+            for(int epInfoIndex = 0; epInfoIndex < currentRangeEpsData.length; epInfoIndex++){
+              epsData.addAll({
+                (epOffset+epInfoIndex): currentRangeEpsData[epInfoIndex]
+              });
+            }
           }
 
-          epCommentData[selectedEp] = currentEpCommentList;
+          debugPrint("currentEpsData Length:${epsData.length}");
 
-          debugPrint("subject ID: $subjectID - Ep.$selectedEp load done ");
-
-          notifyListeners();
+          notifyListeners(); //完成
 
         }
-      });
 
-  }
-  
+    });
+
+	}
+
+	Future<void> loadEp() async{
+
+		if(epsData.isEmpty){
+			await getEpsInformation();
+			if(epsData.isEmpty) return;
+		}
+
+    else{
+      if(epsData[selectedEp] == null){
+        await getEpsInformation(offset: convertSegement(selectedEp,100));
+        if(epsData.isEmpty) return;
+      }
+    }
+
+    
+
+		if(epCommentData[selectedEp] != null){
+
+			if(epCommentData[selectedEp]!.isEmpty){
+				debugPrint("$selectedEp in Progress");
+				return;
+			}
+
+			debugPrint("$selectedEp already loaded");
+			
+			return;
+		}
+
+		//初始化占位
+		epCommentData[selectedEp] = [];
+		
+		await HttpApiClient.client.get(
+			BangumiAPIUrls.epComment(epsData[selectedEp]!.epID!),
+		).then((response){
+			if(response.data != null){
+
+			epCommentData[selectedEp] = loadEpCommentDetails(response);
+
+			//空处理 userId = 0 代表为空
+			if(epCommentData[selectedEp]!.isEmpty){
+				epCommentData[selectedEp] = [EpCommentDetails()..userId = 0];
+			}
+			
+			debugPrint("$subjectID load Ep.$selectedEp detail done");
+
+			notifyListeners();
+
+			}
+		});
+
+	}
+	
 }

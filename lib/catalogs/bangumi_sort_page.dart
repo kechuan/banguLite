@@ -1,5 +1,7 @@
 
 
+import 'dart:math';
+
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/widgets/fragments/animated_wave_footer.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
@@ -66,8 +68,9 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
         loadMoreData(currentSearchConfig);
       },
       
-      //onRefresh: (){},
       childBuilder: (_,physic){ // scroll Action by: CustomScrollView. just sync notice the physicAction.
+
+        //debugPrint("${MediaQuery.devicePixelRatioOf(context)}");
         return Scaffold(
           body: NotificationListener<ScrollUpdateNotification>(
             onNotification: (notification) {
@@ -92,7 +95,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
           
                       child: ValueListenableBuilder(
                         valueListenable: browserSortTypeNotifier,
-                        builder: (_, __, child) {
+                        builder: (_, browserSortType, child) {
                           return Row(
                           
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -101,15 +104,15 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                               InkResponse(
                                 hoverColor: Colors.transparent,
                                 splashColor: Colors.transparent,
-                                child: const Wrap(
+                                child: Wrap(
                                   
                                   crossAxisAlignment : WrapCrossAlignment.center,
                                   spacing: 12,
                                   children:  [
                                 
-                                    Text("筛选动画"),
+                                    const Text("筛选动画"),
                                 
-                                    Icon(Icons.filter_list,size: 35),
+                                    Icon(Icons.filter_list,size: min(35,MediaQuery.sizeOf(context).width/20)),
                                   ],
                                 ),
                                 onTap: () => fliterShowNotifier.value = !fliterShowNotifier.value,
@@ -140,8 +143,8 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                                           return  Padding(
                                             padding: const EdgeInsets.only(right: 16),
                                             child:  viewType == ViewType.gridView ? 
-                                                    const Icon(Icons.grid_view,size: 35) : 
-                                                    const Icon(Icons.format_list_bulleted,size: 35),
+                                                    Icon(Icons.grid_view,size: min(35,MediaQuery.sizeOf(context).width/20)) : 
+                                                    Icon(Icons.format_list_bulleted,size: min(35,MediaQuery.sizeOf(context).width/20)),
                                           );
                                         }
                                       ),
@@ -149,7 +152,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                                   ),
                                                   
                                   AnimatedSortSelector(
-                                    currentType: browserSortTypeNotifier.value,
+                                    currentType: browserSortType,
                                     selectedType: SortType.rank,
                                     onTap: (){
 
@@ -163,7 +166,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                                   ),
                                                   
                                   AnimatedSortSelector(
-                                    currentType: browserSortTypeNotifier.value,
+                                    currentType: browserSortType,
                                     selectedType: SortType.heat,
                                     onTap: (){
                                       
@@ -177,7 +180,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                                   ),
                                                   
                                   AnimatedSortSelector(
-                                    currentType: browserSortTypeNotifier.value,
+                                    currentType: browserSortType,
                                     selectedType: SortType.score,
                                     onTap: (){
         
@@ -290,7 +293,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
                                   padding: const EdgeInsets.all(16),
                                   child: NotificationListener<ScrollUpdateNotification>(
                                     onNotification: (notification) => true,
-                                    child: BangutileGridView(
+                                    child: BanguTileGridView(
                                       keyDeliver: messageGridStreamKey,
                                       bangumiLists: messageList,
                                     ),
@@ -309,6 +312,8 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
       
           
                 const SliverPadding(padding: EdgeInsets.only(bottom: 60)),
+
+
                 
                 SliverToBoxAdapter(
                   child: ValueListenableBuilder(

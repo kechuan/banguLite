@@ -1,5 +1,6 @@
 
 import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class BangumiDetailPage extends StatefulWidget {
 class _BangumiDetailPageState extends State<BangumiDetailPage> {
 
   ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
-  BangumiDetails? currentSubjectDetail; //dependence InheritedWidget(Provider). don't turn to stateless.
+  //BangumiDetails? currentSubjectDetail; //dependence InheritedWidget(Provider). don't turn to stateless.
   ValueNotifier<Color> detailImageColorNotifier = ValueNotifier<Color>( const Color.fromARGB(183, 236, 211, 231));
 
   @override
@@ -76,170 +77,165 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: detailImageColorNotifier,
-      builder: (_,linearColor,detailScaffold) {
-        return Theme(
-          data: ThemeData(
-            primaryColor: linearColor,
-            scaffoldBackgroundColor: linearColor,
-            fontFamily: 'MiSansFont',
-          ),
-          child:detailScaffold!,
-        );
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.6),
-          
-          title: ValueListenableBuilder(valueListenable: appbarTitleNotifier, builder: (_,appbarTitle,__)=>Text(appbarTitle)),
-          leading: IconButton(
-            onPressed: (){
-              Navigator.of(context).pop();
-              //context.read<CommentModel>().resetProp();
-      
-              //退出时移除ID.
-              context.read<BangumiModel>().routesIDList.remove(currentSubjectDetail?.id);
-              currentSubjectDetail = null;
-      
-            }, icon: const Icon(Icons.arrow_back)
-          ),
-          actions: [
-            IconButton(
-              onPressed: () async {
-                if(await canLaunchUrlString("https://bgm.tv/subject/${widget.bangumiID}")){
-                  await launchUrlString("https://bgm.tv/subject/${widget.bangumiID}");
-                }
-              },
-              icon: Transform.rotate(
-                angle: -45,
-                child: const Icon(Icons.link),
-              )
-            )
-          ],
-        ),
-      
-        body: NotificationListener<ScrollNotification>(
-          onNotification: (notification) {
-            final double offset = notification.metrics.pixels; //scrollview 的 offset : 注意不要让更内层的scrollView影响到它监听
-            if (offset >= 60) { 
-              appbarTitleNotifier.value = currentSubjectDetail?.name ?? "";
-              //appbarTitleNotifier.value = currentSubjectDetail?.id.toString() ?? ""; Debug
-            }
-      
-            else{
-              appbarTitleNotifier.value = "";
-            }
+
+    
+
+    return ChangeNotifierProvider(
+      create: (context) => BangumiModel(),
+      child: ValueListenableBuilder(
+        valueListenable: detailImageColorNotifier,
+        builder: (_,linearColor,detailScaffold) {
+          return Theme(
+            data: ThemeData(
+              primaryColor: linearColor,
+              scaffoldBackgroundColor: linearColor,
+              fontFamily: 'MiSansFont',
+            ),
+            child:detailScaffold!,
+          );
+        },
+        child: Builder(
+          builder: (context) {
+            return Scaffold(
+              appBar: AppBar(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.6),
+                
+                title: ValueListenableBuilder(valueListenable: appbarTitleNotifier, builder: (_,appbarTitle,__)=>Text(appbarTitle)),
+                leading: IconButton(
+                  onPressed: ()=>Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back)
+                ),
+                actions: [
+                  IconButton(
+                    onPressed: () async {
+                      if(await canLaunchUrlString(BangumiWebUrls.subject(widget.bangumiID))){
+                        await launchUrlString(BangumiWebUrls.subject(widget.bangumiID));
+                      }
+                    },
+                    icon: Transform.rotate(
+                      angle: -45,
+                      child: const Icon(Icons.link),
+                    )
+                  )
+                ],
+              ),
             
-            return false;
-          },
-          
-          child: Selector<BangumiModel, int>(
-          selector:(_, bangumiModel) => bangumiModel.bangumiID,
-          shouldRebuild: (previous, next){
-      
-            if(next == 0) return false;
-      
-            final bangumiDetailModel = context.read<BangumiModel>();
-      
-            if(bangumiDetailModel.routesIDList.contains(bangumiDetailModel.bangumiID)){
-              return false;
-            }
-      
-            return previous!=next;
-          },
-          builder: (_,bangumiID,child) {
-        
-            debugPrint("BangumiID: $bangumiID => ${widget.bangumiID}");
-        
-            return FutureBuilder(
-              future: context.read<BangumiModel>().loadDetails(widget.bangumiID),
-              builder: (_,snapshot){
-      
-                switch(snapshot.connectionState){
-                  case ConnectionState.done:{
-                    if(snapshot.hasData){
-                      currentSubjectDetail = snapshot.data;
-                    }
-      
-                    debugPrint("parse done ,builderStamp: ${DateTime.now()}");
-        
+              body: NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  final bangumiModel = context.read<BangumiModel>();
+                  BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails; //dependenc
+                  
+                  final double offset = notification.metrics.pixels; //scrollview 的 offset : 注意不要让更内层的scrollView影响到它监听
+                  if (offset >= 60) { 
+                    appbarTitleNotifier.value = currentSubjectDetail?.name ?? "";
+                    //appbarTitleNotifier.value = currentSubjectDetail?.id.toString() ?? ""; Debug
                   }
-        
-                  default: {}
-                }
-        
-                return EasyRefresh.builder(
-                  header: const MaterialHeader(),
-                  onRefresh: ()=> context.read<BangumiModel>().loadDetails(bangumiID,refresh:true),
-                  childBuilder: (_,physic){
-                    return SingleChildScrollView(
-                      physics: physic,
-                      child: Skeletonizer(
-                        enabled: currentSubjectDetail==null,
-                        child: ValueListenableBuilder(
-                          valueListenable: detailImageColorNotifier,
-                          builder: (_,linearColor,child) {
-                            return AnimatedContainer(
-                              duration: const Duration(milliseconds: 500),
-                              padding: const EdgeInsets.all(16),
-                              decoration:  BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.white,
-                                    //Color.fromARGB(255, 209, 220, 233)
-                                    linearColor,
-                                  ]
-                                )
-                              ),
-                              child: child!
-                              );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              
-                              BangumiDetailIntro(bangumiDetails: currentSubjectDetail ?? BangumiDetails()),
-                              
-                              NotificationListener<ScrollNotification>(
-                                onNotification: (_) => true,
-                                child: BangumiSummary(summary: currentSubjectDetail?.summary)
-                              ),
-                              
-                              NotificationListener<ScrollNotification>(
-                                onNotification: (_) => true,
-                                child: BangumiHotComment(id: widget.bangumiID) 
-                                //内含Future 界面变动的时候 这个也会被rebuild
-                                //唯一的办法就是像上面那样 由details创立bangumiModel 只是这样的话就会让原本分割开的 details comment关系又融合进去了
-                              
-                                //不过至少在后端请求数据里做了防rebuild触发的重复处理
-                              ),
-                              
-                            
-                            ],
-                          ),
-                              
-                        ),
-      
-                      ),
-                    );
+            
+                  else{
+                    appbarTitleNotifier.value = "";
                   }
-                );
-        
-        
-              },
+                  
+                  return false;
+                },
+                
+                child: Selector<BangumiModel, int>(
+                selector:(_, bangumiModel) => bangumiModel.bangumiID,
+                shouldRebuild: (previous, next){
+                  if(next == 0) return false;
+                  return previous!=next;
+                },
+                builder: (_,bangumiID,child) {
+            
+                  final bangumiModel = context.read<BangumiModel>();
+              
+                  debugPrint("BangumiID: $bangumiID => ${widget.bangumiID}");
+              
+                  return FutureBuilder(
+                    future: bangumiModel.loadDetails(widget.bangumiID),
+                    builder: (_,snapshot){
+
+                      if(snapshot.connectionState == ConnectionState.done){
+                        debugPrint("parse ${widget.bangumiID} done ,builderStamp: ${DateTime.now()}");
+                      }
+              
+                      return EasyRefresh.builder(
+                        header: const MaterialHeader(),
+                        onRefresh: ()=> context.read<BangumiModel>().loadDetails(bangumiID,refresh:true),
+                        childBuilder: (_,physic){
+            
+                          
+                          BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails; //dependenc
+            
+                          return SingleChildScrollView(
+                            physics: physic,
+                            child: Skeletonizer(
+                              enabled: currentSubjectDetail==null,
+                              child: ValueListenableBuilder(
+                                valueListenable: detailImageColorNotifier,
+                                builder: (_,linearColor,child) {
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    padding: const EdgeInsets.all(16),
+                                    decoration:  BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.white,
+                                          //Color.fromARGB(255, 209, 220, 233)
+                                          linearColor,
+                                        ]
+                                      )
+                                    ),
+                                    child: child!
+                                    );
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    
+                                    BangumiDetailIntro(bangumiDetails: currentSubjectDetail ?? BangumiDetails()),
+                                    
+                                    NotificationListener<ScrollNotification>(
+                                      onNotification: (_) => true,
+                                      child: BangumiSummary(summary: currentSubjectDetail?.summary)
+                                    ),
+                                    
+                                    NotificationListener<ScrollNotification>(
+                                      onNotification: (_) => true,
+                                      child: BangumiHotComment(id: widget.bangumiID,name: bangumiModel.bangumiDetails?.name,) 
+                                      //内含Future 界面变动的时候 这个也会被rebuild
+                                      //唯一的办法就是像上面那样 由details创立bangumiModel 只是这样的话就会让原本分割开的 details comment关系又融合进去了
+                                    
+                                      //不过至少在后端请求数据里做了防rebuild触发的重复处理
+                                    ),
+                                    
+                                  
+                                  ],
+                                ),
+                                    
+                              ),
+            
+                            ),
+                          );
+                        }
+                      );
               
               
-            );
-        
-          },
-        ),
-      )
-      
+                    },
+                    
+                    
+                  );
+              
+                },
+              ),
             )
-        
+            
+                  );
+          }
+        )
+          
+      ),
     );
       
     

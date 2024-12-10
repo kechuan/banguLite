@@ -26,7 +26,7 @@ class CommentModel extends ChangeNotifier {
 
   Future<void> getCommentLength(int subjectID) async {
     await HttpApiClient.client.get(
-      BangumiUrls.comment(subjectID),
+      BangumiAPIUrls.comment(subjectID),
       queryParameters: BangumiQuerys.commentQuery..["limit"] = 1
     ).then((response){
       if(response.data != null && response.data["total"] != null){
@@ -48,9 +48,7 @@ class CommentModel extends ChangeNotifier {
         debugPrint("comment subjectID $subjectID: was empty!");
 
         //因为 null/[] 已经被用来占用为 标志位了 无数据返回部分就以这种形式进行处理
-        commentsData.addAll({
-          1:[CommentDetails()..userId = 0],
-        });
+        commentsData.addAll({1:[CommentDetails()..userId = 0]});
 
         notifyListeners();
         return;
@@ -114,7 +112,7 @@ class CommentModel extends ChangeNotifier {
     try{
 
       final detailInformation = await HttpApiClient.client.get(
-      BangumiUrls.comment(subjectID),
+      BangumiAPIUrls.comment(subjectID),
       queryParameters: BangumiQuerys.commentQuery
 
       // 末数 比如 55-50 => 5 这样就不会请求一整页的数据 而是请求残余页的条目数

@@ -1,8 +1,8 @@
 
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/widgets/warp_page_dialog.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/models/providers/bangumi_model.dart';
 
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_comments.dart';
@@ -12,10 +12,12 @@ import 'package:provider/provider.dart';
 class MoreCommentsPage extends StatelessWidget  {
   const MoreCommentsPage({
     super.key,
-    required this.subjectID
+    required this.subjectID,
+    this.name
   });
 
   final int subjectID;
+  final String? name;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,7 @@ class MoreCommentsPage extends StatelessWidget  {
       builder: (context,child) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(context.read<BangumiModel>().bangumiDetails?.name ?? "comments Detail"),
+            title: Text(name ?? "comments Detail"),
             actions: [
               //when loaded, show more or empty
               //jumpPage
@@ -50,7 +52,7 @@ class MoreCommentsPage extends StatelessWidget  {
                       return WarpPageDialog(
                         pageSelectorController: pageSelectorController,
                         jumpPageEditingController: jumpPageEditingController,
-                        commentTotalPage: convertTotalToPage(commentModel.commentLength, 10),
+                        commentTotalPage: convertTotalCommentPage(commentModel.commentLength, 10),
                         onConfirmPressed: () {
                           Navigator.of(context).pop();
 
@@ -73,14 +75,14 @@ class MoreCommentsPage extends StatelessWidget  {
           
           body: FutureBuilder(
             future: context.read<CommentModel>().getCommentLength(subjectID), 
-            //代价比较低 所以就不专门设立Completer或者State了
+            //sideEffect的代价比较低 所以就不专门设立Completer或者State了
             builder: (_,snapshot) {
               switch(snapshot.connectionState){
           
                 case ConnectionState.done:{
                   return CommentView(
                     //totalPageLength: context.read<CommentModel>().commentLength,
-                    totalPageLength: convertTotalToPage(context.read<CommentModel>().commentLength, 10),
+                    totalPageLength: convertTotalCommentPage(context.read<CommentModel>().commentLength, 10),
                     commentPageController: commentPageController,
         
                     subjectID: subjectID,
@@ -99,20 +101,6 @@ class MoreCommentsPage extends StatelessWidget  {
       }
     );
      
-  }
-
-  int convertTotalToPage(int totalItemsLength,int pageLength){
-    int pageCount = 0;
-
-    if(totalItemsLength%pageLength == 0){
-      pageCount =  totalItemsLength ~/ pageLength;
-    }
-
-    else{
-      pageCount = (totalItemsLength ~/ pageLength) + 1;
-    }
-
-    return pageCount;
   }
 
 }

@@ -2,8 +2,12 @@
 
 import 'dart:math';
 
+import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/eps_info.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/widgets/components/ep_comments.dart';
+import 'package:bangu_lite/widgets/fragments/ep_toggle_panel.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_listtile_template.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
@@ -11,6 +15,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 
 @FFRoute(name: '/subjectEp')
@@ -18,15 +23,12 @@ import 'package:skeletonizer/skeletonizer.dart';
 class BangumiEpPage extends StatefulWidget {
   const BangumiEpPage({
     super.key,
-    required this.subjectID,
-    this.epIndex
-    //required this.epsInformation
+	required this.epModel,
+	required this.totalEps
   });
 
-  final int subjectID;
-  final int? epIndex;
-
-  //final Map<String,dynamic> epsInformation;
+  final EpModel epModel;
+  final int totalEps;
 
   @override
   State<BangumiEpPage> createState() => _BangumiEpPageState();
@@ -34,105 +36,155 @@ class BangumiEpPage extends StatefulWidget {
 
 class _BangumiEpPageState extends State<BangumiEpPage> {
 
+  Future<void>? epsInformationFuture;
+
   @override
   Widget build(BuildContext context) {
 
+    //return ChangeNotifierProvider(
+	return ChangeNotifierProvider.value(
+		value: widget.epModel,
+		builder: (context,child){
 
-    return ChangeNotifierProvider(
-      create: (_) => EpModel(subjectID: widget.subjectID,selectedEp: widget.epIndex ?? 1),
-      builder: (context,child){
+			final epModel = widget.epModel;
 
-        final epModel = context.read<EpModel>();
+			//final ScrollController scrollController = ScrollController();
 
-        return EasyRefresh(
-          footer: const MaterialFooter(),
-          header: const MaterialHeader(),
-          onRefresh: () => epModel.loadEps(),
-          onLoad: () => debugPrint("下拉加载"),
-          child: Scaffold(
-            appBar: AppBar(
-              title: Text("Ep.${widget.epIndex} current EpName(CN)"),
-            ),
-            body: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-            
-              children: [
-            
-                const EpInfo(),
-            
-                //做成悬浮样式 监听scrollNotification
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                  
-                      InkResponse(
-                        onTap: () => epModel.updateSelectedEp(max(1,epModel.selectedEp-1)),
-                        child:  Row(
-                          children: [
-                            const Icon(Icons.arrow_back_ios,size: 18),
-                            const Padding(padding: EdgeInsets.symmetric(horizontal: 6)),
-                            Text(
-                              "上一话 Ep. ${max(1,epModel.selectedEp-1)} Name",
-                              style: TextStyle(color: epModel.selectedEp == 1 ? Colors.grey : null),
-                            ),
-                          ],
-                        ),
-                      ),
-                  
-                      InkResponse(
-                        onTap: () => epModel.updateSelectedEp(min(epModel.epsData.length,epModel.selectedEp+1)),
-                        child:  Row(
-                          children: [
-                            Text(
-                              "下一话 Ep. ${min(epModel.epsData.length,epModel.selectedEp-1)} Name",
-                              style: TextStyle(color: epModel.selectedEp == epModel.epsData.length ? Colors.grey : null),
-                            ),
-            
-                            const Padding(padding: EdgeInsets.symmetric(horizontal: 6)),
-                            const Icon(Icons.arrow_forward_ios,size: 18),
-                          ],
-                        ),
-                      ),
-                  
-                    ],
-                  ),
-                ),
-            
-                //吐槽箱 (count)
-                Expanded(
-                  child: EpCommentDetails(),
-                )
-            
-              ],
-            ),
-          ),
-        );
-      },
-    );
+			epsInformationFuture ??= epModel.getEpsInformation(offset: epModel.selectedEp~/100 );
+
+			return EasyRefresh.builder(
+			//  footer: const MaterialFooter(),
+				header: const MaterialHeader(),
+
+				childBuilder: (_,physics) {
+					return Scaffold(
+						appBar: AppBar(
+							title: Selector<EpModel,int>(
+								selector: (_, epModel) => epModel.selectedEp,
+								shouldRebuild: (previous, next) => previous!=next,
+								builder: (_,selectedEp,__) => Text("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN} ")
+							),
+							actions: [
+
+								IconButton(
+									onPressed: () async {
+										if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
+										await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
+										}
+									},
+									icon: Transform.rotate(
+										angle: -45,
+										child: const Icon(Icons.link),
+									)
+								),
+
+
+							],
+						),
+						body:  Selector<EpModel,Map<int,EpsInfo>>(
+							selector: (_, epModel) => epModel.epsData,
+							shouldRebuild: (previous, next) => previous.length != next.length,
+							builder: (_,epsData,child) {
+	
+								return Selector<EpModel,int>(
+									selector: (_, epModel) => epModel.selectedEp,
+									shouldRebuild: (previous, next) => previous != next,
+									builder: (_,selectedEp,child){
+	
+										return CustomScrollView(
+											physics:physics,
+											slivers: [
+	
+												SliverList(
+													delegate: SliverChildListDelegate(
+														[
+															EpInfo(epsInfo: epsData,selectedEp: selectedEp),
+
+															//迟早变成 SliverAppbar
+
+															 FutureBuilder(
+																future: epsInformationFuture,
+																builder: (_,snapshot){
+																	return EpTogglePanel(currentEp: selectedEp,totalEps: widget.totalEps);
+																}
+															),
+
+													
+														]
+													)
+												),
+	
+												child!
+
+
+	
+											],	
+										);
+										
+									},
+									
+									child: const EpCommentDetails()
+
+								);
+	
+	
+							}
+						)
+					
+						
+						
+						
+					);
+				}
+				
+				
+
+
+			);
+		},
+	  );
+    
   }
 }
 
 class EpInfo extends StatelessWidget {
   
-  const EpInfo({super.key});
+  const EpInfo({
+    super.key,
+    required this.epsInfo,
+    required this.selectedEp,
+  });
+
+  final Map<int,EpsInfo> epsInfo;
+  final int selectedEp;
+
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+
+    if(epsInfo.isEmpty){
+      return const Skeletonizer(
+        child: SkeletonListTileTemplate()
+      );
+    }
+
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListTile(
-          title: Text("current Eps"),
-          subtitle: Text("current Ep status"),
+
+		ListTile(
+          title: Row(
+            children: [
+				Text("${epsInfo[selectedEp]!.nameCN ?? epsInfo[selectedEp]!.name}"),
+				const Padding(padding: PaddingH6),
+				Text("${epsInfo[selectedEp]!.airDate}",style: const TextStyle(fontSize: 14,color: Colors.grey)),
+            ],
+          ),
+         
         ),
 
-
         ListTile(
-          title:  SelectableText(
-            "desc"
-          ),
+          title:  SelectableText("${epsInfo[selectedEp]!.description}"),
         ),
 
        
@@ -141,91 +193,84 @@ class EpInfo extends StatelessWidget {
   }
 }
 
-class EpCommentDetails extends StatefulWidget {
-  const EpCommentDetails({super.key});
+class EpCommentDetails extends StatelessWidget {
+	const EpCommentDetails({
+		super.key,
+	});
 
-  @override
-  State<EpCommentDetails> createState() => _EpCommentDetailsState();
+
+	@override
+	Widget build(BuildContext context) {
+
+		return Selector<EpModel,List?>(
+			selector: (_, epModel) => epModel.epCommentData[epModel.selectedEp],
+			shouldRebuild: (previous, next)=> previous!=next,
+			
+			builder: (_,currentEpCommentData,child){
+				
+				return FutureBuilder(
+					future: context.read<EpModel>().loadEp(),
+					builder: (_,snapshot) {
+
+						final epModel = context.read<EpModel>();
+						int currentEp = epModel.selectedEp;
+				
+						debugPrint("currentEp:$currentEp");
+
+						bool isCommentLoading = epModel.epCommentData[currentEp] == null || epModel.epCommentData[currentEp]!.isEmpty;
+
+						return Skeletonizer.sliver(
+							enabled: isCommentLoading,
+							child: SliverList.separated(
+								itemCount: isCommentLoading ? 3 : epModel.epCommentData[currentEp]!.length+1,
+								itemBuilder: (_,epCommentIndex){
+									//Loading...
+									if(isCommentLoading){
+										return const SkeletonListTileTemplate();
+									}
+
+									if(epCommentIndex == 0){
+										int commentCount = 0;
+
+										if(epModel.epCommentData[epModel.selectedEp]![0].userId != 0){
+											commentCount = epModel.epCommentData[epModel.selectedEp]!.length;
+										}
+
+										return Padding(
+											padding: const EdgeInsets.all(16),
+											child: Row(
+												children: [
+													const Text("吐槽箱",style: TextStyle(fontSize: 24)),
+																		
+													const Padding(padding: PaddingH6),
+																		
+													Text("$commentCount",style: const TextStyle(color: Colors.grey))
+												],
+											),
+										);
+									}
+								
+									//无评论的显示状态
+									if(epModel.epCommentData[currentEp]![0].userId == 0){
+										return const Center(
+											child: Padding(
+												padding: EdgeInsets.only(top:64),
+												child: Text("该集数暂无人评论...",style: TextStyle(fontSize: 16)),
+											),
+										);
+									}
+									
+								
+									return EpCommentView(epCommentData: epModel.epCommentData[currentEp]![epCommentIndex-1]);
+								},
+								separatorBuilder: (_,__,) => const Divider(height: 1), 
+							),
+						);
+
+					}
+				);
+			}
+		);
+	}
 }
 
-class _EpCommentDetailsState extends State<EpCommentDetails> {
-
-  @override
-  void initState() {
-    
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-    
-        const Padding(
-          padding:  EdgeInsets.all(16),
-          child: Row(
-            
-            children: [
-                Text("吐槽箱",style: TextStyle(fontSize: 24)),
-
-                Padding(padding: EdgeInsetsDirectional.symmetric(horizontal: 6)),
-
-                Text("33",style: TextStyle(color: Colors.grey))
-            ],
-          ),
-        ),
-
-          Expanded(
-            child: Selector<EpModel,int?>(
-              selector: (_, epModel) => epModel.selectedEp,
-              shouldRebuild: (previous, next) => previous!=next,
-              builder: (_,currentEp,child){
-
-                final epModel = context.read<EpModel>();
-
-                debugPrint("currentEp:$currentEp");
-
-                //策略转变 不再分页 而是下拉加载
-
-                return FutureBuilder(
-                  future: Future.delayed(Duration.zero),
-                  builder: (_,snapshot) {
-
-                    //snapshot充当rebuild
-
-                    return Skeletonizer(
-                      enabled: epModel.epCommentData[currentEp] == null,
-                      child: AnimatedList.separated(
-                        initialItemCount: epModel.epCommentData[currentEp] != null ? epModel.epCommentData[currentEp]!.length : 1,
-                        itemBuilder: (_,epCommentIndex,animation){
-                    
-                          //Loading...
-                          if(epModel.epCommentData[currentEp] == null) return const SkeletonListtileTemplate();
-                    
-                          //无评论的显示状态
-                          if(epModel.epCommentData[currentEp]!.isEmpty) return const Center(child: Text("该集数暂无人评论..."));
-
-                          return EpCommentView(
-                            epCommentData: epModel.epCommentData[currentEp]![epCommentIndex],
-                          );
-
-                    
-                        }, 
-                        separatorBuilder: (_,__,___) => const Divider(height: 1), 
-                        removedSeparatorBuilder: (_,__,___) => const SizedBox.shrink()
-                      ),
-                    );
-                  }
-                );
-
-                 
-              },
-            ),
-          ),
-              
-        
-      ],
-    );
-  }
-}

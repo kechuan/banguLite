@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:flutter/material.dart';
 
@@ -27,11 +29,13 @@ class AnimatedSortSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+
+        //min(30,MediaQuery.sizeOf(context).width/20) - 10
         
         AnimatedContainer(
           color: currentType == selectedType ? const Color(0xffd1e5f4)  : null,
-          height: currentType == selectedType ? 30 : 40,
-          width: currentType == selectedType ? 30 : 40,
+          height: currentType == selectedType ? min(30,MediaQuery.sizeOf(context).width/20) : min(40,MediaQuery.sizeOf(context).width/20),
+          width: currentType == selectedType ? min(30,MediaQuery.sizeOf(context).width/20) : min(40,MediaQuery.sizeOf(context).width/20),
           duration: const Duration(milliseconds: 150),
           curve: Curves.linear,
           child: InkResponse(

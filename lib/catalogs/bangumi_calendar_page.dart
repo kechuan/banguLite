@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
-import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/weekday_select_overlay.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
@@ -147,8 +146,6 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
                             
                                               if(weeklyBangumisRecommend!=null){
                                                 debugPrint("$currentIndex => ${currentIndex % weeklyBangumisRecommend.length} => ${weeklyBangumisRecommend[currentIndex % weeklyBangumisRecommend.length].name} ");
-
-                                                context.read<BangumiModel>().routesIDList.add(weeklyBangumisRecommend[currentIndex % weeklyBangumisRecommend.length].id!);
                                                   
                                                 Navigator.pushNamed(
                                                   context,
@@ -279,7 +276,7 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
                               ),
 
                               SliverToBoxAdapter(
-                                child: BangutileGridView(
+                                child: BanguTileGridView(
                                   bangumiLists: calendarBangumis.isEmpty ? [] : calendarBangumis.values.elementAt(selectedDay-1),
                                 ),
                               )

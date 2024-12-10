@@ -15,9 +15,11 @@ class BangumiHotComment extends StatefulWidget {
   const BangumiHotComment({
     super.key,
     required this.id,
+	this.name
   });
 
   final int id;
+  final String? name;
 
   @override
   State<BangumiHotComment> createState() => _BangumiHotCommentState();
@@ -31,10 +33,10 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("parse comment rebuild: ${widget.id}"); 
+    //debugPrint("parse comment rebuild: ${widget.id}"); 
 
     return ChangeNotifierProvider(
-      create: (context) => CommentModel(),
+      create: (_) => CommentModel(),
       builder: (providerContext,child) {
 
         if(widget.id == 0) return const SizedBox.shrink();
@@ -57,20 +59,13 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
             
             shouldRebuild: (previous, next){
         
-              //if(context.read<BangumiModel>().routesIDList.contains(id)) return false;
-        
               if(previous.isEmpty || next.isEmpty) return true;
               debugPrint("comment rebuild received: ${previous[0].commentTimeStamp!=next[0].commentTimeStamp}");
               return previous[0].commentTimeStamp!=next[0].commentTimeStamp;
             },
             builder: (_,commentListData,child) {
         
-              //if(id != providerContext.read<CommentModel>().commentID && )
-        
               return FutureBuilder(
-
-                //@deprecated
-                //future: providerContext.read<CommentModel>().loadComments(widget.id), 
                 future: commentFuture,
 
                   //以后学聪明点 要不就直接写进initState 然后刷新携带flag 
@@ -104,7 +99,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                             
                           
                             if(commentListData.isEmpty){
-                              return const SkeletonListtileTemplate();
+                              return const SkeletonListTileTemplate();
                             }
                             
                             //无评论的显示状态
@@ -159,7 +154,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                                 Navigator.pushNamed(
                                   providerContext,
                                   Routes.moreComment,
-                                  arguments: {"subjectID":widget.id}
+                                  arguments: {"subjectID":widget.id,"name":widget.name}
                                 );
                               },
                               child: const Text("更多吐槽",style: TextStyle(decoration: TextDecoration.underline,fontSize: 16),),

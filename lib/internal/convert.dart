@@ -1,3 +1,4 @@
+
 enum WeekDay{
 
   mon("一",1),
@@ -53,30 +54,64 @@ String? convertAmpsSymbol(String? originalString){
   return originalString;
 }
 
-String convertDigitNumString(int originalnumber, {int? numberBits}){
+String convertDigitNumString(int originalNumber, {int numberBits = 2}){
 
-  String fillingContent = '0';
+  String fillingContent = '';
 
-  if(numberBits!=null){
-    for(int addTimes = numberBits; addTimes>0; addTimes--){
-      fillingContent+='0';
-    }
-
-    if(originalnumber < 10*numberBits){
-      return '$fillingContent$originalnumber';
-    }
-
+  if(originalNumber >= 10*(numberBits-1)){
+    return '$originalNumber';
   }
 
   else{
-    if(originalnumber < 10){
-      return '$fillingContent$originalnumber';
+    for(numberBits; numberBits>1; numberBits--){
+      fillingContent+='0';
     }
+
+    return '$fillingContent$originalNumber';
   }
 
-  return originalnumber.toString();
 }
 
+String convertBangumiCommentSticker(String originalComment){
+  RegExp stickerMatch = RegExp(r'(\()+bgm+(\d{2,3})(\))');
+  
+  String mappedComment = originalComment.replaceAllMapped(
+    stickerMatch, 
+    (match){
+
+      String resultText = "";
+      String replaceTag = "sticker";
+
+      List<String?> resultList = [];
+      
+
+      for(String? currentPattern in match.groups([1,2,3])){
+        switch(currentPattern){
+          case '(': resultList.add("[$replaceTag]"); break;
+          case ')': resultList.add("[/$replaceTag]"); break;
+          default: resultList.add("assets/bangumiSticker/bgm${match.group(2)}.gif");
+        }
+      }
+
+
+      resultText = resultList.join();
+
+      
+
+      return resultText;
+
+      
+    }
+  );
+
+  //debugPrint("convert :$mappedComment");
+
+  return mappedComment;
+
+									
+}
+
+int convertSegement(int totalEps, int segementRange) => convertTotalCommentPage(totalEps,segementRange);
 int convertTotalCommentPage(int totalComments, int pageRange){
 return  totalComments % pageRange == 0 ?
         totalComments~/pageRange :
@@ -115,7 +150,7 @@ int convertAiredEps(String? bangumiAirDate){
 	int residualDateTime = (DateTime.now().millisecondsSinceEpoch - DateTime(bangumiYear,bangumiMonth,bangumiDay).millisecondsSinceEpoch);
 
 	//放送开始附带一集 因此+1
-	int airedEps =  residualDateTime ~/ const Duration(days: 7).inMilliseconds;
+	int airedEps =  (residualDateTime ~/ const Duration(days: 7).inMilliseconds) + 1;
 
 	return airedEps;
 }

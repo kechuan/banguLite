@@ -1,7 +1,9 @@
+import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
+import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 class BangumiCommentTile extends StatelessWidget {
   const BangumiCommentTile({
@@ -30,7 +32,7 @@ class BangumiCommentTile extends StatelessWidget {
             ) : 
                 
             //const FlutterLogo(),
-            Image.asset("asset/icons/icon.png"),
+            Image.asset("assets/icons/icon.png"),
         
             Text(commentData.nickName ?? "nameID",style: const TextStyle(color: Colors.blue)),
           ],
@@ -40,7 +42,32 @@ class BangumiCommentTile extends StatelessWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(commentData.comment ?? "comment"),
+          BBCodeText(
+              data: convertBangumiCommentSticker(commentData.comment ?? "comment"),
+              
+              stylesheet: BBStylesheet(
+                tags: [
+                  BoldTag(),
+                  ItalicTag(),
+                  UnderlineTag(),
+                  StrikeThroughTag(),
+                  ColorTag(),
+                  ImgTag(),
+                  UrlTag(),
+                  QuoteTag(),
+                  SpoilerTag(),
+                  LeftAlignTag(),
+                  CenterAlignTag(),
+                  RightAlignTag(),
+                  BoldTag(),
+                  MaskTag(),
+                  BangumiStickerTag(),
+                  
+                ],
+                selectableText: true,
+                defaultText: const TextStyle(fontFamily: 'MiSansFont',color: Colors.black,fontSize: 16)
+              ),
+            ),
           Row(
             children: [
   

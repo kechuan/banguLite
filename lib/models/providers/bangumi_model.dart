@@ -15,18 +15,12 @@ class BangumiModel extends ChangeNotifier {
 
   BangumiDetails? bangumiDetails;
 
-  
-
-  final Set<int> routesIDList = {}; //用于记录存放当前路由支上有多少个ID。
-
-  Future<BangumiDetails?> loadDetails(int newID,{bool? refresh}) async {
-
-    //BangumiDetails? bangumiDetails;
+  Future<void> loadDetails(int newID,{bool? refresh}) async {
 
     if(newID!=bangumiID || refresh == true){
       _bangumiID = newID;
 
-      final detailInformation = await HttpApiClient.client.get("${BangumiUrls.subject}/$bangumiID");
+      final detailInformation = await HttpApiClient.client.get("${BangumiAPIUrls.subject}/$bangumiID");
 
       if(detailInformation.data!=null){
         bangumiDetails = loadDetailsData(detailInformation);
@@ -38,7 +32,7 @@ class BangumiModel extends ChangeNotifier {
       notifyListeners();
     });
 
-    return bangumiDetails;
+    //return bangumiDetails;
 
   }
 

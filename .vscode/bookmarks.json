@@ -1,0 +1,24 @@
+{
+	"files": [
+		{
+			"path": "lib/catalogs/bangumi_ep_page.dart",
+			"bookmarks": [
+				{
+					"line": 149,
+					"column": 38,
+					"label": "EPInfo"
+				}
+			]
+		},
+		{
+			"path": "lib/widgets/components/bangumi_detail_intro.dart",
+			"bookmarks": [
+				{
+					"line": 186,
+					"column": 21,
+					"label": "Portial——EP入口"
+				}
+			]
+		}
+	]
+}

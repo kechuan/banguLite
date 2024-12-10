@@ -1,14 +1,22 @@
 plugins {
-    id "com.android.application"
-    id "kotlin-android"
+    id "com.android.application" 
+	//AGP
+    id "kotlin-android" 
+	//KGP
+
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
 }
 
 android {
+	//Your project is configured with Android NDK 23.1.7779620, but the following plugin(s) depend on a different Android NDK version:
+	//- path_provider_android requires Android NDK 27.0.12077973
+	//- sqflite requires Android NDK 27.0.12077973
+	//- url_launcher_android requires Android NDK 27.0.12077973
     namespace = "io.flutter.banguLite"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    //ndkVersion = flutter.ndkVersion
+	ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -28,6 +36,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+		
     }
 
     buildTypes {

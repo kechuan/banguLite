@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/models/ep_details.dart';
 import 'package:bangu_lite/widgets/components/ep_replied_comment_dialog.dart';
 import 'package:flutter/material.dart';
@@ -21,13 +22,9 @@ class EpRepliedTile extends ListTile {
     ) return const SizedBox.shrink();
 
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(),
-        //color: Colors.blue,
-      ),
+      decoration: BoxDecoration(border: Border.all()),
       child: ListTile(
         tileColor: const Color.fromARGB(225, 212, 232, 215),
-        title: const SizedBox.shrink(),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -36,24 +33,32 @@ class EpRepliedTile extends ListTile {
               min(3,epCommentData.repliedComment!.length), 
               (index){
       
-                return InkResponse(
-                  containedInkWell: true,
-                  hoverColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  onTap: (){
-                    showModalBottomSheet(
-                      constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
-                      context: context,
-                      builder: (_)=> EpRepliedCommentDialog(currentComment: epCommentData,commentIndex: index)
-                    );
-                  },
+                return Padding(
+                  padding: PaddingV6,
+                  child: InkResponse(
+                    containedInkWell: true,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: (){
+                      showModalBottomSheet(
+                        constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
+                        context: context,
+                        builder: (_)=> EpRepliedCommentDialog(currentComment: epCommentData,commentIndex: index)
+                      );
+                    },
+                  
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("${epCommentData.repliedComment![index].nickName}:"),
+                  
+                        const Padding(padding: PaddingH6),
+    
+                        Expanded(child: Text("${epCommentData.repliedComment![index].comment}"),)
 
-                  child: Row(
-                    children: [
-                      Text("${epCommentData.repliedComment![index].nickName}:"),
-                      const Padding(padding: EdgeInsets.symmetric(horizontal: 6)),
-                      Text("${epCommentData.repliedComment![index].comment}")
-                    ],
+                      ],
+                    ),
+                    
                   ),
                 );
       

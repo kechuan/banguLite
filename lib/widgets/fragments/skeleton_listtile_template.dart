@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class SkeletonListtileTemplate extends StatelessWidget {
-  const SkeletonListtileTemplate({super.key});
+class SkeletonListTileTemplate extends StatelessWidget {
+  const SkeletonListTileTemplate({super.key});
 
   @override
   Widget build(BuildContext context) {

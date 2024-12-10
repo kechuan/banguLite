@@ -13,18 +13,19 @@ class HttpApiClient{
   };
 
   static void init(){
-    HttpApiClient.clientOption.baseUrl = BangumiUrls.baseUrl;
+    HttpApiClient.clientOption.baseUrl = BangumiAPIUrls.baseUrl;
     HttpApiClient.clientOption.headers = HttpApiClient.broswerHeader;
     HttpApiClient.client.options = HttpApiClient.clientOption;
   }
 
 }
 
-class BangumiUrls {
+class BangumiAPIUrls {
   static const String baseUrl = "https://api.bgm.tv";
 
   //static String get subject => '$baseUrl/subject';
   static String get calendar => '$baseUrl/calendar';
+                    
 
   static String get subject => '$baseUrl/v0/subjects';
   static String get eps => '$baseUrl/v0/episodes';
@@ -39,6 +40,17 @@ class BangumiUrls {
 
   static String comment(int subjectID) => '$newUrl/p1/subjects/$subjectID/comments';
   static String epComment(int epID) => '$newUrl/p1/subjects/-/episode/$epID/comments';
+
+}
+
+class BangumiWebUrls{
+  static const String baseUrl = "https://bgm.tv";
+
+  static String subject(int subjectID) => '$baseUrl/subject/$subjectID';
+  static String ep(int epID) => '$baseUrl/ep/$epID';
+
+  static String subjectComment(int subjectID) => '$baseUrl/subject/$subjectID/comments';
+  
 
 }
 

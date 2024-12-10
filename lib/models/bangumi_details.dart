@@ -12,7 +12,7 @@ class BangumiDetails {
 	String? name;
 
 	String? summary;
-	Map<String,String> informationList = {};
+	Map<String,dynamic> informationList = {};
 	Map<String,int> tagsList = {};
 	//  Map<String,dynamic> questionList = {};
 
@@ -22,23 +22,6 @@ class BangumiDetails {
 		"rank": 0.0,
 	};
 
-	Map<String,dynamic> epsInformationList = { 
-      "airdate": "2024-11-30",
-      "name": "知",
-      "name_cn": "",
-      "duration": "00:25:00",
-      "desc": "ピャスト伯の死から数ヶ月――バデーニは膨大な観測記録を基に「地動説」の完成に没頭し、オクジーはヨレンタから文字を教わり自身の心境を綴るようになる。が、バデーニはオクジーのその行動に一切の価値を認めず、進まない研究に苛立ちを隠せずにいた。\r\n一方、同地区の教会では司教が異端審問官を増員し、いよいよ異端への弾圧を強めようとしていた。",
-      "ep": 10,
-      "sort": 10,
-      "id": 1390988,
-      "subject_id": 389156,
-      "comment": 1,
-      "type": 0,
-      "disc": 0,
-      "duration_seconds": 1500
-
-	};
-  
 
 }
 
@@ -88,26 +71,17 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
               "rank": currentBangumi["rank"] ?? 0.0,
             };
 
-			//debugPrint("date:${currentBangumi["date"]}");
+			
 
             if(
-				judgeInSeasonBangumi(currentBangumi["air_date"]) &&
-				currentBangumi["rating"]["score"] > 7.0 && 
-				currentBangumi["rating"]["total"] > 500
-			){
-              popularBangumis.add(bangumiDetails);
+              judgeInSeasonBangumi(currentBangumi["air_date"]) &&
+              currentBangumi["rating"]["score"] > 7.0 && 
+              currentBangumi["rating"]["total"] > 500
+            ){
+               popularBangumis.add(bangumiDetails);
             }
           }
 
-		  //rankBox 要素
-		  /*
-			"count": {
-				"1": 3,
-				"2": 1,
-				...
-				}
-			*/
-		//  "rankBox": currentBangumi["count"] ?? 0.0,
 
           weekdayBangumis.add(bangumiDetails);
 
@@ -159,16 +133,16 @@ BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
 	 //info collect
 
       bangumiDetails.informationList = {
-        "eps":bangumiData["eps"].toString(),
+        "eps":bangumiData["eps"] == 0 ? bangumiData["total_episodes"] : bangumiData["eps"],
         "alias":bangumiData["name_cn"].isNotEmpty ? bangumiData["name"] : "",
       };
 	
       for(Map currentInformation in bangumiData["infobox"]){
 
         if(
-			currentInformation["key"] != "放送星期" &&
-			currentInformation["key"] != "放送开始"
-		) continue;
+          currentInformation["key"] != "放送星期" &&
+          currentInformation["key"] != "放送开始"
+        ) continue;
 
 		switch(currentInformation["key"]){
 			case "放送开始": {

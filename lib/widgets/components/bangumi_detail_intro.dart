@@ -1,13 +1,17 @@
 import 'dart:math';
 
-import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/models/providers/ep_model.dart';
+import 'package:bangu_lite/widgets/components/ep_select.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/delegates/search_delegates.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:provider/provider.dart';
 
 class BangumiDetailIntro extends StatelessWidget {
   const BangumiDetailIntro({
@@ -147,6 +151,86 @@ class IntroPortrait extends StatelessWidget {
 
                     BuildInfoBox(informationList: bangumiDetails.informationList),
                 
+					//Entry for Portial
+
+					InkResponse(
+						onTap: () {
+
+							showModalBottomSheet(
+							//enableDrag: false,
+							//backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+							constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
+							context: context,
+							
+							builder: (_) => EasyRefresh(
+								child: Center(
+									child: BuildEps(
+										subjectID: bangumiDetails.id!, 
+										informationList: bangumiDetails.informationList,
+										portialMode: true,
+									),
+								),
+
+								
+							),
+						);
+
+						},
+						child: SizedBox(
+							height: 50,
+							child: Container(
+								decoration: BoxDecoration(
+									borderRadius: BorderRadius.circular(12),
+									color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.6)
+									
+								),
+								child: Padding(
+									padding: PaddingH12,
+									child: Row(
+										mainAxisAlignment: MainAxisAlignment.spaceBetween,
+										children: [
+											const Text("放送详情"),
+										
+											Row(
+												
+												children: [
+
+													Builder(
+														builder: (_){
+															if(
+																bangumiDetails.informationList["air_weekday"] == null || 
+																convertAiredEps(bangumiDetails.informationList["air_date"]) >= bangumiDetails.informationList["eps"] ||
+																bangumiDetails.informationList["eps"] > 500 //不确定长度
+															){
+																return Text("共${bangumiDetails.informationList["eps"]}集");
+															}
+
+
+															return Text("${convertAiredEps(bangumiDetails.informationList["air_date"])}/${bangumiDetails.informationList["eps"]}");
+														}
+													),
+
+													
+
+													//bangumiDetails.informationList["eps"] < 100 ?
+													//Text("${convertAiredEps(bangumiDetails.informationList["air_date"])}/${bangumiDetails.informationList["eps"]}") :
+													//const Text("*/*"),
+
+													const Padding(
+														padding: EdgeInsets.only(left: 6),
+														child: Icon(Icons.arrow_forward_ios,size: 16,),
+													)
+												]
+											)
+										
+										],
+									),
+								),
+							),
+						),
+					),
+
+					
 
 
                   ],
@@ -270,10 +354,12 @@ class IntroLandscape extends StatelessWidget {
                   ),
                 ),
 
-
                 BuildInfoBox(informationList: bangumiDetails.informationList),
 
-                BuildEps(informationList: bangumiDetails.informationList),
+                BuildEps(
+                  subjectID: bangumiDetails.id ?? 0,
+                  informationList: bangumiDetails.informationList,
+                ),
 
                 //tags
                 BuildTags(tagsList: bangumiDetails.tagsList)
@@ -404,9 +490,6 @@ class BuildDetailImages extends StatelessWidget {
 		height: max(MediaQuery.sizeOf(context).height*1/4,MediaQuery.sizeOf(context).width*1/6),
 	);
 	
-	//FlutterLogo(
-    //  size: max(MediaQuery.sizeOf(context).height*1/4,MediaQuery.sizeOf(context).width*1/6),
-    //);
   }
 }
 
@@ -417,7 +500,7 @@ class BuildInfoBox extends StatelessWidget{
     required this.informationList
   });
 
-  final Map<String, String> informationList;
+  final Map<String, dynamic> informationList;
 
   @override
   Widget build(BuildContext context) {
@@ -439,83 +522,123 @@ class BuildInfoBox extends StatelessWidget{
 class BuildEps extends StatelessWidget {
   const BuildEps({
     super.key,
-    required this.informationList
+    required this.subjectID,
+    required this.informationList,
+	this.portialMode
   });
 
-  final Map<String, String> informationList;
+  final int subjectID;
+  final Map<String, dynamic> informationList;
+  final bool? portialMode;
 
   @override
   Widget build(BuildContext context) {
 
-	int totalEps = int.tryParse(informationList["eps"] ?? "") ?? 0;
-	int airedEps = convertAiredEps(informationList["air_date"]);
+    int totalEps = informationList["eps"] ?? 0;
+    int airedEps = convertAiredEps(informationList["air_date"]);
 
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Wrap(
-        direction : Axis.horizontal,
-        spacing: 12,
-        runSpacing: 12,
-        children: List.generate(
-			totalEps,
-			(index){
-
-				Color currentEpsColor = Colors.white;
-
-				//放送中
-				if(airedEps <= totalEps){ 
-					if(airedEps == index) currentEpsColor = const Color.fromARGB(255, 219, 245, 223);
-					if(airedEps > index)  currentEpsColor = const Color.fromARGB(255, 217, 231, 255);
-				}
-
-				//已完结
-				else{
-					currentEpsColor = Colors.blueAccent;
-				}
-
-				return Container(
-					decoration: BoxDecoration(
-						border: Border(
-							top: const BorderSide(),
-							left: const BorderSide(),
-							right: const BorderSide(),
-							bottom: BorderSide(
-								width: 3, 
-								color: convertAiredEps(informationList["air_date"]) >= index ? Colors.blueAccent : Colors.grey,
-							),
-						),
-						color: currentEpsColor
-							
-						
-					),
-					
-					child: SizedBox(
-						height: 30,
-						width: 30,
-						child: InkResponse(
-							containedInkWell: true,
-							onTap: (){
-								debugPrint("${index+1}");
-								Navigator.pushNamed(
-									context, Routes.subjectEp,
-									arguments: {
-										"subjectID":389156,
-										"epIndex": index+1
-									}
-								);
-							},
-							
-							child: Center(
-								child: Text("${index+1}"), //需求FittedBox 适配 三位数以上集数 以及 展开 或者 页面翻开
-							),
-						),
-					),
-				);
-			}
-          
-          
-        ),
-      ),
+    return ChangeNotifierProvider(
+    			create: (_) => EpModel(subjectID: subjectID,selectedEp: 1),
+    			builder: (context,child) {
+    
+    		  return Padding(
+    			padding: const EdgeInsets.all(12),
+    			child: Builder(
+    			  builder: (_){
+    
+    					if(totalEps == 0) return const SizedBox.shrink();
+    
+    					return EpSelect(
+    						totalEps: totalEps,
+    						airedEps: airedEps,
+    						portialMode: portialMode,
+							name: informationList["alias"],
+    					);
+    
+    			  //return Wrap(
+    			  //  direction : Axis.horizontal,
+    			  //  spacing: 12,
+    			  //  runSpacing: 12,
+    			  //  children: List.generate(
+    			  //    min(100,totalEps),
+    			  //    (index){
+    			
+    			  
+    			  //        int currentEp = index;
+    			  
+    			  //        Color currentEpsColor = Colors.white;
+    			  
+    			  //        //放送中
+    			  //        if(airedEps <= totalEps){ 
+    			  //          if(airedEps == currentEp) currentEpsColor = const Color.fromARGB(255, 219, 245, 223);
+    			  //          if(airedEps > currentEp)  currentEpsColor = const Color.fromARGB(255, 217, 231, 255);
+    			  //        }
+    				
+    			  //        //已完结
+    			  //        else{
+    			  //          currentEpsColor = const Color.fromARGB(255, 217, 231, 255);
+    			  //        }
+    				
+    			  //        return Container(
+    			  //          decoration: BoxDecoration(
+    			  //            border: Border(
+    			  //              top: const BorderSide(),
+    			  //              left: const BorderSide(),
+    			  //              right: const BorderSide(),
+    			  //              bottom: BorderSide(
+    			  //                width: 3, 
+    			  //                color: convertAiredEps(informationList["air_date"]) >= index ? Colors.blueAccent : Colors.grey,
+    			  //              ),
+    			  //            ),
+    			  //            color: currentEpsColor
+    							
+    						  
+    			  //          ),
+    						
+    			  //          child: SizedBox(
+    			  //            height: 30,
+    			  //            width: 30,
+    			  //            child: InkResponse(
+    			  //              containedInkWell: true,
+    			  //              onTap: (){
+    			  
+    			  
+    			  //               Navigator.pushNamed(
+    			  //                context, Routes.subjectEp,
+    			  //                arguments: {
+    			  //                  "subjectID":subjectID,
+    			  //                  "totalEps": totalEps,
+    			  //                  "epModel": context.read<EpModel>(),
+    			  //                }
+    			  //              );
+    			  
+    							
+    							  
+    			  //              },
+    			  
+    			  //              //需求FittedBox 适配 三位数以上集数 以及 展开 或者 页面翻开
+    			  //              child: Center(
+    			  //                child: Text("${currentEp+1}")
+    			  
+    								
+    			  //                )
+    							
+    			  //            ),
+    			  //          ),
+    			  //        );
+    					
+    			  //      }
+    			  //    )
+    			  //  );
+    				  
+    
+    			  
+    			
+    				}
+    				
+    			  )
+    		  );
+    		}
     );
   }
 }

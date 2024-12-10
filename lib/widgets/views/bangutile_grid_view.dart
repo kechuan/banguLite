@@ -1,12 +1,10 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
-import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-class BangutileGridView extends StatelessWidget {
-  const BangutileGridView({
+class BanguTileGridView extends StatelessWidget {
+  const BanguTileGridView({
     super.key,
     this.keyDeliver,
     required this.bangumiLists,
@@ -63,8 +61,6 @@ class BangutileGridView extends StatelessWidget {
                     imageUrl: bangumiLists[currentBangumiIndex].coverUri,
                     onTap: () {
                       if(bangumiLists[currentBangumiIndex].name!=null){
-                    
-                        context.read<BangumiModel>().routesIDList.add(bangumiLists[currentBangumiIndex].id!);
             
                         Navigator.pushNamed(
                           context,
@@ -111,8 +107,6 @@ class BangutileGridView extends StatelessWidget {
                 bangumiTitle: bangumiLists[currentBangumiIndex].name,
                 onTap: () {
                     if(bangumiLists[currentBangumiIndex].name!=null){
-          
-                      context.read<BangumiModel>().routesIDList.add(bangumiLists[currentBangumiIndex].id!);
           
                       Navigator.pushNamed(
                         context,

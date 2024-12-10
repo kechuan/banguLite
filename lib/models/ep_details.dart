@@ -1,51 +1,75 @@
 import 'package:dio/dio.dart';
 
-//class EpInformation {
-//  int? id;
-//  String? name;
-//  String? desc;
-//  int? epIndex;
-//  int? commentCounts;
-
-//}
-
 class EpCommentDetails{
     int? userId;
-    int? epCommentIndex;
+    String? epCommentIndex;
 
     String? nickName; //
     String? avatarUri;
     String? sign;
     String? comment;
     List<EpCommentDetails>? repliedComment;
-    //String? repliedComment;
-
+    
     int? commentTimeStamp;
     int? rate;
 
 }
 
 
-EpCommentDetails loadEpsData(Response bangumiEpDetailResponse){
+List<EpCommentDetails> loadEpCommentDetails(Response bangumiEpDetailResponse){
 
-  //Map<String,dynamic> bangumiEpData = bangumiEpDetailResponse.data;
+	List epCommentList = bangumiEpDetailResponse.data;
 
-	final EpCommentDetails bangumiEpDetails = EpCommentDetails();
+	final List<EpCommentDetails> currentEpCommentList = [];
 
-  //bangumiEpDetails.coverUri = bangumiEpData["images"]["large"];
-  //bangumiEpDetails.summary = bangumiEpData["summary"];
-  //bangumiEpDetails.name = bangumiEpData["name_cn"].isNotEmpty ? bangumiEpData["name_cn"] : bangumiEpData["name"];
-  //bangumiEpDetails.id = bangumiEpData["id"];
+	int currentCommentIndex = 0;
 
-  ////  debugPrint("rating:${bangumiEpData["rating"]["total"]}");
+	for(Map currentEpCommentMap in epCommentList){
+		EpCommentDetails currentEpComment = EpCommentDetails();
 
-  //bangumiEpDetails.ratingList = {
-  //  "total": bangumiEpData["rating"]["total"] ?? 0,
-  //  "score": bangumiEpData["rating"]["score"] ?? 0,
-  //  "rank": bangumiEpData["rating"]["rank"] ?? 0, //返回的是一个数值0
-  //};
+		currentCommentIndex++;
 
-  return bangumiEpDetails;
+			currentEpComment
+			..comment = currentEpCommentMap["content"]
+			..commentTimeStamp = currentEpCommentMap["createdAt"]
+			..userId = currentEpCommentMap["user"]["id"]
+			..avatarUri = currentEpCommentMap["user"]["avatar"]["large"]
+			..nickName = currentEpCommentMap["user"]["nickname"]
+			..sign = currentEpCommentMap["user"]["sign"]
+			..epCommentIndex = "$currentCommentIndex"
+			;
 
+			if(currentEpCommentMap["replies"].isNotEmpty){
+
+				int currentRepliedCommentIndex = 0;
+
+				List<EpCommentDetails> currentEpCommentRepliedList = [];
+
+				for(Map currentEpCommentMap in currentEpCommentMap["replies"]){
+					currentRepliedCommentIndex++;
+					EpCommentDetails currentEpRepliedComment = EpCommentDetails();
+
+					currentEpRepliedComment
+					..comment = currentEpCommentMap["content"]
+					..commentTimeStamp = currentEpCommentMap["createdAt"]
+						..userId = currentEpCommentMap["user"]["id"]
+						..avatarUri = currentEpCommentMap["user"]["avatar"]["large"]
+						..nickName = currentEpCommentMap["user"]["nickname"]
+						..sign = currentEpCommentMap["user"]["sign"]
+						..epCommentIndex = "$currentCommentIndex-$currentRepliedCommentIndex"
+					;
+
+					currentEpCommentRepliedList.add(currentEpRepliedComment);
+			
+				}
+
+				currentEpComment.repliedComment = currentEpCommentRepliedList;
+
+			}
+
+			currentEpCommentList.add(currentEpComment);
+	} 
+
+	 return currentEpCommentList;
 
 }

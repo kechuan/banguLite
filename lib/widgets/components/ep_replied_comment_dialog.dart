@@ -14,23 +14,31 @@ class EpRepliedCommentDialog extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+
+    if(commentIndex!=null) debugPrint("打开了第${commentIndex!+1}个评论");
+
     return ListView.builder(
-      itemCount: currentComment.repliedComment?.length ?? 1,
+      itemCount: (currentComment.repliedComment?.length ?? 1)+1,
       
       itemBuilder: (_,index){
 
-        if(commentIndex!=null) debugPrint("打开了第${commentIndex!+1}个评论");
-
         if(index == 0){
-          return Column(
-            children: [
-              EpCommentTile(epCommentData: currentComment),
-              const Divider(height: 1),
-            ],
-          );
+            return Column(  
+              children: [
+                EpCommentTile(epCommentData: currentComment),
+                const Divider(height: 1),
+              ],
+            );
+         }
+
+        if(currentComment.repliedComment!.isNotEmpty){
+          return EpCommentTile(epCommentData: currentComment.repliedComment![index-1]);
         }
 
-        return EpCommentTile(epCommentData: currentComment.repliedComment![index]);
+        else{
+          return const SizedBox.shrink();
+        }
+
     
       }
     );

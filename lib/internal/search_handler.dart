@@ -8,7 +8,7 @@ import 'package:bangu_lite/models/bangumi_details.dart';
 Future<List<BangumiDetails>> searchHandler(String query) async {
 
   Response<dynamic> responseData = await HttpApiClient.client.get(
-    '${BangumiUrls.search}/$query',
+    '${BangumiAPIUrls.search}/$query',
     queryParameters: BangumiQuerys.searchQuery..["max_results"] = 10
   );
 
@@ -51,7 +51,7 @@ Future<List<BangumiDetails>> sortSearchHandler(
   ) async {
 
   Response<dynamic> responseData = await HttpApiClient.client.post(
-    BangumiUrls.bangumiSubjectSort,
+    BangumiAPIUrls.bangumiSubjectSort,
     queryParameters: BangumiQuerys.sortQuery..['offset'] = searchOffset ?? 0,
 
     //data: BangumiDatas.sortData

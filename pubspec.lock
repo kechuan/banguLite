@@ -46,6 +46,14 @@ packages:
       url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
     source: hosted
     version: "2.11.0"
+  bbob_dart:
+    dependency: "direct main"
+    description:
+      name: bbob_dart
+      sha256: d754e0dfd800582a6f0a43ae4f12db8eb763e89f584674c334a36e0faaddb1f9
+      url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
+    source: hosted
+    version: "0.2.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -291,6 +299,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_bbcode:
+    dependency: "direct main"
+    description:
+      name: flutter_bbcode
+      sha256: fa25fd697893b58cd304eaeb1119e437e64d55978ef76412d04eb6eef3dfecf4
+      url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
+    source: hosted
+    version: "1.5.0"
   flutter_cache_manager:
     dependency: transitive
     description:

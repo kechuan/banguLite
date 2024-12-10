@@ -1,5 +1,3 @@
-
-
 import 'dart:io';
 
 import 'package:bangu_lite/internal/hive.dart';
@@ -8,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/routes/bangu_lite_route.dart';
 import 'package:flutter/services.dart';
@@ -43,11 +40,13 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => BangumiModel()),
-        ChangeNotifierProvider(create: (_) => IndexModel()),
-      ],
+    
+    return ChangeNotifierProvider(
+      create: (_) => IndexModel(),
+      //providers: [
+      //  ChangeNotifierProvider(create: (_) => BangumiModel()),
+      //  ChangeNotifierProvider(create: (_) => IndexModel()),
+      //],
       child: MaterialApp(
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 140, 205, 244)),

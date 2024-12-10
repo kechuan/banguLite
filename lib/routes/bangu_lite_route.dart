@@ -5,6 +5,7 @@
 // fast mode: true
 // **************************************************************************
 // ignore_for_file: prefer_const_literals_to_create_immutables,unused_local_variable,unused_import,unnecessary_import,unused_shown_name,implementation_imports,duplicate_import
+import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/widgets.dart';
 
@@ -43,6 +44,9 @@ FFRouteSettings getRouteSettings({
           subjectID: asT<int>(
             safeArguments['subjectID'],
           )!,
+          name: asT<String?>(
+            safeArguments['name'],
+          ),
         ),
       );
     case '/subjectDetail':
@@ -66,12 +70,12 @@ FFRouteSettings getRouteSettings({
           key: asT<Key?>(
             safeArguments['key'],
           ),
-          subjectID: asT<int>(
-            safeArguments['subjectID'],
+          epModel: asT<EpModel>(
+            safeArguments['epModel'],
           )!,
-          epIndex: asT<int?>(
-            safeArguments['epIndex'],
-          ),
+          totalEps: asT<int>(
+            safeArguments['totalEps'],
+          )!,
         ),
       );
     default:

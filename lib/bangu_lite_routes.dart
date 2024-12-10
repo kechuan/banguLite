@@ -28,7 +28,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// MoreCommentsPage : [int(required) subjectID]
+  /// MoreCommentsPage : [int(required) subjectID, String? name]
   static const String moreComment = '/moreComment';
 
   /// '/subjectDetail'
@@ -46,6 +46,6 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiEpPage : [int(required) subjectID, int? epIndex]
+  /// BangumiEpPage : [EpModel(required) epModel, int(required) totalEps]
   static const String subjectEp = '/subjectEp';
 }
