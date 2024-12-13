@@ -109,33 +109,33 @@ class EpTogglePanel extends StatelessWidget {
                       builder: (_){
 
                         //越过边境线 需求加载
-                        if( epModel.epsData[currentEp+1]?.epID == null){
+                        if( epModel.epsData[currentEp+1]?.epID == null && currentEp+1 <= totalEps){
                           return Row(
-							children: [
-								Text("Ep. ${currentEp+1}",style: const TextStyle(color: Colors.grey),),
+                            children: [
+                              Text("Ep. ${currentEp+1}",style: const TextStyle(color: Colors.grey),),
 
-								const Padding(padding: PaddingH6),
+                              const Padding(padding: PaddingH6),
 
-								const SizedBox(
-									height: 20,
-									width: 20,
-									child:  CircularProgressIndicator(strokeWidth: 3)
-								)
-							],
-                             
-                          );
+                              const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child:  CircularProgressIndicator(strokeWidth: 3)
+                              )
+                            ],
+                                          
+                            );
                         }
 
 
                         //常规条件
                         return ConstrainedBox(
-							constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3) ,
-							child: Text(
-								"Ep. ${min(totalEps,currentEp+1)} ${epModel.epsData[min(totalEps,currentEp+1)]?.nameCN ?? epModel.epsData[min(totalEps,currentEp+1)]?.name ?? "loading"}",
-								style: TextStyle(color: currentEp == totalEps ? Colors.grey : null),
-								overflow: TextOverflow.ellipsis,
-						  ),
-						);
+                          constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3) ,
+                          child: Text(
+                            "Ep. ${min(totalEps,currentEp+1)} ${epModel.epsData[min(totalEps,currentEp+1)]?.nameCN ?? epModel.epsData[min(totalEps,currentEp+1)]?.name ?? "loading"}",
+                            style: TextStyle(color: currentEp == totalEps ? Colors.grey : null),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
                       }
                     ),
 

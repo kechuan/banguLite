@@ -35,8 +35,8 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
   Widget build(BuildContext context) {
     //debugPrint("parse comment rebuild: ${widget.id}"); 
 
-    return ChangeNotifierProvider(
-      create: (_) => CommentModel(),
+    return ChangeNotifierProvider.value(
+      value: context.watch<CommentModel>(),
       builder: (providerContext,child) {
 
         if(widget.id == 0) return const SizedBox.shrink();
@@ -154,10 +154,10 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                                 Navigator.pushNamed(
                                   providerContext,
                                   Routes.moreComment,
-                                  arguments: {"subjectID":widget.id,"name":widget.name}
+                                  arguments: {"commentModel":context.read<CommentModel>(),"subjectID":widget.id,"name":widget.name}
                                 );
                               },
-                              child: const Text("更多吐槽",style: TextStyle(decoration: TextDecoration.underline,fontSize: 16),),
+                              child: const Text("更多吐槽",style: TextStyle(decoration: TextDecoration.underline,fontSize: 16,color: Colors.black)),
                             ),
                           ),
                         ),

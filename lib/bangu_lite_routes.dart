@@ -28,7 +28,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// MoreCommentsPage : [int(required) subjectID, String? name]
+  /// MoreCommentsPage : [CommentModel(required) commentModel, int(required) subjectID, String? name]
   static const String moreComment = '/moreComment';
 
   /// '/subjectDetail'

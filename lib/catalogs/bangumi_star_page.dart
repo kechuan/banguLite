@@ -13,42 +13,18 @@ class BangumiStarPage extends StatefulWidget {
 
 class _BangumiStarPageState extends State<BangumiStarPage> {
 
-  Map<int,Map?> hiveStarMap = {};
-
   @override
   void initState() {
-
-    for(int currentStarIndex = 0; currentStarIndex<MyHive.starBangumisDataBase.keys.length; currentStarIndex++){
-      hiveStarMap.addAll({
-        MyHive.starBangumisDataBase.keyAt(currentStarIndex):(MyHive.starBangumisDataBase.values.elementAt(currentStarIndex))
-      });
-    }
-
-    bus.on("star",(arg){
-
-      debugPrint("star Staus change: update");
-
-      hiveStarMap.clear();
-
-      for(int currentStarIndex = 0; currentStarIndex<MyHive.starBangumisDataBase.keys.length; currentStarIndex++){
-        hiveStarMap.addAll({
-          MyHive.starBangumisDataBase.keyAt(currentStarIndex):(MyHive.starBangumisDataBase.values.elementAt(currentStarIndex))
-        });
-      }
-
-      setState(() {
-        
-      });
-
+    bus.on("star", (arg){
+      setState(() {});
     });
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      
+
+    return Scaffold(      
       appBar: AppBar(
         toolbarHeight: 60,
         title: const Padding(
@@ -107,10 +83,10 @@ class _BangumiStarPageState extends State<BangumiStarPage> {
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 8),
         child: ListView.builder(
-          itemCount: hiveStarMap.isEmpty ? 1 : hiveStarMap.length,
+          itemCount: MyHive.starBangumisDataBase.keys.isEmpty ? 1 : MyHive.starBangumisDataBase.keys.length,
           itemBuilder: (_,index){
         
-            if(hiveStarMap.isEmpty){
+            if(MyHive.starBangumisDataBase.keys.isEmpty){
               return const Center(
                 child: Text("暂无订阅信息"),
               );
@@ -118,14 +94,14 @@ class _BangumiStarPageState extends State<BangumiStarPage> {
         
             return BangumiListTile(
               imageSize: const Size(100, 150),
-              bangumiTitle: hiveStarMap.values.elementAt(index)?["name"],
-              imageUrl: hiveStarMap.values.elementAt(index)?["coverUri"],
-              trailing: Text("score: ${hiveStarMap.values.elementAt(index)?["score"]}"),
+              bangumiTitle: MyHive.starBangumisDataBase.values.elementAt(index)["name"],
+              imageUrl: MyHive.starBangumisDataBase.values.elementAt(index)["coverUri"],
+              trailing: Text("score: ${MyHive.starBangumisDataBase.values.elementAt(index)["score"]}"),
               onTap: () {
                 Navigator.pushNamed(
                   context,
                   Routes.subjectDetail,
-                  arguments: {"bangumiID":hiveStarMap.keys.elementAt(index)},
+                  arguments: {"bangumiID":MyHive.starBangumisDataBase.keys.elementAt(index)},
                 );
               },
             );

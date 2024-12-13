@@ -1,7 +1,4 @@
 
-
-import 'dart:math';
-
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/eps_info.dart';
@@ -23,8 +20,8 @@ import 'package:url_launcher/url_launcher_string.dart';
 class BangumiEpPage extends StatefulWidget {
   const BangumiEpPage({
     super.key,
-	required this.epModel,
-	required this.totalEps
+    required this.epModel,
+    required this.totalEps
   });
 
   final EpModel epModel;
@@ -172,15 +169,15 @@ class EpInfo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
 
-		ListTile(
+        ListTile(
           title: Row(
             children: [
-				Text("${epsInfo[selectedEp]!.nameCN ?? epsInfo[selectedEp]!.name}"),
-				const Padding(padding: PaddingH6),
-				Text("${epsInfo[selectedEp]!.airDate}",style: const TextStyle(fontSize: 14,color: Colors.grey)),
+              Text("${epsInfo[selectedEp]!.nameCN ?? epsInfo[selectedEp]!.name}"),
+              const Padding(padding: PaddingH6),
+              Text("${epsInfo[selectedEp]!.airDate}",style: const TextStyle(fontSize: 14,color: Colors.grey)),
             ],
           ),
-         
+          
         ),
 
         ListTile(
@@ -244,7 +241,23 @@ class EpCommentDetails extends StatelessWidget {
 																		
 													const Padding(padding: PaddingH6),
 																		
-													Text("$commentCount",style: const TextStyle(color: Colors.grey))
+													Text("$commentCount",style: const TextStyle(color: Colors.grey)),
+
+                          //BBCode测试
+                          //BBCodeText(
+                          //  //data: "[img=36]这是一个测试[/img] [color=#FF0000]这是另一个测试[/color]", 
+                          //  //data: "[img]https://p.sda1.dev/19/c25b1394330e0a0da6f140ececce3015/1dec650d1b1ee1a139ea09f81246d53d.png[/img]",
+                          //  data: "[img]https://i.yusa.me/RwiYjbYD7yGL.webp[/img]",
+                            
+                          //  stylesheet: BBStylesheet(
+                          //    tags: [
+                          //      SizeTag(),
+                          //      ColorTag(),
+                          //      LateLoadImgTag()
+                          //    ]
+                          //  ),
+                          //)
+
 												],
 											),
 										);

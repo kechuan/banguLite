@@ -1,50 +1,9 @@
 
-enum WeekDay{
+import 'dart:math';
 
-  mon("一",1),
-  tues("二",2),
-  weds("三",3),
-  thur("四",4),
-  fri("五",5),
-  sat("六",6),
-  sun("日",7);
+import 'package:bangu_lite/internal/const.dart';
 
-  final String dayText;
-  final int dayIndex;
-  
-  const WeekDay(this.dayText,this.dayIndex);
-}
 
-enum ViewType{
-  listView(),
-  gridView();
-
-  const ViewType();
-
-}
-
-enum SortType{
-  rank("rank"),
-  heat("heat"),
-  score("score");
-
-  final String sortType;
-
-  const SortType(this.sortType);
-}
-
-enum Season{
-
-  spring("春",4),
-  summer("夏",7),
-  autumn("秋",10),
-  winter("冬",1);
-
-  final String seasonText;
-  final int month;
-
-  const Season(this.seasonText,this.month);
-}
 
 String? convertAmpsSymbol(String? originalString){
   if(originalString?.contains("&amp;") ?? false){
@@ -153,4 +112,48 @@ int convertAiredEps(String? bangumiAirDate){
 	int airedEps =  (residualDateTime ~/ const Duration(days: 7).inMilliseconds) + 1;
 
 	return airedEps;
+}
+
+String convertTypeSize(int totalLength,{StorageSize type = StorageSize.megabytes}){
+  
+  const int binary = 1024;
+  num result = totalLength/pow(binary,type.index);
+  String suffix;
+
+  switch(type){
+    case StorageSize.bytes: {suffix = StorageSize.bytes.suffix; break;}
+    case StorageSize.kilobytes: {suffix = StorageSize.kilobytes.suffix; break;}
+    case StorageSize.megabytes: {suffix = StorageSize.megabytes.suffix; break;}
+    case StorageSize.gigabytes: {suffix = StorageSize.gigabytes.suffix; break;}
+  }
+
+  return "${result.toStringAsFixed(2)}$suffix";
+}
+
+String convertScoreRank(double? score){
+
+  if(score==null) return ScoreRank.none.rankText;
+
+  String resultRankText = "";
+
+  //The property 'score' can't be accessed on the type 'ScoreRank' in a constant expression.
+
+  //不确定到底是写一堆if-else结构还是直接这样顺序处理哪个更好
+  //但这个至少简单 那就这个了
+
+  if(score == ScoreRank.none.score) resultRankText = ScoreRank.none.rankText;
+  if(score >= ScoreRank.worst.score) resultRankText = ScoreRank.worst.rankText;
+  if(score >= ScoreRank.worse.score) resultRankText = ScoreRank.worse.rankText;
+  if(score >= ScoreRank.poor.score) resultRankText = ScoreRank.poor.rankText;
+  if(score >= ScoreRank.bad.score) resultRankText = ScoreRank.bad.rankText;
+  if(score >= ScoreRank.medium.score) resultRankText = ScoreRank.medium.rankText;
+  if(score >= ScoreRank.pass.score) resultRankText = ScoreRank.pass.rankText;
+  if(score >= ScoreRank.great.score) resultRankText = ScoreRank.great.rankText;
+  if(score >= ScoreRank.excellent.score) resultRankText = ScoreRank.excellent.rankText;
+  if(score >= ScoreRank.perfect.score) resultRankText = ScoreRank.perfect.rankText;
+  
+
+  return resultRankText;
+
+
 }

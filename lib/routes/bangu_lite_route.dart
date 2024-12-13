@@ -5,6 +5,7 @@
 // fast mode: true
 // **************************************************************************
 // ignore_for_file: prefer_const_literals_to_create_immutables,unused_local_variable,unused_import,unnecessary_import,unused_shown_name,implementation_imports,duplicate_import
+import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/widgets.dart';
@@ -41,6 +42,9 @@ FFRouteSettings getRouteSettings({
           key: asT<Key?>(
             safeArguments['key'],
           ),
+          commentModel: asT<CommentModel>(
+            safeArguments['commentModel'],
+          )!,
           subjectID: asT<int>(
             safeArguments['subjectID'],
           )!,

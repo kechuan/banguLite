@@ -15,15 +15,14 @@ class EpSelect extends StatefulWidget {
     super.key,
     required this.totalEps,
     required this.airedEps,
-	this.portialMode,
-	this.name,
-    
+    this.name,
+    this.portialMode,
   });
 
   final int totalEps;
   final int airedEps;
-  final bool? portialMode;
   final String? name;
+  final bool? portialMode;
   
 
   @override
@@ -38,8 +37,8 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
 
+    final EpModel epModel = context.read<EpModel>();
 
-	final EpModel epModel = context.read<EpModel>();
 
     epsInformationFuture ??= epModel.getEpsInformation();
 
@@ -52,167 +51,170 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
           return Column(
             children: [
           
-          			widget.totalEps >= 100 ?
+          			segements >= 2 ?
           				//Tabbar
           				Theme(
           					data: ThemeData(
           						scrollbarTheme: const ScrollbarThemeData(
-          						thickness: WidgetStatePropertyAll(0.0) //it work
-          					)
-          				),
-          				child: SizedBox(
-          					height: 60,
-          					child: TabBar(
-          						indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-          						controller: TabController(length: segements, vsync: this),
-          						onTap: (index){
-          							epSegementsIndexNotifier.value = index;
-          							epsInformationFuture = epModel.getEpsInformation(offset: index+1);
-          						},
-          						isScrollable: true,
-          						tabs: List.generate(
-          							segements, 
-          							(index) => SizedBox(
-          								height: 60,
-          								width: 100,
-          								child: Center(child: Text("${(index*100)+1}~${min((index+1)*100,widget.totalEps)}"))
-          							)
-          							
-          						),
-          							
-          					),
-          				),
-          			):
-					Center(
-						child: Padding(
-							padding: PaddingV12,
-							child: Text("${widget.name}"),
-						)
-					),
+                        thickness: WidgetStatePropertyAll(0.0) //it work
+                      )
+                    ),
+                    child: SizedBox(
+                      height: 60,
+                      child: TabBar(
+                        indicatorColor: Theme.of(context).scaffoldBackgroundColor,
+                        controller: TabController(length: segements, vsync: this),
+                        onTap: (index){
+                          epSegementsIndexNotifier.value = index;
+                          epsInformationFuture = epModel.getEpsInformation(offset: index+1);
+                        },
+                        isScrollable: true,
+                        tabs: List.generate(
+                          segements, 
+                          (index) => SizedBox(
+                            height: 60,
+                            width: 100,
+                            child: Center(child: Text("${(index*100)+1}~${min((index+1)*100,widget.totalEps)}"))
+                          )
+                          
+                        ),
+                          
+                      ),
+                    ),
+                  ):
+
+                  widget.portialMode == true ? 
+                    Center(
+                      child: Padding(
+                        padding: PaddingV12,
+                        child: Text("${widget.name}"),
+                      )
+                    ):
+                  const SizedBox.shrink(),
           
           			//TabView
           			SizedBox(
-						height: widget.portialMode == true ? constraint.maxHeight -50 : 250,
-						//height: 250,
-						child: ValueListenableBuilder(
-						valueListenable: epSegementsIndexNotifier,
-						builder: (_,currentSegment,child) {
-									
-							int currentSegementRange = (currentSegment)*100; //范围 区域300 这个意思
-							int currentSegmentEps = min(100,widget.totalEps - (currentSegementRange)).abs();
+                  height: widget.portialMode == true ? constraint.maxHeight -50 : 250,
+                  //height: 250,
+                  child: ValueListenableBuilder(
+                  valueListenable: epSegementsIndexNotifier,
+                  builder: (_,currentSegment,child) {
+                        
+                    int currentSegementRange = (currentSegment)*100; //范围 区域300 这个意思
+                    int currentSegmentEps = min(100,widget.totalEps - (currentSegementRange)).abs();
 
-							//context.read区域	
-							return FutureBuilder(
-								future: epsInformationFuture, //通知器 并不传递信息
-								builder: (_,snapshot) {
+                    //context.read区域	
+                    return FutureBuilder(
+                      future: epsInformationFuture, //通知器 并不传递信息
+                      builder: (_,snapshot) {
 
-									//epModel => context.watch区域
-									return Selector<EpModel,bool>(
-										selector: (_, epModel) => epModel.epsData[(currentSegementRange)+1]?.epID == null,
-										shouldRebuild: (previous, next) => previous!=next,
-										builder: (_,loadingStatus,child) {
-										//debugPrint(" inside enabled: ${(currentSegementRange)+1}  ${epModel.epsData[(currentSegementRange)+1]?.epID == null}");
-											return Skeletonizer(
-												enabled: loadingStatus,
-												child: child!
-											);
-										},
-										child: GridView.builder(
-											itemCount: currentSegmentEps,
-											gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
-												crossAxisCount: widget.portialMode == true ? 1 : 3,
-												mainAxisExtent: 60,
-												mainAxisSpacing: 6,
-												crossAxisSpacing: 6
-											),
-											shrinkWrap: true,
-											itemBuilder: (_,index){
-														
-												Color currentEpsColor = Colors.white;
-											
-												int currentEpIndex = (currentSegementRange)+(index)+1;
+                        //epModel => context.watch区域
+                        return Selector<EpModel,bool>(
+                          selector: (_, epModel)=> epModel.epsData[(currentSegementRange)+1]?.epID == null,
+                          shouldRebuild: (previous, next) => previous!=next,
+                          builder: (_,loadingStatus,child) {
+                          //debugPrint(" inside enabled: ${(currentSegementRange)+1}  ${epModel.epsData[(currentSegementRange)+1]?.epID == null}");
+                            return Skeletonizer(
+                              enabled: loadingStatus,
+                              child: child!
+                            );
+                          },
+                          child: Expanded(
+                            child: GridView.builder(
+                              shrinkWrap: true,
+                              itemCount: currentSegmentEps,
+                              gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: widget.portialMode == true ? 1 : 3,
+                                mainAxisExtent: 60,
+                                mainAxisSpacing: 6,
+                                crossAxisSpacing: 6
+                              ),
+                              
+                              itemBuilder: (_,index){
+                                    
+                                Color currentEpsColor = Colors.white;
+                                int currentEpIndex = (currentSegementRange)+(index)+1;
+                            
+                                //放送中
+                                if(widget.airedEps <= widget.totalEps){ 
+                                  if(widget.airedEps == currentEpIndex) currentEpsColor = const Color.fromARGB(255, 219, 245, 223);
+                                  if(widget.airedEps > currentEpIndex)  currentEpsColor = Theme.of(context).scaffoldBackgroundColor;
+                                }
+                            
+                                //已完结
+                                else{
+                                  currentEpsColor = const Color.fromARGB(255, 217, 231, 255);
+                                }
+                              
+                                      
+                                return SizedBox(
+                                  height: 60,
+                                  child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border(
+                                     
+                                      bottom: BorderSide(
+                                        width: 3, 
+                                        color: widget.airedEps >= currentEpIndex ? Theme.of(context).scaffoldBackgroundColor.withOpacity(0.2) : Colors.grey,
+                                      ),
+                                    ),
+                                    color: currentEpsColor
+                                    
+                                    
+                                  ),
+                                    child: InkResponse(
+                                      containedInkWell: true,
+                                      hoverColor: Colors.transparent,     // 悬浮时圆点
+                                      highlightColor: Colors.transparent, // 点击时的圆点
+                                      
+                                      onTap: (){
+                                
+                                        debugPrint("selected Ep:$currentEpIndex");
+                                        epModel.updateSelectedEp(currentEpIndex);
+                                      
+                                        Navigator.pushNamed(
+                                          context, Routes.subjectEp,
+                                          arguments: {
+                                          "subjectID":epModel.subjectID,
+                                          "totalEps": widget.totalEps,
+                                          "epModel": epModel,
+                                          }
+                                        );
+                                    
+                                      
+                                      },
+                                              
+                                      
+                                      child: Center(
+                                        //child: Text("Ep. $currentEpIndex ${epModel.epsData[currentEpIndex]?.nameCN ?? epModel.epsData[currentEpIndex]?.name }"),
+                                        child: Builder(
+                                          builder: (_) {
+                            
+                                            EpsInfo? currentInfo = epModel.epsData[currentEpIndex];
+                              
+                                            String currentEpText = currentInfo?.nameCN ?? currentInfo?.name ?? ""; 
 
-												//放送中
-												if(widget.airedEps <= widget.totalEps){ 
-													if(widget.airedEps == currentEpIndex) currentEpsColor = const Color.fromARGB(255, 219, 245, 223);
-													if(widget.airedEps > currentEpIndex)  currentEpsColor = const Color.fromARGB(255, 217, 231, 255);
-												}
-
-												//已完结
-												else{
-													currentEpsColor = const Color.fromARGB(255, 217, 231, 255);
-												}
-											
-															
-												return SizedBox(
-													height: 60,
-													child: Container(
-													decoration: BoxDecoration(
-														border: Border(
-														top: const BorderSide(),
-														left: const BorderSide(),
-														right: const BorderSide(),
-														bottom: BorderSide(
-															width: 3, 
-															color: widget.airedEps >= currentEpIndex ? Colors.blueAccent : Colors.grey,
-														),
-														),
-														color: currentEpsColor
-														
-														
-													),
-														child: InkResponse(
-															containedInkWell: true,
-															
-															onTap: (){
-												
-															debugPrint("selected Ep:$currentEpIndex");
-															epModel.updateSelectedEp(currentEpIndex);
-														
-															Navigator.pushNamed(
-																context, Routes.subjectEp,
-																arguments: {
-																"subjectID":epModel.subjectID,
-																"totalEps": widget.totalEps,
-																"epModel": epModel,
-																}
-															);
-														
-															
-															},
-																			
-															
-															child: Center(
-																//child: Text("Ep. $currentEpIndex ${epModel.epsData[currentEpIndex]?.nameCN ?? epModel.epsData[currentEpIndex]?.name }"),
-																child: Builder(
-																  builder: (_) {
-
-																	EpsInfo? currentInfo = epModel.epsData[currentEpIndex];
-
-																	String currentEpText = currentInfo?.nameCN ?? currentInfo?.name ?? ""; 
-																	
-																	
-																		
-
-																    return Text("Ep. $currentEpIndex ${currentEpText.isEmpty ? currentInfo?.name : currentEpText}");
-																  }
-																),
-															) 
-														),
-													),
-												);
-														
-											}
-										),
-										
-									);
-								}
-							);
-									
-						}
-									
-						),
-					)
+                                            return Text("Ep. $currentEpIndex ${currentEpText.isEmpty ? currentInfo?.name : currentEpText}");
+                                          }
+                                        ),
+                                      ) 
+                                    ),
+                                  ),
+                                );
+                                    
+                              }
+                            ),
+                          ),
+                          
+                        );
+                      }
+                    );
+                        
+                  }
+                        
+                  ),
+                )
           
             ],
           );

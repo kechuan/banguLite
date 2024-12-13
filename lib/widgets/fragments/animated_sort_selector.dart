@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/const.dart';
 import 'package:flutter/material.dart';
 
 class AnimatedSortSelector extends StatelessWidget {

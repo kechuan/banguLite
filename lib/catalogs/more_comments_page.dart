@@ -12,10 +12,12 @@ import 'package:provider/provider.dart';
 class MoreCommentsPage extends StatelessWidget  {
   const MoreCommentsPage({
     super.key,
+    required this.commentModel,
     required this.subjectID,
     this.name
   });
 
+  final CommentModel commentModel;
   final int subjectID;
   final String? name;
 
@@ -25,8 +27,9 @@ class MoreCommentsPage extends StatelessWidget  {
     final PageController commentPageController = PageController();
     
     //给每个番剧页面都单独拉一个 CommentProvider 避免互相跳转之间打架
-    return ChangeNotifierProvider(
-      create: (_) => CommentModel(),
+    return ChangeNotifierProvider.value(
+      //create: (_) => CommentModel(),
+      value: commentModel,
       builder: (context,child) {
         return Scaffold(
           appBar: AppBar(

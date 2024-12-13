@@ -2,7 +2,7 @@
 
 import 'dart:math';
 
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/widgets/fragments/animated_wave_footer.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -26,7 +26,7 @@ class BangumiSortPage extends StatefulWidget {
   State<BangumiSortPage> createState() => _BangumiSortPageState();
 }
 
-class _BangumiSortPageState extends State<BangumiSortPage> {
+class _BangumiSortPageState extends State<BangumiSortPage>{
 
   final GlobalKey<SliverAnimatedListState> messageListStreamKey = GlobalKey<SliverAnimatedListState>();
   final GlobalKey<AnimatedGridState> messageGridStreamKey = GlobalKey<AnimatedGridState>();
@@ -54,6 +54,7 @@ class _BangumiSortPageState extends State<BangumiSortPage> {
     super.initState();
 
   }
+
 
   @override
   Widget build(BuildContext context) {

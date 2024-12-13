@@ -16,10 +16,22 @@ class BangumiDetails {
 	Map<String,int> tagsList = {};
 	//  Map<String,dynamic> questionList = {};
 
-	Map<String,num> ratingList = {
+	Map<String,dynamic> ratingList = {
 		"total": 0,
 		"score": 0.0,
 		"rank": 0.0,
+    "count":{
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0
+    }
 	};
 
 
@@ -68,7 +80,8 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
             bangumiDetails.ratingList = {
               "total": currentBangumi["rating"]["total"],
               "score": currentBangumi["rating"]["score"],
-              "rank": currentBangumi["rank"] ?? 0.0,
+              "rank": currentBangumi["rank"] ?? 0,
+              "count":currentBangumi["rating"]["count"]
             };
 
 			
@@ -126,8 +139,9 @@ BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
 
       bangumiDetails.ratingList = {
         "total": bangumiData["rating"]["total"] ?? 0,
-        "score": bangumiData["rating"]["score"] ?? 0,
+        "score": bangumiData["rating"]["score"] ?? 0.0,
         "rank": bangumiData["rating"]["rank"] ?? 0, //返回的是一个数值0
+        "count":bangumiData["rating"]["count"] ?? {}
       };
 
 	 //info collect

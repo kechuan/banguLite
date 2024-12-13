@@ -40,20 +40,17 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
+
     return ChangeNotifierProvider(
       create: (_) => IndexModel(),
-      //providers: [
-      //  ChangeNotifierProvider(create: (_) => BangumiModel()),
-      //  ChangeNotifierProvider(create: (_) => IndexModel()),
-      //],
       child: MaterialApp(
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 140, 205, 244)),
-          fontFamily: 'MiSansFont'
+          fontFamily: 'MiSansFont',
         ),
         initialRoute: Routes.index,
-        
+        //navigatorObservers: [],
+        navigatorObservers: [RouteObserver<ModalRoute>()],
         onGenerateRoute: (RouteSettings settings) {
           return onGenerateRoute(
             settings: settings,

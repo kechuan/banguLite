@@ -11,6 +11,7 @@ class CachedImageLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -18,7 +19,11 @@ class CachedImageLoader extends StatelessWidget {
         ),
         child: Builder(
           builder: (_){
+
             if(imageUrl!=null){
+
+              DateTime loadStartTime = DateTime.now();
+
               return CachedNetworkImage(
                 imageUrl: imageUrl!,
                 imageBuilder: (_,imageProvider){
@@ -34,7 +39,13 @@ class CachedImageLoader extends StatelessWidget {
                 },
                 
                 progressIndicatorBuilder: (_, url, progress) {
-                  //debugPrint("url: $url , progress:${progress.progress}/${progress.totalSize}");
+
+                  bool showProgressIndicator = false;
+
+                  if(DateTime.now().millisecondsSinceEpoch - loadStartTime.millisecondsSinceEpoch > 5000){
+                     showProgressIndicator = true;
+                  }
+                  //debugPrint("url: $url , progress:${progress}");
 
                   return DecoratedBox(                              
                     decoration: BoxDecoration(
@@ -42,8 +53,8 @@ class CachedImageLoader extends StatelessWidget {
                       color: Colors.grey,
                     ),
                     
-                    child: const Center(
-                      child: Text("loading..."), //loading
+                    child: Center(
+                      child: Text("loading... ${showProgressIndicator ? progress : ""}"), //loading
                     ),
                   );
                 },
@@ -51,7 +62,7 @@ class CachedImageLoader extends StatelessWidget {
             }
         
             else{
-              return const Center(child: FlutterLogo()); //null 
+              return Center(child: Image.asset("assets/icons/icon.png")); //null 
             }
           }
         )

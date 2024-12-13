@@ -39,24 +39,26 @@ class BangumiListTile extends ListTile {
             )
           ),
     
-          Padding(
-            padding: const EdgeInsets.only(left: 24), //padding 2
-            child: SizedBox(
-              height: 150,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: 50,
-                    maxWidth: ( MediaQuery.sizeOf(context).width - imageSize.width - 24 - 40 ), //calculate
-                    
-                    
+          Expanded(
+            child: LayoutBuilder(
+              builder: (_,constraint) {
+                return Padding(
+                  padding: const EdgeInsets.only(left: 24), //padding 2
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: imageSize.height ,
+                      maxWidth: constraint.maxWidth - imageSize.width, //calculate
+                      
+                      
+                    ),
+                    child: Text(
+                      bangumiTitle ?? "name",
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    )
                   ),
-                  child: Text(
-                    bangumiTitle ?? "name",
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  )
-                ))
+                );
+              }
             ),
           ),
           

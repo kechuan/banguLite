@@ -4,6 +4,7 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/widgets/components/ep_select.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -40,8 +41,6 @@ class IntroPortrait extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final ValueNotifier<bool> isStaredNotifier = ValueNotifier(MyHive.starBangumisDataBase.containsKey(bangumiDetails.id));
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -53,12 +52,34 @@ class IntroPortrait extends StatelessWidget {
             //Pic
             Expanded(
               flex: 2,
-              child: FittedBox(
-                child: BuildDetailImages(
-                  detailImageUrl: bangumiDetails.coverUri,
-                  imageID: bangumiDetails.id
-                ),
-              )
+              child: Column(
+                children: [
+                  FittedBox(
+                    child: BuildDetailImages(
+                      detailImageUrl: bangumiDetails.coverUri,
+                      imageID: bangumiDetails.id
+                    ),
+                  ),
+              
+                  const Padding(padding: PaddingV6),
+              
+                  //BangumiRankBox(
+                  //  constraint: constraint,
+                  //  bangumiDetails: bangumiDetails,
+                  //)
+              
+                  //Container(
+                  //  height: 100,
+                  //  width: constraint.maxWidth,
+                  //  decoration: BoxDecoration(
+                  //    border: Border.all()
+                  //  ),
+                  //  child: Center(
+                  //    child: Text("BangumiRankBox Here"),
+                  //  ),
+                  //)
+                ],
+              ),
             ),
     
             //Info
@@ -71,164 +92,34 @@ class IntroPortrait extends StatelessWidget {
                 
                   //detail——rating
                   children: [
-        
-                    ListTile(
-                      title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                    
+                    Row(
+                      children: [
+
+                        Expanded(
+                          child: ListTile(
+                            title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                    
+                                Text(bangumiDetails.informationList["alias"] ?? ""),
+                                    
+                                
                               
-                          Text(bangumiDetails.informationList["alias"] ?? ""),
-                              
-                          Wrap(
-                            spacing: 12,
-                            
-                            alignment: WrapAlignment.spaceBetween,
-                            children: [
-                                          
-                              Text(bangumiDetails.ratingList["rank"]!=0 ? 'Rank #${bangumiDetails.ratingList["rank"]}' : ""),
-                    
-                              Wrap(
-                                alignment:WrapAlignment.spaceBetween,
-                                children: [
-                    
-                                  Text(
-                                    "Score ${bangumiDetails.ratingList["score"]?.toDouble()}",
-                                    style: TextStyle(
-                                      color: Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*((bangumiDetails.ratingList["score"] ?? 0)/10).toInt()), 0, 1),
-                                      fontWeight: FontWeight.bold
-                                    )
-                                  ),
-                    
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                                    child: Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey),),
-                                  ),
-                    
-                    
-                                ],
-                              ),
-                      
-                            ],
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                      trailing: IconButton(
-                        onPressed: (){
+                        ),
 
-                          //manage Function
-
-                          if(isStaredNotifier.value){
-                            MyHive.starBangumisDataBase.delete(bangumiDetails.id);
-                            isStaredNotifier.value = false;
-                          }
-
-                          else{
-                            MyHive.starBangumisDataBase.put(
-                              bangumiDetails.id!, {
-                                "name": bangumiDetails.name,
-                                "coverUri": bangumiDetails.coverUri,
-                                "eps": bangumiDetails.informationList["eps"],
-                                "score": bangumiDetails.ratingList["score"],
-                              }
-                            );
-
-                            isStaredNotifier.value = true;
-                          }
-
-                          bus.emit("star");
-                          
+                        StarButton(bangumiDetails: bangumiDetails)
                         
-                      }, icon: ValueListenableBuilder(
-                        valueListenable: isStaredNotifier,
-                        builder: (_,isStared,child){
-                          return isStared ? const Icon(Icons.star) : const Icon(Icons.star_outline);
-                        }
-                      )
-                      
-                      ),
-                    ),
 
+                      ],
+                    ),
+                    
                     BuildInfoBox(informationList: bangumiDetails.informationList),
                 
-					//Entry for Portial
-
-					InkResponse(
-						onTap: () {
-
-							showModalBottomSheet(
-							//enableDrag: false,
-							//backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-							constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
-							context: context,
-							
-							builder: (_) => EasyRefresh(
-								child: Center(
-									child: BuildEps(
-										subjectID: bangumiDetails.id!, 
-										informationList: bangumiDetails.informationList,
-										portialMode: true,
-									),
-								),
-
-								
-							),
-						);
-
-						},
-						child: SizedBox(
-							height: 50,
-							child: Container(
-								decoration: BoxDecoration(
-									borderRadius: BorderRadius.circular(12),
-									color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.6)
-									
-								),
-								child: Padding(
-									padding: PaddingH12,
-									child: Row(
-										mainAxisAlignment: MainAxisAlignment.spaceBetween,
-										children: [
-											const Text("放送详情"),
-										
-											Row(
-												
-												children: [
-
-													Builder(
-														builder: (_){
-															if(
-																bangumiDetails.informationList["air_weekday"] == null || 
-																convertAiredEps(bangumiDetails.informationList["air_date"]) >= bangumiDetails.informationList["eps"] ||
-																bangumiDetails.informationList["eps"] > 500 //不确定长度
-															){
-																return Text("共${bangumiDetails.informationList["eps"]}集");
-															}
-
-
-															return Text("${convertAiredEps(bangumiDetails.informationList["air_date"])}/${bangumiDetails.informationList["eps"]}");
-														}
-													),
-
-													
-
-													//bangumiDetails.informationList["eps"] < 100 ?
-													//Text("${convertAiredEps(bangumiDetails.informationList["air_date"])}/${bangumiDetails.informationList["eps"]}") :
-													//const Text("*/*"),
-
-													const Padding(
-														padding: EdgeInsets.only(left: 6),
-														child: Icon(Icons.arrow_forward_ios,size: 16,),
-													)
-												]
-											)
-										
-										],
-									),
-								),
-							),
-						),
-					),
 
 					
 
@@ -237,8 +128,104 @@ class IntroPortrait extends StatelessWidget {
                 ),
               ),
             ),
+
+            
           ],
         ),
+
+        LayoutBuilder(
+          builder:(_,constraint){
+            return BangumiRankBox(
+              constraint: constraint,
+              bangumiDetails: bangumiDetails,
+            );
+          }
+           
+        ),
+
+
+        const Padding(padding: PaddingV12),
+
+         //Entry for Portial
+          
+        InkResponse(
+          onTap: () {
+
+            //final EpModel epModel = context.read<EpModel>();
+            showModalBottomSheet(
+              constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
+              context: context,
+              
+              builder: (_){
+
+                return ChangeNotifierProvider.value(
+                  value: context.watch<EpModel>(),
+                  builder: (_,__) {
+                    return EasyRefresh(
+                    child: Center(
+                      child: BuildEps(
+                        subjectID: bangumiDetails.id!, 
+                        informationList: bangumiDetails.informationList,
+                        portialMode: true,
+                        outerContext: context,
+                      ),
+                    ),
+                    
+                    
+                                    );
+                  }
+                );
+              }
+            );
+          },
+          child: SizedBox(
+            height: 50,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.6)
+                
+              ),
+              child: Padding(
+                padding: PaddingH12,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("放送详情"),
+                  
+                    Row(
+                      
+                      children: [
+
+                        Builder(
+                          builder: (_){
+                            if(
+                              bangumiDetails.informationList["air_weekday"] == null || 
+                              convertAiredEps(bangumiDetails.informationList["air_date"]) >= bangumiDetails.informationList["eps"] ||
+                              bangumiDetails.informationList["eps"] > 500 //不确定长度
+                            ){
+                              return Text("共${bangumiDetails.informationList["eps"]}集");
+                            }
+
+                            return Text("${convertAiredEps(bangumiDetails.informationList["air_date"])}/${bangumiDetails.informationList["eps"]}");
+                          }
+                        ),
+
+
+                        const Padding(
+                          padding: EdgeInsets.only(left: 6),
+                          child: Icon(Icons.arrow_forward_ios,size: 16,),
+                        )
+                      ]
+                    )
+                  
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+          
 
         ConstrainedBox(
           constraints: const BoxConstraints.tightFor(width: double.infinity),
@@ -261,8 +248,6 @@ class IntroLandscape extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final ValueNotifier<bool> isStaredNotifier = ValueNotifier(MyHive.starBangumisDataBase.containsKey(bangumiDetails.id));
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,7 +286,7 @@ class IntroLandscape extends StatelessWidget {
                               Text(
                                 "Score ${bangumiDetails.ratingList["score"]?.toDouble()}",
                                 style: TextStyle(
-                                  color: Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*((bangumiDetails.ratingList["score"] ?? 0)/10).toInt()), 0, 1),
+                                  color: Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*(((bangumiDetails.ratingList["score"] as num))/10).toInt()), 0, 1),
                                   fontWeight: FontWeight.bold
                                 )
                               ),
@@ -318,41 +303,9 @@ class IntroLandscape extends StatelessWidget {
                       ),
                     ],
                   ),
-                  trailing: IconButton(
-                    onPressed: (){
-
-                        //manage Function
-
-                        if(isStaredNotifier.value){
-                          MyHive.starBangumisDataBase.delete(bangumiDetails.id);
-                          isStaredNotifier.value = false;
-                        }
-
-                        else{
-                          MyHive.starBangumisDataBase.put(
-                            bangumiDetails.id!, {
-                              "name": bangumiDetails.name,
-                              "coverUri": bangumiDetails.coverUri,
-                              "eps": bangumiDetails.informationList["eps"],
-                              "score": bangumiDetails.ratingList["score"],
-                            }
-                          );
-
-                          isStaredNotifier.value = true;
-                        }
-
-                        bus.emit("star");
-                        
-                      
-                    }, 
-                    
-                    icon: ValueListenableBuilder(
-                      valueListenable: isStaredNotifier,
-                        builder: (_,isStared,__) => isStared ? const Icon(Icons.star) : const Icon(Icons.star_outline)
-                    )
+                  trailing: StarButton(bangumiDetails: bangumiDetails)
                   
-                  ),
-                ),
+                   ),
 
                 BuildInfoBox(informationList: bangumiDetails.informationList),
 
@@ -401,7 +354,10 @@ class BuildTags extends StatelessWidget {
                       border: Border.all(width: 0.5,color: const Color.fromARGB(255, 219, 190, 213))
                     ),
                     child: TextButton(
-                      child: Text("${tagsList.keys.elementAt(index)} ${tagsList.values.elementAt(index)}"),
+                      child: Text(
+                        "${tagsList.keys.elementAt(index)} ${tagsList.values.elementAt(index)}",
+                        style: TextStyle(color: Theme.of(context).scaffoldBackgroundColor),
+                      ),
                       onPressed: () {
                         showSearch(
                           context: context,
@@ -436,18 +392,23 @@ class BuildDetailImages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final bangumiModel = context.read<BangumiModel>();
+
     return detailImageUrl != null ?
 
       CachedNetworkImage(
         
         imageUrl: detailImageUrl!,
         imageBuilder: (_,imageProvider){
-          
-          ColorScheme.fromImageProvider(provider: imageProvider).then((coverScheme){
+
+          if(bangumiModel.bangumiThemeColor==null){
+            ColorScheme.fromImageProvider(provider: imageProvider).then((coverScheme){
             debugPrint("parse Picture:${coverScheme.primary}");
-            bus.emit("imageColor",{imageID!:coverScheme.primary});
-          });
-      
+            bangumiModel.getThemeColor(coverScheme.primary);
+            });
+          }
+
           return Container(
             constraints: BoxConstraints(
               minHeight: MediaQuery.orientationOf(context) == Orientation.landscape ? 300 : 200,
@@ -456,7 +417,8 @@ class BuildDetailImages extends StatelessWidget {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: imageProvider,
-                fit: BoxFit.contain,
+                //fit: BoxFit.contain,
+                fit: BoxFit.fill,
               ),
               borderRadius: BorderRadius.circular(16)
             ),
@@ -524,12 +486,14 @@ class BuildEps extends StatelessWidget {
     super.key,
     required this.subjectID,
     required this.informationList,
-	this.portialMode
+	  this.portialMode,
+    this.outerContext
   });
 
   final int subjectID;
   final Map<String, dynamic> informationList;
   final bool? portialMode;
+  final BuildContext? outerContext;
 
   @override
   Widget build(BuildContext context) {
@@ -537,108 +501,217 @@ class BuildEps extends StatelessWidget {
     int totalEps = informationList["eps"] ?? 0;
     int airedEps = convertAiredEps(informationList["air_date"]);
 
-    return ChangeNotifierProvider(
-    			create: (_) => EpModel(subjectID: subjectID,selectedEp: 1),
-    			builder: (context,child) {
-    
-    		  return Padding(
-    			padding: const EdgeInsets.all(12),
-    			child: Builder(
-    			  builder: (_){
-    
-    					if(totalEps == 0) return const SizedBox.shrink();
-    
-    					return EpSelect(
-    						totalEps: totalEps,
-    						airedEps: airedEps,
-    						portialMode: portialMode,
-							name: informationList["alias"],
-    					);
-    
-    			  //return Wrap(
-    			  //  direction : Axis.horizontal,
-    			  //  spacing: 12,
-    			  //  runSpacing: 12,
-    			  //  children: List.generate(
-    			  //    min(100,totalEps),
-    			  //    (index){
-    			
-    			  
-    			  //        int currentEp = index;
-    			  
-    			  //        Color currentEpsColor = Colors.white;
-    			  
-    			  //        //放送中
-    			  //        if(airedEps <= totalEps){ 
-    			  //          if(airedEps == currentEp) currentEpsColor = const Color.fromARGB(255, 219, 245, 223);
-    			  //          if(airedEps > currentEp)  currentEpsColor = const Color.fromARGB(255, 217, 231, 255);
-    			  //        }
-    				
-    			  //        //已完结
-    			  //        else{
-    			  //          currentEpsColor = const Color.fromARGB(255, 217, 231, 255);
-    			  //        }
-    				
-    			  //        return Container(
-    			  //          decoration: BoxDecoration(
-    			  //            border: Border(
-    			  //              top: const BorderSide(),
-    			  //              left: const BorderSide(),
-    			  //              right: const BorderSide(),
-    			  //              bottom: BorderSide(
-    			  //                width: 3, 
-    			  //                color: convertAiredEps(informationList["air_date"]) >= index ? Colors.blueAccent : Colors.grey,
-    			  //              ),
-    			  //            ),
-    			  //            color: currentEpsColor
-    							
-    						  
-    			  //          ),
-    						
-    			  //          child: SizedBox(
-    			  //            height: 30,
-    			  //            width: 30,
-    			  //            child: InkResponse(
-    			  //              containedInkWell: true,
-    			  //              onTap: (){
-    			  
-    			  
-    			  //               Navigator.pushNamed(
-    			  //                context, Routes.subjectEp,
-    			  //                arguments: {
-    			  //                  "subjectID":subjectID,
-    			  //                  "totalEps": totalEps,
-    			  //                  "epModel": context.read<EpModel>(),
-    			  //                }
-    			  //              );
-    			  
-    							
-    							  
-    			  //              },
-    			  
-    			  //              //需求FittedBox 适配 三位数以上集数 以及 展开 或者 页面翻开
-    			  //              child: Center(
-    			  //                child: Text("${currentEp+1}")
-    			  
-    								
-    			  //                )
-    							
-    			  //            ),
-    			  //          ),
-    			  //        );
-    					
-    			  //      }
-    			  //    )
-    			  //  );
-    				  
-    
-    			  
-    			
-    				}
-    				
-    			  )
-    		  );
-    		}
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: totalEps == 0 ? 
+        const SizedBox.shrink() :
+        EpSelect(
+          totalEps: totalEps,
+          airedEps: airedEps,
+          name: informationList["alias"],
+          portialMode: portialMode,
+          //outerContext: outerContext,
+        )
+      
     );
   }
 }
+
+class StarButton extends StatelessWidget{
+  const StarButton({
+    super.key, 
+    required this.bangumiDetails
+  });
+
+  final BangumiDetails bangumiDetails;
+
+  @override
+  Widget build(BuildContext context) {
+    final ValueNotifier<bool> isStaredNotifier = ValueNotifier(MyHive.starBangumisDataBase.containsKey(bangumiDetails.id));
+
+    return IconButton(
+      onPressed: (){
+
+        //manage Function
+
+        if(isStaredNotifier.value){
+          MyHive.starBangumisDataBase.delete(bangumiDetails.id);
+          isStaredNotifier.value = false;
+        }
+
+        else{
+          MyHive.starBangumisDataBase.put(
+            bangumiDetails.id!, {
+              "name": bangumiDetails.name,
+              "coverUri": bangumiDetails.coverUri,
+              "eps": bangumiDetails.informationList["eps"],
+              "score": bangumiDetails.ratingList["score"],
+            }
+          );
+
+          isStaredNotifier.value = true;
+        }
+
+        bus.emit("star");
+        
+      
+    }, icon: ValueListenableBuilder(
+      valueListenable: isStaredNotifier,
+      builder: (_,isStared,child){
+        return isStared ? const Icon(Icons.star) : const Icon(Icons.star_outline);
+      }
+    )
+    
+  );
+                        
+
+  }
+
+}
+
+
+class BangumiRankBox extends StatelessWidget {
+  const BangumiRankBox({
+    super.key,
+    required this.bangumiDetails,
+    required this.constraint,
+  });
+
+  final BoxConstraints constraint;
+  final BangumiDetails bangumiDetails;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 150,
+      width: constraint.maxWidth,
+      decoration: BoxDecoration(
+        
+        borderRadius: BorderRadius.circular(8),
+        color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.4)
+        
+      ),
+      child: Center(
+        child: Theme(
+          data: ThemeData(
+            scrollbarTheme: const ScrollbarThemeData(
+              thickness: WidgetStatePropertyAll(0.0),
+            ),
+            highlightColor: Colors.transparent,
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                top: 12,
+                width: constraint.maxWidth,
+                child: Padding(
+                  padding: PaddingH12,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                          
+                      Row(
+                        
+                        children: [
+                      
+                          Text(
+                            "${bangumiDetails.ratingList["score"]?.toDouble()}",
+                            style: TextStyle(
+                              color: Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*(((bangumiDetails.ratingList["score"] as num) ?? 0)/10).toInt()), 0, 1),
+                              fontWeight: FontWeight.bold,
+                              //fontSize: 16
+                            )
+                          ),
+                      
+                          const Padding(padding: PaddingH6),
+                      
+                          Text(convertScoreRank(bangumiDetails.ratingList["score"]?.toDouble()),style: const TextStyle(fontSize: 16)),
+                      
+                      
+                        ],
+                      ),
+                  
+                      //const Padding(padding: PaddingH6),
+                  
+                      Row(
+                        children: [
+                          Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey),),
+                      
+                          const Padding(padding: EdgeInsets.only(left: 6)),
+                      
+                      
+                          Text(bangumiDetails.ratingList["rank"]!=0 ? 'Rank #${bangumiDetails.ratingList["rank"]}' : ""),
+                                      
+                        ],
+                      )
+                  
+                  
+                      
+                      //Options
+                      //Padding(
+                      //  padding: const EdgeInsets.symmetric(horizontal: 6),
+                      //  child: Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey),),
+                      //),
+                          
+                          
+                    ],
+                  ),
+                ),
+              ),
+
+              ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 10,
+                itemExtent: (constraint.maxWidth/10),
+                physics: const NeverScrollableScrollPhysics(), //禁止用户滑动进度条
+                itemBuilder: (_,index){
+              
+                  double currentRankRatio;
+              
+                  if(bangumiDetails.ratingList["total"] == 0){
+                     currentRankRatio = 0;
+                  }
+              
+                  else{
+                    currentRankRatio = bangumiDetails.ratingList["count"]["${index+1}"] / bangumiDetails.ratingList["total"];
+                  }
+              
+              
+                  return Tooltip(
+                    message: "${bangumiDetails.ratingList["count"]["${index+1}"]} vote(s), ${(currentRankRatio*100).toStringAsFixed(2)}%",
+                    child: Padding(
+                      padding: PaddingH6,
+                      child: Stack(
+                        alignment: Alignment.bottomCenter,
+                        
+                        children: [
+                                  
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 300), 
+                            height: 175*currentRankRatio, //理论上最大值应该是200 毕竟极端值 1:1 但不想顶到上方的Score区域
+                            color:Theme.of(context).scaffoldBackgroundColor,
+                          ),
+                                  
+                          Text(
+                            "${index+1}",
+                            style: TextStyle(fontSize: 10,color: currentRankRatio > 0.2 ?Colors.white : Colors.black)
+                          ),
+                                  
+                          
+                        ],
+                      ),
+                    ),
+                  );
+                  
+                  
+                  
+                }
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+

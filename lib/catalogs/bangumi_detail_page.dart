@@ -1,6 +1,8 @@
 
-import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/providers/comment_model.dart';
+import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
@@ -28,63 +30,45 @@ class BangumiDetailPage extends StatefulWidget {
   State<BangumiDetailPage> createState() => _BangumiDetailPageState();
 }
 
-class _BangumiDetailPageState extends State<BangumiDetailPage> {
 
+
+//class _BangumiDetailPageState extends State<BangumiDetailPage> {
+class _BangumiDetailPageState extends LifecycleState<BangumiDetailPage> {
+
+  bool isPaused = false;
   ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
-  //BangumiDetails? currentSubjectDetail; //dependence InheritedWidget(Provider). don't turn to stateless.
-  ValueNotifier<Color> detailImageColorNotifier = ValueNotifier<Color>( const Color.fromARGB(183, 236, 211, 231));
+ 
 
   @override
-  void initState() {
-    //bus.emit("imageColor",coverScheme.primary);
-    bus.on(
-      "imageColor",(arg){
-        // {ID: imageUrl}
-        if(arg is Map<int,Color>){
-          if(arg.keys.first == widget.bangumiID){
-
-            Color resultColor = arg.values.first;
-            
-            debugPrint("[detailPage] ID: ${widget.bangumiID}, Color:$resultColor, Lumi:${resultColor.computeLuminance()}");
-
-            if(resultColor.computeLuminance()<0.5){
-              HSLColor hslColor = HSLColor.fromColor(resultColor); //亮度过低 转换HSL色度
-              double newLightness = (hslColor.lightness + 0.3).clamp(0.8, 1.0); // 确保不超过 1.0
-
-              double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.4); //偏透明色
-              HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
-
-              resultColor = newHSLColor.toColor();
-
-              debugPrint("result Color:$resultColor,Lumi:${resultColor.computeLuminance()}");
-
-              detailImageColorNotifier.value = resultColor;
-
-            }
-
-            else{
-              detailImageColorNotifier.value = arg.values.first;
-            }
-
-            
-          }
-        }
-      }
-    );
-    super.initState();
+  void didPushNext() {
+    isPaused = true;
+    super.didPushNext();
   }
 
+  
+  @override
+  void didPopNext() {
+    isPaused = false;
+    super.didPopNext();
+  }
 
   @override
   Widget build(BuildContext context) {
 
-    
-
-    return ChangeNotifierProvider(
-      create: (context) => BangumiModel(),
-      child: ValueListenableBuilder(
-        valueListenable: detailImageColorNotifier,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BangumiModel()),
+        ChangeNotifierProvider(create: (_) => EpModel(subjectID: widget.bangumiID,selectedEp: 1)),
+        ChangeNotifierProvider(create: (_) => CommentModel())
+        
+      ],
+      //create: (_) => BangumiModel(),
+      child: Selector<BangumiModel,Color?>(
+        selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
+        shouldRebuild: (previous, next) => previous!=next,
+        
         builder: (_,linearColor,detailScaffold) {
+          debugPrint("linear color:$linearColor");
           return Theme(
             data: ThemeData(
               primaryColor: linearColor,
@@ -139,99 +123,124 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
                 },
                 
                 child: Selector<BangumiModel, int>(
-                selector:(_, bangumiModel) => bangumiModel.bangumiID,
-                shouldRebuild: (previous, next){
-                  if(next == 0) return false;
-                  return previous!=next;
-                },
-                builder: (_,bangumiID,child) {
-            
-                  final bangumiModel = context.read<BangumiModel>();
-              
-                  debugPrint("BangumiID: $bangumiID => ${widget.bangumiID}");
-              
-                  return FutureBuilder(
-                    future: bangumiModel.loadDetails(widget.bangumiID),
-                    builder: (_,snapshot){
+                    selector:(_, bangumiModel) => bangumiModel.bangumiID,
+                      shouldRebuild: (previous, next){
+                        if(next == 0) return false;
+                        return previous!=next;
+                      },
+                      builder: (_,bangumiID,child) {
+                  
+                        final bangumiModel = context.read<BangumiModel>();
+                    
+                        debugPrint("BangumiID: $bangumiID => ${widget.bangumiID}");
+                    
+                        return FutureBuilder(
+                          future: bangumiModel.loadDetails(widget.bangumiID),
+                          builder: (_,snapshot){
 
-                      if(snapshot.connectionState == ConnectionState.done){
-                        debugPrint("parse ${widget.bangumiID} done ,builderStamp: ${DateTime.now()}");
-                      }
-              
-                      return EasyRefresh.builder(
-                        header: const MaterialHeader(),
-                        onRefresh: ()=> context.read<BangumiModel>().loadDetails(bangumiID,refresh:true),
-                        childBuilder: (_,physic){
-            
-                          
-                          BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails; //dependenc
-            
-                          return SingleChildScrollView(
-                            physics: physic,
-                            child: Skeletonizer(
-                              enabled: currentSubjectDetail==null,
-                              child: ValueListenableBuilder(
-                                valueListenable: detailImageColorNotifier,
-                                builder: (_,linearColor,child) {
-                                  return AnimatedContainer(
-                                    duration: const Duration(milliseconds: 500),
-                                    padding: const EdgeInsets.all(16),
-                                    decoration:  BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          Colors.white,
-                                          //Color.fromARGB(255, 209, 220, 233)
-                                          linearColor,
-                                        ]
-                                      )
+                            if(snapshot.connectionState == ConnectionState.done){
+                              debugPrint("parse ${widget.bangumiID} done ,builderStamp: ${DateTime.now()}");
+                            }
+                    
+                            return EasyRefresh.builder(
+                              header: const MaterialHeader(),
+                              onRefresh: ()=> context.read<BangumiModel>().loadDetails(bangumiID,refresh:true),
+                              childBuilder: (_,physic){
+                  
+                                
+                                BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails; //dependenc
+                  
+                                return CustomScrollView(
+                                  slivers: [
+                                    Skeletonizer.sliver(
+                                      enabled: currentSubjectDetail==null,
+                                      child: 
+                                      
+                                      
+                                      Selector<BangumiModel,Color?>(
+                                        selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
+                                        shouldRebuild: (previous, next) => previous!=next,
+                                        builder: (_,linearColor,detailChild) {
+
+                                          return TweenAnimationBuilder<Color?>(
+                                            tween: ColorTween(
+                                              begin: const Color.fromARGB(255, 140, 205, 244),
+                                              end: linearColor ?? Colors.white,
+                                            ),
+                                            duration: const Duration(milliseconds: 500),
+                                            builder: (_, linearColor, __) {
+
+                                              return DecoratedSliver(
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    begin: Alignment.topCenter,
+                                                    end: Alignment.bottomCenter,
+                                                    colors: [
+                                                      Colors.white,
+                                                      linearColor!,
+                                                    ]
+                                                  )
+                                                ),
+                                                sliver: detailChild,
+                                                
+                                              );
+
+                                             
+
+                                             
+                                            },
+                                            
+                                            
+                                          );
+
+                                        },
+                                        child: SliverPadding(
+                                          padding: const EdgeInsets.all(16),
+                                          sliver: SliverList(
+                                            delegate: SliverChildListDelegate(
+                                              [
+                                                BangumiDetailIntro(bangumiDetails: currentSubjectDetail ?? BangumiDetails()),
+                                              
+                                                NotificationListener<ScrollNotification>(
+                                                  onNotification: (_) => true,
+                                                  child: BangumiSummary(summary: currentSubjectDetail?.summary)
+                                                ),
+                                                
+                                                NotificationListener<ScrollNotification>(
+                                                  onNotification: (_) => true,
+                                                  child: BangumiHotComment(id: widget.bangumiID,name: bangumiModel.bangumiDetails?.name,) 
+                                                  //内含Future 界面变动的时候 这个也会被rebuild
+                                                  //唯一的办法就是像上面那样 由details创立bangumiModel 只是这样的话就会让原本分割开的 details comment关系又融合进去了
+                                                
+                                                  //不过至少在后端请求数据里做了防rebuild触发的重复处理
+                                                ),
+                                              ]
+                                            )
+                                          ),
+                                        )
+                                        
+                                       
+                                            
+                                      ),
+                                                      
                                     ),
-                                    child: child!
-                                    );
-                                },
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    
-                                    BangumiDetailIntro(bangumiDetails: currentSubjectDetail ?? BangumiDetails()),
-                                    
-                                    NotificationListener<ScrollNotification>(
-                                      onNotification: (_) => true,
-                                      child: BangumiSummary(summary: currentSubjectDetail?.summary)
-                                    ),
-                                    
-                                    NotificationListener<ScrollNotification>(
-                                      onNotification: (_) => true,
-                                      child: BangumiHotComment(id: widget.bangumiID,name: bangumiModel.bangumiDetails?.name,) 
-                                      //内含Future 界面变动的时候 这个也会被rebuild
-                                      //唯一的办法就是像上面那样 由details创立bangumiModel 只是这样的话就会让原本分割开的 details comment关系又融合进去了
-                                    
-                                      //不过至少在后端请求数据里做了防rebuild触发的重复处理
-                                    ),
-                                    
-                                  
                                   ],
-                                ),
-                                    
-                              ),
-            
-                            ),
-                          );
-                        }
-                      );
-              
-              
-                    },
+                                );
+
+                              }
+                            );
                     
                     
-                  );
-              
-                },
-              ),
-            )
-            
-                  );
+                          },
+                          
+                          
+                        );
+                    
+                      },
+                    ),
+              )
+                
+            );
           }
         )
           
@@ -240,4 +249,6 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
       
     
   }
+
+
 }

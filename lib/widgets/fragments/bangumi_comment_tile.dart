@@ -44,26 +44,8 @@ class BangumiCommentTile extends StatelessWidget {
         children: [
           BBCodeText(
               data: convertBangumiCommentSticker(commentData.comment ?? "comment"),
-              
               stylesheet: BBStylesheet(
-                tags: [
-                  BoldTag(),
-                  ItalicTag(),
-                  UnderlineTag(),
-                  StrikeThroughTag(),
-                  ColorTag(),
-                  ImgTag(),
-                  UrlTag(),
-                  QuoteTag(),
-                  SpoilerTag(),
-                  LeftAlignTag(),
-                  CenterAlignTag(),
-                  RightAlignTag(),
-                  BoldTag(),
-                  MaskTag(),
-                  BangumiStickerTag(),
-                  
-                ],
+                tags: allEffectTag,
                 selectableText: true,
                 defaultText: const TextStyle(fontFamily: 'MiSansFont',color: Colors.black,fontSize: 16)
               ),
