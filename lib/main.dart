@@ -43,22 +43,43 @@ class MainApp extends StatelessWidget {
 
     return ChangeNotifierProvider(
       create: (_) => IndexModel(),
-      child: MaterialApp(
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 140, 205, 244)),
-          fontFamily: 'MiSansFont',
-        ),
-        initialRoute: Routes.index,
-        //navigatorObservers: [],
-        navigatorObservers: [RouteObserver<ModalRoute>()],
-        onGenerateRoute: (RouteSettings settings) {
-          return onGenerateRoute(
-            settings: settings,
-            getRouteSettings: getRouteSettings,
+      child: Builder(
+        builder: (context) {
+          return MaterialApp(
+            theme: ThemeData(
+          			colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 140, 205, 244)),
+          			fontFamily: 'MiSansFont',
+            ),
+          		darkTheme: ThemeData(
+          			brightness: Brightness.dark,
+          			fontFamily: 'MiSansFont',
+          			colorScheme: const ColorScheme.dark(
+          				primary: Color.fromARGB(255, 140, 205, 244),
+          				onPrimary: Colors.white, //unSelected颜色
+          				secondary: Colors.white,
+          				onSecondary:Color.fromARGB(255, 140, 205, 244), //onSelected 的颜色
+          				surface: Colors.black,
+          				
+          				outline: Colors.white,
+          					
+          
+          			)
+          		),
+          		themeMode: context.watch<IndexModel>().themeMode,
+          		
+            initialRoute: Routes.index,
+            //navigatorObservers: [],
+            navigatorObservers: [RouteObserver<ModalRoute>()],
+            onGenerateRoute: (RouteSettings settings) {
+              return onGenerateRoute(
+                settings: settings,
+                getRouteSettings: getRouteSettings,
+              );
+            },
+          
+          
           );
-        },
-
-      
+        }
       ),
     );
   }

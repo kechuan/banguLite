@@ -48,6 +48,8 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                 bool isValid = pictureRequestInformation.contentLength != null;
 
                 return Card(
+                  shadowColor: Colors.white,
+                  elevation: 6,
                   child: UnVisibleResponse(
                     onTap: (){
                       if(!isValid) return;

@@ -1,8 +1,12 @@
 
+import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
@@ -33,24 +37,24 @@ class BangumiDetailPage extends StatefulWidget {
 
 
 //class _BangumiDetailPageState extends State<BangumiDetailPage> {
-class _BangumiDetailPageState extends LifecycleState<BangumiDetailPage> {
+class _BangumiDetailPageState extends State<BangumiDetailPage> {
 
-  bool isPaused = false;
+  //bool isPaused = false;
   ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
  
 
-  @override
-  void didPushNext() {
-    isPaused = true;
-    super.didPushNext();
-  }
+  //@override
+  //void didPushNext() {
+  //  isPaused = true;
+  //  super.didPushNext();
+  //}
 
   
-  @override
-  void didPopNext() {
-    isPaused = false;
-    super.didPopNext();
-  }
+  //@override
+  //void didPopNext() {
+  //  isPaused = false;
+  //  super.didPopNext();
+  //}
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +64,6 @@ class _BangumiDetailPageState extends LifecycleState<BangumiDetailPage> {
         ChangeNotifierProvider(create: (_) => BangumiModel()),
         ChangeNotifierProvider(create: (_) => EpModel(subjectID: widget.bangumiID,selectedEp: 1)),
         ChangeNotifierProvider(create: (_) => CommentModel())
-        
       ],
       //create: (_) => BangumiModel(),
       child: Selector<BangumiModel,Color?>(
@@ -71,6 +74,7 @@ class _BangumiDetailPageState extends LifecycleState<BangumiDetailPage> {
           debugPrint("linear color:$linearColor");
           return Theme(
             data: ThemeData(
+              brightness: Theme.of(context).brightness,
               primaryColor: linearColor,
               scaffoldBackgroundColor: linearColor,
               fontFamily: 'MiSansFont',
@@ -80,16 +84,31 @@ class _BangumiDetailPageState extends LifecycleState<BangumiDetailPage> {
         },
         child: Builder(
           builder: (context) {
+
+            final BangumiModel bangumiModel = context.read<BangumiModel>();
+            final IndexModel indexModel = context.read<IndexModel>();
+
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.6),
                 
-                title: ValueListenableBuilder(valueListenable: appbarTitleNotifier, builder: (_,appbarTitle,__)=>Text(appbarTitle)),
+                title: ValueListenableBuilder(valueListenable: appbarTitleNotifier, builder: (_,appbarTitle,__)=>Text(appbarTitle,style: const TextStyle(color: Colors.black),)),
                 leading: IconButton(
                   onPressed: ()=>Navigator.of(context).pop(),
                   icon: const Icon(Icons.arrow_back)
                 ),
                 actions: [
+                  //const ToggleThemeModeButton(),
+                  ToggleThemeModeButton(
+                    onThen: (){
+                      //debugPrint("trigged onThen");
+                      bangumiModel.bangumiThemeColor = null;
+                      bangumiModel.getThemeColor(bangumiModel.imageColor!,darkMode: indexModel.themeMode == ThemeMode.dark);
+                    }
+                  ),
+
+                  const Padding(padding: PaddingH6),
+
                   IconButton(
                     onPressed: () async {
                       if(await canLaunchUrlString(BangumiWebUrls.subject(widget.bangumiID))){
@@ -122,10 +141,10 @@ class _BangumiDetailPageState extends LifecycleState<BangumiDetailPage> {
                   return false;
                 },
                 
-                child: Selector<BangumiModel, int>(
+                child: Selector<BangumiModel, int?>(
                     selector:(_, bangumiModel) => bangumiModel.bangumiID,
                       shouldRebuild: (previous, next){
-                        if(next == 0) return false;
+                        if(next == null) return false;
                         return previous!=next;
                       },
                       builder: (_,bangumiID,child) {
@@ -159,13 +178,16 @@ class _BangumiDetailPageState extends LifecycleState<BangumiDetailPage> {
                                       
                                       Selector<BangumiModel,Color?>(
                                         selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
+                                        //selector: (_, bangumiModel) => judgeDarknessMode(context) ? bangumiModel.getThemeColor(context,darkMode: true) : bangumiModel.bangumiThemeColor ,
                                         shouldRebuild: (previous, next) => previous!=next,
                                         builder: (_,linearColor,detailChild) {
 
                                           return TweenAnimationBuilder<Color?>(
                                             tween: ColorTween(
                                               begin: const Color.fromARGB(255, 140, 205, 244),
-                                              end: linearColor ?? Colors.white,
+                                              //end: linearColor ?? Colors.white,
+                                              //begin: Theme.of(context).brightness == Brightness.dark ? Colors.black : const Color.fromARGB(255, 140, 205, 244),
+                                              end: Theme.of(context).brightness == Brightness.dark ? Colors.black : linearColor ?? Colors.white,
                                             ),
                                             duration: const Duration(milliseconds: 500),
                                             builder: (_, linearColor, __) {
@@ -176,7 +198,7 @@ class _BangumiDetailPageState extends LifecycleState<BangumiDetailPage> {
                                                     begin: Alignment.topCenter,
                                                     end: Alignment.bottomCenter,
                                                     colors: [
-                                                      Colors.white,
+                                                      Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
                                                       linearColor!,
                                                     ]
                                                   )

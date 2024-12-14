@@ -1,4 +1,6 @@
 
+import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/widgets/fragments/comment_image_panel.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
@@ -25,13 +27,13 @@ final allEffectTag = [
 ];
 
 class MaskDisplay extends StatelessWidget {
-  final String spoilerText;
+  final String maskText;
   final List<InlineSpan> content;
   final bool selectable;
 
   	const MaskDisplay({
 		super.key,
-		required this.spoilerText,
+		required this.maskText,
 		required this.content,
 	
 		this.selectable = true
@@ -42,47 +44,60 @@ class MaskDisplay extends StatelessWidget {
 
 	ValueNotifier<bool> activedNotifier = ValueNotifier<bool>(false);
 
-	return UnVisibleResponse(
-		onTap: () => activedNotifier.value = true,
-		  child: MouseRegion(
-			onEnter: (event) => activedNotifier.value = true,
-			onExit: (event) => activedNotifier.value = false,
-			child: ValueListenableBuilder(
-					valueListenable: activedNotifier,
-					builder: (_,activedStatus,__) {
-		  
-						return ColoredBox(
-							color: Colors.black,
-							child: 
-								TweenAnimationBuilder<Color?>(
-									duration: const Duration(milliseconds: 300),
-									tween: ColorTween(
-										begin: Colors.black,
-										end: activedStatus ? Colors.white : Colors.black,
-									),
-		  
-									builder: (_,color,__){
-										//MergeStyle
-										List<InlineSpan> newInlineSpan = content.map(
-												(currentSpan){
-													return TextSpan(
-														text: currentSpan.toPlainText(),
-														style: currentSpan.style!.merge(TextStyle(color: color)),
-													);
-												}
-											).toList();
-		  
-										return selectable ? 
-										SelectableText.rich(TextSpan(children: newInlineSpan)) :
-										RichText(text: TextSpan(children: newInlineSpan));
-									}
-								)
-							
-						);
-					}
-			  ),
-			),
-		);
+  
+	return MouseRegion(
+    onEnter: (event) => activedNotifier.value = true,
+    onExit: (event) => activedNotifier.value = false,
+    child: Listener( //手势不知道和哪个组件冲突了 怀疑是BBCode内部也实现了空白的手势处理组件 那我干脆用Listener好了
+      //onTap: () => activedNotifier.value = true,
+      onPointerDown: (event) => activedNotifier.value = true,
+      
+      
+      child:
+          ValueListenableBuilder(
+            valueListenable: activedNotifier,
+            builder: (_,activedStatus,__) {
+
+                bool isDarkMode = judgeDarknessMode(context);
+          
+                debugPrint("activedStatus rebuild");
+          
+              return ColoredBox(
+                color: isDarkMode ? BangumiThemeColor.macha.color :Colors.black,
+                child: 
+                  TweenAnimationBuilder<Color?>(
+                    duration: const Duration(milliseconds: 300),
+                    tween: ColorTween(
+                      begin: isDarkMode ? BangumiThemeColor.macha.color :Colors.black,
+                      end: isDarkMode ? (activedStatus ? Colors.black : BangumiThemeColor.macha.color) : (activedStatus ? Colors.white : Colors.black),
+                    ),
+          
+                    builder: (_,color,__){
+                      //MergeStyle
+                      List<InlineSpan> newInlineSpan = content.map(
+                          (currentSpan){
+                            return TextSpan(
+                              text: currentSpan.toPlainText(),
+                              style: currentSpan.style!.merge(TextStyle(color: color)),
+                            );
+                          }
+                        ).toList();
+          
+                      return selectable ? 
+                      SelectableText.rich(TextSpan(children: newInlineSpan)) :
+                      RichText(text: TextSpan(children: newInlineSpan));
+                              
+                              
+                    }
+                  )
+                
+              );
+            }
+        )
+      
+      )
+    );
+				
   
   }
 }
@@ -102,13 +117,13 @@ class MaskTag extends WrappedStyleTag {
     }
 
     return [
-      	WidgetSpan(
-			child: MaskDisplay(
-				spoilerText: text,
-				content: spans,
-				selectable: renderer.stylesheet.selectableText,
-			)
-		)
+      WidgetSpan(
+        child: MaskDisplay(
+          maskText: text,
+          content: spans,
+          selectable: renderer.stylesheet.selectableText,
+        )
+		  )
     ];
 
   }
@@ -156,17 +171,14 @@ class LateLoadImgTag extends AdvancedTag {
 	//debugPrint("lateLoad textContent:${imageUri}");
 	//目标: 只获取图片大小 并显示成一个Widget 直到。。你再次点击 以获取真正的图片.
 
-    //final image = Image.network(imageUrl,
-    //    errorBuilder: (context, error, stack) => Text("[$tag error: $error"));
-
     if (renderer.peekTapAction() != null) {
       return [
         WidgetSpan(
-			child: GestureDetector(
-				onTap: renderer.peekTapAction(),
-				child: CommentImagePanel(imageUri: imageUri),
-			)
-		)
+          child: GestureDetector(
+            onTap: renderer.peekTapAction(),
+            child: CommentImagePanel(imageUri: imageUri),
+          )
+		    )
       ];
     }
 

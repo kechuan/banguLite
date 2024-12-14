@@ -119,92 +119,101 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                               child: child!
                             );
                           },
-                          child: Expanded(
-                            child: GridView.builder(
-                              shrinkWrap: true,
-                              itemCount: currentSegmentEps,
-                              gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: widget.portialMode == true ? 1 : 3,
-                                mainAxisExtent: 60,
-                                mainAxisSpacing: 6,
-                                crossAxisSpacing: 6
-                              ),
-                              
-                              itemBuilder: (_,index){
-                                    
-                                Color currentEpsColor = Colors.white;
-                                int currentEpIndex = (currentSegementRange)+(index)+1;
-                            
-                                //放送中
-                                if(widget.airedEps <= widget.totalEps){ 
-                                  if(widget.airedEps == currentEpIndex) currentEpsColor = const Color.fromARGB(255, 219, 245, 223);
-                                  if(widget.airedEps > currentEpIndex)  currentEpsColor = Theme.of(context).scaffoldBackgroundColor;
-                                }
-                            
-                                //已完结
-                                else{
-                                  currentEpsColor = const Color.fromARGB(255, 217, 231, 255);
-                                }
-                              
-                                      
-                                return SizedBox(
-                                  height: 60,
-                                  child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border(
-                                     
-                                      bottom: BorderSide(
-                                        width: 3, 
-                                        color: widget.airedEps >= currentEpIndex ? Theme.of(context).scaffoldBackgroundColor.withOpacity(0.2) : Colors.grey,
-                                      ),
-                                    ),
-                                    color: currentEpsColor
-                                    
-                                    
-                                  ),
-                                    child: InkResponse(
-                                      containedInkWell: true,
-                                      hoverColor: Colors.transparent,     // 悬浮时圆点
-                                      highlightColor: Colors.transparent, // 点击时的圆点
-                                      
-                                      onTap: (){
-                                
-                                        debugPrint("selected Ep:$currentEpIndex");
-                                        epModel.updateSelectedEp(currentEpIndex);
-                                      
-                                        Navigator.pushNamed(
-                                          context, Routes.subjectEp,
-                                          arguments: {
-                                          "subjectID":epModel.subjectID,
-                                          "totalEps": widget.totalEps,
-                                          "epModel": epModel,
-                                          }
-                                        );
-                                    
-                                      
-                                      },
-                                              
-                                      
-                                      child: Center(
-                                        //child: Text("Ep. $currentEpIndex ${epModel.epsData[currentEpIndex]?.nameCN ?? epModel.epsData[currentEpIndex]?.name }"),
-                                        child: Builder(
-                                          builder: (_) {
-                            
-                                            EpsInfo? currentInfo = epModel.epsData[currentEpIndex];
-                              
-                                            String currentEpText = currentInfo?.nameCN ?? currentInfo?.name ?? ""; 
-
-                                            return Text("Ep. $currentEpIndex ${currentEpText.isEmpty ? currentInfo?.name : currentEpText}");
-                                          }
-                                        ),
-                                      ) 
-                                    ),
-                                  ),
-                                );
-                                    
-                              }
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            itemCount: currentSegmentEps,
+                            gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: widget.portialMode == true ? 1 : 3,
+                              mainAxisExtent: 60,
+                              mainAxisSpacing: 6,
+                              crossAxisSpacing: 6
                             ),
+                            
+                            itemBuilder: (_,index){
+                                  
+                              Color currentEpsColor = Colors.white;
+                              int currentEpIndex = (currentSegementRange)+(index)+1;
+                          
+                              //放送中
+                              if(widget.airedEps <= widget.totalEps){ 
+                                if(widget.airedEps == currentEpIndex) currentEpsColor = const Color.fromARGB(255, 219, 245, 223);
+                                if(widget.airedEps > currentEpIndex)  currentEpsColor = Theme.of(context).scaffoldBackgroundColor;
+                              }
+                          
+                              //已完结
+                              else{
+                                //currentEpsColor = const Color.fromARGB(255, 217, 231, 255);
+                                currentEpsColor = Theme.of(context).scaffoldBackgroundColor;
+                              }
+                            
+                                    
+                              return SizedBox(
+                                height: 60,
+                                child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border(
+                                   
+                                    bottom: BorderSide(
+                                      width: 3, 
+                                      //color: widget.airedEps >= currentEpIndex ? Theme.of(context).scaffoldBackgroundColor.withOpacity(0.2) : Colors.grey,
+                                      color:  Colors.grey.withOpacity(0.2),
+                                    ),
+                                  ),
+                                  color: currentEpsColor
+                                  
+                                  
+                                ),
+                                  child: InkResponse(
+                                    containedInkWell: true,
+                                    hoverColor: Colors.transparent,     // 悬浮时圆点
+                                    highlightColor: Colors.transparent, // 点击时的圆点
+                                    
+                                    onTap: (){
+                              
+                                      debugPrint("selected Ep:$currentEpIndex");
+                                      epModel.updateSelectedEp(currentEpIndex);
+                                    
+                                      Navigator.pushNamed(
+                                        context, Routes.subjectEp,
+                                        arguments: {
+                                        "subjectID":epModel.subjectID,
+                                        "totalEps": widget.totalEps,
+                                        "epModel": epModel,
+                                        }
+                                      );
+                                  
+                                    
+                                    },
+                                            
+                                    
+                                    child: Center(
+                                      //child: Text("Ep. $currentEpIndex ${epModel.epsData[currentEpIndex]?.nameCN ?? epModel.epsData[currentEpIndex]?.name }"),
+                                      child: Builder(
+                                        builder: (_) {
+
+                                          //Color lisibleColor = Theme.of(context).scaffoldBackgroundColor;
+                                          
+                                          //if(Theme.of(context).scaffoldBackgroundColor.computeLuminance() > 0.5){
+                                          //  lisibleColor = Colors.black;
+                                          //}
+                          
+                                          EpsInfo? currentInfo = epModel.epsData[currentEpIndex];
+                            
+                                          String currentEpText = currentInfo?.nameCN ?? currentInfo?.name ?? ""; 
+                          
+                                          return Text(
+                                            "Ep. $currentEpIndex ${currentEpText.isEmpty ? currentInfo?.name : currentEpText}",
+                                            style: const TextStyle(color: Colors.black)
+                                          );
+                                        }
+                                      ),
+                                    ) 
+                                  ),
+                                ),
+                              );
+                                  
+                            }
                           ),
                           
                         );

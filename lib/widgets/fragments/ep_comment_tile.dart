@@ -81,11 +81,10 @@ class EpCommentTile extends StatelessWidget {
             
             BBCodeText(
               data: convertBangumiCommentSticker(epCommentData.comment ?? "comment"),
-              
               stylesheet: BBStylesheet(
                 tags: allEffectTag,
                 selectableText: true,
-                defaultText: const TextStyle(fontFamily: 'MiSansFont',color: Colors.black,fontSize: 16)
+                defaultText: const TextStyle(fontFamily: 'MiSansFont',fontSize: 16)
               ),
             ),
         

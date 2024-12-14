@@ -47,7 +47,7 @@ class BangumiCommentTile extends StatelessWidget {
               stylesheet: BBStylesheet(
                 tags: allEffectTag,
                 selectableText: true,
-                defaultText: const TextStyle(fontFamily: 'MiSansFont',color: Colors.black,fontSize: 16)
+                defaultText: const TextStyle(fontFamily: 'MiSansFont',fontSize: 16)
               ),
             ),
           Row(

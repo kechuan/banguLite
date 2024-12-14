@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class BangumiCalendarPage extends StatefulWidget {
   State<BangumiCalendarPage> createState() => _BangumiCalendarPageState();
 }
 
-class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
+class _BangumiCalendarPageState extends LifecycleAppState<BangumiCalendarPage> {
 
   Future? calendarLoadFuture;
   Timer? carouselTimer;
@@ -66,7 +67,6 @@ class _BangumiCalendarPageState extends State<BangumiCalendarPage> {
   Widget build(BuildContext context) {
     return EasyRefresh.builder(
       header: const MaterialHeader(),
-      //onRefresh: ()=> calendarLoadFuture = context.read<IndexModel>().loadCalendar(),
       onRefresh: ()=> calendarLoadFuture = context.read<IndexModel>().reloadCalendar(),
       
       childBuilder: (_,physic){

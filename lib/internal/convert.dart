@@ -2,6 +2,8 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 
 
@@ -156,4 +158,8 @@ String convertScoreRank(double? score){
   return resultRankText;
 
 
+}
+
+bool judgeDarknessMode(BuildContext context){
+  return Theme.of(context).brightness == Brightness.dark ? true : false;
 }

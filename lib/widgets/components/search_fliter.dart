@@ -1,11 +1,13 @@
 
 
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/widgets/fragments/date_range_select.dart';
+import 'package:provider/provider.dart';
 
 class Searchfliter extends StatefulWidget {
   const Searchfliter({super.key});
@@ -54,25 +56,28 @@ class _SearchfliterState extends State<Searchfliter> {
   @override
   Widget build(BuildContext context) {
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.sizeOf(context).width
+    return Theme(
+      data: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Theme.of(context).colorScheme.secondary,
+          brightness: Theme.of(context).brightness
+        )
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
       
-            //DateRange
-            DecoratedBox(
-              decoration: const BoxDecoration( 
-                border: Border(
-                  bottom: BorderSide(width: 1),
-              )),
-              child: Row(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.sizeOf(context).width
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+        
+              //DateRange
+              Row(
                 children: [
-
+              
                   DateRangeSelect(
                     key: const ValueKey("monthStartSelect"),
                     dateRangeEditingController: yearEditingControllerStart
@@ -90,16 +95,11 @@ class _SearchfliterState extends State<Searchfliter> {
               
                 ],
               ),
-            ),
+        
+              const Divider(height: 1),
       
-            //RankRange
-            DecoratedBox(
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(width: 1)
-                )
-              ),
-              child: Row(
+              //RankRange
+              Row(
                 children: [
               
                   const Text("rankRange:"),
@@ -140,22 +140,15 @@ class _SearchfliterState extends State<Searchfliter> {
                   ),
                 ],
               ),
-            ),
-      
-      
-            //TagsList TextField
-            DecoratedBox(
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(width: 1),
-                )
-              ),
+        
+              const Divider(height: 1),
               
-              child: Row(
+              //TagsList TextField
+              Row(
                 children: [
                   
                   const Text("tagInput:"),
-      
+                    
                   Padding(
                     padding: const EdgeInsets.only(left: 12),
                     child: SizedBox(
@@ -171,11 +164,11 @@ class _SearchfliterState extends State<Searchfliter> {
                       ),
                     ),
                   ),
-      
+                    
                   //细节: label得到的icon是会顺应 colorSchme主题色的
                   TextButton.icon(
                     onPressed: (){
-      
+                    
                       tagsList.add(tagsEditingController.text);
                       
                       animatedTagsListKey.currentState?.insertItem(
@@ -184,152 +177,135 @@ class _SearchfliterState extends State<Searchfliter> {
                       );
                     }, label: const Icon(Icons.upload)
                   )
-      
-      
+                    
+                    
                 ],
               ),
-            ),
-
-            //RankSlider
-            Row(
-              children: [
-                
-                const Text("ratingRange:"),
-            
-                Text("${ratingRange.start*10}"),
       
-                //但好在还是可以间接的用Expanded来限制
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    //不能直接使用Expanded 不知道为什么 也许是因为它在layout Inspector里
-                    //查看是RangeSlirenderObject吧??
-                    child: RangeSlider( 
-                      values: ratingRange, 
-                      onChanged: (rankValues){
-                        setState(() {
-                          ratingRange = rankValues;
-                        });
-                      },
-                      divisions: 20,
-                                  
+              const Divider(height: 1),
+      
+              //RankSlider
+              Row(
+                children: [
+                  
+                  const Text("ratingRange:"),
+              
+                  Text("${ratingRange.start*10}"),
+        
+                  //但好在还是可以间接的用Expanded来限制
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      //不能直接使用Expanded 不知道为什么 也许是因为它在layout Inspector里
+                      //查看是RangeSlirenderObject吧??
+                      child: RangeSlider( 
+                        values: ratingRange, 
+                        onChanged: (rankValues){
+                          setState(() {
+                            ratingRange = rankValues;
+                          });
+                        },
+                        divisions: 20,
+                                    
+                      ),
                     ),
                   ),
-                ),
-            
-                Text("${ratingRange.end*10}"),
               
-              
-              ],
-            ),
-      
-      
-      
-            //TagsList Show
-            ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxHeight: 55,
+                  Text("${ratingRange.end*10}"),
+                
+                
+                ],
               ),
-              child: NotificationListener<ScrollUpdateNotification>(
-                onNotification: (notification) => true, //捕获冒泡滚动 不要让上层响应
-                child: AnimatedList.separated(
-                  key: animatedTagsListKey,
-                  scrollDirection: Axis.horizontal,
-                  initialItemCount: tagsList.length,
-                  separatorBuilder: (_,index,animation) => const Padding(padding: EdgeInsets.symmetric(horizontal: 12)),
-                  removedSeparatorBuilder: (_, index, animation) => const SizedBox.shrink(),
-                  itemBuilder: (listContext,index,animation){
-
-                  if(tagsList.isEmpty) return const SizedBox.shrink();
-
-
-                   return SlideTransition(
-                    position: animation.drive(Tween<Offset>(begin: const Offset(-1, 0),end: Offset.zero)), 
-                    // begin/end 是相对于insert状态来说的 如果是remove行为则应该是反向
-                     child: FadeTransition(
-                      opacity: animation,
-                       child: Padding(
-                         padding: const EdgeInsets.symmetric(vertical: 5),
-                         child: ElevatedButton(
-                           onPressed: (){
-                         
-                            final String recordText = tagsList[index];
-                         
-                            tagsList.removeAt(index);
-                         
-                             AnimatedList.of(listContext).removeItem(
-                               index,
-                               (_,animation){
-                                  return FadeTransition(
-                                    opacity: animation.drive(Tween<double>(begin: 0,end: 1)),
-                                    child: SlideTransition(
-                                      position: animation.drive(Tween<Offset>(begin: const Offset(-1, 0),end: Offset.zero)),
-                                      child: ElevatedButton(
-                                        onPressed: (){},
-                                        child: Row(
-                                          children: [
-                                            Text(recordText),         
-                                            const Padding(
-                                              padding: EdgeInsets.only(left: 12),
-                                              child: Icon(Icons.close),
-                                            ),
-                                          ],
-                                        ),
-                                        )
-                                    ),
-                                  );
-                               }
-                            );
-                           },
+        
+        
+        
+              //TagsList Show
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxHeight: 55,
+                ),
+                child: NotificationListener<ScrollUpdateNotification>(
+                  onNotification: (notification) => true, //捕获冒泡滚动 不要让上层响应
+                  child: AnimatedList.separated(
+                    key: animatedTagsListKey,
+                    scrollDirection: Axis.horizontal,
+                    initialItemCount: tagsList.length,
+                    separatorBuilder: (_,index,animation) => const Padding(padding: EdgeInsets.symmetric(horizontal: 12)),
+                    removedSeparatorBuilder: (_, index, animation) => const SizedBox.shrink(),
+                    itemBuilder: (listContext,index,animation){
+      
+                    if(tagsList.isEmpty) return const SizedBox.shrink();
+      
+      
+                     return SlideTransition(
+                      position: animation.drive(Tween<Offset>(begin: const Offset(-1, 0),end: Offset.zero)), 
+                      // begin/end 是相对于insert状态来说的 如果是remove行为则应该是反向
+                       child: FadeTransition(
+                        opacity: animation,
+                         child: Padding(
+                           padding: const EdgeInsets.symmetric(vertical: 5),
+                           child: ElevatedButton(
+                             onPressed: (){
                            
-                           child: Row(
-                             children: [
-                               
-                              Text(tagsList[index]),
-                                             
-                               const Padding(
-                                 padding: EdgeInsets.only(left: 12),
-                                 child: Icon(Icons.close),
-                               ),
-                             ],
+                              final String recordText = tagsList[index];
+                           
+                              tagsList.removeAt(index);
+                           
+                               AnimatedList.of(listContext).removeItem(
+                                 index,
+                                 (_,animation){
+                                    return FadeTransition(
+                                      opacity: animation.drive(Tween<double>(begin: 0,end: 1)),
+                                      child: SlideTransition(
+                                        position: animation.drive(Tween<Offset>(begin: const Offset(-1, 0),end: Offset.zero)),
+                                        child: ElevatedButton(
+                                          onPressed: (){},
+                                          child: Row(
+                                            children: [
+                                              Text(recordText),         
+                                              const Padding(
+                                                padding: EdgeInsets.only(left: 12),
+                                                child: Icon(Icons.close),
+                                              ),
+                                            ],
+                                          ),
+                                          )
+                                      ),
+                                    );
+                                 }
+                              );
+                             },
+                             
+                             child: Row(
+                               children: [
+                                 
+                                Text(tagsList[index]),
+                                               
+                                 const Padding(
+                                   padding: EdgeInsets.only(left: 12),
+                                   child: Icon(Icons.close),
+                                 ),
+                               ],
+                             ),
                            ),
                          ),
                        ),
-                     ),
-                   );
-                  }
+                     );
+                    }
+                  ),
                 ),
               ),
-            ),
-            
-            kDebugMode ? Text("AllData:${searchFliter.toString()}") :const SizedBox.shrink(),
-      
-            //Submit
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: (){
-      
-                    bus.emit('sortSubmit',
-                      searchFliter['filter'] = {
-                        "rank": [
-                          ">=${int.tryParse(rankEditingControllerStart.text) ?? 2}",
-                          "<${int.tryParse(rankEditingControllerEnd.text) ?? 99999}"
-                        ],
-                        "rating":[
-                          ">=${ratingRange.start*10}",
-                          "<${ratingRange.end*10}"
-                        ],
-                        "air_date": [ //服务器倒是会自动屏蔽无效的air_date 帮大忙了倒是
-                          ">=${yearEditingControllerStart.text}-${ monthSelect[0]!= null ? convertDigitNumString(monthSelect.values.first) : '01'}-01",
-                          "<=${yearEditingControllerEnd.text}-${monthSelect[0]!= null ? convertDigitNumString(monthSelect.values.last) : '12'}-01",
-                        ],
-                        "tag": tagsList
-                      }
-                    );
-      
-                    setState(() {
+              
+              kDebugMode ? Text("AllData:${searchFliter.toString()}") :const SizedBox.shrink(),
+        
+              //Submit
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: (){
+        
+                      bus.emit('sortSubmit',
                         searchFliter['filter'] = {
                           "rank": [
                             ">=${int.tryParse(rankEditingControllerStart.text) ?? 2}",
@@ -340,20 +316,39 @@ class _SearchfliterState extends State<Searchfliter> {
                             "<${ratingRange.end*10}"
                           ],
                           "air_date": [ //服务器倒是会自动屏蔽无效的air_date 帮大忙了倒是
-                                                      ">=${yearEditingControllerStart.text}-${ monthSelect[0]!= null ? convertDigitNumString(monthSelect.values.first) : '01'}-01",
-                          "<=${yearEditingControllerEnd.text}-${monthSelect[0]!= null ? convertDigitNumString(monthSelect.values.last) : '12'}-01",
+                            ">=${yearEditingControllerStart.text}-${ monthSelect[0]!= null ? convertDigitNumString(monthSelect.values.first) : '01'}-01",
+                            "<=${yearEditingControllerEnd.text}-${monthSelect[0]!= null ? convertDigitNumString(monthSelect.values.last) : '12'}-01",
                           ],
                           "tag": tagsList
-                        };
-                    });
-                    
-                  }, child: const Text("submit")
-                )
-              ]
-            ),
-       
-      
-          ],
+                        }
+                      );
+        
+                      setState(() {
+                          searchFliter['filter'] = {
+                            "rank": [
+                              ">=${int.tryParse(rankEditingControllerStart.text) ?? 2}",
+                              "<${int.tryParse(rankEditingControllerEnd.text) ?? 99999}"
+                            ],
+                            "rating":[
+                              ">=${ratingRange.start*10}",
+                              "<${ratingRange.end*10}"
+                            ],
+                            "air_date": [ //服务器倒是会自动屏蔽无效的air_date 帮大忙了倒是
+                                                        ">=${yearEditingControllerStart.text}-${ monthSelect[0]!= null ? convertDigitNumString(monthSelect.values.first) : '01'}-01",
+                            "<=${yearEditingControllerEnd.text}-${monthSelect[0]!= null ? convertDigitNumString(monthSelect.values.last) : '12'}-01",
+                            ],
+                            "tag": tagsList
+                          };
+                      });
+                      
+                    }, child: const Text("submit")
+                  )
+                ]
+              ),
+         
+        
+            ],
+          ),
         ),
       ),
     );

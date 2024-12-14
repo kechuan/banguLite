@@ -64,14 +64,14 @@ enum Season{
 enum ScoreRank{
   none("未评分",0),
   worst("不忍直视",1.5), // 1.5-
-  worse("很差",3), // 1.5~3
-  poor("差",3.5), //3 ~ 3.5
-  bad("较差",4.5), //3.5~4.5
-  medium("不过不失",5.5), //4.5~5.5
-  pass("还行",6), //5.5~6
-  great("推荐",7.5), //6~7.5
-  excellent("力荐",9), //7.5 ~ 9
-  perfect("神作",10) //9+
+  worse("很差",1.5), // 1.5~3
+  poor("差",3), //3 ~ 3.5
+  bad("较差",3.5), //3.5~4.5
+  medium("不过不失",4.5), //4.5~5.5
+  pass("还行",5.5), //5.5~6.5
+  great("推荐",6.5), //6.5~8
+  excellent("力荐",8), //8 ~ 9
+  perfect("神作",9) //9+
   ;
 
   final String rankText;
@@ -82,7 +82,7 @@ enum ScoreRank{
 }
 
 enum BangumiThemeColor{
-  sea(Color.fromARGB(255, 217, 231, 255)), //Primary: const Color.fromARGB(255, 140, 205, 244)
+  sea(Color.fromARGB(255, 140, 205, 244)), //Primary: const Color.fromARGB(255, 140, 205, 244)
   macha(Color.fromARGB(255, 219, 245, 223)),
   ruby(Color.fromARGB(255, 255, 217, 217)),
   ;

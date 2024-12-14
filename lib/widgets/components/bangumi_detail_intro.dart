@@ -162,17 +162,19 @@ class IntroPortrait extends StatelessWidget {
                   value: context.watch<EpModel>(),
                   builder: (_,__) {
                     return EasyRefresh(
-                    child: Center(
-                      child: BuildEps(
-                        subjectID: bangumiDetails.id!, 
-                        informationList: bangumiDetails.informationList,
-                        portialMode: true,
-                        outerContext: context,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: BuildEps(
+                            subjectID: bangumiDetails.id!, 
+                            informationList: bangumiDetails.informationList,
+                            portialMode: true,
+                            outerContext: context,
+                          ),
+                        ),
                       ),
-                    ),
-                    
-                    
-                                    );
+                  
+                    );
                   }
                 );
               }
@@ -229,7 +231,10 @@ class IntroPortrait extends StatelessWidget {
 
         ConstrainedBox(
           constraints: const BoxConstraints.tightFor(width: double.infinity),
-          child: BuildTags(tagsList: bangumiDetails.tagsList)
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: BuildTags(tagsList: bangumiDetails.tagsList),
+          )
         ),
       ],
     );
@@ -266,56 +271,50 @@ class IntroLandscape extends StatelessWidget {
               //detail——rating
               children: [
     
-                ListTile(
-                  title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                Padding(
+                  padding: PaddingH6,
+                  child: ListTile(
+                    title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                      
+                        Text(bangumiDetails.informationList["alias"] ?? ""),
+                      
+                       
+                      ],
+                    ),
+                    trailing: StarButton(bangumiDetails: bangumiDetails)
+                    
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
                     children: [
-    
-                      Text(bangumiDetails.informationList["alias"] ?? ""),
-    
-                      Wrap(
-                        //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        alignment: WrapAlignment.spaceBetween,
-                        children: [
-                                      
-                          Text(bangumiDetails.ratingList["rank"]!=0 ? 'Rank #${bangumiDetails.ratingList["rank"]}' : ""),
-                            
-                          Row(
-                            children: [
-                              Text(
-                                "Score ${bangumiDetails.ratingList["score"]?.toDouble()}",
-                                style: TextStyle(
-                                  color: Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*(((bangumiDetails.ratingList["score"] as num))/10).toInt()), 0, 1),
-                                  fontWeight: FontWeight.bold
-                                )
-                              ),
-                                      
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 6),
-                                child: Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey),),
-                              ),
-                                      
-                            ],
-                          ),
-                                      
-                        ],
-                      ),
+                      BuildInfoBox(informationList: bangumiDetails.informationList),
+                  
+                      const Spacer(),
+                  
+                      BangumiRankBox(bangumiDetails: bangumiDetails, constraint: const BoxConstraints(minWidth: 300,maxWidth: 400))
                     ],
                   ),
-                  trailing: StarButton(bangumiDetails: bangumiDetails)
-                  
-                   ),
+                ),
 
-                BuildInfoBox(informationList: bangumiDetails.informationList),
-
-                BuildEps(
-                  subjectID: bangumiDetails.id ?? 0,
-                  informationList: bangumiDetails.informationList,
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: BuildEps(
+                    subjectID: bangumiDetails.id ?? 0,
+                    informationList: bangumiDetails.informationList,
+                  ),
                 ),
 
                 //tags
-                BuildTags(tagsList: bangumiDetails.tagsList)
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: BuildTags(tagsList: bangumiDetails.tagsList),
+                )
                 
 
               ],
@@ -339,43 +338,39 @@ class BuildTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Builder(
-        builder: (_){
-          if(tagsList.isNotEmpty){
-            return Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: List.generate(tagsList.length, (index){
-                  return DecoratedBox(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(width: 0.5,color: const Color.fromARGB(255, 219, 190, 213))
+    return Builder(
+      builder: (_){
+        if(tagsList.isNotEmpty){
+          return Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: List.generate(tagsList.length, (index){
+                return DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(width: 0.5,color: const Color.fromARGB(255, 219, 190, 213))
+                  ),
+                  child: TextButton(
+                    child: Text(
+                      "${tagsList.keys.elementAt(index)} ${tagsList.values.elementAt(index)}",
+                      style: TextStyle(color: Theme.of(context).scaffoldBackgroundColor),
                     ),
-                    child: TextButton(
-                      child: Text(
-                        "${tagsList.keys.elementAt(index)} ${tagsList.values.elementAt(index)}",
-                        style: TextStyle(color: Theme.of(context).scaffoldBackgroundColor),
-                      ),
-                      onPressed: () {
-                        showSearch(
-                          context: context,
-                          delegate: CustomSearchDelegate(),
-                          query: tagsList.keys.elementAt(index)
-                        );
-                      },
-                      
-                    )
-                  );
-                })
-              ,
-            );
-          }
-      
-          return const Text("暂无Tags信息");
+                    onPressed: () {
+                      showSearch(
+                        context: context,
+                        delegate: CustomSearchDelegate(),
+                        query: tagsList.keys.elementAt(index)
+                      );
+                    },
+                    
+                  )
+                );
+              }),
+          );
         }
-      ),
+    
+        return const Text("暂无Tags信息");
+      }
     );
   }
 }
@@ -404,8 +399,8 @@ class BuildDetailImages extends StatelessWidget {
 
           if(bangumiModel.bangumiThemeColor==null){
             ColorScheme.fromImageProvider(provider: imageProvider).then((coverScheme){
-            debugPrint("parse Picture:${coverScheme.primary}");
-            bangumiModel.getThemeColor(coverScheme.primary);
+              debugPrint("parse Picture:${coverScheme.primary}");
+              bangumiModel.getThemeColor(coverScheme.primary,darkMode: Theme.of(context).brightness == Brightness.dark);
             });
           }
 
@@ -472,6 +467,7 @@ class BuildInfoBox extends StatelessWidget{
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text("放送日期: ${informationList["air_date"]}",style: const TextStyle(fontWeight: FontWeight.bold),),
           Text("总集数: ${informationList["eps"]}",style: const TextStyle(fontWeight: FontWeight.bold),),
           Text("更新日期: ${informationList["air_weekday"]}",style: const TextStyle(fontWeight: FontWeight.bold),)
         ],
@@ -501,19 +497,15 @@ class BuildEps extends StatelessWidget {
     int totalEps = informationList["eps"] ?? 0;
     int airedEps = convertAiredEps(informationList["air_date"]);
 
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: totalEps == 0 ? 
-        const SizedBox.shrink() :
-        EpSelect(
-          totalEps: totalEps,
-          airedEps: airedEps,
-          name: informationList["alias"],
-          portialMode: portialMode,
-          //outerContext: outerContext,
-        )
-      
-    );
+    return totalEps == 0 ? 
+      const SizedBox.shrink() :
+      EpSelect(
+        totalEps: totalEps,
+        airedEps: airedEps,
+        name: informationList["alias"],
+        portialMode: portialMode,
+        //outerContext: outerContext,
+      );
   }
 }
 
@@ -587,7 +579,7 @@ class BangumiRankBox extends StatelessWidget {
       width: constraint.maxWidth,
       decoration: BoxDecoration(
         
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.4)
         
       ),
@@ -606,54 +598,55 @@ class BangumiRankBox extends StatelessWidget {
                 width: constraint.maxWidth,
                 child: Padding(
                   padding: PaddingH12,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                          
                       Row(
-                        
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                      
-                          Text(
-                            "${bangumiDetails.ratingList["score"]?.toDouble()}",
-                            style: TextStyle(
-                              color: Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*(((bangumiDetails.ratingList["score"] as num) ?? 0)/10).toInt()), 0, 1),
-                              fontWeight: FontWeight.bold,
-                              //fontSize: 16
-                            )
+                              
+                          Row(
+                            
+                            children: [
+                          
+                              Text(
+                                "${bangumiDetails.ratingList["score"]?.toDouble()}",
+                                style: TextStyle(
+                                  color: Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*(((bangumiDetails.ratingList["score"] as num))/10).toInt()), 0, 1),
+                                  fontWeight: FontWeight.bold,
+                                  //fontSize: 16
+                                )
+                              ),
+                          
+                              const Padding(padding: PaddingH6),
+                          
+                              Text(convertScoreRank(bangumiDetails.ratingList["score"]?.toDouble()),style: const TextStyle(fontSize: 16)),
+                          
+                          
+                            ],
                           ),
                       
-                          const Padding(padding: PaddingH6),
+                          //const Padding(padding: PaddingH6),
                       
-                          Text(convertScoreRank(bangumiDetails.ratingList["score"]?.toDouble()),style: const TextStyle(fontSize: 16)),
+                          Row(
+                            children: [
+                              //Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey)),
+                          
+                              const Padding(padding: EdgeInsets.only(left: 6)),
+                          
+                          
+                              Text(bangumiDetails.ratingList["rank"]!=0 ? 'Rank #${bangumiDetails.ratingList["rank"]}' : ""),
+                                          
+                            ],
+                          )
                       
-                      
+                              
                         ],
                       ),
-                  
-                      //const Padding(padding: PaddingH6),
-                  
-                      Row(
-                        children: [
-                          Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey),),
-                      
-                          const Padding(padding: EdgeInsets.only(left: 6)),
-                      
-                      
-                          Text(bangumiDetails.ratingList["rank"]!=0 ? 'Rank #${bangumiDetails.ratingList["rank"]}' : ""),
-                                      
-                        ],
-                      )
-                  
-                  
-                      
-                      //Options
-                      //Padding(
-                      //  padding: const EdgeInsets.symmetric(horizontal: 6),
-                      //  child: Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey),),
-                      //),
-                          
-                          
+
+                      Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey)),
+                    
+                    
                     ],
                   ),
                 ),
@@ -678,6 +671,8 @@ class BangumiRankBox extends StatelessWidget {
               
               
                   return Tooltip(
+					verticalOffset: -24,
+					triggerMode: TooltipTriggerMode.tap,
                     message: "${bangumiDetails.ratingList["count"]["${index+1}"]} vote(s), ${(currentRankRatio*100).toStringAsFixed(2)}%",
                     child: Padding(
                       padding: PaddingH6,

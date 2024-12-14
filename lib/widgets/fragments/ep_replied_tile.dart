@@ -24,7 +24,7 @@ class EpRepliedTile extends ListTile {
     return Container(
       decoration: BoxDecoration(border: Border.all()),
       child: ListTile(
-        tileColor: const Color.fromARGB(225, 212, 232, 215),
+        tileColor: Theme.of(context).brightness == Brightness.light ? const Color.fromARGB(225, 212, 232, 215) : const Color.fromARGB(255, 118, 121, 119),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

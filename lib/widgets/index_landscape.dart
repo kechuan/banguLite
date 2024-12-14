@@ -1,4 +1,6 @@
 import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
+import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
 import 'package:bangu_lite/catalogs/bangumi_sort_page.dart';
@@ -27,28 +29,32 @@ class IndexLandscape extends StatelessWidget {
               selectedIndex: currentPageIndex,
               
               leading: railLeading!,
-
+              trailing: const Padding(
+                padding: EdgeInsets.only(top: 120), //magic number
+                child: ToggleThemeModeButton(),
+              ),
+            
               destinations: const [
-        
+                    
                 NavigationRailDestination(
                   icon: Icon(Icons.local_fire_department_outlined),
                   selectedIcon: Icon(Icons.local_fire_department_rounded),
                   label: Text('资讯')
                 ),
-        
+                    
                 NavigationRailDestination(
                   icon: Icon(Icons.filter_alt_outlined),
                   selectedIcon: Icon(Icons.filter_alt),
                   label: Text('筛选')
                 ),
-
+            
                 NavigationRailDestination(
                   icon: Icon(Icons.rss_feed_outlined),
                   selectedIcon: Icon(Icons.rss_feed),
                   label: Text('订阅')
                 ),
-
-
+            
+            
               ],
               onDestinationSelected: (newIndex) => selectedPageIndexNotifier.value = newIndex,
             ),
@@ -72,7 +78,7 @@ class IndexLandscape extends StatelessWidget {
       child: 
 
        Padding( 
-        padding: const EdgeInsets.only(top: 50),
+        padding: const EdgeInsets.symmetric(vertical: 50),
         child: Column(
           children: [
             const Icon(Icons.live_tv_rounded),

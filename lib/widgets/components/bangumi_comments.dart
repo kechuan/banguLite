@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -93,10 +94,11 @@ class _CommentViewState extends State<CommentView> with SingleTickerProviderStat
           child: EasyRefresh(
             child: TabBar(
               controller: commentController,
-              //onTap: (value) {
-              //  debugPrint("value:$value");
-              //},
               isScrollable: true,
+              indicatorColor: BangumiThemeColor.sea.color,
+              unselectedLabelColor: BangumiThemeColor.sea.color,
+              labelColor: BangumiThemeColor.sea.color,
+              
               tabs: 
                 List.generate(
                   widget.totalPageLength,
