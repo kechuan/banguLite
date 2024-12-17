@@ -39,7 +39,6 @@ class AnimatedSortSelector extends StatelessWidget {
         children: [
       
           //min(30,MediaQuery.sizeOf(context).width/20) - 10
-          //Theme.of(context).colorScheme.primary  const Color.fromARGB(255,130,211,224) 
           
           AnimatedContainer(
             //color: currentType == selectedType ? const Color(0xffd1e5f4) : null,
