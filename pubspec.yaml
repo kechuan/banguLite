@@ -1,7 +1,7 @@
 name: bangu_lite
 description: "Lite to Surf Bangumi"
 publish_to: 'none'
-version: 0.3.1
+version: 0.4.1
 
 environment:
   sdk: ^3.5.0
@@ -25,12 +25,13 @@ dependencies:
   skeletonizer: ^1.4.2
   sliver_tools: ^0.2.12
   url_launcher: ^6.3.0
+  
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
-  build_runner: ^2.4.12
+  build_runner: ^2.4.11
   flutter_launcher_icons: ^0.14.1
 
 flutter:

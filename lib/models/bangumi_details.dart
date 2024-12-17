@@ -156,7 +156,9 @@ BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
         if(
           currentInformation["key"] != "放送星期" &&
           currentInformation["key"] != "放送开始"
-        ) continue;
+        ) {
+          continue;
+        }
 
 		switch(currentInformation["key"]){
 			case "放送开始": {
@@ -177,7 +179,9 @@ BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
 		if(
 			bangumiDetails.informationList["air_date"] != null && 
 			bangumiDetails.informationList["air_weekday"] != null
-		) break;
+		) {
+		  break;
+		}
 
 
       }

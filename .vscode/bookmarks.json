@@ -4,12 +4,12 @@
 			"path": "lib/catalogs/bangumi_ep_page.dart",
 			"bookmarks": [
 				{
-					"line": 146,
+					"line": 184,
 					"column": 38,
 					"label": "EPInfo"
 				},
 				{
-					"line": 245,
+					"line": 283,
 					"column": 36,
 					"label": "BBCode测试"
 				}
@@ -22,6 +22,26 @@
 					"line": 55,
 					"column": 14,
 					"label": "EpSelect"
+				}
+			]
+		},
+		{
+			"path": "lib/catalogs/bangumi_calendar_page.dart",
+			"bookmarks": [
+				{
+					"line": 102,
+					"column": 35,
+					"label": "calendarPage——资讯页面"
+				}
+			]
+		},
+		{
+			"path": "lib/main.dart",
+			"bookmarks": [
+				{
+					"line": 25,
+					"column": 25,
+					"label": "Android——SystemChromeSetting"
 				}
 			]
 		}

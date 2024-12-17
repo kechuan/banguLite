@@ -156,8 +156,8 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                    
                                     bottom: BorderSide(
                                       width: 3, 
-                                      //color: widget.airedEps >= currentEpIndex ? Theme.of(context).scaffoldBackgroundColor.withOpacity(0.2) : Colors.grey,
-                                      color:  Colors.grey.withOpacity(0.2),
+                                      //color: widget.airedEps >= currentEpIndex ? Theme.of(context).scaffoldBackgroundColor.withValues(alpha:0.2) : Colors.grey,
+                                      color:  Colors.grey.withValues(alpha:0.2),
                                     ),
                                   ),
                                   color: currentEpsColor

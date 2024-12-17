@@ -15,33 +15,31 @@ class ToggleThemeModeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkResponse(
-    onTap: (){
+      onTap: (){
 
-      final indexModel = context.read<IndexModel>();
+        final indexModel = context.read<IndexModel>();
 
-      if(indexModel.themeMode == ThemeMode.dark){
-        indexModel.updateThemeMode(ThemeMode.light);
-      }
-      else{
-        indexModel.updateThemeMode(ThemeMode.dark);
-      }
+        if(indexModel.themeMode == ThemeMode.dark){
+          indexModel.updateThemeMode(ThemeMode.light);
+        }
+        else{
+          indexModel.updateThemeMode(ThemeMode.dark);
+        }
 
-      if(onThen != null) onThen!();
-        
-    },
-    child: Selector<IndexModel,ThemeMode>(
-      selector: (_, indexModel) => indexModel.themeMode,
-      shouldRebuild: (previous, next) => previous!=next,
-      builder: (_, currentTheme, child){
-        return Icon(
-          currentTheme == ThemeMode.dark ? 
-          Icons.dark_mode_outlined :
-          Icons.wb_sunny_outlined
-          ,size: min(30,MediaQuery.sizeOf(context).width/20));
+        if(onThen != null) onThen!();
+          
       },
-    ),
-
-    
-  );
+      child: Selector<IndexModel,ThemeMode>(
+        selector: (_, indexModel) => indexModel.themeMode,
+        shouldRebuild: (previous, next) => previous!=next,
+        builder: (_, currentTheme, child){
+          return Icon(
+            currentTheme == ThemeMode.dark ? 
+            Icons.dark_mode_outlined :
+            Icons.wb_sunny_outlined
+            ,size: min(30,MediaQuery.sizeOf(context).width/15));
+        },
+      ),
+    );
   }
 }

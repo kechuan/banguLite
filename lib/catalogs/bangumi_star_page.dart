@@ -28,7 +28,7 @@ class _BangumiStarPageState extends State<BangumiStarPage> {
       appBar: AppBar(
         toolbarHeight: 60,
         title: const Padding(
-          padding: EdgeInsets.only(top: 40,left: 20),
+          padding: EdgeInsets.only(left: 20),
           child: Text("订阅界面"),
         ),
         actions: [

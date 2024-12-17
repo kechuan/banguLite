@@ -23,7 +23,7 @@ class BangumiCalendarPage extends StatefulWidget {
   State<BangumiCalendarPage> createState() => _BangumiCalendarPageState();
 }
 
-class _BangumiCalendarPageState extends LifecycleAppState<BangumiCalendarPage> {
+class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
 
   Future? calendarLoadFuture;
   Timer? carouselTimer;
@@ -47,6 +47,24 @@ class _BangumiCalendarPageState extends LifecycleAppState<BangumiCalendarPage> {
 
     });
   }
+
+  @override
+  void onPause() {
+    debugPrint("caleandar pause");
+    if(carouselTimer!=null){
+      carouselTimer?.cancel();
+    }
+    super.onPause();
+  }
+
+  @override
+  void onResume() {
+    debugPrint("caleandar resume");
+    carouselSpinTimer();
+    super.onResume();
+  }
+
+  
 
   void carouselSpinTimer(){
     if(carouselTimer!=null){
@@ -105,7 +123,7 @@ class _BangumiCalendarPageState extends LifecycleAppState<BangumiCalendarPage> {
                                   bottom: Divider.createBorderSide(context) //
                                 ),
 
-                                color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+                                color: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
                                 
                               ),
                               
@@ -260,7 +278,7 @@ class _BangumiCalendarPageState extends LifecycleAppState<BangumiCalendarPage> {
                                     border: Border(
                                       bottom: Divider.createBorderSide(context)
                                     ),
-                                    color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
+                                    color: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
                                   ),
                                   child: Row(
                                     children: [

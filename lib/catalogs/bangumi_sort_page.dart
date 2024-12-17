@@ -2,11 +2,8 @@
 
 import 'dart:math';
 
-import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/animated_wave_footer.dart';
-import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/foundation.dart';
@@ -19,7 +16,6 @@ import 'package:bangu_lite/models/bangumi_details.dart';
 import 'package:bangu_lite/widgets/components/search_fliter.dart';
 import 'package:bangu_lite/widgets/fragments/animated_sort_selector.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
-import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 

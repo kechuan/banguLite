@@ -17,13 +17,24 @@ android {
     //ndkVersion = flutter.ndkVersion
 	ndkVersion = "27.0.12077973"
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    //compileOptions {
+    //    sourceCompatibility = JavaVersion.VERSION_1_8
+    //    targetCompatibility = JavaVersion.VERSION_1_8
+	//	encoding="UTF-8"
+    //}
+
+    //kotlinOptions {
+    //    jvmTarget = JavaVersion.VERSION_1_8
+    //}
+
+	compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+		encoding="UTF-8"
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_17
     }
 
     defaultConfig {
@@ -44,6 +55,13 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.debug
         }
+
+		//debug {
+        //    signingConfig signingConfigs.debug
+		//	//buildDir = "build/outputs/apk" // 指定输出目录
+            
+        //    //setProperty("archivesBaseName", "app-${variant.name}")
+        //}
     }
 
 

@@ -22,8 +22,9 @@ class EpTogglePanel extends StatelessWidget {
     final EpModel epModel = context.read<EpModel>();
     
     //迟早变成 SliverAppbar
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 16),
+    return Container(
+        height: 80,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -35,8 +36,6 @@ class EpTogglePanel extends StatelessWidget {
                 onTap: () => epModel.updateSelectedEp(max(1,currentEp-1)),
                 child:  Row(
                   children: [
-
-                    
 
                     const Icon(Icons.arrow_back_ios,size: 18),
                     const Padding(padding: EdgeInsets.symmetric(horizontal: 6)),
@@ -50,35 +49,32 @@ class EpTogglePanel extends StatelessWidget {
                         if( currentEp != 1 && epModel.epsData[currentEp-1] == null){
 
                           	return Row(
-								children: [
-									Text("Ep. ${currentEp-1}}",style: const TextStyle(color: Colors.grey),),
+                              children: [
+                                Text("Ep. ${currentEp-1}}",style: const TextStyle(color: Colors.grey),),
 
-									const Padding(padding: PaddingH6),
+                                const Padding(padding: PaddingH6),
 
-									const SizedBox(
-										height: 20,
-										width: 20,
-										child:  CircularProgressIndicator(strokeWidth: 3)
-										)
-								],
-							);
+                                const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child:  CircularProgressIndicator(strokeWidth: 3)
+                                )
+                              ],
+                            );
                         }
 
 
                         //常规条件
                         return ConstrainedBox(
-							constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3),
-						  child: Text(
-							"Ep. ${max(1,currentEp-1)} ${epModel.epsData[max(1,currentEp-1)]!.nameCN ?? epModel.epsData[max(1,currentEp-1)]!.name}",
-							style: TextStyle(color: currentEp == 1 ? Colors.grey : null),
-												  overflow: TextOverflow.ellipsis,
-						  ),
-						);
+                          constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3),
+                          child: Text(
+                            "Ep. ${max(1,currentEp-1)} ${epModel.epsData[max(1,currentEp-1)]!.nameCN ?? epModel.epsData[max(1,currentEp-1)]!.name}",
+                            style: TextStyle(color: currentEp == 1 ? Colors.grey :Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
                       }
                     ),
-
-
-                    
 
                   ],
                 ),
@@ -132,7 +128,7 @@ class EpTogglePanel extends StatelessWidget {
                           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3) ,
                           child: Text(
                             "Ep. ${min(totalEps,currentEp+1)} ${epModel.epsData[min(totalEps,currentEp+1)]?.nameCN ?? epModel.epsData[min(totalEps,currentEp+1)]?.name ?? "loading"}",
-                            style: TextStyle(color: currentEp == totalEps ? Colors.grey : null),
+                            style: TextStyle(color: currentEp == totalEps ? Colors.grey :Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
                             overflow: TextOverflow.ellipsis,
                           ),
                         );

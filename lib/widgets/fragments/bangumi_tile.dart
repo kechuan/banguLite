@@ -49,7 +49,6 @@ class BangumiListTile extends ListTile {
                       maxHeight: imageSize.height ,
                       maxWidth: constraint.maxWidth - imageSize.width, //calculate
                       
-                      
                     ),
                     child: Text(
                       bangumiTitle ?? "name",

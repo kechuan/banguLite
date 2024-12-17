@@ -2,7 +2,6 @@
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/widgets/fragments/comment_image_panel.dart';
-import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 

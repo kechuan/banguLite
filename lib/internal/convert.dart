@@ -3,9 +3,6 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
-
 
 String? convertAmpsSymbol(String? originalString){
   if(originalString?.contains("&amp;") ?? false){
@@ -92,7 +89,9 @@ bool judgeInSeasonBangumi(String? bangumiAirDate){
     if(
         (DateTime.now().month - bangumiMonth).abs() <= 2 || 
         (DateTime.now().month - bangumiMonth).abs() >= 10
-    ) return true;
+    ) {
+      return true;
+    }
   }
 
   return false;

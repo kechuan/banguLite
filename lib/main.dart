@@ -14,8 +14,8 @@ import 'package:provider/provider.dart';
 void main() async {
 
   if (kReleaseMode) {
-      debugPrint = (String? message, {int? wrapWidth}) {};
-    }
+    debugPrint = (String? message, {int? wrapWidth}) {};
+  }
 
   // path_provider 初始化需要
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,11 +24,16 @@ void main() async {
   await MyHive.init();
 
   if(Platform.isAndroid){
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        systemNavigationBarColor: Colors.transparent
-      )
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,  // 使用 edgeToEdge 模式
     );
+
+    SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+    ),
+  );
   }
 
   runApp(const MainApp());
@@ -47,26 +52,26 @@ class MainApp extends StatelessWidget {
         builder: (context) {
           return MaterialApp(
             theme: ThemeData(
-          			colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 140, 205, 244)),
-          			fontFamily: 'MiSansFont',
+                colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 140, 205, 244)),
+                fontFamily: 'MiSansFont',
             ),
-          		darkTheme: ThemeData(
-          			brightness: Brightness.dark,
-          			fontFamily: 'MiSansFont',
-          			colorScheme: const ColorScheme.dark(
-          				primary: Color.fromARGB(255, 140, 205, 244),
-          				onPrimary: Colors.white, //unSelected颜色
-          				secondary: Colors.white,
-          				onSecondary:Color.fromARGB(255, 140, 205, 244), //onSelected 的颜色
-          				surface: Colors.black,
-          				
-          				outline: Colors.white,
-          					
+              darkTheme: ThemeData(
+                brightness: Brightness.dark,
+                fontFamily: 'MiSansFont',
+                colorScheme: const ColorScheme.dark(
+                  primary: Color.fromARGB(255, 140, 205, 244),
+                  onPrimary: Colors.white, //unSelected颜色
+                  secondary: Colors.white,
+                  onSecondary:Color.fromARGB(255, 140, 205, 244), //onSelected 的颜色
+                  surface: Colors.black,
+                  
+                  outline: Colors.white,
+                    
           
-          			)
-          		),
-          		themeMode: context.watch<IndexModel>().themeMode,
-          		
+                )
+              ),
+              themeMode: context.watch<IndexModel>().themeMode,
+              
             initialRoute: Routes.index,
             //navigatorObservers: [],
             navigatorObservers: [RouteObserver<ModalRoute>()],

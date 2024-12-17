@@ -1,4 +1,5 @@
 import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
+import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
 import 'package:bangu_lite/catalogs/bangumi_sort_page.dart';
@@ -20,20 +21,25 @@ class IndexPortial extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            leading: const SizedBox.shrink(),
-            leadingWidth: 0,
-            centerTitle: true,
-            title: const Padding(
-              padding: EdgeInsets.only(left: 58), //32+24
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.live_tv_rounded,size: 32),
-                    Padding(padding: EdgeInsets.symmetric(horizontal: 12)),
-                    Text("BanguLite",style: TextStyle(fontSize: 16)),
-                  ],
-                ),
+            leading: const ToggleThemeModeButton(),
+            //leadingWidth: 0,
+            flexibleSpace: const Column(
+              children: [
+                 Spacer(),
+                 Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.live_tv_rounded,size: 32),
+                      Padding(padding: EdgeInsets.symmetric(horizontal: 12)),
+                      Text("BanguLite",style: TextStyle(fontSize: 16)),
+                    ],
+                  ),
+
+                 Padding(padding: EdgeInsets.only(bottom: 12))
+              
+              ],
             ),
+            
             actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 12),

@@ -1,13 +1,11 @@
 
 
-import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/widgets/fragments/date_range_select.dart';
-import 'package:provider/provider.dart';
 
 class Searchfliter extends StatefulWidget {
   const Searchfliter({super.key});
@@ -38,6 +36,8 @@ class _SearchfliterState extends State<Searchfliter> {
 
   Map<int,int> monthSelect = {};
 
+  bool inputBorderShow = false;
+
   @override
   void initState() {
     bus.on(const ValueKey("monthStartSelect"),(arg){
@@ -56,12 +56,18 @@ class _SearchfliterState extends State<Searchfliter> {
   @override
   Widget build(BuildContext context) {
 
+    Theme.of(context).brightness == Brightness.dark ? 
+    inputBorderShow = true :
+    inputBorderShow = false;
+
     return Theme(
       data: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Theme.of(context).colorScheme.secondary,
-          brightness: Theme.of(context).brightness
-        )
+          seedColor: Theme.of(context).colorScheme.primary,
+          brightness: (Theme.of(context).brightness),
+          
+        ),
+        
       ),
       
       child: ConstrainedBox(
@@ -112,8 +118,8 @@ class _SearchfliterState extends State<Searchfliter> {
                         child: TextField(
                           controller: rankEditingControllerStart,
                           textAlign: TextAlign.center,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none
+                          decoration:  InputDecoration(
+                            border: inputBorderShow ? null : InputBorder.none
                           ),
                         ),
                       ),
@@ -129,8 +135,8 @@ class _SearchfliterState extends State<Searchfliter> {
                         child: TextField(
                           controller: rankEditingControllerEnd,
                           textAlign: TextAlign.center,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none
+                          decoration:  InputDecoration(
+                            border: inputBorderShow ? null : InputBorder.none
                           ),
                         ),
                       ),
@@ -157,8 +163,8 @@ class _SearchfliterState extends State<Searchfliter> {
                         onNotification: (notification) => true, //禁止通知给上层
                         child: TextField(
                           controller: tagsEditingController,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none
+                          decoration:  InputDecoration(
+                            border: inputBorderShow ? null : InputBorder.none
                           ),
                         ),
                       ),

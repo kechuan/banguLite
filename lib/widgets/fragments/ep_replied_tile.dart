@@ -19,7 +19,9 @@ class EpRepliedTile extends ListTile {
     if( 
       epCommentData.repliedComment == null ||
       epCommentData.repliedComment!.isEmpty
-    ) return const SizedBox.shrink();
+    ) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       decoration: BoxDecoration(border: Border.all()),

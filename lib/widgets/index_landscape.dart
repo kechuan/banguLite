@@ -1,5 +1,4 @@
 import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
-import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';

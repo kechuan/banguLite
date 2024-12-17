@@ -1,4 +1,6 @@
 
+import 'dart:math';
+
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/eps_info.dart';
@@ -12,6 +14,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 
@@ -35,111 +38,146 @@ class _BangumiEpPageState extends State<BangumiEpPage> {
 
   Future<void>? epsInformationFuture;
 
+  ValueNotifier<double> opacityNotifier = ValueNotifier<double>(0);
+
   @override
   Widget build(BuildContext context) {
 
-    //return ChangeNotifierProvider(
-	return ChangeNotifierProvider.value(
-		value: widget.epModel,
-		builder: (context,child){
+   
+    return ChangeNotifierProvider.value(
+      value: widget.epModel,
+      builder: (context,child){
 
-			final epModel = widget.epModel;
-
-			//final ScrollController scrollController = ScrollController();
-
-			epsInformationFuture ??= epModel.getEpsInformation(offset: epModel.selectedEp~/100 );
-
-			return EasyRefresh.builder(
-			//  footer: const MaterialFooter(),
-				header: const MaterialHeader(),
-
-				childBuilder: (_,physics) {
-					return Scaffold(
-						appBar: AppBar(
-							title: Selector<EpModel,int>(
-								selector: (_, epModel) => epModel.selectedEp,
-								shouldRebuild: (previous, next) => previous!=next,
-								builder: (_,selectedEp,__) => Text("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN} ")
-							),
-							actions: [
-
-								IconButton(
-									onPressed: () async {
-										if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
-										await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
-										}
-									},
-									icon: Transform.rotate(
-										angle: -45,
-										child: const Icon(Icons.link),
-									)
-								),
+        final epModel = widget.epModel;
 
 
-							],
-						),
-						body:  Selector<EpModel,Map<int,EpsInfo>>(
-							selector: (_, epModel) => epModel.epsData,
-							shouldRebuild: (previous, next) => previous.length != next.length,
-							builder: (_,epsData,child) {
-	
-								return Selector<EpModel,int>(
-									selector: (_, epModel) => epModel.selectedEp,
-									shouldRebuild: (previous, next) => previous != next,
-									builder: (_,selectedEp,child){
-	
-										return CustomScrollView(
-											physics:physics,
-											slivers: [
-	
-												SliverList(
-													delegate: SliverChildListDelegate(
-														[
-															EpInfo(epsInfo: epsData,selectedEp: selectedEp),
+        epsInformationFuture ??= epModel.getEpsInformation(offset: epModel.selectedEp~/100 );
 
-															//迟早变成 SliverAppbar
+        return EasyRefresh.builder(
+          header: const MaterialHeader(),
 
-															 FutureBuilder(
-																future: epsInformationFuture,
-																builder: (_,snapshot){
-																	return EpTogglePanel(currentEp: selectedEp,totalEps: widget.totalEps);
-																}
-															),
+          childBuilder: (_,physics) {
+            
+            return Scaffold( //Listview need materialDesign
 
-													
-														]
-													)
-												),
-	
-												child!
+              body: NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                    final double offset = notification.metrics.pixels; //scrollview 的 offset : 注意不要让更内层的scrollView影响到它监听
 
+                    double opacityDegree = min(0.8,offset/300);
+                  
+                    //debugPrint("opacityDegree: $opacityDegree");
+                    WidgetsBinding.instance.addPostFrameCallback((timeStamp){
+                      opacityNotifier.value = opacityDegree;
+                    });
+                  
+                    return false;
+                },
+                child: Selector<EpModel,Map<int,EpsInfo>>(
+                    selector: (_, epModel) => epModel.epsData,
+                    shouldRebuild: (previous, next) => previous.length != next.length,
+                    builder: (_,epsData,child) {
+                    
+                      return Selector<EpModel,int>(
+                        selector: (_, epModel) => epModel.selectedEp,
+                        shouldRebuild: (previous, next) => previous != next,
+                        builder: (_,selectedEp,commentDetailchild){
+                    
+                          return CustomScrollView(
+                            physics:physics,
+                            slivers: [
+                  
+                              MultiSliver(
+                                pushPinnedChildren: true,
+                                children: [
+      
+                                  SliverPinnedHeader(
+                                    child: AppBar(
+                                      title: Text("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}"),
+                                      //backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6) keep,
+                                      backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
+      
+                                      actions: [
+      
+                                        IconButton(
+                                          onPressed: () async {
+                                            if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
+                                            await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
+                                            }
+                                          },
+                                          icon: Transform.rotate(
+                                            angle: -45,
+                                            child: const Icon(Icons.link),
+                                          )
+                                        ),
+      
+      
+                                      ],
+                                    )
+                                    
+                                    
+      
+                                  ),
+                                  
+      
+                                  EpInfo(epsInfo: epsData,selectedEp: selectedEp),
+                                ],
+                              ),
+      
+                              MultiSliver(
+                                pushPinnedChildren: true,
+                                children: [
+      
+                                  SliverPinnedHeader(
+                                    
+                                    
+                                      child: ValueListenableBuilder(
+                                        valueListenable: opacityNotifier,
+                                        builder: (_,opacity,child) {
+                                          debugPrint("opacity: $opacity");
+                                          return FutureBuilder(
+                                            future: epsInformationFuture,
+                                            builder: (_,snapshot){
+                                              return AppBar(
+												scrolledUnderElevation: 0, // 设置为0来禁用滚动时的阴影效果
+                                                leading: const SizedBox.shrink(),
+                                                leadingWidth: 0,
+												backgroundColor: BangumiThemeColor.macha.color.withValues(alpha:opacity),
+                                                titleTextStyle: const TextStyle(fontSize: 16),
+                                                title: EpTogglePanel(currentEp: selectedEp,totalEps: widget.totalEps)
+                                              );
+                                            }
+                                          );
+                                        }
+                                      )
+                                      
+                                    ),
+                                  
+      
+      
+                                  commentDetailchild!
+                                ],
+                              ),
+                  
+                    
+                            ],	
+                          );
+                          
+                        },
+                        
+                        child: const EpCommentDetails()
+                  
+                      );
 
-	
-											],	
-										);
-										
-									},
-									
-									child: const EpCommentDetails()
+                    }
+                  )
+              )
+            );
+          }
 
-								);
-	
-	
-							}
-						)
-					
-						
-						
-						
-					);
-				}
-				
-				
-
-
-			);
-		},
-	  );
+        );
+      },
+    );
     
   }
 }

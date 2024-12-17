@@ -1,7 +1,5 @@
 
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/convert.dart';
-import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
@@ -90,7 +88,7 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
 
             return Scaffold(
               appBar: AppBar(
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.6),
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha:0.6),
                 
                 title: ValueListenableBuilder(valueListenable: appbarTitleNotifier, builder: (_,appbarTitle,__)=>Text(appbarTitle,style: const TextStyle(color: Colors.black),)),
                 leading: IconButton(
@@ -125,7 +123,7 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
             
               body: NotificationListener<ScrollNotification>(
                 onNotification: (notification) {
-                  final bangumiModel = context.read<BangumiModel>();
+                  //final bangumiModel = context.read<BangumiModel>();
                   BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails; //dependenc
                   
                   final double offset = notification.metrics.pixels; //scrollview 的 offset : 注意不要让更内层的scrollView影响到它监听
@@ -149,7 +147,7 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
                       },
                       builder: (_,bangumiID,child) {
                   
-                        final bangumiModel = context.read<BangumiModel>();
+                        //final bangumiModel = context.read<BangumiModel>();
                     
                         debugPrint("BangumiID: $bangumiID => ${widget.bangumiID}");
                     
@@ -163,7 +161,7 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
                     
                             return EasyRefresh.builder(
                               header: const MaterialHeader(),
-                              onRefresh: ()=> context.read<BangumiModel>().loadDetails(bangumiID,refresh:true),
+                              onRefresh: ()=> bangumiModel.loadDetails(bangumiID,refresh:true),
                               childBuilder: (_,physic){
                   
                                 
@@ -231,10 +229,6 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
                                                 NotificationListener<ScrollNotification>(
                                                   onNotification: (_) => true,
                                                   child: BangumiHotComment(id: widget.bangumiID,name: bangumiModel.bangumiDetails?.name,) 
-                                                  //内含Future 界面变动的时候 这个也会被rebuild
-                                                  //唯一的办法就是像上面那样 由details创立bangumiModel 只是这样的话就会让原本分割开的 details comment关系又融合进去了
-                                                
-                                                  //不过至少在后端请求数据里做了防rebuild触发的重复处理
                                                 ),
                                               ]
                                             )
