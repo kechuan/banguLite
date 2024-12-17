@@ -182,9 +182,9 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
 
                                           return TweenAnimationBuilder<Color?>(
                                             tween: ColorTween(
-                                              begin: const Color.fromARGB(255, 140, 205, 244),
+                                              begin: BangumiThemeColor.sea.color,
                                               //end: linearColor ?? Colors.white,
-                                              //begin: Theme.of(context).brightness == Brightness.dark ? Colors.black : const Color.fromARGB(255, 140, 205, 244),
+                                              //begin: Theme.of(context).brightness == Brightness.dark ? Colors.black : const BangumiThemeColor.sea.color,
                                               end: Theme.of(context).brightness == Brightness.dark ? Colors.black : linearColor ?? Colors.white,
                                             ),
                                             duration: const Duration(milliseconds: 500),

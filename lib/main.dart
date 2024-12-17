@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/foundation.dart';
@@ -28,12 +29,12 @@ void main() async {
       SystemUiMode.edgeToEdge,  // 使用 edgeToEdge 模式
     );
 
-    SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarDividerColor: Colors.transparent,
-    ),
-  );
+	SystemChrome.setSystemUIOverlayStyle(
+		const SystemUiOverlayStyle(
+			systemNavigationBarColor: Colors.transparent,
+			systemNavigationBarDividerColor: Colors.transparent,
+		),
+	);
   }
 
   runApp(const MainApp());
@@ -52,17 +53,17 @@ class MainApp extends StatelessWidget {
         builder: (context) {
           return MaterialApp(
             theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 140, 205, 244)),
+                colorScheme: ColorScheme.fromSeed(seedColor: BangumiThemeColor.sea.color),
                 fontFamily: 'MiSansFont',
             ),
               darkTheme: ThemeData(
                 brightness: Brightness.dark,
                 fontFamily: 'MiSansFont',
-                colorScheme: const ColorScheme.dark(
-                  primary: Color.fromARGB(255, 140, 205, 244),
+                colorScheme: ColorScheme.dark(
+                  primary: BangumiThemeColor.sea.color,
                   onPrimary: Colors.white, //unSelected颜色
                   secondary: Colors.white,
-                  onSecondary:Color.fromARGB(255, 140, 205, 244), //onSelected 的颜色
+                  onSecondary:BangumiThemeColor.sea.color, //onSelected 的颜色
                   surface: Colors.black,
                   
                   outline: Colors.white,
