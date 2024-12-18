@@ -98,7 +98,7 @@ bool judgeInSeasonBangumi(String? bangumiAirDate){
 
 }
 
-int convertAiredEps(String? bangumiAirDate){
+int convertAirDateTime(String? bangumiAirDate){
 	if(bangumiAirDate == null) return 0;
 
 	List<String> dateSegments = bangumiAirDate.split("-");
@@ -107,7 +107,14 @@ int convertAiredEps(String? bangumiAirDate){
 	int bangumiMonth = int.parse(dateSegments[1]);
 	int bangumiDay = int.parse(dateSegments[2]);
 
-	int residualDateTime = (DateTime.now().millisecondsSinceEpoch - DateTime(bangumiYear,bangumiMonth,bangumiDay).millisecondsSinceEpoch);
+  return DateTime(bangumiYear,bangumiMonth,bangumiDay).millisecondsSinceEpoch;
+
+}
+
+int convertAiredEps(String? bangumiAirDate){
+	if(bangumiAirDate == null) return 0;
+
+	int residualDateTime = (DateTime.now().millisecondsSinceEpoch - convertAirDateTime(bangumiAirDate));
 
 	//放送开始附带一集 因此+1
 	int airedEps =  (residualDateTime ~/ const Duration(days: 7).inMilliseconds) + 1;

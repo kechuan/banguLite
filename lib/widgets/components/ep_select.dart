@@ -94,7 +94,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
           
           			//TabView
           			SizedBox(
-                  height: widget.portialMode == true ? constraint.maxHeight -50 : 250,
+                  height: widget.portialMode == true ? constraint.maxHeight -60 : 250,
                   //height: 250,
                   child: ValueListenableBuilder(
                   valueListenable: epSegementsIndexNotifier,
@@ -133,10 +133,16 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                   
                               Color currentEpsColor = Colors.white;
                               int currentEpIndex = (currentSegementRange)+(index)+1;
+
+
+                              //judgeInSeasonBangumi(bangumiAirDate)
+
+
                           
                               //放送中
-                              if(widget.airedEps <= widget.totalEps){ 
-                                if(widget.airedEps == currentEpIndex) currentEpsColor = const Color.fromARGB(255, 219, 245, 223);
+                              if(widget.airedEps < widget.totalEps){ 
+                                
+                                if(widget.airedEps == currentEpIndex) currentEpsColor = BangumiThemeColor.macha.color;
                                 if(widget.airedEps > currentEpIndex)  currentEpsColor = Theme.of(context).scaffoldBackgroundColor;
                               }
                           
@@ -153,7 +159,6 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border(
-                                   
                                     bottom: BorderSide(
                                       width: 3, 
                                       //color: widget.airedEps >= currentEpIndex ? Theme.of(context).scaffoldBackgroundColor.withValues(alpha:0.2) : Colors.grey,
@@ -161,7 +166,6 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   color: currentEpsColor
-                                  
                                   
                                 ),
                                   child: InkResponse(
@@ -192,12 +196,6 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                       child: Builder(
                                         builder: (_) {
 
-                                          //Color lisibleColor = Theme.of(context).scaffoldBackgroundColor;
-                                          
-                                          //if(Theme.of(context).scaffoldBackgroundColor.computeLuminance() > 0.5){
-                                          //  lisibleColor = Colors.black;
-                                          //}
-                          
                                           EpsInfo? currentInfo = epModel.epsData[currentEpIndex];
                             
                                           String currentEpText = currentInfo?.nameCN ?? currentInfo?.name ?? ""; 

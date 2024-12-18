@@ -21,6 +21,7 @@ class EpCommentTile extends StatelessWidget {
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             
@@ -40,36 +41,44 @@ class EpCommentTile extends StatelessWidget {
           
               const Padding(padding: PaddingH6),
           
-              
-          
               const Spacer(),
           
-              Row(
-                children: [
-          
-                  Text("#${epCommentData.epCommentIndex}"),
-          
-                  const Padding(padding: PaddingH6),
-          
-                  Builder(
-                    builder: (_){
-                      DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(epCommentData.commentTimeStamp!*1000);
-                      return Text(
-                        "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"
-                      );
-                    }
-                  ),
-                ],
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 160), 
+                //这个长度一般是 "YEAR-MO-DA HO:MI" 的长度
+                //但如果设备上的字体是不一样的话。。我就不好说了
+                child: Wrap(
+                  //crossAxisAlignment: WrapCrossAlignment.end,
+                  alignment: WrapAlignment.end,
+                  children: [
+                          
+                    Text("#${epCommentData.epCommentIndex}"),
+                          
+                    Builder(
+                      builder: (_){
+                        DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(epCommentData.commentTimeStamp!*1000);
+                        return Text(
+                          "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"
+                        );
+                      }
+                    ),
+                  ],
+                ),
               )
           
               
             ],
           ),
-        
+
+          epCommentData.sign!.isEmpty ?
+          const SizedBox.shrink() :
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: SelectableText(epCommentData.sign!.isNotEmpty ? "(${epCommentData.sign})" : "",style:const TextStyle(fontSize: 16,color: Colors.grey)),
+            child: SelectableText("(${epCommentData.sign})",style:const TextStyle(fontSize: 16,color: Colors.grey)),
           ),
+        
+        
+          
         ],
       ),
 

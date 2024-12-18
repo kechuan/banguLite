@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 import 'package:bbob_dart/bbob_dart.dart' as bbob;
+import 'package:url_launcher/url_launcher_string.dart';
 
 final allEffectTag = [
 	BoldTag(),
@@ -16,8 +17,16 @@ final allEffectTag = [
 	SizeTag(),
 	//ImgTag(),
 	LateLoadImgTag(),
-	UrlTag(),
-	QuoteTag(),
+	UrlTag(
+    onTap: (link) async {
+      if(await canLaunchUrlString(link)){
+        await launchUrlString(link);
+      }
+    }
+    
+  ),
+	//QuoteTag(),
+  AdapterQuoteTag(),
 	LeftAlignTag(),
 	CenterAlignTag(),
 	RightAlignTag(),
@@ -43,7 +52,6 @@ class MaskDisplay extends StatelessWidget {
 
 	ValueNotifier<bool> activedNotifier = ValueNotifier<bool>(false);
 
-  
 	return MouseRegion(
     onEnter: (event) => activedNotifier.value = true,
     onExit: (event) => activedNotifier.value = false,
@@ -99,6 +107,73 @@ class MaskDisplay extends StatelessWidget {
 				
   
   }
+}
+
+class AdapterQuoteDisplay extends StatelessWidget{
+  final String? author;
+  final TextStyle headerTextStyle;
+  final List<InlineSpan> content;
+
+  const AdapterQuoteDisplay({
+    super.key,
+    required this.content,
+    this.author,
+    this.headerTextStyle = const TextStyle()
+  });
+
+  @override
+  Widget build(BuildContext context) {
+
+    bool isDarkMode = judgeDarknessMode(context);
+
+    return Theme(
+      data: ThemeData(
+        brightness: Theme.of(context).brightness,
+      ),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        decoration: const BoxDecoration(
+          border: Border(left: BorderSide(color: Colors.grey, width: 2))),
+            child: Column(
+              children: [
+                if (author != null)
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    width: double.infinity,
+                    decoration: 
+                      const BoxDecoration(
+                        //color: Colors.white,
+                        border:Border(bottom: BorderSide(color: Colors.grey, width: 1))
+                      ),
+                    child: Text("$author said:", style: headerTextStyle),
+                    
+                  ),
+                Builder(
+                  builder: (_) {
+
+                    List<InlineSpan> newInlineSpan = content.map(
+                      (currentSpan){
+                        return TextSpan(
+                          text: currentSpan.toPlainText(),
+                          style: currentSpan.style!.merge(TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
+                        );
+                      }
+                    ).toList();
+
+                    return Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                        child: RichText(text: TextSpan(children: newInlineSpan)));
+                  }
+                )
+              ],
+            ),
+      ),
+    );
+  }
+
+
+
 }
 
 class MaskTag extends WrappedStyleTag {
@@ -190,8 +265,6 @@ class SizeTag extends StyleTag{
 
 	@override
 	TextStyle transformStyle(TextStyle oldStyle, Map<String, String>? attributes) {
-		//example: [Size=20][/Size] attributes?.entries.first.key => 20
-		//element.children.first.textContent;
 		if (attributes?.entries.isEmpty ?? true) return oldStyle;
 
 		double fontSize = double.tryParse(attributes?.entries.first.key ?? "0.0")!;
@@ -199,3 +272,29 @@ class SizeTag extends StyleTag{
 		return oldStyle.copyWith(fontSize: fontSize);
 	}
 }
+
+class AdapterQuoteTag extends WrappedStyleTag {
+  final TextStyle headerTextStyle;
+
+  AdapterQuoteTag({
+    this.headerTextStyle = const TextStyle(),
+  }) : super("quote");
+
+  @override
+  List<InlineSpan> wrap(
+      FlutterRenderer renderer, bbob.Element element, List<InlineSpan> spans) {
+    String? author =
+        element.attributes.isNotEmpty ? element.attributes.values.first : null;
+
+    return [
+      WidgetSpan(
+        child: AdapterQuoteDisplay(
+          author: author,
+          headerTextStyle: headerTextStyle,
+          content: spans,
+        )
+      ),
+    ];
+  }
+}
+

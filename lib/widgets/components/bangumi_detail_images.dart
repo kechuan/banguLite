@@ -27,8 +27,9 @@ class BuildDetailImages extends StatelessWidget {
         imageUrl: detailImageUrl!,
         imageBuilder: (_,imageProvider){
 
-          if(bangumiModel.bangumiThemeColor==null){
+          if(bangumiModel.imageColor==null){
             ColorScheme.fromImageProvider(provider: imageProvider).then((coverScheme){
+
               debugPrint("parse Picture:${coverScheme.primary}");
               bangumiModel.getThemeColor(coverScheme.primary,darkMode: Theme.of(context).brightness == Brightness.dark);
             });

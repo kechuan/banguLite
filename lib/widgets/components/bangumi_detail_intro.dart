@@ -160,9 +160,9 @@ class IntroPortrait extends StatelessWidget {
                   
                     );
                   }
-);
+                );
               }
-);
+            );
           },
           child: SizedBox(
             height: 50,
@@ -171,7 +171,7 @@ class IntroPortrait extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.6)
                 
-),
+              ),
               child: Padding(
                 padding: PaddingH12,
                 child: Row(
@@ -185,17 +185,40 @@ class IntroPortrait extends StatelessWidget {
 
                         Builder(
                           builder: (_){
+
+                            final epModel = context.read<EpModel>();
+
+                            int airedEps = 0;
+
                             if (
                               bangumiDetails.informationList["air_weekday"] == null || 
                               convertAiredEps(bangumiDetails.informationList["air_date"]) >= bangumiDetails.informationList["eps"] ||
                               bangumiDetails.informationList["eps"] > 500 //不确定长度
-){
+                            ){
                               return Text("共${bangumiDetails.informationList["eps"]}集");
                             }
 
-                            return Text("${convertAiredEps(bangumiDetails.informationList["air_date"])}/${bangumiDetails.informationList["eps"]}");
+                            if(bangumiDetails.informationList["eps"] != 0){
+                              
+                              if(epModel.epsData[epModel.epsData.length]?.airDate != null){
+                                epModel.epsData.values.any((currentEpInfo){
+                                  
+                                  //debugPrint("airedEps:$airedEps");
+
+                                  bool overlapAirDate = convertAirDateTime(currentEpInfo.airDate) - DateTime.now().millisecondsSinceEpoch >= 0;
+                                  overlapAirDate ? null : airedEps+=1;
+
+                                  return overlapAirDate;
+
+                                });
+
+                              }
+                            }
+
+                            return Text("$airedEps/${bangumiDetails.informationList["eps"]}");
+                            //return Text("${convertAiredEps(bangumiDetails.informationList["air_date"])}/${bangumiDetails.informationList["eps"]}");
                           }
-),
+                        ),
 
 
                         const Padding(

@@ -100,8 +100,7 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
                   ToggleThemeModeButton(
                     onThen: (){
                       //debugPrint("trigged onThen");
-                      bangumiModel.bangumiThemeColor = null;
-                      bangumiModel.getThemeColor(bangumiModel.imageColor!,darkMode: indexModel.themeMode == ThemeMode.dark);
+                      bangumiModel.getThemeColor(bangumiModel.imageColor ?? BangumiThemeColor.sea.color,darkMode: indexModel.themeMode == ThemeMode.dark);
                     }
                   ),
 

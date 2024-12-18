@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:flutter/material.dart';
 
 class AnimatedWaveFooter extends StatefulWidget {
@@ -15,7 +16,7 @@ class AnimatedWaveFooter extends StatefulWidget {
   State<AnimatedWaveFooter> createState() => _AnimatedWaveFooterState();
 }
 
-class _AnimatedWaveFooterState extends State<AnimatedWaveFooter> with SingleTickerProviderStateMixin {
+class _AnimatedWaveFooterState extends LifecycleState<AnimatedWaveFooter> with SingleTickerProviderStateMixin {
 
   late AnimationController waveController;
 
@@ -31,12 +32,25 @@ class _AnimatedWaveFooterState extends State<AnimatedWaveFooter> with SingleTick
     super.initState();
   }
 
+  @override
+  void onPause() {
+    waveController.stop();
+    super.onPause();
+  }
+
+  @override
+  void onResume() {
+    waveController.repeat();
+    super.onPause();
+  }
+
 
   @override
   void dispose() {
     waveController.dispose();
     super.dispose();
   }
+
   
   @override
   Widget build(BuildContext context) {

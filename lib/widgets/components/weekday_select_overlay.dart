@@ -118,7 +118,7 @@ class WeekDaySelectOverlay{
                   child: ClipRRect(
                     borderRadius:BorderRadius.circular(16),
                     child: Material(
-                      color: const Color.fromARGB(255, 208, 226, 208),
+                      color: BangumiThemeColor.macha.color,
                       child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [

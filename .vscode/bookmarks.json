@@ -44,6 +44,16 @@
 					"label": "Android——SystemChromeSetting"
 				}
 			]
+		},
+		{
+			"path": "lib/models/providers/ep_model.dart",
+			"bookmarks": [
+				{
+					"line": 30,
+					"column": 54,
+					"label": "获取EPInfo信息"
+				}
+			]
 		}
 	]
 }

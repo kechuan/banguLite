@@ -1,6 +1,7 @@
 
 import 'dart:async';
 
+import 'package:bangu_lite/internal/const.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
@@ -43,12 +44,15 @@ class BangumiModel extends ChangeNotifier {
   }
 
   void getThemeColor(Color imageProviderColor,{bool? darkMode}){
+
+    bangumiThemeColor = null;
     
-    if(bangumiThemeColor!=null) return;
+    if(!BangumiThemeColor.values.any((currentTheme) => currentTheme.color == imageProviderColor)){
+      imageColor ??= imageProviderColor;
+    }
 
+    
     Color resultColor = imageProviderColor;
-    imageColor = imageProviderColor;
-
 
     if(darkMode==true){
       if(resultColor.computeLuminance()>0.5){
@@ -73,8 +77,6 @@ class BangumiModel extends ChangeNotifier {
         HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
 
         resultColor = newHSLColor.toColor();
-
-        
 
       }
     }
