@@ -225,7 +225,10 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                                       ),
                                                                       child: Padding(
                                                                         padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 2),
-                                                                        child: Text("${weeklyBangumisRecommend?[currentIndex].ratingList["score"]?.toDouble() ?? "-.-"}",style: const TextStyle(fontSize: 14,color: Colors.white),),
+                                                                        child: Text(
+                                                                          "${weeklyBangumisRecommend?[currentIndex].ratingList["score"]?.toDouble() ?? "-.-"}",
+                                                                          style: const TextStyle(fontSize: 14,color: Colors.black)
+                                                                        ),
                                                                       )
                                                                     ),
                                                                   ),
