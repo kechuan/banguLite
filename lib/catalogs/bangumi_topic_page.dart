@@ -59,17 +59,14 @@ class _BangumiTopicPageState extends State<BangumiTopicPage> {
 					
 						return Scaffold( //Listview need materialDesign
 
-							
 							body: Selector<TopicModel,TopicDetails>(
 								selector: (_, topicModel) => topicModel.topicDetailData[widget.topicInfo.topicID!] ?? TopicDetails(),
 								shouldRebuild: (previous, next) => previous != next,
-								builder: (_,topicDetailData,child) {
+								builder: (_,topicDetailData,topicComment) {
 
 									return CustomScrollView(
 										physics:physics,
 										slivers: [
-
-
 
 											MultiSliver(
 												children: [
@@ -98,16 +95,12 @@ class _BangumiTopicPageState extends State<BangumiTopicPage> {
 															)
 													),
 
-													
-
-
-
-													child!
+													topicComment!
 									
 												]
 											)
 
-											
+										
 										],
 										
 										
@@ -151,6 +144,8 @@ class _BangumiTopicPageState extends State<BangumiTopicPage> {
 													if(topicCommentIndex == 0){
 
 														return ListView(
+															physics: const NeverScrollableScrollPhysics(),
+															
 															shrinkWrap: true,
 															children: [
 																EpCommentView(
@@ -161,11 +156,11 @@ class _BangumiTopicPageState extends State<BangumiTopicPage> {
 																		..comment = currentTopicDetail.content
 																		..commentTimeStamp = currentTopicDetail.createdTime
 																		//..epCommentIndex = "0"
-
-
+															
+															
 																		
 																),
-
+															
 																Padding(
 																	padding: const EdgeInsets.all(16),
 																	child: Row(
@@ -174,14 +169,14 @@ class _BangumiTopicPageState extends State<BangumiTopicPage> {
 																								
 																			const Padding(padding: PaddingH6),
 																								
-																			Text("$commentCount",style: const TextStyle(color: Colors.grey)),
-										
-										
+																			Text("${commentCount!-1}",style: const TextStyle(color: Colors.grey)),
+																								
+																								
 																		],
 																	),
 																),
-
-
+															
+															
 															],
 														);
 
@@ -191,24 +186,7 @@ class _BangumiTopicPageState extends State<BangumiTopicPage> {
 														
 													}
 								
-													//if(topicCommentIndex == 1){
-													//	//int commentCount = 0;
-													//	return Padding(
-													//		padding: const EdgeInsets.all(16),
-													//		child: Row(
-													//			children: [
-													//				const Text("回复",style: TextStyle(fontSize: 24)),
-																						
-													//				const Padding(padding: PaddingH6),
-																						
-													//				Text("$commentCount",style: const TextStyle(color: Colors.grey)),
-								
-								
-													//			],
-													//		),
-													//	);
-													
-													//}
+												
 												
 													//无评论的显示状态
 													if(currentTopicDetail.repliedComment!.isEmpty){

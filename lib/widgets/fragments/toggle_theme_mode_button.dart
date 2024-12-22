@@ -19,7 +19,7 @@ class ToggleThemeModeButton extends StatelessWidget {
 
         final indexModel = context.read<IndexModel>();
 
-        if(indexModel.themeMode == ThemeMode.dark){
+        if(indexModel.themeMode == ThemeMode.dark || Theme.of(context).brightness == Brightness.dark){
           indexModel.updateThemeMode(ThemeMode.light);
         }
         else{
@@ -34,7 +34,8 @@ class ToggleThemeModeButton extends StatelessWidget {
         shouldRebuild: (previous, next) => previous!=next,
         builder: (_, currentTheme, child){
           return Icon(
-            currentTheme == ThemeMode.dark ? 
+            //currentTheme == ThemeMode.dark ? 
+            Theme.of(context).brightness == Brightness.dark ? 
             Icons.dark_mode_outlined :
             Icons.wb_sunny_outlined
             ,size: min(30,MediaQuery.sizeOf(context).width/15));
