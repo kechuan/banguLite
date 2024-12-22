@@ -169,7 +169,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
                       return BangumiListTile(
                         imageSize: const Size(100, 150),
                         bangumiTitle: searchData[index].name!,
-                        imageUrl: searchData[index].coverUri,
+                        imageUrl: searchData[index].coverUrl,
 
                         onTap: () {
                           Navigator.popAndPushNamed(

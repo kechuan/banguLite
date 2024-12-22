@@ -25,7 +25,7 @@ Future<List<BangumiDetails>> searchHandler(String query) async {
 
       bangumiDetail.name = currentBangumi["name_cn"].isEmpty ? currentBangumi["name"] : currentBangumi["name_cn"];
       bangumiDetail.id = currentBangumi["id"];
-      bangumiDetail.coverUri = currentBangumi["images"]["medium"];
+      bangumiDetail.coverUrl = currentBangumi["images"]["medium"];
 
       searchResult.add(bangumiDetail);
     }
@@ -86,7 +86,7 @@ Future<List<BangumiDetails>> sortSearchHandler(
 
       bangumiDetail.name = currentBangumi["name_cn"].isEmpty ? currentBangumi["name"] : currentBangumi["name_cn"];
       bangumiDetail.id = currentBangumi["id"];
-      bangumiDetail.coverUri = currentBangumi["image"];
+      bangumiDetail.coverUrl = currentBangumi["image"];
 
       bangumiDetail.ratingList = {
         "total": currentBangumi["total"] ?? 0,

@@ -95,7 +95,7 @@ class _BangumiStarPageState extends State<BangumiStarPage> {
             return BangumiListTile(
               imageSize: const Size(100, 150),
               bangumiTitle: MyHive.starBangumisDataBase.values.elementAt(index)["name"],
-              imageUrl: MyHive.starBangumisDataBase.values.elementAt(index)["coverUri"],
+              imageUrl: MyHive.starBangumisDataBase.values.elementAt(index)["coverUrl"],
               trailing: Text("score: ${MyHive.starBangumisDataBase.values.elementAt(index)["score"]}"),
               onTap: () {
                 Navigator.pushNamed(

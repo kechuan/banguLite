@@ -1,4 +1,5 @@
 
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:dio/dio.dart';
 
 
@@ -26,12 +27,9 @@ class BangumiAPIUrls {
   //static String get subject => '$baseUrl/subject';
   static String get calendar => '$baseUrl/calendar';
                     
-
   static String get subject => '$baseUrl/v0/subjects';
   static String get eps => '$baseUrl/v0/episodes';
-
   static String get search => '$baseUrl/search/subject';
-
 
   static const String bangumiSubjectSort = '$baseUrl/v0/search/subjects';
 
@@ -40,6 +38,8 @@ class BangumiAPIUrls {
 
   static String comment(int subjectID) => '$newUrl/p1/subjects/$subjectID/comments';
   static String epComment(int epID) => '$newUrl/p1/subjects/-/episode/$epID/comments';
+  static String topics(int subjectID) => '$newUrl/p1/subjects/$subjectID/topics';
+  static String topicComment(int topicID) => '$newUrl/p1/subjects/-/topics/$topicID';
 
 }
 
@@ -47,10 +47,10 @@ class BangumiWebUrls{
   static const String baseUrl = "https://bgm.tv";
 
   static String subject(int subjectID) => '$baseUrl/subject/$subjectID';
-  static String ep(int epID) => '$baseUrl/ep/$epID';
-
   static String subjectComment(int subjectID) => '$baseUrl/subject/$subjectID/comments';
-  
+  static String subjectTopic(int topicID) => '$baseUrl/subject/topic/$topicID';
+
+  static String ep(int epID) => '$baseUrl/ep/$epID';
 
 }
 
@@ -66,6 +66,7 @@ class BangumiQuerys {
 
   static Map<String,int>  commentQuery = {"limit":10,"offset":0},
                           sortQuery = {"limit":10,"offset":0},
+                          topicsQuery = {"limit":30,"offset":0},
                           epQuery = {"subject_id":0,"limit":100,"offset":0}
                           ;
                              
@@ -86,4 +87,32 @@ class BangumiDatas {
       "nsfw": false,
     }
   };
+}
+
+
+void downloadSticker() async {
+
+  await Future.wait(
+    List.generate(
+      126, (index){
+
+        if(index == 0) return Future((){});
+
+        String suffix = "gif"; 
+        
+        if(index < 24){
+          suffix = "png";
+          if(index == 11 || index == 23) suffix = "gif";
+        }
+
+        return HttpApiClient.client.download(
+          "https://bgm.tv/img/smiles/${index > 23 ? "tv" : "bgm"}/${convertDigitNumString(index > 23 ? index-23 : index)}.$suffix",
+          './assets/sticker/bangumiSticker/bgm${convertDigitNumString(index)}.gif',
+        );
+       
+      }
+    )
+  );
+
+
 }

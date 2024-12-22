@@ -29,7 +29,7 @@ class StarButton extends StatelessWidget{
           MyHive.starBangumisDataBase.put(
             bangumiDetails.id!, {
               "name": bangumiDetails.name,
-              "coverUri": bangumiDetails.coverUri,
+              "coverUrl": bangumiDetails.coverUrl,
               "eps": bangumiDetails.informationList["eps"],
               "score": bangumiDetails.ratingList["score"],
             }

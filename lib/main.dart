@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +76,7 @@ class MainApp extends StatelessWidget {
               
             initialRoute: Routes.index,
             //navigatorObservers: [],
-            navigatorObservers: [RouteObserver<ModalRoute>()],
+            navigatorObservers: [Lifecycle.lifecycleRouteObserver],
             onGenerateRoute: (RouteSettings settings) {
               return onGenerateRoute(
                 settings: settings,

@@ -1,6 +1,6 @@
 
 import 'package:bangu_lite/internal/convert.dart';
-import 'package:bangu_lite/widgets/fragments/skeleton_listtile_template.dart';
+import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 
@@ -15,7 +15,7 @@ class BangumiHotComment extends StatefulWidget {
   const BangumiHotComment({
     super.key,
     required this.id,
-	this.name
+	  this.name
   });
 
   final int id;
@@ -33,15 +33,10 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
   @override
   Widget build(BuildContext context) {
-    //debugPrint("parse comment rebuild: ${widget.id}"); 
 
-    return ChangeNotifierProvider.value(
-      value: context.watch<CommentModel>(),
-      builder: (providerContext,child) {
+      if(widget.id == 0) return const SizedBox.shrink();
 
-        if(widget.id == 0) return const SizedBox.shrink();
-
-        commentFuture ??= providerContext.read<CommentModel>().loadComments(widget.id);
+      commentFuture ??= context.read<CommentModel>().loadComments(widget.id);
 
         return Padding(
           padding: const EdgeInsets.all(12),
@@ -73,7 +68,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                   //真的该好好想想 就为了节省这Model里多存放一份的数据有必要像这次这样
                   //写一大堆反rebuild的措施吗？ 这从头到尾起码也有三四天的时间去折腾这里了
 
-                builder: (_,snapshot){
+                builder: (_,__){
         
                   //Selector虽然不rebuild 但不代表不会真不需要layout. 
                   //所以如果size改变的时候 这里的builder流程还是会触发. 但如果你使用的是selector提供的值 这里的值会尽量保持的像静态child!处理的一样
@@ -144,7 +139,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
                               onPressed: (){
 
-                                final commentModel = providerContext.read<CommentModel>();
+                                final commentModel = context.read<CommentModel>();
 
                                 if(commentModel.commentsData.values.first.length == 1 && commentModel.commentsData.values.first[0].userId == 0){
                                   debugPrint("no comment");
@@ -152,8 +147,8 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                                 }
 
                                 Navigator.pushNamed(
-                                  providerContext,
-                                  Routes.moreComment,
+                                  context,
+                                  Routes.moreComments,
                                   arguments: {"commentModel":context.read<CommentModel>(),"subjectID":widget.id,"name":widget.name}
                                 );
                               },
@@ -176,27 +171,27 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                             hoverColor: Colors.transparent,
                             onTap: (){
                               debugPrint("change way");
-                              //providerContext.read<CommentModel>().toggleAutoRebuildStatus();
+                              //context.read<CommentModel>().toggleAutoRebuildStatus();
                                   
-                              final commentModel = providerContext.read<CommentModel>();
+                              final commentModel = context.read<CommentModel>();
                           
                               isOldCommentSort.value = !isOldCommentSort.value;
                           
                               if(
                                 commentModel.commentsData.keys.contains(
                                   convertTotalCommentPage(
-                                    providerContext.read<CommentModel>().commentLength, 
+                                    context.read<CommentModel>().commentLength, 
                                     10
                                 ))
                               ){
-                                providerContext.read<CommentModel>().notifyListeners();
+                                context.read<CommentModel>().notifyListeners();
                               }
                                   
                               else{
                                 
                                 commentModel.currentPageIndex = isOldCommentSort.value ? convertTotalCommentPage(commentModel.commentLength,10) : 1;
                                 
-                                providerContext.read<CommentModel>().loadComments(widget.id,isReverse: isOldCommentSort.value).then((_){
+                                context.read<CommentModel>().loadComments(widget.id,isReverse: isOldCommentSort.value).then((_){
                                   commentModel.changePage(commentModel.currentPageIndex);
                                 });
                               }
@@ -228,7 +223,6 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
           ),
             
         );
-      }
-    );
+      
   }
 }

@@ -26,6 +26,7 @@ class BuildEps extends StatelessWidget {
     final epModel = context.watch<EpModel>(); //那没办法 只能让你以watch形式监控了
 
     int totalEps = informationList["eps"] ?? 0;
+    //String airDate = informationList["air_date"] ?? "";
 
     int airedEps = 0;
 

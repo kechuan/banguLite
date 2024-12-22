@@ -54,6 +54,8 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
     if(carouselTimer!=null){
       carouselTimer?.cancel();
     }
+
+    //WeekDaySelectOverlay.weekDaySelectOverlay?.closeWeekDaySelectFieldOverlay();
     super.onPause();
   }
 
@@ -63,6 +65,15 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
     carouselSpinTimer();
     super.onResume();
   }
+
+
+  @override
+  void didPushNext() {
+    //debugPrint("push");
+    WeekDaySelectOverlay.weekDaySelectOverlay?.closeWeekDaySelectFieldOverlay();
+    super.didPushNext();
+  }
+
 
   
 
@@ -186,7 +197,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                   
                                                   Positioned.fill(
                                                     child: weeklyBangumisRecommend!=null ?
-                                                    CachedImageLoader(imageUrl: weeklyBangumisRecommend[currentIndex].coverUri!) :
+                                                    CachedImageLoader(imageUrl: weeklyBangumisRecommend[currentIndex].coverUrl!) :
                                                     const Center(child: Text("Loading"))
                                                   ),
                                                   

@@ -4,11 +4,13 @@ import 'package:bangu_lite/widgets/warp_page_dialog.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 
+@FFAutoImport()
 import 'package:bangu_lite/models/providers/comment_model.dart';
+
 import 'package:bangu_lite/widgets/components/bangumi_comments.dart';
 import 'package:provider/provider.dart';
 
-@FFRoute(name: '/moreComment')
+@FFRoute(name: '/moreComments')
 class MoreCommentsPage extends StatelessWidget  {
   const MoreCommentsPage({
     super.key,

@@ -16,9 +16,9 @@ class BangumiSummary extends StatelessWidget {
     //功能等待实现: 1初始时固定size 用户展开时 变成滚动组件 也可以恢复成原来的样子
     debugPrint("summary rebuild");
 
-    if(summary!=null && summary!.isEmpty){
+    if(summary==null || summary!.isEmpty){
       return const Padding(
-        padding:  EdgeInsets.all(12.0),
+        padding: EdgeInsets.all(12.0),
         child:  Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

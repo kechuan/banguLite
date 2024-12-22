@@ -8,7 +8,7 @@ import 'package:bangu_lite/internal/convert.dart';
 class BangumiDetails {
 
 	int? id;
-	String? coverUri;
+	String? coverUrl;
 	String? name;
 
 	String? summary;
@@ -66,7 +66,7 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
             if(currentBangumi["name_cn"] == "") continue;
           }
 
-          bangumiDetails.coverUri = currentBangumi["images"]["large"];
+          bangumiDetails.coverUrl = currentBangumi["images"]["large"];
           bangumiDetails.id = currentBangumi["id"];
 
           bangumiDetails.name = currentBangumi["name_cn"].isEmpty ?
@@ -130,7 +130,7 @@ BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
 
     final BangumiDetails bangumiDetails = BangumiDetails();
 
-      bangumiDetails.coverUri = bangumiData["images"]["large"];
+      bangumiDetails.coverUrl = bangumiData["images"]["large"];
       bangumiDetails.summary = bangumiData["summary"];
       bangumiDetails.name = bangumiData["name_cn"].isNotEmpty ? bangumiData["name_cn"] : bangumiData["name"];
       bangumiDetails.id = bangumiData["id"];
@@ -201,3 +201,15 @@ BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
 
     return bangumiDetails;
   }
+
+enum SubjectType {
+  book(1), // 书籍
+  anime(2), // 动画
+  music(3), // 音乐
+  game(4), // 游戏
+  real(6); // 三次元
+
+  final int subjectType;
+
+  const SubjectType(this.subjectType);
+}

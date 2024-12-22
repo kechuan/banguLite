@@ -56,7 +56,7 @@ class IntroPortrait extends StatelessWidget {
                 children: [
                   FittedBox(
                     child: BuildDetailImages(
-                      detailImageUrl: bangumiDetails.coverUri,
+                      detailImageUrl: bangumiDetails.coverUrl,
                       imageID: bangumiDetails.id
 					)
                   ),
@@ -141,7 +141,9 @@ class IntroPortrait extends StatelessWidget {
               context: context,
               
               builder: (_){
-
+                //因为showDialog/showModalBottomSheet 使用的context是独立在整个体系之外的
+                //在 layout inspector 里能看到 此时它的层级关系是和 其他的Page一样直接属于materialApp的分支之下
+                //因此只能直接这样处理了
                 return ChangeNotifierProvider.value(
                   value: context.watch<EpModel>(),
                   builder: (_,__) {
@@ -265,7 +267,7 @@ class IntroLandscape extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
 
-        Expanded(child: FittedBox(child: BuildDetailImages(detailImageUrl: bangumiDetails.coverUri,imageID: bangumiDetails.id))),
+        Expanded(child: FittedBox(child: BuildDetailImages(detailImageUrl: bangumiDetails.coverUrl,imageID: bangumiDetails.id))),
         
         //Info
         Expanded(

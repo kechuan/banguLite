@@ -4,6 +4,8 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/models/providers/topic_model.dart';
+import 'package:bangu_lite/widgets/components/bangumi_detail_topics.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
@@ -33,27 +35,10 @@ class BangumiDetailPage extends StatefulWidget {
 }
 
 
-
-//class _BangumiDetailPageState extends State<BangumiDetailPage> {
 class _BangumiDetailPageState extends State<BangumiDetailPage> {
 
-  //bool isPaused = false;
   ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
  
-
-  //@override
-  //void didPushNext() {
-  //  isPaused = true;
-  //  super.didPushNext();
-  //}
-
-  
-  //@override
-  //void didPopNext() {
-  //  isPaused = false;
-  //  super.didPopNext();
-  //}
-
   @override
   Widget build(BuildContext context) {
 
@@ -61,7 +46,8 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
       providers: [
         ChangeNotifierProvider(create: (_) => BangumiModel()),
         ChangeNotifierProvider(create: (_) => EpModel(subjectID: widget.bangumiID,selectedEp: 1)),
-        ChangeNotifierProvider(create: (_) => CommentModel())
+        ChangeNotifierProvider(create: (_) => CommentModel()),
+        ChangeNotifierProvider(create: (_) => TopicModel(subjectID: widget.bangumiID,)),
       ],
       //create: (_) => BangumiModel(),
       child: Selector<BangumiModel,Color?>(
@@ -83,8 +69,10 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
         child: Builder(
           builder: (context) {
 
-            final BangumiModel bangumiModel = context.read<BangumiModel>();
             final IndexModel indexModel = context.read<IndexModel>();
+            final BangumiModel bangumiModel = context.read<BangumiModel>();
+            //final TopicModel topicModel = context.read<TopicModel>();
+            
 
             return Scaffold(
               appBar: AppBar(
@@ -96,6 +84,17 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
                   icon: const Icon(Icons.arrow_back)
                 ),
                 actions: [
+
+                  //IconButton(
+                  //  onPressed: () {
+                  //    downloadSticker();
+                  //  },
+                  //  icon: const Icon(Icons.download)
+                  //),
+
+                  //const Padding(padding: PaddingH6),
+
+
                   //const ToggleThemeModeButton(),
                   ToggleThemeModeButton(
                     onThen: (){
@@ -219,11 +218,14 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
                                             delegate: SliverChildListDelegate(
                                               [
                                                 BangumiDetailIntro(bangumiDetails: currentSubjectDetail ?? BangumiDetails()),
-                                              
+
                                                 NotificationListener<ScrollNotification>(
                                                   onNotification: (_) => true,
                                                   child: BangumiSummary(summary: currentSubjectDetail?.summary)
                                                 ),
+
+                                                //BangumiDetailTopics(subjectID: widget.bangumiID,name: bangumiModel.bangumiDetails?.name,),
+                                                BangumiDetailTopics(name: bangumiModel.bangumiDetails?.name),
                                                 
                                                 NotificationListener<ScrollNotification>(
                                                   onNotification: (_) => true,

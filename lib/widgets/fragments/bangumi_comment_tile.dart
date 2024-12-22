@@ -23,12 +23,12 @@ class BangumiCommentTile extends StatelessWidget {
           spacing: 12,
           children: [
         
-          commentData.avatarUri!=null ? 
+          commentData.avatarUrl!=null ? 
                 
             SizedBox(
               height: 50,
               width: 50,
-              child: CachedImageLoader(imageUrl: commentData.avatarUri!)
+              child: CachedImageLoader(imageUrl: commentData.avatarUrl!)
             ) : 
                 
             //const FlutterLogo(),

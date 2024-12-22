@@ -58,7 +58,7 @@ class BanguTileGridView extends StatelessWidget {
                 opacity: animation,
                   child:  BangumiGridTile(
                     bangumiTitle: bangumiLists[currentBangumiIndex].name,
-                    imageUrl: bangumiLists[currentBangumiIndex].coverUri,
+                    imageUrl: bangumiLists[currentBangumiIndex].coverUrl,
                     onTap: () {
                       if(bangumiLists[currentBangumiIndex].name!=null){
             
@@ -103,7 +103,7 @@ class BanguTileGridView extends StatelessWidget {
             itemBuilder: (_,currentBangumiIndex){
 
               return BangumiGridTile(
-                imageUrl: bangumiLists[currentBangumiIndex].coverUri,
+                imageUrl: bangumiLists[currentBangumiIndex].coverUrl,
                 bangumiTitle: bangumiLists[currentBangumiIndex].name,
                 onTap: () {
                     if(bangumiLists[currentBangumiIndex].name!=null){

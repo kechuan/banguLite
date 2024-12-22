@@ -5,11 +5,12 @@ class CommentDetails {
 
   int? userId;
   String? nickName;
-  String? avatarUri;
+  String? avatarUrl;
   
   String? comment;
   int? commentTimeStamp;
   int? rate;
+  int? type;
   
 }
 
@@ -24,18 +25,19 @@ List<CommentDetails> loadCommentResponse(Response commentDetailResponse) {
     List commentResponseList = commentResponse["data"]; //不要试图给请求假设类型 Map也不行!!
 
 
-    for(var currentComment in commentResponseList){
+    for(Map currentComment in commentResponseList){
 
       //debugPrint("${currentComment.runtimeType}, $currentComment");
 
       final CommentDetails commentDetails = CommentDetails();
       
         commentDetails
-          ..avatarUri = currentComment["user"]["avatar"]["medium"]
+          ..avatarUrl = currentComment["user"]["avatar"]["medium"]
           ..userId = currentComment["user"]["id"]
           ..nickName = currentComment["user"]["nickname"]
           ..comment = currentComment["comment"]
           ..rate = currentComment["rate"]
+          ..type = currentComment["type"]
           ..commentTimeStamp = currentComment["updatedAt"]
         ;
       

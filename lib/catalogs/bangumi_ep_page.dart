@@ -4,10 +4,13 @@ import 'dart:math';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/eps_info.dart';
+
+@FFAutoImport()
 import 'package:bangu_lite/models/providers/ep_model.dart';
+
 import 'package:bangu_lite/widgets/components/ep_comments.dart';
 import 'package:bangu_lite/widgets/fragments/ep_toggle_panel.dart';
-import 'package:bangu_lite/widgets/fragments/skeleton_listtile_template.dart';
+import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
@@ -73,12 +76,7 @@ class _BangumiEpPageState extends State<BangumiEpPage> {
                   
                     return false;
                 },
-                child: Selector<EpModel,Map<int,EpsInfo>>(
-                    selector: (_, epModel) => epModel.epsData,
-                    shouldRebuild: (previous, next) => previous.length != next.length,
-                    builder: (_,epsData,child) {
-                    
-                      return Selector<EpModel,int>(
+                child:                       Selector<EpModel,int>(
                         selector: (_, epModel) => epModel.selectedEp,
                         shouldRebuild: (previous, next) => previous != next,
                         builder: (_,selectedEp,commentDetailchild){
@@ -120,7 +118,7 @@ class _BangumiEpPageState extends State<BangumiEpPage> {
                                   ),
                                   
       
-                                  EpInfo(epsInfo: epsData,selectedEp: selectedEp),
+                                  EpInfo(epsInfo: epModel.epsData,selectedEp: selectedEp),
                                 ],
                               ),
       
@@ -139,10 +137,10 @@ class _BangumiEpPageState extends State<BangumiEpPage> {
                                             future: epsInformationFuture,
                                             builder: (_,snapshot){
                                               return AppBar(
-												scrolledUnderElevation: 0, // 设置为0来禁用滚动时的阴影效果
+												                        scrolledUnderElevation: 0, // 设置为0来禁用滚动时的阴影效果
                                                 leading: const SizedBox.shrink(),
                                                 leadingWidth: 0,
-												backgroundColor: BangumiThemeColor.macha.color.withValues(alpha:opacity),
+											                        	backgroundColor: BangumiThemeColor.sea.color.withValues(alpha:opacity),
                                                 titleTextStyle: const TextStyle(fontSize: 16),
                                                 title: EpTogglePanel(currentEp: selectedEp,totalEps: widget.totalEps)
                                               );
@@ -165,12 +163,10 @@ class _BangumiEpPageState extends State<BangumiEpPage> {
                           
                         },
                         
-                        child: const EpCommentDetails()
+                        child: const EpCommentPageDetails()
                   
-                      );
+                      )
 
-                    }
-                  )
               )
             );
           }
@@ -206,7 +202,7 @@ class EpInfo extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
+    
         ListTile(
           title: Row(
             children: [
@@ -217,19 +213,19 @@ class EpInfo extends StatelessWidget {
           ),
           
         ),
-
+    
         ListTile(
           title:  SelectableText("${epsInfo[selectedEp]!.description}"),
         ),
-
+    
        
       ],
     );
   }
 }
 
-class EpCommentDetails extends StatelessWidget {
-	const EpCommentDetails({
+class EpCommentPageDetails extends StatelessWidget {
+	const EpCommentPageDetails({
 		super.key,
 	});
 
