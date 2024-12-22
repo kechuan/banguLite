@@ -30,7 +30,6 @@ class MoreCommentsPage extends StatelessWidget  {
     
     //给每个番剧页面都单独拉一个 CommentProvider 避免互相跳转之间打架
     return ChangeNotifierProvider.value(
-      //create: (_) => CommentModel(),
       value: commentModel,
       builder: (context,child) {
         return Scaffold(

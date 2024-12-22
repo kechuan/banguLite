@@ -95,9 +95,14 @@ int convertAirDateTime(String? bangumiAirDate){
 
   List<String> dateSegments = bangumiAirDate.split("-");
 
+  if(dateSegments.length != 3) return 0;
+
   int bangumiYear = int.parse(dateSegments[0]);
   int bangumiMonth = int.parse(dateSegments[1]);
   int bangumiDay = int.parse(dateSegments[2]);
+
+  //if( bangumiYear == null && bangumiMonth == null && bangumiDay == null) return 0;
+
   return DateTime(bangumiYear,bangumiMonth,bangumiDay).millisecondsSinceEpoch;
 
 

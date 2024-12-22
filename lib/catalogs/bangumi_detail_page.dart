@@ -169,10 +169,7 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
                                   slivers: [
                                     Skeletonizer.sliver(
                                       enabled: currentSubjectDetail==null,
-                                      child: 
-                                      
-                                      
-                                      Selector<BangumiModel,Color?>(
+                                      child: Selector<BangumiModel,Color?>(
                                         selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
                                         //selector: (_, bangumiModel) => judgeDarknessMode(context) ? bangumiModel.getThemeColor(context,darkMode: true) : bangumiModel.bangumiThemeColor ,
                                         shouldRebuild: (previous, next) => previous!=next,
@@ -224,7 +221,6 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
                                                   child: BangumiSummary(summary: currentSubjectDetail?.summary)
                                                 ),
 
-                                                //BangumiDetailTopics(subjectID: widget.bangumiID,name: bangumiModel.bangumiDetails?.name,),
                                                 BangumiDetailTopics(name: bangumiModel.bangumiDetails?.name),
                                                 
                                                 NotificationListener<ScrollNotification>(

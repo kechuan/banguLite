@@ -27,36 +27,40 @@ class CommentView extends StatefulWidget {
 
 class _CommentViewState extends State<CommentView> with SingleTickerProviderStateMixin {
 
-  late TabController commentController;
+  late TabController commentTabController;
 
-  //final PageController widget.commentPageController = PageController();
-  final ScrollController tabScrollController = ScrollController();
-  //final Map<int,List<CommentDetails>> commentsData = {}; 
+  //bool handleTabChange = false;
 
   //既然我没办法做到pageView预先加载 但预先填充数据这点 我还是能做到的
 
   @override
   void initState() {
 
-    commentController = TabController(
+    commentTabController = TabController(
       vsync: this,
       length: widget.totalPageLength
     );
+    
+      commentTabController.addListener((){
 
-    commentController.addListener((){
+       
+        if(commentTabController.index - widget.commentPageController.page!.toInt().abs() < 2) return;
         widget.commentPageController.jumpToPage(
-          commentController.index, 
+          commentTabController.index, 
         );
-    });
+      });
+    
+
+
 
     super.initState();
   }
 
   @override
   void dispose() {
-    commentController.dispose();
+    commentTabController.dispose();
     widget.commentPageController.dispose();
-    tabScrollController.dispose();
+    
     
     super.dispose();
   }
@@ -93,7 +97,7 @@ class _CommentViewState extends State<CommentView> with SingleTickerProviderStat
           ),
           child: EasyRefresh(
             child: TabBar(
-              controller: commentController,
+              controller: commentTabController,
               isScrollable: true,
               indicatorColor: BangumiThemeColor.sea.color,
               unselectedLabelColor: BangumiThemeColor.sea.color,
@@ -104,7 +108,7 @@ class _CommentViewState extends State<CommentView> with SingleTickerProviderStat
                   widget.totalPageLength,
                   (index) => SizedBox(
                     height: 60,
-                    width: MediaQuery.sizeOf(context).width/(widget.totalPageLength).clamp(1, 6), //最多存在6个
+                    width: MediaQuery.sizeOf(context).width/(widget.totalPageLength).clamp(1, 7), //最多存在7个
                     child: Center(child: Text("${index+1}"))
                   )
                 ),
@@ -114,27 +118,32 @@ class _CommentViewState extends State<CommentView> with SingleTickerProviderStat
         toolbarHeight: 60,
         
       ),
-      body: PageView.builder(
-        controller: widget.commentPageController,
-        onPageChanged: (newPageIndex){
+      body: EasyRefresh(
+        triggerAxis: Axis.horizontal,
+        child: PageView.builder(
+          controller: widget.commentPageController,
+          onPageChanged: (newPageIndex){
+        
+            commentModel.changePage(newPageIndex+1);
+        
+            debugPrint("PageView Changed:${newPageIndex+1}");
 
-          context.read<CommentModel>().changePage(newPageIndex+1);
-
-          debugPrint("PageView Changed:${newPageIndex+1}");
-          
-          //用于解决移动端允许拖拽commentPage以响应上方的tabController
-          //但是它会令 tabController本身被受限 其本质原因是animateToPage。
-          if(newPageIndex != commentController.index){
-            debugPrint("redirect commentController:$newPageIndex");
-            commentController.animateTo(newPageIndex);
-          }
-
-        },
-        itemCount: widget.totalPageLength,
-        itemBuilder: (_,index)=> CachePage(
-          currentPageIndex: index,
-          //commentsData: commentsData, //在loading的途中直接载入
-          id: widget.subjectID,
+            commentTabController.animateTo(newPageIndex);
+            
+            ////用于解决移动端允许拖拽commentPage以响应上方的tabController
+            ////但是它会令 tabController本身被受限 其本质原因是animateToPage。
+            //if(newPageIndex != commentTabController.index){
+            //  debugPrint("redirect commentTabController:$newPageIndex");
+            //  commentTabController.animateTo(newPageIndex);
+            //}
+        
+          },
+          itemCount: widget.totalPageLength,
+          itemBuilder: (_,index)=> CachePage(
+            currentPageIndex: index,
+            //commentsData: commentsData, //在loading的途中直接载入
+            id: widget.subjectID,
+          ),
         ),
       )
     );
