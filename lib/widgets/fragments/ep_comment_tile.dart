@@ -27,11 +27,11 @@ class EpCommentTile extends StatelessWidget {
             
             children: [
           
-              epCommentData.avatarUri!=null ? 
+              epCommentData.avatarUrl!=null ? 
               SizedBox(
                 height: 50,
                 width: 50,
-                child: CachedImageLoader(imageUrl: epCommentData.avatarUri!)
+                child: CachedImageLoader(imageUrl: epCommentData.avatarUrl!)
               ) : 
               Image.asset("assets/icons/icon.png"),
           
@@ -49,10 +49,12 @@ class EpCommentTile extends StatelessWidget {
                 //但如果设备上的字体是不一样的话。。我就不好说了
                 child: Wrap(
                   //crossAxisAlignment: WrapCrossAlignment.end,
+                  spacing: 3,
                   alignment: WrapAlignment.end,
                   children: [
                           
-                    Text("#${epCommentData.epCommentIndex}"),
+                    //Text("#${epCommentData.epCommentIndex}"),
+                    Text(epCommentData.epCommentIndex== null ? "" : "#${epCommentData.epCommentIndex}"),
                           
                     Builder(
                       builder: (_){

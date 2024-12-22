@@ -133,7 +133,7 @@ class EpModel extends ChangeNotifier{
 		).then((response){
 			if(response.data != null){
 
-			epCommentData[selectedEp] = loadEpCommentDetails(response);
+			epCommentData[selectedEp] = loadEpCommentDetails(response.data);
 
 			//空处理 userId = 0 代表为空
 			if(epCommentData[selectedEp]!.isEmpty){

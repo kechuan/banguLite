@@ -20,6 +20,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   infinite_carousel: ^1.1.1
+  material_design_icons_flutter: ^7.0.7296
   path_provider: ^2.1.4
   provider: ^6.1.2
   skeletonizer: ^1.4.2

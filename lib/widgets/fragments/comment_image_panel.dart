@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 class CommentImagePanel extends StatefulWidget {
   const CommentImagePanel({
     super.key,
-    required this.imageUri,
+    required this.imageUrl,
   });
 
-  final String imageUri;
+  final String imageUrl;
 
   @override
   State<CommentImagePanel> createState() => _CommentImagePanelState();
@@ -28,7 +28,7 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
   @override
   Widget build(BuildContext context) {
 
-    loadInformationFuture ??= loadByteInformation(widget.imageUri);
+    loadInformationFuture ??= loadByteInformation(widget.imageUrl);
     
 
     return FutureBuilder(
@@ -88,7 +88,7 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                           );
                         }
                   
-                        return CachedNetworkImage(imageUrl: widget.imageUri);
+                        return CachedNetworkImage(imageUrl: widget.imageUrl);
                         
                       }
                     ),

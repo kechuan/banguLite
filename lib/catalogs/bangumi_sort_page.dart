@@ -266,7 +266,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                     opacity: animation,
                                     child: BangumiListTile(
                                       bangumiTitle: messageList[index].name,
-                                      imageUrl: messageList[index].coverUri,
+                                      imageUrl: messageList[index].coverUrl,
                                       imageSize: const Size(100,150),
                                       onTap: () {
                                         Navigator.pushNamed(

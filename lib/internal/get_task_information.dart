@@ -22,12 +22,12 @@ int byteParse(String bytesRangeValue){
   return int.parse(bytesRangeValue.split(" ")[1].split("/")[1]);
 }
 
-Future<RequestByteInformation> loadByteInformation(String imageUri) async {
+Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
   RequestByteInformation pictureRequestInformation = RequestByteInformation();
 
   await HttpApiClient.client
     .get(
-      imageUri,
+      imageUrl,
       options: Options(
         headers: {'range':'bytes=0-1'},
         sendTimeout: const Duration(seconds: 5),
@@ -47,11 +47,11 @@ Future<RequestByteInformation> loadByteInformation(String imageUri) async {
     }
     ).catchError((error){
       switch (error.type) {
-        case DioExceptionType.badResponse: {debugPrint('$imageUri 不存在'); break;}
+        case DioExceptionType.badResponse: {debugPrint('$imageUrl 不存在'); break;}
         case DioExceptionType.connectionTimeout:
         case DioExceptionType.sendTimeout:
         case DioExceptionType.receiveTimeout:
-          debugPrint('$imageUri 超时');
+          debugPrint('$imageUrl 超时');
           break;
       }
     });

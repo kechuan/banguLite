@@ -69,8 +69,8 @@ enum ScoreRank{
   bad("较差",3.5), //3.5~4.5
   medium("不过不失",4.5), //4.5~5.5
   pass("还行",5.5), //5.5~6.5
-  great("推荐",6.5), //6.5~8
-  excellent("力荐",8), //8 ~ 9
+  great("推荐",6.5), //6.5~7.5
+  excellent("力荐",7.5), //7.5 ~ 9
   perfect("神作",9) //9+
   ;
 
@@ -80,6 +80,7 @@ enum ScoreRank{
   const ScoreRank(this.rankText,this.score);
 
 }
+
 
 enum BangumiThemeColor{
   sea(Color.fromARGB(255, 140, 205, 244)), //Primary: const Color.fromARGB(255, 140, 205, 244)
@@ -102,4 +103,8 @@ const PaddingV6 = EdgeInsetsDirectional.symmetric(vertical: 6);
 const PaddingV12 = EdgeInsetsDirectional.symmetric(vertical: 12);
 
 const PaddingH6V12 = EdgeInsetsDirectional.symmetric(horizontal: 6,vertical: 12);
+const PaddingH12V6 = EdgeInsetsDirectional.symmetric(horizontal: 12,vertical: 6);
+
+const Padding6 = EdgeInsetsDirectional.all(6);
+const Padding12 = EdgeInsetsDirectional.all(12);
 

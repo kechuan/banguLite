@@ -31,7 +31,9 @@ final allEffectTag = [
 	CenterAlignTag(),
 	RightAlignTag(),
 	MaskTag(),
+  //SpoilerTag()
 	BangumiStickerTag()
+  
 ];
 
 class MaskDisplay extends StatelessWidget {
@@ -218,9 +220,9 @@ class BangumiStickerTag extends AdvancedTag{
 
     final image = Image.asset(
 		imageUrl,
-		scale: 0.8,
+		scale: imageUrl.contains(RegExp(r'(124)|(125)')) ? 1.6 : 0.8,
         errorBuilder: (context, error, stack) => Text("[$tag]")
-	);
+	  );
 
     return [
       WidgetSpan(
@@ -240,9 +242,9 @@ class LateLoadImgTag extends AdvancedTag {
       return [TextSpan(text: "[$tag]")];
     }
 
-    String imageUri = element.children.first.textContent;
+    String imageUrl = element.children.first.textContent;
 
-	//debugPrint("lateLoad textContent:${imageUri}");
+	//debugPrint("lateLoad textContent:${imageUrl}");
 	//目标: 只获取图片大小 并显示成一个Widget 直到。。你再次点击 以获取真正的图片.
 
     if (renderer.peekTapAction() != null) {
@@ -250,13 +252,13 @@ class LateLoadImgTag extends AdvancedTag {
         WidgetSpan(
           child: GestureDetector(
             onTap: renderer.peekTapAction(),
-            child: CommentImagePanel(imageUri: imageUri),
+            child: CommentImagePanel(imageUrl: imageUrl),
           )
 		    )
       ];
     }
 
-    return [ WidgetSpan(child: CommentImagePanel(imageUri: imageUri)) ];
+    return [ WidgetSpan(child: CommentImagePanel(imageUrl: imageUrl)) ];
   }
 }
 

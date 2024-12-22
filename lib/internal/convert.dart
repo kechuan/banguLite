@@ -80,34 +80,29 @@ bool judgeInSeasonBangumi(String? bangumiAirDate){
 
   if(bangumiAirDate == null) return false;
 
-  List<String> dateSegments = bangumiAirDate.split("-");
+  final convertedTime = DateTime.parse(bangumiAirDate);
 
-  int bangumiYear = int.parse(dateSegments[0]);
-  int bangumiMonth = int.parse(dateSegments[1]);
+  //if(DateTime.now().difference(convertedTime) > const Duration(days: 365)){
+  //  return false;
+  //}
 
-  if((bangumiYear - DateTime.now().year).abs() <= 1){
-    if(
-        (DateTime.now().month - bangumiMonth).abs() <= 2 || 
-        (DateTime.now().month - bangumiMonth).abs() >= 10
-    ) {
-      return true;
-    }
-  }
-
-  return false;
+  return DateTime.now().difference(convertedTime) < const Duration(days: 90);
 
 }
 
 int convertAirDateTime(String? bangumiAirDate){
 	if(bangumiAirDate == null) return 0;
 
-	List<String> dateSegments = bangumiAirDate.split("-");
+  List<String> dateSegments = bangumiAirDate.split("-");
 
-	int bangumiYear = int.parse(dateSegments[0]);
-	int bangumiMonth = int.parse(dateSegments[1]);
-	int bangumiDay = int.parse(dateSegments[2]);
-
+  int bangumiYear = int.parse(dateSegments[0]);
+  int bangumiMonth = int.parse(dateSegments[1]);
+  int bangumiDay = int.parse(dateSegments[2]);
   return DateTime(bangumiYear,bangumiMonth,bangumiDay).millisecondsSinceEpoch;
+
+
+  //return DateTime.parse(bangumiAirDate).millisecondsSinceEpoch; 
+  // fail to analyse `2022-3-8` `2022-03-8` : Invalid date format
 
 }
 
@@ -144,7 +139,8 @@ String convertScoreRank(double? score){
 
   String resultRankText = "";
 
-  //The property 'score' can't be accessed on the type 'ScoreRank' in a constant expression.
+  //为什么不用switch? 
+  //Error: The property 'score' can't be accessed on the type 'ScoreRank' in a constant expression.
 
   //不确定到底是写一堆if-else结构还是直接这样顺序处理哪个更好
   //但这个至少简单 那就这个了
@@ -164,6 +160,10 @@ String convertScoreRank(double? score){
   return resultRankText;
 
 
+}
+
+String convertDateTimeToString(DateTime dateTime){
+  return "${dateTime.year}-${convertDigitNumString(dateTime.month)}-${convertDigitNumString(dateTime.day)} ${convertDigitNumString(dateTime.hour)}:${convertDigitNumString(dateTime.minute)}";
 }
 
 bool judgeDarknessMode(BuildContext context){
