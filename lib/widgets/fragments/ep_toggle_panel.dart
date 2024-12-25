@@ -68,7 +68,7 @@ class EpTogglePanel extends StatelessWidget {
                         return ConstrainedBox(
                           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3),
                           child: Text(
-                            "Ep. ${max(1,currentEp-1)} ${epModel.epsData[max(1,currentEp-1)]!.nameCN ?? epModel.epsData[max(1,currentEp-1)]!.name}",
+                            "Ep. ${max(1,currentEp-1)} ${epModel.epsData[max(1,currentEp-1)]!.nameCN!.isEmpty ?  epModel.epsData[max(1,currentEp-1)]!.name : epModel.epsData[max(1,currentEp-1)]!.nameCN}",
                             style: TextStyle(color: currentEp == 1 ? Colors.grey :Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,fontFamily: "MiSansFont"),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -119,7 +119,7 @@ class EpTogglePanel extends StatelessWidget {
                         return ConstrainedBox(
                           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3) ,
                           child: Text(
-                            "Ep. ${min(totalEps,currentEp+1)} ${epModel.epsData[min(totalEps,currentEp+1)]?.nameCN ?? epModel.epsData[min(totalEps,currentEp+1)]?.name ?? "loading"}",
+                            "Ep. ${min(totalEps,currentEp+1)} ${epModel.epsData[min(totalEps,currentEp+1)]!.nameCN!.isEmpty ? epModel.epsData[min(totalEps,currentEp+1)]?.name : epModel.epsData[min(totalEps,currentEp+1)]?.nameCN ?? "loading"}",
                             style: TextStyle(color: currentEp == totalEps ? Colors.grey :Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,fontFamily: "MiSansFont"),
                             overflow: TextOverflow.ellipsis,
                           ),

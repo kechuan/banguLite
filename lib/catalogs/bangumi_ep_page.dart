@@ -1,7 +1,11 @@
 
 import 'dart:math';
 
+import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/bus_register_method.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/eps_info.dart';
 
@@ -37,11 +41,41 @@ class BangumiEpPage extends StatefulWidget {
   State<BangumiEpPage> createState() => _BangumiEpPageState();
 }
 
-class _BangumiEpPageState extends State<BangumiEpPage> {
+class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
 
   Future<void>? epsInformationFuture;
 
   ValueNotifier<double> opacityNotifier = ValueNotifier<double>(0);
+
+  bool isActived = true; 
+  
+  //在极端状况之下 说不定会出现 (BangumiDetailPageA)EpPage => BangumiDetailPageB => EpPageB...
+  //此时 整个路由链存活的 EpPageState 都会触发这个 AppRoute 那就麻烦了, 因此需要加以管控
+
+  @override
+  void initState() {
+    bus.on(
+      'AppRoute',
+      (link) {
+        if(!isActived) return;
+        appRouteMethod(context,link);
+
+      }
+    );
+    super.initState();
+  }
+
+  @override
+  void didPushNext() {
+    isActived = false;
+    super.didPushNext();
+  }
+
+  @override
+  void didPopNext() {
+    isActived = true;
+    super.didPopNext();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,96 +110,96 @@ class _BangumiEpPageState extends State<BangumiEpPage> {
                   
                     return false;
                 },
-                child:                       Selector<EpModel,int>(
-                        selector: (_, epModel) => epModel.selectedEp,
-                        shouldRebuild: (previous, next) => previous != next,
-                        builder: (_,selectedEp,commentDetailchild){
-                    
-                          return CustomScrollView(
-                            physics:physics,
-                            slivers: [
-                  
-                              MultiSliver(
-                                pushPinnedChildren: true,
-                                children: [
-      
-                                  SliverPinnedHeader(
-                                    child: AppBar(
-                                      title: Text("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}"),
-                                      //backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6) keep,
-                                      backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
-      
-                                      actions: [
-      
-                                        IconButton(
-                                          onPressed: () async {
-                                            if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
-                                            await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
-                                            }
-                                          },
-                                          icon: Transform.rotate(
-                                            angle: -45,
-                                            child: const Icon(Icons.link),
-                                          )
-                                        ),
-      
-      
-                                      ],
-                                    )
-                                    
-                                    
-      
-                                  ),
-                                  
-      
-                                  EpInfo(epsInfo: epModel.epsData,selectedEp: selectedEp),
-                                ],
+                  child: Selector<EpModel,int>(
+                    selector: (_, epModel) => epModel.selectedEp,
+                    shouldRebuild: (previous, next) => previous != next,
+                    builder: (_,selectedEp,commentDetailchild){
+                
+                      return CustomScrollView(
+                        physics:physics,
+                        slivers: [
+              
+                          MultiSliver(
+                            pushPinnedChildren: true,
+                            children: [
+  
+                              SliverPinnedHeader(
+                                child: AppBar(
+                                  title: Text("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}"),
+                                  //backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6) keep,
+                                  backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
+  
+                                  actions: [
+  
+                                    IconButton(
+                                      onPressed: () async {
+                                        if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
+                                        await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
+                                        }
+                                      },
+                                      icon: Transform.rotate(
+                                        angle: -45,
+                                        child: const Icon(Icons.link),
+                                      )
+                                    ),
+  
+  
+                                  ],
+                                )
+                                
+                                
+  
                               ),
-      
-                              MultiSliver(
-                                pushPinnedChildren: true,
-                                children: [
-      
-                                  SliverPinnedHeader(
-                                    
-                                    
-                                      child: ValueListenableBuilder(
-                                        valueListenable: opacityNotifier,
-                                        builder: (_,opacity,child) {
-                                          debugPrint("opacity: $opacity");
-                                          return FutureBuilder(
-                                            future: epsInformationFuture,
-                                            builder: (_,snapshot){
-                                              return AppBar(
-												                        scrolledUnderElevation: 0, // 设置为0来禁用滚动时的阴影效果
-                                                leading: const SizedBox.shrink(),
-                                                leadingWidth: 0,
-											                        	backgroundColor: BangumiThemeColor.sea.color.withValues(alpha:opacity),
-                                                titleTextStyle: const TextStyle(fontSize: 16),
-                                                title: EpTogglePanel(currentEp: selectedEp,totalEps: widget.totalEps)
-                                              );
-                                            }
+                              
+  
+                              EpInfo(epsInfo: epModel.epsData,selectedEp: selectedEp),
+                            ],
+                          ),
+  
+                          MultiSliver(
+                            pushPinnedChildren: true,
+                            children: [
+  
+                              SliverPinnedHeader(
+                                
+                                
+                                  child: ValueListenableBuilder(
+                                    valueListenable: opacityNotifier,
+                                    builder: (_,opacity,child) {
+                                      debugPrint("opacity: $opacity");
+                                      return FutureBuilder(
+                                        future: epsInformationFuture,
+                                        builder: (_,snapshot){
+                                          return AppBar(
+                                            scrolledUnderElevation: 0, // 设置为0来禁用滚动时的阴影效果
+                                            leading: const SizedBox.shrink(),
+                                            leadingWidth: 0,
+                                            backgroundColor: BangumiThemeColor.sea.color.withValues(alpha:opacity),
+                                            titleTextStyle: const TextStyle(fontSize: 16),
+                                            title: EpTogglePanel(currentEp: selectedEp,totalEps: widget.totalEps)
                                           );
                                         }
-                                      )
-                                      
-                                    ),
+                                      );
+                                    }
+                                  )
                                   
-      
-      
-                                  commentDetailchild!
-                                ],
-                              ),
-                  
+                                ),
+                              
+  
+  
+                              commentDetailchild!
+                            ],
+                          ),
+              
+                
+                        ],	
+                      );
+                      
+                    },
                     
-                            ],	
-                          );
-                          
-                        },
-                        
-                        child: const EpCommentPageDetails()
-                  
-                      )
+                    child: const EpCommentPageDetails()
+              
+                  )
 
               )
             );

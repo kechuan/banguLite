@@ -4,12 +4,12 @@
 			"path": "lib/catalogs/bangumi_ep_page.dart",
 			"bookmarks": [
 				{
-					"line": 180,
+					"line": 214,
 					"column": 38,
 					"label": "EPInfo"
 				},
 				{
-					"line": 279,
+					"line": 313,
 					"column": 36,
 					"label": "BBCode测试"
 				}
@@ -62,6 +62,46 @@
 					"line": 16,
 					"column": 0,
 					"label": "更多讨论列表——moreTopics"
+				}
+			]
+		},
+		{
+			"path": "lib/internal/custom_bbcode_tag.dart",
+			"bookmarks": [
+				{
+					"line": 12,
+					"column": 0,
+					"label": "BBCodeTag"
+				}
+			]
+		},
+		{
+			"path": "lib/catalogs/bangumi_topic_page.dart",
+			"bookmarks": [
+				{
+					"line": 24,
+					"column": 31,
+					"label": "subjectTopic——番剧单个topic详情"
+				}
+			]
+		},
+		{
+			"path": "lib/catalogs/bangumi_comment_page.dart",
+			"bookmarks": [
+				{
+					"line": 12,
+					"column": 33,
+					"label": "subjectComment——番剧吐槽详情"
+				}
+			]
+		},
+		{
+			"path": "lib/catalogs/bangumi_detail_page.dart",
+			"bookmarks": [
+				{
+					"line": 26,
+					"column": 32,
+					"label": "subjectDetail——番剧详情"
 				}
 			]
 		}

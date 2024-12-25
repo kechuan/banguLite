@@ -113,8 +113,8 @@ class WavePainter extends CustomPainter {
 
     double currentPharse = 0.0;
 
-    //相位绘制法 对于缓和角度的采样精度 需求较低 所以32点采样一次
-    for (currentOffsetX; currentOffsetX < size.width; currentOffsetX += 12) {
+    //相位绘制法 对于缓和角度的采样精度 需求较低 所以3点采样一次
+    for (currentOffsetX; currentOffsetX < size.width; currentOffsetX += 3) {
 
       //if(currentOffsetX%3 != 0 && currentOffsetX!=1) continue;
 

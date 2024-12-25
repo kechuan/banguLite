@@ -1,6 +1,9 @@
 import 'dart:math';
 
+import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
+import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,33 +23,44 @@ class BuildDetailImages extends StatelessWidget {
 
     final bangumiModel = context.read<BangumiModel>();
 
+    bool darkMode = judgeDarknessMode(context);
+
     return detailImageUrl != null ?
 
       CachedNetworkImage(
-        
         imageUrl: detailImageUrl!,
         imageBuilder: (_,imageProvider){
-
+      
           if(bangumiModel.imageColor==null){
             ColorScheme.fromImageProvider(provider: imageProvider).then((coverScheme){
-
+      
               debugPrint("parse Picture:${coverScheme.primary}");
-              bangumiModel.getThemeColor(coverScheme.primary,darkMode: Theme.of(context).brightness == Brightness.dark);
+              bangumiModel.getThemeColor(coverScheme.primary,darkMode: darkMode);
             });
           }
+      
+          return UnVisibleResponse(
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                Routes.photoView,
+                arguments: {"imageProvider":imageProvider},
+              );
 
-          return Container(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.orientationOf(context) == Orientation.landscape ? 300 : 200,
-              minWidth: MediaQuery.orientationOf(context) == Orientation.landscape ? 200 : 133,
-            ),
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: imageProvider,
-                //fit: BoxFit.contain,
-                fit: BoxFit.fill,
+            },
+            child: Container(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.orientationOf(context) == Orientation.landscape ? 300 : 200,
+                minWidth: MediaQuery.orientationOf(context) == Orientation.landscape ? 200 : 133,
               ),
-              borderRadius: BorderRadius.circular(16)
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: imageProvider,
+                  //fit: BoxFit.contain,
+                  fit: BoxFit.fill,
+                ),
+                borderRadius: BorderRadius.circular(16)
+              ),
             ),
           );
         },

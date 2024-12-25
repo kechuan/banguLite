@@ -32,13 +32,14 @@ List<EpCommentDetails> loadEpCommentDetails(List epCommentListData){
 		currentCommentIndex++;
 
 			currentEpComment
-			..comment = currentEpCommentMap["content"]
-			..commentTimeStamp = currentEpCommentMap["createdAt"]
-			..userId = currentEpCommentMap["user"]["id"]
-			..avatarUrl = currentEpCommentMap["user"]["avatar"]["large"]
-			..nickName = currentEpCommentMap["user"]["nickname"]
-			..sign = currentEpCommentMap["user"]["sign"]
-			..epCommentIndex = "$currentCommentIndex"
+        ..comment = currentEpCommentMap["content"]
+        ..state = currentEpCommentMap["state"]
+        ..commentTimeStamp = currentEpCommentMap["createdAt"]
+        ..userId = currentEpCommentMap["user"]["id"]
+        ..avatarUrl = currentEpCommentMap["user"]["avatar"]["large"]
+        ..nickName = currentEpCommentMap["user"]["nickname"]
+        ..sign = currentEpCommentMap["user"]["sign"]
+        ..epCommentIndex = "$currentCommentIndex"
 			;
 
 			if(currentEpCommentMap["replies"].isNotEmpty){
@@ -53,12 +54,13 @@ List<EpCommentDetails> loadEpCommentDetails(List epCommentListData){
 
 					currentEpRepliedComment
 					..comment = currentEpCommentMap["content"]
+          ..state = currentEpCommentMap["state"]
 					..commentTimeStamp = currentEpCommentMap["createdAt"]
+          ..epCommentIndex = "$currentCommentIndex-$currentRepliedCommentIndex"
 						..userId = currentEpCommentMap["user"]["id"]
 						..avatarUrl = currentEpCommentMap["user"]["avatar"]["large"]
 						..nickName = currentEpCommentMap["user"]["nickname"]
 						..sign = currentEpCommentMap["user"]["sign"]
-						..epCommentIndex = "$currentCommentIndex-$currentRepliedCommentIndex"
 					;
 
 					currentEpCommentRepliedList.add(currentEpRepliedComment);
@@ -76,17 +78,3 @@ List<EpCommentDetails> loadEpCommentDetails(List epCommentListData){
 
 }
 
-
-enum CommentState {
-  normal(), // 正常
-  adminCloseTopic(), // 关闭
-  adminReopen(), // 重开
-  adminPin(), // 置顶
-  adminMerge(), // 合并
-  adminSilentTopic(), // 下沉
-  aserDelete(), // 自行删除
-  adminDelete(), // 管理员删除
-  adminOffTopic(); // 折叠
-
-  const CommentState();
-}

@@ -37,18 +37,9 @@ class EpRepliedTile extends ListTile {
       
                 return Padding(
                   padding: PaddingV6,
-                  child: InkResponse(
-                    containedInkWell: true,
-                    hoverColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: (){
-                      showModalBottomSheet(
-                        constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
-                        context: context,
-                        builder: (_)=> EpRepliedCommentDialog(currentComment: epCommentData,commentIndex: index)
-                      );
-                    },
-                  
+                  child: ShowCommentTap(
+                    epCommentData: epCommentData,
+                    commentIndex: index,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -68,23 +59,13 @@ class EpRepliedTile extends ListTile {
             ),
     
             if(epCommentData.repliedComment!.length > 3) 
-              InkResponse(
-                hoverColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                containedInkWell: true,
-                onTap: (){
-                    showModalBottomSheet(
-                      constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
-                      context: context,
-                      builder: (_)=> EpRepliedCommentDialog(currentComment: epCommentData)
-                    );
-                },
-                
-                
+
+
+              ShowCommentTap(
+                epCommentData: epCommentData,
                 child: Text(
                   "> 点击查看 ${epCommentData.repliedComment!.length} 条评论",
                   style: const TextStyle(color: Colors.blueAccent),
-      
                 )
               ),
         
@@ -96,5 +77,36 @@ class EpRepliedTile extends ListTile {
     );
 
     
+  }
+
+}
+
+class ShowCommentTap extends InkResponse {
+  const ShowCommentTap({
+    super.key,
+    super.child,
+    required this.epCommentData,
+    this.commentIndex
+  });
+
+  final EpCommentDetails epCommentData;
+  final int? commentIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkResponse(
+      hoverColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      containedInkWell: true,
+      onTap: (){
+        showModalBottomSheet(
+          isScrollControlled: true,
+          constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width,maxHeight:MediaQuery.sizeOf(context).height*3/4),
+          context: context,
+          builder: (_)=> EpRepliedCommentDialog(currentComment: epCommentData,commentIndex: commentIndex)
+        );
+      },
+      child: child,
+    );
   }
 }

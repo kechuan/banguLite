@@ -49,7 +49,7 @@ class EpCommentTile extends StatelessWidget {
                 //但如果设备上的字体是不一样的话。。我就不好说了
                 child: Wrap(
                   //crossAxisAlignment: WrapCrossAlignment.end,
-                  spacing: 3,
+                  spacing: 6,
                   alignment: WrapAlignment.end,
                   children: [
                           
@@ -89,6 +89,20 @@ class EpCommentTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            //Text("${epCommentData.state}"),
+            if(
+              ( epCommentData.state == CommentState.adminCloseTopic.index ||
+                epCommentData.state == CommentState.userDelete.index ||
+                epCommentData.state == CommentState.adminDelete.index
+              ) &&  epCommentData.state != null
+            )
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("发言已隐藏",style: TextStyle(fontSize: 16)),
+                  Text("原因: ${CommentState.values[epCommentData.state!].reason}")
+                ],
+              ),
             
             BBCodeText(
               data: convertBangumiCommentSticker(epCommentData.comment ?? "comment"),

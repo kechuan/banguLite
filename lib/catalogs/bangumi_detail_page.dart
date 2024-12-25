@@ -1,10 +1,14 @@
 
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
+import 'package:bangu_lite/widgets/components/bangumi_detail_review.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_topics.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -25,29 +29,29 @@ import 'package:url_launcher/url_launcher_string.dart';
 class BangumiDetailPage extends StatefulWidget {
   const BangumiDetailPage({
     super.key,
-    required this.bangumiID
+    required this.subjectID
   });
 
-  final int bangumiID;
+  final int subjectID;
 
   @override
   State<BangumiDetailPage> createState() => _BangumiDetailPageState();
 }
 
 
-class _BangumiDetailPageState extends State<BangumiDetailPage> {
+class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
 
   ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
- 
+
   @override
   Widget build(BuildContext context) {
 
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => BangumiModel()),
-        ChangeNotifierProvider(create: (_) => EpModel(subjectID: widget.bangumiID,selectedEp: 1)),
+        ChangeNotifierProvider(create: (_) => EpModel(subjectID: widget.subjectID,selectedEp: 1)),
         ChangeNotifierProvider(create: (_) => CommentModel()),
-        ChangeNotifierProvider(create: (_) => TopicModel(subjectID: widget.bangumiID,)),
+        ChangeNotifierProvider(create: (_) => TopicModel(subjectID: widget.subjectID,)),
       ],
       //create: (_) => BangumiModel(),
       child: Selector<BangumiModel,Color?>(
@@ -85,17 +89,6 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
                 ),
                 actions: [
 
-                  //IconButton(
-                  //  onPressed: () {
-                  //    downloadSticker();
-                  //  },
-                  //  icon: const Icon(Icons.download)
-                  //),
-
-                  //const Padding(padding: PaddingH6),
-
-
-                  //const ToggleThemeModeButton(),
                   ToggleThemeModeButton(
                     onThen: (){
                       //debugPrint("trigged onThen");
@@ -107,8 +100,8 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
 
                   IconButton(
                     onPressed: () async {
-                      if(await canLaunchUrlString(BangumiWebUrls.subject(widget.bangumiID))){
-                        await launchUrlString(BangumiWebUrls.subject(widget.bangumiID));
+                      if(await canLaunchUrlString(BangumiWebUrls.subject(widget.subjectID))){
+                        await launchUrlString(BangumiWebUrls.subject(widget.subjectID));
                       }
                     },
                     icon: Transform.rotate(
@@ -138,28 +131,28 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
                 },
                 
                 child: Selector<BangumiModel, int?>(
-                    selector:(_, bangumiModel) => bangumiModel.bangumiID,
+                    selector:(_, bangumiModel) => bangumiModel.subjectID,
                       shouldRebuild: (previous, next){
                         if(next == null) return false;
                         return previous!=next;
                       },
-                      builder: (_,bangumiID,child) {
+                      builder: (_,subjectID,child) {
                   
                         //final bangumiModel = context.read<BangumiModel>();
                     
-                        debugPrint("BangumiID: $bangumiID => ${widget.bangumiID}");
+                        debugPrint("subjectID: $subjectID => ${widget.subjectID}");
                     
                         return FutureBuilder(
-                          future: bangumiModel.loadDetails(widget.bangumiID),
+                          future: bangumiModel.loadDetails(widget.subjectID),
                           builder: (_,snapshot){
 
                             if(snapshot.connectionState == ConnectionState.done){
-                              debugPrint("parse ${widget.bangumiID} done ,builderStamp: ${DateTime.now()}");
+                              debugPrint("parse ${widget.subjectID} done ,builderStamp: ${DateTime.now()}");
                             }
                     
                             return EasyRefresh.builder(
                               header: const MaterialHeader(),
-                              onRefresh: ()=> bangumiModel.loadDetails(bangumiID,refresh:true),
+                              onRefresh: ()=> bangumiModel.loadDetails(subjectID,refresh:true),
                               childBuilder: (_,physic){
                   
                                 
@@ -221,11 +214,13 @@ class _BangumiDetailPageState extends State<BangumiDetailPage> {
                                                   child: BangumiSummary(summary: currentSubjectDetail?.summary)
                                                 ),
 
+                                                BangumiDetailReview(name: bangumiModel.bangumiDetails?.name),
+
                                                 BangumiDetailTopics(name: bangumiModel.bangumiDetails?.name),
                                                 
                                                 NotificationListener<ScrollNotification>(
                                                   onNotification: (_) => true,
-                                                  child: BangumiHotComment(id: widget.bangumiID,name: bangumiModel.bangumiDetails?.name,) 
+                                                  child: BangumiHotComment(id: widget.subjectID,name: bangumiModel.bangumiDetails?.name,) 
                                                 ),
                                               ]
                                             )

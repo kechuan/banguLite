@@ -148,11 +148,11 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
                                 Navigator.pushNamed(
                                   context,
-                                  Routes.moreComments,
+                                  Routes.subjectComment,
                                   arguments: {"commentModel":context.read<CommentModel>(),"subjectID":widget.id,"name":widget.name}
                                 );
                               },
-                              child: const Text("更多吐槽",style: TextStyle(decoration: TextDecoration.underline,fontSize: 16)),
+                              child: const Text("吐槽合集",style: TextStyle(decoration: TextDecoration.underline,fontSize: 16)),
                             ),
                           ),
                         ),

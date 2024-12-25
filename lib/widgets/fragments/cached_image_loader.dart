@@ -1,3 +1,5 @@
+import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -5,9 +7,11 @@ class CachedImageLoader extends StatelessWidget {
   const CachedImageLoader({
     super.key,
     this.imageUrl,
+    this.photoViewStatus
   });
 
   final String? imageUrl;
+  final bool? photoViewStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -27,26 +31,33 @@ class CachedImageLoader extends StatelessWidget {
               return CachedNetworkImage(
                 imageUrl: imageUrl!,
                 imageBuilder: (_,imageProvider){
-                  return DecoratedBox(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: imageProvider,
-                        fit: BoxFit.cover,
+                  return UnVisibleResponse(
+                    onTap: (){
+                      //debugPrint("photoViewStatus: $photoViewStatus");
+                      //photoViewStatus == true ? photoView(context,imageProvider) : null ;
+                    },
+
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: imageProvider,
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.circular(16)
                       ),
-                      borderRadius: BorderRadius.circular(16)
                     ),
                   );
                 },
                 
                 progressIndicatorBuilder: (_, url, progress) {
-
+              
                   bool showProgressIndicator = false;
-
+              
                   if(DateTime.now().millisecondsSinceEpoch - loadStartTime.millisecondsSinceEpoch > 5000){
                      showProgressIndicator = true;
                   }
                   //debugPrint("url: $url , progress:${progress}");
-
+              
                   return DecoratedBox(                              
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
@@ -66,6 +77,14 @@ class CachedImageLoader extends StatelessWidget {
             }
           }
         )
+    );
+  }
+
+  void photoView(BuildContext context,ImageProvider imageProvider){
+    Navigator.pushNamed(
+      context,
+      Routes.photoView,
+      arguments: {"imageProvider":imageProvider},
     );
   }
 }

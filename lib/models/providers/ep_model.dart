@@ -77,7 +77,7 @@ class EpModel extends ChangeNotifier{
         
           List<EpsInfo> currentRangeEpsData = loadEpsData(response);
 
-          int? epOffset = currentRangeEpsData[0].epIndex;
+          int? epOffset = currentRangeEpsData.isEmpty ? 0 : currentRangeEpsData[0].epIndex;
 
           if(epOffset!=null){
             for(int epInfoIndex = 0; epInfoIndex < currentRangeEpsData.length; epInfoIndex++){

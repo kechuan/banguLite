@@ -33,7 +33,8 @@ migrate_working_dir/
 /build/
 **/backups/
 **/backup/
-**/hivedb
+/hivedb/
+.gitignore
 
 # Symbolication related
 app.*.symbols

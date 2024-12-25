@@ -29,26 +29,6 @@ class MoreTopicsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    //final List<TopicInfo> topicsList = [
-    //  TopicInfo()
-    //    ..topicID = 1
-    //    ..topicName = "hi"
-    //    ..creatorNickName = "kechuan"
-    //    ..createdTime = DateTime.now().millisecondsSinceEpoch - 20000
-    //    ..repliesCount = 30
-    //    ..lastRepliedNickName = "TVkechuan",
-
-    //   TopicInfo()
-    //    ..topicID = 1
-    //    ..topicName = "it is a longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongglonglonglonglonglonglonglonglonglonglonglonglonglonglonglong"
-    //    ..creatorNickName = "kechuan"
-    //    ..createdTime = DateTime.now().millisecondsSinceEpoch - 20000
-    //    ..repliesCount = 30
-    //    ..lastRepliedNickName = "TVkechuan"
-        
-    //];
-
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Topics: $title"),

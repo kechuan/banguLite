@@ -54,11 +54,10 @@ class _BangumiStarPageState extends State<BangumiStarPage> {
                       TextButton(
                         onPressed: (){
 
-                          MyHive.starBangumisDataBase.clear().then(
-                            (value){
-
-                            }
-                          );
+                          setState(() {
+                            MyHive.starBangumisDataBase.clear();
+                          });
+                          
                           Navigator.of(context).pop();
                         }, 
                         child: const Text("确认")
@@ -101,7 +100,7 @@ class _BangumiStarPageState extends State<BangumiStarPage> {
                 Navigator.pushNamed(
                   context,
                   Routes.subjectDetail,
-                  arguments: {"bangumiID":MyHive.starBangumisDataBase.keys.elementAt(index)},
+                  arguments: {"subjectID":MyHive.starBangumisDataBase.keys.elementAt(index)},
                 );
               },
             );

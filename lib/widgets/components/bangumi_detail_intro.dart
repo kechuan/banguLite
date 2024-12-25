@@ -2,6 +2,7 @@
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_eps.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_images.dart';
@@ -12,6 +13,7 @@ import 'package:bangu_lite/widgets/fragments/star_button.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class BangumiDetailIntro extends StatelessWidget {
@@ -58,7 +60,7 @@ class IntroPortrait extends StatelessWidget {
                     child: BuildDetailImages(
                       detailImageUrl: bangumiDetails.coverUrl,
                       imageID: bangumiDetails.id
-					)
+                    )
                   ),
               
                   const Padding(padding: PaddingV6)
@@ -83,16 +85,7 @@ class IntroPortrait extends StatelessWidget {
                         Expanded(
                           child: ListTile(
                             title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                    
-                                Text(bangumiDetails.informationList["alias"] ?? "")
-                                    
-                                
-                              
-                              ]
-                            )
+                            subtitle: Text(bangumiDetails.informationList["alias"] ?? "")
                           )
                         ),
 
@@ -283,19 +276,19 @@ class IntroLandscape extends StatelessWidget {
                 Padding(
                   padding: PaddingH6,
                     child: ListTile(
-						title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
-						subtitle: Column(
-						crossAxisAlignment: CrossAxisAlignment.start,
-						children: [
-						
-							Text(bangumiDetails.informationList["alias"] ?? "")
-						
-						
-						]
-						),
-						trailing: StarButton(bangumiDetails: bangumiDetails)
-                    
-					)
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: '${bangumiDetails.name}'));
+                        //showToast("标题已复制,长按复制alias",context:context);
+                        fadeToaster(context: context,message: "标题已复制,长按复制alias");
+                      },
+                      onLongPress: () {
+                        Clipboard.setData(ClipboardData(text: '${bangumiDetails.informationList["alias"] ?? ""}'));
+                        fadeToaster(context:context,message:"alias已复制");
+                      },
+                      title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
+                      subtitle: Text(bangumiDetails.informationList["alias"] ?? ""),
+                      trailing: StarButton(bangumiDetails: bangumiDetails)
+                    )
                 ),
 
                 Padding(

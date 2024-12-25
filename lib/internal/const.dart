@@ -48,7 +48,16 @@ enum SortType{
   const SortType(this.sortType);
 }
 
-enum Season{
+enum ScaleType{
+
+  small(),
+  medium(),
+  large();
+
+  const ScaleType();
+}
+
+enum SeasonType{
 
   spring("春",4),
   summer("夏",7),
@@ -58,7 +67,24 @@ enum Season{
   final String seasonText;
   final int month;
 
-  const Season(this.seasonText,this.month);
+  const SeasonType(this.seasonText,this.month);
+}
+
+
+enum CommentState {
+  normal("正常"),
+  adminCloseTopic("管理员关闭"),
+  adminReopen("管理员重开"),
+  adminPin("管理员置顶"),
+  adminMerge("管理员合并"),
+  adminSilentTopic("管理员下沉"),
+  userDelete("自行删除"),
+  adminDelete("管理员删除"),
+  adminOffTopic("管理员折叠");
+
+  final String reason;
+
+  const CommentState(this.reason);
 }
 
 enum ScoreRank{

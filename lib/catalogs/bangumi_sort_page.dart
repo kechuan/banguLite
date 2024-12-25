@@ -4,7 +4,6 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/widgets/fragments/animated_wave_footer.dart';
-import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +28,7 @@ class BangumiSortPage extends StatefulWidget {
 class _BangumiSortPageState extends State<BangumiSortPage>{
 
   final GlobalKey<SliverAnimatedListState> messageListStreamKey = GlobalKey<SliverAnimatedListState>();
-  final GlobalKey<AnimatedGridState> messageGridStreamKey = GlobalKey<AnimatedGridState>();
+  final GlobalKey<SliverAnimatedGridState> messageGridStreamKey = GlobalKey<SliverAnimatedGridState>();
 
   final ScrollController sortScrollController = ScrollController();
 
@@ -272,7 +271,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                         Navigator.pushNamed(
                                           context,
                                           Routes.subjectDetail,
-                                          arguments: {"bangumiID":messageList[index].id}
+                                          arguments: {"subjectID":messageList[index].id}
                                         );
                                       },
                               
@@ -286,24 +285,82 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                               ),
                             ),
 
-
-
-                        
                             SliverOffstage(
                               offstage: viewType != ViewType.gridView || loadCount == 0,
-                              sliver: SliverToBoxAdapter(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: NotificationListener<ScrollUpdateNotification>(
-                                    onNotification: (notification) => true,
-                                    child: BanguTileGridView(
-                                      keyDeliver: messageGridStreamKey,
-                                      bangumiLists: messageList,
-                                    ),
+
+
+                              sliver: SliverPadding(
+                                padding: const EdgeInsets.all(16),
+                                sliver: SliverAnimatedGrid(
+                                  key: messageGridStreamKey,
+                                  initialItemCount: messageList.length,
+                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    mainAxisSpacing: 32,
+                                    crossAxisSpacing: 16,
                                   ),
+                                  itemBuilder: (context, currentBangumiIndex, animation) {
+                                
+                                    if(currentBangumiIndex > messageList.length - 1){
+                                      debugPrint("prevent strangeOverFlow rebuild");
+                                      return const SizedBox.shrink();
+                                    }
+                                
+                                    debugPrint("gridIndex:$currentBangumiIndex");
+                                
+                                    return NotificationListener<ScrollUpdateNotification>(
+                                      onNotification: (notification) => true,
+                                        child:  FadeTransition(
+                                        opacity: animation,
+                                          child:  BangumiGridTile(
+                                            bangumiTitle: messageList[currentBangumiIndex].name,
+                                            imageUrl: messageList[currentBangumiIndex].coverUrl,
+                                            onTap: () {
+                                              if(messageList[currentBangumiIndex].name!=null){
+                                    
+                                                Navigator.pushNamed(
+                                                  context,
+                                                  Routes.subjectDetail,
+                                                  arguments: {"subjectID":messageList[currentBangumiIndex].id},
+                                                );
+                                              }
+                                            },
+                                          )
+                                      )
+                                    );
+                                  },
                                 ),
-                              ),
+                              )
+
+                              //  child: Padding(
+                              //    padding: const EdgeInsets.all(16),
+                              //    child: NotificationListener<ScrollUpdateNotification>(
+                              //      onNotification: (notification) => true,
+                              //      child: BanguTileGridView(
+                              //        keyDeliver: messageGridStreamKey,
+                              //        bangumiLists: messageList,
+                              //      ),
+                              //    ),
+                              //  ),
+                              //),
+
+                              //sliver: SliverToBoxAdapter(
+                              //  child: Padding(
+                              //    padding: const EdgeInsets.all(16),
+                              //    child: NotificationListener<ScrollUpdateNotification>(
+                              //      onNotification: (notification) => true,
+                              //      child: BanguTileGridView(
+                              //        keyDeliver: messageGridStreamKey,
+                              //        bangumiLists: messageList,
+                              //      ),
+                              //    ),
+                              //  ),
+                              //),
+
+
                             )
+
+                         
                         
                           ],
                         );
@@ -316,9 +373,8 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
           
                 const SliverPadding(padding: EdgeInsets.only(bottom: 60)),
 
-
-                
                 SliverToBoxAdapter(
+                //SliverFillRemaining(
                   child: ValueListenableBuilder(
                     valueListenable: loadCountNotifier,
                     builder: (_,loadCount,child) {
@@ -330,14 +386,16 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
 
                           Offstage(
                             offstage: loadCount==0,
-                            child: AnimatedWaveFooter(
-                              waveHeight: 60,
-                              painter: Paint(),
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: AnimatedWaveFooter(
+                                waveHeight: 60,
+                                painter: Paint(),
+                              ),
                             ),
                           ),
 
                           SizedBox(
-                            //color: const Color.fromARGB(255, 222, 238, 252),
                             height: 80,
                             child: Center(
                               child: Text(showMessage),

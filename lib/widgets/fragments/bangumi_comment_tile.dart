@@ -28,7 +28,7 @@ class BangumiCommentTile extends StatelessWidget {
             SizedBox(
               height: 50,
               width: 50,
-              child: CachedImageLoader(imageUrl: commentData.avatarUrl!)
+              child: CachedImageLoader(imageUrl: commentData.avatarUrl!,photoViewStatus: true,)
             ) : 
                 
             //const FlutterLogo(),

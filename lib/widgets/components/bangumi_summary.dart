@@ -16,7 +16,7 @@ class BangumiSummary extends StatelessWidget {
     //功能等待实现: 1初始时固定size 用户展开时 变成滚动组件 也可以恢复成原来的样子
     debugPrint("summary rebuild");
 
-    if(summary==null || summary!.isEmpty){
+    if(summary == null || summary!.isEmpty){
       return const Padding(
         padding: EdgeInsets.all(12.0),
         child:  Column(
@@ -95,7 +95,7 @@ class BangumiSummary extends StatelessWidget {
                 offstage: expandedStatus,
                 child: InkResponse(
                   onTap: () => expandedSummaryNotifier.value = !expandedSummaryNotifier.value,
-                  child: Container(
+                  child: DecoratedBox(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       gradient: const LinearGradient(
@@ -116,7 +116,6 @@ class BangumiSummary extends StatelessWidget {
       },
       child: 
         SizedBox(
-          width: double.infinity,
           child: SelectableText(
             summary ?? "no Data",
             style: const TextStyle(overflow: TextOverflow.ellipsis,fontSize: 16),          

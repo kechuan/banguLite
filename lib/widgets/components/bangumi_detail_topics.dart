@@ -75,16 +75,20 @@ class BangumiDetailTopics extends StatelessWidget {
                           padding: const EdgeInsets.only(right: 12),
                           
                           child: TextButton(
+                            
               
                             onPressed: (){
-              
+
+                              if(topicsList[0].topicID == 0) return;
+
                               Navigator.pushNamed(
                                 context,
                                 Routes.moreTopics,
                                 arguments: {"topicsList":topicsList,"title":name,"topicModel":topicModel}
                               );
+
                             },
-                            child: const Text("更多讨论 >",style: TextStyle(decoration: TextDecoration.underline,fontSize: 16)),
+                            child: Text("更多讨论 >",style: TextStyle(decoration: TextDecoration.underline,fontSize: 16,color: topicsList.isEmpty || topicsList[0].topicID == 0 ? Colors.grey : null)),  
                           )
                         )
               
@@ -105,7 +109,9 @@ class BangumiDetailTopics extends StatelessWidget {
                           itemCount: min(6,topicsList.length),
                           itemBuilder: (context, index) {
               
-                            final topicTime = DateTime.fromMillisecondsSinceEpoch(topicsList[index].createdTime!*1000);
+                            final topicCreateTime = DateTime.fromMillisecondsSinceEpoch(topicsList[index].createdTime!*1000);
+                            //final topicUpdateTime = DateTime.fromMillisecondsSinceEpoch(topicsList[index].lastRepliedTime!*1000);
+                            
                                         
                             return Theme(
                               data: ThemeData(
@@ -114,8 +120,9 @@ class BangumiDetailTopics extends StatelessWidget {
                               ),
                               child: Card(
                                 child: ListTile(
+                                 
                                   title: Text("${topicsList[index].topicName}"),
-                                  trailing: Text(convertDateTimeToString(topicTime)),
+                                  trailing: Text(convertDateTimeToString(topicCreateTime)),
                                   onTap: () {
                                     Navigator.pushNamed(
                                       context,

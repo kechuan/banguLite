@@ -8,8 +8,8 @@ import 'package:bangu_lite/widgets/fragments/bangumi_comment_tile.dart';
 import 'package:provider/provider.dart';
 
 
-class CachePage extends StatefulWidget {
-  const CachePage({
+class CommentCachePage extends StatefulWidget {
+  const CommentCachePage({
     super.key,
     required this.id,
     required this.currentPageIndex,
@@ -19,11 +19,11 @@ class CachePage extends StatefulWidget {
   final int currentPageIndex;
 
   @override
-  State<CachePage> createState() => _CachePageState();
+  State<CommentCachePage> createState() => _CommentCachePageState();
 
 }
 
-class _CachePageState extends State<CachePage> with AutomaticKeepAliveClientMixin {
+class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepAliveClientMixin {
 
   static const int disactivePageRange = 3; //差值为3
 

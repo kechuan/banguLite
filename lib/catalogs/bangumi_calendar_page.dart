@@ -179,7 +179,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                 Navigator.pushNamed(
                                                   context,
                                                   Routes.subjectDetail,
-                                                  arguments: {"bangumiID":weeklyBangumisRecommend[currentIndex % weeklyBangumisRecommend.length].id},
+                                                  arguments: {"subjectID":weeklyBangumisRecommend[currentIndex % weeklyBangumisRecommend.length].id},
                                                 );
 
                                                 

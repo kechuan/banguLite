@@ -10,10 +10,10 @@ import 'package:bangu_lite/models/bangumi_details.dart';
 class BangumiModel extends ChangeNotifier {
   BangumiModel();
 
-  //int _bangumiID = 0;
-  //int get bangumiID => _bangumiID;
+  //int _subjectID = 0;
+  //int get subjectID => _subjectID;
 
-  int? bangumiID = 0;
+  int? subjectID = 0;
 
   BangumiDetails? bangumiDetails;
 
@@ -25,10 +25,10 @@ class BangumiModel extends ChangeNotifier {
 
     if(newID==null) return;
 
-    if(newID!=bangumiID || refresh == true){
-      bangumiID = newID;
+    if(newID!=subjectID || refresh == true){
+      subjectID = newID;
 
-      final detailInformation = await HttpApiClient.client.get("${BangumiAPIUrls.subject}/$bangumiID");
+      final detailInformation = await HttpApiClient.client.get("${BangumiAPIUrls.subject}/$subjectID");
 
       if(detailInformation.data!=null){
         bangumiDetails = loadDetailsData(detailInformation);
@@ -84,7 +84,7 @@ class BangumiModel extends ChangeNotifier {
     bangumiThemeColor = resultColor;
 
 
-    debugPrint("[detailPage] ID: $bangumiID, Color:$imageProviderColor => $resultColor, Lumi:${resultColor.computeLuminance()}");
+    debugPrint("[detailPage] ID: $subjectID, Color:$imageProviderColor => $resultColor, Lumi:${resultColor.computeLuminance()}");
     notifyListeners();
 
 

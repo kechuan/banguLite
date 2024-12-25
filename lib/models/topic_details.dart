@@ -56,6 +56,7 @@ List<EpCommentDetails> loadTopicCommentDetails(List epCommentListData){
 
 			currentEpComment
         ..comment = currentEpCommentMap["text"]
+        ..state = currentEpCommentMap["state"]
         ..commentTimeStamp = currentEpCommentMap["createdAt"]
         ..userId = currentEpCommentMap["creator"]["id"]
         ..avatarUrl = currentEpCommentMap["creator"]["avatar"]["large"]
@@ -76,11 +77,12 @@ List<EpCommentDetails> loadTopicCommentDetails(List epCommentListData){
 
 					currentEpRepliedComment
             ..comment = currentEpCommentMap["text"]
+            ..state = currentEpCommentMap["state"]
             ..commentTimeStamp = currentEpCommentMap["createdAt"]
-            ..userId = currentEpCommentMap["creator"]["id"]
-            ..avatarUrl = currentEpCommentMap["creator"]["avatar"]["large"]
-            ..nickName = currentEpCommentMap["creator"]["nickname"]
-            ..sign = currentEpCommentMap["creator"]["sign"]
+              ..userId = currentEpCommentMap["creator"]["id"]
+              ..avatarUrl = currentEpCommentMap["creator"]["avatar"]["large"]
+              ..nickName = currentEpCommentMap["creator"]["nickname"]
+              ..sign = currentEpCommentMap["creator"]["sign"]
 						..epCommentIndex = "$currentCommentIndex-$currentRepliedCommentIndex"
 					;
 

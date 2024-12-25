@@ -175,7 +175,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
                           Navigator.popAndPushNamed(
                             context,
                             Routes.subjectDetail,
-                            arguments: {"bangumiID":searchData[index].id}
+                            arguments: {"subjectID":searchData[index].id}
                           );
                           
                         },

@@ -1,11 +1,13 @@
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/widgets/fragments/comment_image_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 import 'package:bbob_dart/bbob_dart.dart' as bbob;
+import 'package:flutter_bbcode/src/util/color_util.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 final allEffectTag = [
@@ -13,14 +15,18 @@ final allEffectTag = [
 	ItalicTag(),
 	UnderlineTag(),
 	StrikeThroughTag(),
-	ColorTag(),
+	//ColorTag(),
+  PatchColorTag(),
 	SizeTag(),
 	//ImgTag(),
 	LateLoadImgTag(),
 	UrlTag(
     onTap: (link) async {
       if(await canLaunchUrlString(link)){
-        await launchUrlString(link);
+        //debugPrint("prevent");
+
+        bus.emit('AppRoute', link);
+        //await launchUrlString(link);
       }
     }
     
@@ -300,3 +306,19 @@ class AdapterQuoteTag extends WrappedStyleTag {
   }
 }
 
+class PatchColorTag extends StyleTag {
+  PatchColorTag() : super('color');
+
+  @override
+  TextStyle transformStyle(
+      TextStyle oldStyle, Map<String, String>? attributes) {
+    if (attributes?.entries.isEmpty ?? true) {
+      return oldStyle;
+    }
+
+    String? hexColor = attributes?.entries.first.key;
+    if (hexColor == null) return oldStyle;
+    if (!hexColor.contains("#")) return oldStyle;
+    return oldStyle.copyWith(color: HexColor.fromHex(hexColor));
+  }
+}

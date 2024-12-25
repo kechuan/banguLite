@@ -28,8 +28,10 @@ class BangumiIndexPage extends StatelessWidget {
 
           readyQuitFlag = true;
 
+          final messager = ScaffoldMessenger.maybeOf(context);
+
           Future.delayed(const Duration(seconds: 3)).then((value){
-            ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+            messager?.clearSnackBars();
             readyQuitFlag = false;
           });
 

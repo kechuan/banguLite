@@ -24,12 +24,11 @@ class HttpApiClient{
 class BangumiAPIUrls {
   static const String baseUrl = "https://api.bgm.tv";
 
-  //static String get subject => '$baseUrl/subject';
-  static String get calendar => '$baseUrl/calendar';
-                    
-  static String get subject => '$baseUrl/v0/subjects';
-  static String get eps => '$baseUrl/v0/episodes';
-  static String get search => '$baseUrl/search/subject';
+  static const String calendar = '$baseUrl/calendar';   
+
+  static const String subject = '$baseUrl/v0/subjects';
+  static const String eps = '$baseUrl/v0/episodes';
+  static const String search = '$baseUrl/search/subject';
 
   static const String bangumiSubjectSort = '$baseUrl/v0/search/subjects';
 
@@ -71,10 +70,12 @@ class BangumiQuerys {
                           ;
                              
 
-  //神奇的数据装载。。 rank方面的数据 还不如拆分成 minRank & maxRank 。。
+  
 }
 
 class BangumiDatas {
+
+  //神奇的数据装载。。 rank方面的数据 还不如拆分成 minRank & maxRank 。。
   static Map<String,dynamic> get sortData => {
     "keyword": '',
     "sort": "rank",
@@ -82,7 +83,7 @@ class BangumiDatas {
       "type": [2],
       "tag": [],
       "rank": [">2", "<=99999"],
-      "air_date": [">=2016-01-01","<2024-04-01"],
+      "air_date": [">=2016-01-01","<${DateTime.now().toString().substring(0,10)}"],
       "rating": [">=5","<9"],
       "nsfw": false,
     }

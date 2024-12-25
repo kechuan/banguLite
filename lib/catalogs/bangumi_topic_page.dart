@@ -1,3 +1,7 @@
+import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/bus_register_method.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/ep_details.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -24,7 +28,7 @@ class BangumiTopicPage extends StatefulWidget {
     super.key,
     //required this.topicID,
     required this.topicModel,
-	required this.topicInfo
+	  required this.topicInfo
   });
 
   final TopicModel topicModel;
@@ -35,7 +39,40 @@ class BangumiTopicPage extends StatefulWidget {
   State<BangumiTopicPage> createState() => _BangumiTopicPageState();
 }
 
-class _BangumiTopicPageState extends State<BangumiTopicPage> {
+class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
+
+
+  bool isActived = true; 
+  
+  //在极端状况之下 说不定会出现 (BangumiDetailPageA)EpPage => BangumiDetailPageB => EpPageB...
+  //此时 整个路由链存活的 EpPageState 都会触发这个 AppRoute 那就麻烦了, 因此需要加以管控
+
+  @override
+  void initState() {
+
+    bus.on(
+      'AppRoute',
+      (link) {
+        if(!isActived) return;
+        appRouteMethod(context,link);
+      }
+    );
+    
+    super.initState();
+  }
+
+  @override
+  void didPushNext() {
+    isActived = false;
+    super.didPushNext();
+  }
+
+  @override
+  void didPopNext() {
+    isActived = true;
+    super.didPopNext();
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -124,7 +161,7 @@ class _BangumiTopicPageState extends State<BangumiTopicPage> {
 								
 										if(!isCommentLoading){
 											if(currentTopicDetail.id != 0){
-												commentCount = currentTopicDetail.repliedComment!.isEmpty ? 1 : currentTopicDetail.repliedComment!.length;
+												commentCount = currentTopicDetail.repliedComment!.isEmpty ? 0 : currentTopicDetail.repliedComment!.length;
 											}
 										}
 
@@ -138,7 +175,7 @@ class _BangumiTopicPageState extends State<BangumiTopicPage> {
 												itemBuilder: (_,topicCommentIndex){
 													//Loading...
 													if(isCommentLoading){
-														return const SkeletonListTileTemplate();
+														return const SkeletonListTileTemplate(scaleType: ScaleType.small);
 													}
 
 													if(topicCommentIndex == 0){
@@ -169,7 +206,7 @@ class _BangumiTopicPageState extends State<BangumiTopicPage> {
 																								
 																			const Padding(padding: PaddingH6),
 																								
-																			Text("${commentCount!-1}",style: const TextStyle(color: Colors.grey)),
+																			Text("$commentCount",style: const TextStyle(color: Colors.grey)),
 																								
 																								
 																		],

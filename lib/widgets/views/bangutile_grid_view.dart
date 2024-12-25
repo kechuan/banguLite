@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 class BanguTileGridView extends StatelessWidget {
   const BanguTileGridView({
     super.key,
-    this.keyDeliver,
+    
     required this.bangumiLists,
     
   });
 
-  final Key? keyDeliver;
+  
   final List<BangumiDetails> bangumiLists;
 
   @override
@@ -22,8 +22,6 @@ class BanguTileGridView extends StatelessWidget {
                                     
     if(MediaQuery.orientationOf(context) == Orientation.landscape){
       mainAxisShowCount = 4;
-
-      if(keyDeliver is GlobalKey<AnimatedGridState>) mainAxisShowCount = 5; //搜索页面
     }
 
     //小于 大约3格 空间时 显示2
@@ -36,52 +34,6 @@ class BanguTileGridView extends StatelessWidget {
       mainAxisSpacing: 32,
       crossAxisSpacing: 16,
     );
-
-
-    if(keyDeliver is GlobalKey<AnimatedGridState>){
-
-        SingleChildScrollView(
-          child: AnimatedGrid(
-            physics: const ScrollPhysics(),
-            initialItemCount: bangumiLists.length,
-            key: keyDeliver,
-            itemBuilder: (_,currentBangumiIndex,animation){
-              
-              debugPrint("gridIndex:$currentBangumiIndex");
-          
-              if(currentBangumiIndex> bangumiLists.length - 1){
-                debugPrint("prevent strangeOverFlow rebuild");
-                return const SizedBox.shrink();
-              }
-              
-              return FadeTransition(
-                opacity: animation,
-                  child:  BangumiGridTile(
-                    bangumiTitle: bangumiLists[currentBangumiIndex].name,
-                    imageUrl: bangumiLists[currentBangumiIndex].coverUrl,
-                    onTap: () {
-                      if(bangumiLists[currentBangumiIndex].name!=null){
-            
-                        Navigator.pushNamed(
-                          context,
-                          Routes.subjectDetail,
-                          arguments: {"bangumiID":bangumiLists[currentBangumiIndex].id},
-                        );
-                      }
-                    },
-                  )
-                  
-                  
-                  
-              );
-              
-            },
-            gridDelegate: gridDelegate
-              
-          ),
-        );
-
-    }
 
     return Center(
       child: Padding(
@@ -111,7 +63,7 @@ class BanguTileGridView extends StatelessWidget {
                       Navigator.pushNamed(
                         context,
                         Routes.subjectDetail,
-                        arguments: {"bangumiID":bangumiLists[currentBangumiIndex].id},
+                        arguments: {"subjectID":bangumiLists[currentBangumiIndex].id},
                       );
                     }
                   },
