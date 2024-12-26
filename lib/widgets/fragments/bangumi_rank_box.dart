@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
@@ -55,7 +57,10 @@ class BangumiRankBox extends StatelessWidget {
                                 style: TextStyle(
                                   color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*(((bangumiDetails.ratingList["score"] as num))/10).toInt()), 0, 1),
                                   fontWeight: FontWeight.bold,
-                                  //fontSize: 16
+                                  decoration: bangumiDetails.ratingList["rank"]!=0 ? null : TextDecoration.lineThrough ,
+                                  decorationThickness: 5,
+                                  decorationColor: Theme.of(context).scaffoldBackgroundColor,
+                                  fontSize: 16
                                 )
                               ),
                           
@@ -76,7 +81,7 @@ class BangumiRankBox extends StatelessWidget {
                               const Padding(padding: EdgeInsets.only(left: 6)),
                           
                           
-                              Text(bangumiDetails.ratingList["rank"]!=0 ? 'Rank #${bangumiDetails.ratingList["rank"]}' : ""),
+                              Text(bangumiDetails.ratingList["rank"]!=0 ? 'Rank ${convertSubjectType(bangumiDetails.type)} #${bangumiDetails.ratingList["rank"]}' : "暂无排名"),
                                           
                             ],
                           )
@@ -112,8 +117,8 @@ class BangumiRankBox extends StatelessWidget {
               
               
                   return Tooltip(
-					verticalOffset: -24,
-					triggerMode: TooltipTriggerMode.tap,
+                    verticalOffset: -24,
+                    triggerMode: TooltipTriggerMode.tap,
                     message: "${bangumiDetails.ratingList["count"]["${index+1}"]} vote(s), ${(currentRankRatio*100).toStringAsFixed(2)}%",
                     child: Padding(
                       padding: PaddingH6,
@@ -124,7 +129,7 @@ class BangumiRankBox extends StatelessWidget {
                                   
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 300), 
-                            height: 175*currentRankRatio, //理论上最大值应该是200 毕竟极端值 1:1 但不想顶到上方的Score区域
+                            height: min(100,175*currentRankRatio), //理论上最大值应该是200 毕竟极端值 1:1 但不想顶到上方的Score区域
                             color:Theme.of(context).scaffoldBackgroundColor,
                           ),
                                   

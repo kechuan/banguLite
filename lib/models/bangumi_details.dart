@@ -8,6 +8,7 @@ import 'package:bangu_lite/internal/convert.dart';
 class BangumiDetails {
 
 	int? id;
+  int? type;
 	String? coverUrl;
 	String? name;
 
@@ -40,9 +41,8 @@ class BangumiDetails {
 Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarResponse,{bool? animeFliter}){
 
     Map<String,List<BangumiDetails>> weekCalender = {};
-    List<BangumiDetails> popularBangumis = [];
+    List<BangumiDetails> popularInSeasonBangumis = [];
 
-    //理论来说 你只需要获取id/coverUrl/name就足够了
     if(bangumiCalendarResponse.data!=null){
 
       List<dynamic> calendarData = bangumiCalendarResponse.data;
@@ -54,47 +54,21 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
         
         List todayBangumis = currentDayBangumis["items"];
 
-        for(Map currentBangumi in todayBangumis){
+        for(Map<String,dynamic> currentBangumi in todayBangumis){
 
-          //debugPrint("timestamp: inside ${currentBangumi.runtimeType}");
+          
 
           BangumiDetails bangumiDetails = BangumiDetails();
 
-          //debugPrint("bangumi name: ${currentBangumi["name_cn"].isEmpty ? currentBangumi["name"] : currentBangumi["name_cn"]}");
+          bangumiDetails = loadDetailsData(currentBangumi);
 
-          if(animeFliter!=null && animeFliter==true){
-            if(currentBangumi["name_cn"] == "") continue;
+          if(
+            judgeInSeasonBangumi(currentBangumi["air_date"]) &&
+            bangumiDetails.ratingList["score"] > 7.0 && 
+            bangumiDetails.ratingList["total"] > 500
+          ){
+              popularInSeasonBangumis.add(bangumiDetails);
           }
-
-          bangumiDetails.coverUrl = currentBangumi["images"]["large"];
-          bangumiDetails.id = currentBangumi["id"];
-
-          bangumiDetails.name = currentBangumi["name_cn"].isEmpty ?
-           currentBangumi["name"] :
-           currentBangumi["name_cn"] ?? "暂无名称";
-
-          //前端处理法
-          bangumiDetails.name = convertAmpsSymbol(bangumiDetails.name);
-
-          if(currentBangumi["rating"]!=null){
-            bangumiDetails.ratingList = {
-              "total": currentBangumi["rating"]["total"],
-              "score": currentBangumi["rating"]["score"],
-              "rank": currentBangumi["rank"] ?? 0,
-              "count":currentBangumi["rating"]["count"]
-            };
-
-			
-
-            if(
-              judgeInSeasonBangumi(currentBangumi["air_date"]) &&
-              currentBangumi["rating"]["score"] > 7.0 && 
-              currentBangumi["rating"]["total"] > 500
-            ){
-               popularBangumis.add(bangumiDetails);
-            }
-          }
-
 
           weekdayBangumis.add(bangumiDetails);
 
@@ -111,7 +85,7 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
       }
 
       weekCalender.addAll({
-        "最热门":popularBangumis
+        "最热门":popularInSeasonBangumis
       });
 
       //debugPrint("timestamp calendar done:${weekCalender.length}");
@@ -122,30 +96,26 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
   }
 
 
-BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
-
-    Map<String,dynamic> bangumiData = bangumiDetailResponse.data;
-
-    //debugPrint("currentBangumiData: ${bangumiData}");
+BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag = false}) {
 
     final BangumiDetails bangumiDetails = BangumiDetails();
 
-      bangumiDetails.coverUrl = bangumiData["images"]["large"];
-      bangumiDetails.summary = bangumiData["summary"];
-      bangumiDetails.name = bangumiData["name_cn"].isNotEmpty ? bangumiData["name_cn"] : bangumiData["name"];
-      bangumiDetails.id = bangumiData["id"];
+    bangumiDetails.coverUrl = bangumiData["images"]?["large"];
+    bangumiDetails.summary = bangumiData["summary"];
+    bangumiDetails.name = bangumiData["name_cn"].isNotEmpty ? bangumiData["name_cn"] : bangumiData["name"];
+    bangumiDetails.id = bangumiData["id"];
+    bangumiDetails.type = bangumiData["type"];
 
-    //  debugPrint("rating:${bangumiData["rating"]["total"]}");
-
-      bangumiDetails.ratingList = {
-        "total": bangumiData["rating"]["total"] ?? 0,
-        "score": bangumiData["rating"]["score"] ?? 0.0,
-        "rank": bangumiData["rating"]["rank"] ?? 0, //返回的是一个数值0
-        "count":bangumiData["rating"]["count"] ?? {}
-      };
+    bangumiDetails.ratingList = {
+      "total": bangumiData["rating"]?["total"] ?? 0,
+      "score": bangumiData["rating"]?["score"] ?? 0.0,
+      "rank": bangumiData["rating"]?["rank"] ?? 0, //返回的是一个数值0
+      "count": bangumiData["rating"]?["count"] ?? {}
+    };
 
 	 //info collect
 
+   if(detailFlag){
       bangumiDetails.informationList = {
         "eps":bangumiData["eps"] == 0 ? bangumiData["total_episodes"] : bangumiData["eps"],
         "alias":bangumiData["name_cn"].isNotEmpty ? bangumiData["name"] : "",
@@ -160,28 +130,28 @@ BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
           continue;
         }
 
-		switch(currentInformation["key"]){
-			case "放送开始": {
-				bangumiDetails.informationList.addAll({
-					"air_date": bangumiData["date"].toString()
-				});
-				break;
-			}
+        switch(currentInformation["key"]){
+          case "放送开始": {
+            bangumiDetails.informationList.addAll({
+              "air_date": bangumiData["date"].toString()
+            });
+            break;
+          }
 
-			case "放送星期": {
-				bangumiDetails.informationList.addAll({
-					"air_weekday": currentInformation["value"].toString()
-				});
-				break;
-			}
-		}
+          case "放送星期": {
+            bangumiDetails.informationList.addAll({
+              "air_weekday": currentInformation["value"].toString()
+            });
+            break;
+          }
+        }
 
-		if(
-			bangumiDetails.informationList["air_date"] != null && 
-			bangumiDetails.informationList["air_weekday"] != null
-		) {
-		  break;
-		}
+        if(
+          bangumiDetails.informationList["air_date"] != null && 
+          bangumiDetails.informationList["air_weekday"] != null
+        ) {
+          break;
+        }
 
 
       }
@@ -194,13 +164,18 @@ BangumiDetails loadDetailsData(Response bangumiDetailResponse) {
           bangumiData["tags"][tagIndex]["name"].toString():bangumiData["tags"][tagIndex]["count"]
         });
       }
+   }
 
-      debugPrint("bangumiDetails.informationList:${bangumiDetails.informationList}");
+      
 
-      debugPrint("model parse done:${DateTime.now()}. reloadInformation");
+    //debugPrint("bangumiDetails.informationList:${bangumiDetails.informationList}");
+
+    //debugPrint("model parse done:${DateTime.now()}. reloadInformation");
 
     return bangumiDetails;
   }
+
+
 
 enum SubjectType {
   book(1), // 书籍

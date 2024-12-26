@@ -95,7 +95,7 @@ class IntroPortrait extends StatelessWidget {
                       ]
                     ),
                     
-                    BuildInfoBox(informationList: bangumiDetails.informationList)
+                    BuildInfoBox(informationList: bangumiDetails.informationList,type: bangumiDetails.type)
                 
 
 					
@@ -295,7 +295,7 @@ class IntroLandscape extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   child: Row(
                     children: [
-                      BuildInfoBox(informationList: bangumiDetails.informationList),
+                      BuildInfoBox(informationList: bangumiDetails.informationList,type: bangumiDetails.type),
                   
                       const Spacer(),
                   

@@ -116,6 +116,7 @@ class BangumiSummary extends StatelessWidget {
       },
       child: 
         SizedBox(
+          width: double.infinity, //强制让文字(滚动组件)内容占满整个宽度
           child: SelectableText(
             summary ?? "no Data",
             style: const TextStyle(overflow: TextOverflow.ellipsis,fontSize: 16),          

@@ -32,17 +32,24 @@ class EpSelect extends StatefulWidget {
 class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
 
   ValueNotifier<int> epSegementsIndexNotifier = ValueNotifier<int>(0);
+
   Future? epsInformationFuture;
+  TabController? epTabController;
+
+  
 
   @override
   Widget build(BuildContext context) {
 
     final EpModel epModel = context.read<EpModel>();
 
+    int segements = convertSegement(widget.totalEps,100);
 
     epsInformationFuture ??= epModel.getEpsInformation();
+    epTabController ??= TabController(length: segements, vsync: this);
 
-    int segements = convertSegement(widget.totalEps,100);
+    DateTime currentTime = DateTime.now();
+
 
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) => true,
@@ -63,7 +70,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                       height: 60,
                       child: TabBar(
                         indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                        controller: TabController(length: segements, vsync: this),
+                        controller: epTabController,
                         onTap: (index){
                           epSegementsIndexNotifier.value = index;
                           epsInformationFuture = epModel.getEpsInformation(offset: index+1);
@@ -131,28 +138,26 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                             
                             itemBuilder: (_,index){
                                   
-                              Color currentEpsColor = Colors.white;
+                              Color currentEpsColor = Colors.white; //默认白 未放送
                               int currentEpIndex = (currentSegementRange)+(index)+1;
 
+                              EpsInfo? currentInfo = epModel.epsData[currentEpIndex];
 
-                              //judgeInSeasonBangumi(bangumiAirDate)
+                              //对于时间跨度很大的番剧。像海贼王这种的 我处理方式就是最简单的 air_date 判断了 
+                              //不可能做到百分百准确 但没办法 没有更好的思路了
 
+                              DateTime? currentEpAirDate = DateTime.tryParse(currentInfo?.airDate ?? "");
 
-                          
-                              //放送中
-                              if(widget.airedEps < widget.totalEps){ 
-                                
-                                if(widget.airedEps == currentEpIndex) currentEpsColor = BangumiThemeColor.macha.color;
-                                if(widget.airedEps > currentEpIndex)  currentEpsColor = Theme.of(context).scaffoldBackgroundColor;
+                              if(currentEpAirDate!=null){
+                                currentTime.difference(currentEpAirDate) > const Duration(hours: 1) ?
+                                currentEpsColor = Theme.of(context).scaffoldBackgroundColor: //已放送
+                                null ;
                               }
-                          
-                              //已完结
-                              else{
-                                //currentEpsColor = const Color.fromARGB(255, 217, 231, 255);
-                                currentEpsColor = Theme.of(context).scaffoldBackgroundColor;
+
+                              if(widget.airedEps < widget.totalEps){ //如果还有未放送的
+                                if(widget.airedEps == currentEpIndex) currentEpsColor = BangumiThemeColor.macha.color; //标注当前放送中最新的一集
                               }
-                            
-                                    
+
                               return SizedBox(
                                 height: 60,
                                 child: Container(
@@ -181,30 +186,19 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                       Navigator.pushNamed(
                                         context, Routes.subjectEp,
                                         arguments: {
-                                        "subjectID":epModel.subjectID,
-                                        "totalEps": widget.totalEps,
-                                        "epModel": epModel,
+                                          "subjectID":epModel.subjectID,
+                                          "totalEps": widget.totalEps,
+                                          "epModel": epModel,
                                         }
                                       );
                                   
                                     
                                     },
                                             
-                                    
                                     child: Center(
-                                      //child: Text("Ep. $currentEpIndex ${epModel.epsData[currentEpIndex]?.nameCN ?? epModel.epsData[currentEpIndex]?.name }"),
-                                      child: Builder(
-                                        builder: (_) {
-
-                                          EpsInfo? currentInfo = epModel.epsData[currentEpIndex];
-                            
-                                          String currentEpText = currentInfo?.nameCN ?? currentInfo?.name ?? ""; 
-                          
-                                          return Text(
-                                            "Ep. $currentEpIndex ${currentEpText.isEmpty ? currentInfo?.name : currentEpText}",
-                                            style: const TextStyle(color: Colors.black)
-                                          );
-                                        }
+                                      child: Text(
+                                        convertCollectionName(currentInfo,currentEpIndex),
+                                        style: const TextStyle(color: Colors.black)
                                       ),
                                     ) 
                                   ),

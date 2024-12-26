@@ -1,7 +1,5 @@
 
 import 'dart:math';
-
-import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bus_register_method.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/event_bus.dart';

@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/models/eps_info.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +52,7 @@ class EpTogglePanel extends StatelessWidget {
     
                             return Row(
                               children: [
-                                Text("Ep. ${currentEp-1}}",style: const TextStyle(color: Colors.grey,fontFamily: "MiSansFont")),
+                                Text("${convertEPInfoType(epModel.epsData[currentEp-1]?.type)} ${currentEp-1}}",style: const TextStyle(color: Colors.grey,fontFamily: "MiSansFont")),
     
                                 const Padding(padding: PaddingH6),
     
@@ -68,7 +70,7 @@ class EpTogglePanel extends StatelessWidget {
                         return ConstrainedBox(
                           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3),
                           child: Text(
-                            "Ep. ${max(1,currentEp-1)} ${epModel.epsData[max(1,currentEp-1)]!.nameCN!.isEmpty ?  epModel.epsData[max(1,currentEp-1)]!.name : epModel.epsData[max(1,currentEp-1)]!.nameCN}",
+                            convertCollectionName(epModel.epsData[max(1,currentEp-1)]!, max(1,currentEp-1)),
                             style: TextStyle(color: currentEp == 1 ? Colors.grey :Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,fontFamily: "MiSansFont"),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -100,7 +102,7 @@ class EpTogglePanel extends StatelessWidget {
                         if( epModel.epsData[currentEp+1]?.epID == null && currentEp+1 <= totalEps){
                           return Row(
                             children: [
-                              Text("Ep. ${currentEp+1}",style: const TextStyle(color: Colors.grey,fontFamily: "MiSansFont"),),
+                              Text("${convertEPInfoType(epModel.epsData[currentEp+1]?.type)}. ${currentEp+1}",style: const TextStyle(color: Colors.grey,fontFamily: "MiSansFont"),),
     
                               const Padding(padding: PaddingH6),
     
@@ -119,7 +121,8 @@ class EpTogglePanel extends StatelessWidget {
                         return ConstrainedBox(
                           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3) ,
                           child: Text(
-                            "Ep. ${min(totalEps,currentEp+1)} ${epModel.epsData[min(totalEps,currentEp+1)]!.nameCN!.isEmpty ? epModel.epsData[min(totalEps,currentEp+1)]?.name : epModel.epsData[min(totalEps,currentEp+1)]?.nameCN ?? "loading"}",
+                            convertCollectionName(epModel.epsData[min(totalEps,currentEp+1)]!, min(totalEps,currentEp+1)),
+                            //"Ep. ${min(totalEps,currentEp+1)} ${epModel.epsData[min(totalEps,currentEp+1)]!.nameCN!.isEmpty ? epModel.epsData[min(totalEps,currentEp+1)]?.name : epModel.epsData[min(totalEps,currentEp+1)]?.nameCN ?? "loading"}",
                             style: TextStyle(color: currentEp == totalEps ? Colors.grey :Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,fontFamily: "MiSansFont"),
                             overflow: TextOverflow.ellipsis,
                           ),

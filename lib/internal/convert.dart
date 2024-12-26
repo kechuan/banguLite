@@ -2,11 +2,17 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/models/eps_info.dart';
 import 'package:flutter/material.dart';
 
 String? convertAmpsSymbol(String? originalString){
   if(originalString?.contains("&amp;") ?? false){
    return originalString?.replaceAll("&amp;", "&");
+  }
+
+  if(originalString?.contains("&quot;") ?? false){
+   return originalString?.replaceAll('&quot;', '"');
   }
 
   return originalString;
@@ -93,21 +99,20 @@ bool judgeInSeasonBangumi(String? bangumiAirDate){
 int convertAirDateTime(String? bangumiAirDate){
 	if(bangumiAirDate == null) return 0;
 
-  List<String> dateSegments = bangumiAirDate.split("-");
+  int? convertedTimeStamp;
 
+  convertedTimeStamp = DateTime.tryParse(bangumiAirDate)?.millisecondsSinceEpoch;
+  if(convertedTimeStamp !=null) return convertedTimeStamp;
+
+  List<String> dateSegments = bangumiAirDate.split("-");
   if(dateSegments.length != 3) return 0;
 
   int bangumiYear = int.parse(dateSegments[0]);
   int bangumiMonth = int.parse(dateSegments[1]);
   int bangumiDay = int.parse(dateSegments[2]);
 
-  //if( bangumiYear == null && bangumiMonth == null && bangumiDay == null) return 0;
-
   return DateTime(bangumiYear,bangumiMonth,bangumiDay).millisecondsSinceEpoch;
 
-
-  //return DateTime.parse(bangumiAirDate).millisecondsSinceEpoch; 
-  // fail to analyse `2022-3-8` `2022-03-8` : Invalid date format
 
 }
 
@@ -138,38 +143,61 @@ String convertTypeSize(int totalLength,{StorageSize type = StorageSize.megabytes
   return "${result.toStringAsFixed(2)}$suffix";
 }
 
+String convertSubjectType(int? type){
+  if(type == null) return "";
+
+  String resultSubjectType = "";
+
+  for(SubjectType currentType in SubjectType.values){
+    if(currentType.subjectType == type){
+      resultSubjectType = currentType.name;
+      break;
+    }
+  }
+
+  return resultSubjectType.replaceFirst(resultSubjectType[0], resultSubjectType[0].toUpperCase());
+
+}
+
 String convertScoreRank(double? score){
 
   if(score==null) return ScoreRank.none.rankText;
 
-  String resultRankText = "";
+  String resultRankText = ScoreRank.none.rankText;
 
   //为什么不用switch? 
   //Error: The property 'score' can't be accessed on the type 'ScoreRank' in a constant expression.
 
-  //不确定到底是写一堆if-else结构还是直接这样顺序处理哪个更好
-  //但这个至少简单 那就这个了
-
-  if(score == ScoreRank.none.score) resultRankText = ScoreRank.none.rankText;
-  if(score >= ScoreRank.worst.score) resultRankText = ScoreRank.worst.rankText;
-  if(score >= ScoreRank.worse.score) resultRankText = ScoreRank.worse.rankText;
-  if(score >= ScoreRank.poor.score) resultRankText = ScoreRank.poor.rankText;
-  if(score >= ScoreRank.bad.score) resultRankText = ScoreRank.bad.rankText;
-  if(score >= ScoreRank.medium.score) resultRankText = ScoreRank.medium.rankText;
-  if(score >= ScoreRank.pass.score) resultRankText = ScoreRank.pass.rankText;
-  if(score >= ScoreRank.great.score) resultRankText = ScoreRank.great.rankText;
-  if(score >= ScoreRank.excellent.score) resultRankText = ScoreRank.excellent.rankText;
-  if(score >= ScoreRank.perfect.score) resultRankText = ScoreRank.perfect.rankText;
-  
+  for(ScoreRank currentRank in ScoreRank.values){
+    if(score >= currentRank.score){
+      resultRankText = currentRank.rankText;
+      
+    }
+  }
 
   return resultRankText;
-
 
 }
 
 String convertDateTimeToString(DateTime dateTime){
   return "${dateTime.year}-${convertDigitNumString(dateTime.month)}-${convertDigitNumString(dateTime.day)} ${convertDigitNumString(dateTime.hour)}:${convertDigitNumString(dateTime.minute)}";
 }
+
+String convertEPInfoType(int? type){
+  String resultEPType = "Ep";
+  if(type == null) return resultEPType;
+
+  for(EPType currentType in EPType.values){
+    if(currentType.index == type){
+      resultEPType = currentType.name;
+      break;
+    }
+  }
+
+  return resultEPType.replaceFirst(resultEPType[0], resultEPType[0].toUpperCase());
+}
+
+
 
 bool judgeDarknessMode(BuildContext context){
   return Theme.of(context).brightness == Brightness.dark ? true : false;

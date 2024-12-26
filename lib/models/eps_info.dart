@@ -1,3 +1,4 @@
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:dio/dio.dart';
 
 class EpsInfo {
@@ -8,8 +9,11 @@ class EpsInfo {
   String? description;
 
   int? epIndex;
+  num? sort; //同类条目的排序和集数
   int? epID;
   int? commentLength;
+
+  int? type;
 
 }
 
@@ -28,8 +32,11 @@ List<EpsInfo> loadEpsData(Response bangumiEpsInfoResponse){
       ..nameCN = currentEpInfoMap["name_cn"]
       ..epID = currentEpInfoMap["id"]
       ..epIndex = currentEpInfoMap["ep"]
+      ..sort = currentEpInfoMap["sort"]
+      ..type = currentEpInfoMap["type"]
       ..commentLength = currentEpInfoMap["comment"]
-      ..description = currentEpInfoMap["desc"];
+      ..description = currentEpInfoMap["desc"]
+    ;
 
       currentBangumiEpsInfo.add(currentEpInfo);
       
@@ -37,4 +44,27 @@ List<EpsInfo> loadEpsData(Response bangumiEpsInfoResponse){
 
   return currentBangumiEpsInfo;
         
+}
+
+String convertCollectionName(EpsInfo? currentInfo,int currentEpIndex){
+  if(currentInfo==null) return "loading";
+
+  String currentEpType = convertEPInfoType(currentInfo.type);
+  num currentIndex = currentInfo.sort ?? currentEpIndex;
+  String currentEpText = currentInfo.nameCN ?? currentInfo.name ?? ""; 
+
+  return "$currentEpType. $currentIndex ${currentEpText.isEmpty ? currentInfo.name : currentEpText}";
+}
+
+enum EPType{
+  ep(), //本篇
+  sp(),
+  op(),
+  ed(),
+  ad(),
+  mad(),
+  other();
+
+  const EPType();
+  
 }
