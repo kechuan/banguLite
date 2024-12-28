@@ -133,175 +133,179 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
                       double commentProgress = 0.0;
                 
                       return Padding(
-                        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
-                        child: CustomScrollView(
-                          controller: scrollViewController,
-                          physics:physics,
-                          slivers: [
-                                      
-                            MultiSliver(
-                              pushPinnedChildren: true,
-                              children: [
-                          
-                                SliverPinnedHeader(
-                                  child: AppBar(
-                                    title: Text("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}"),
-                                    //backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6) keep,
-                                    backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
-                          
-                                    actions: [
-
-                                      IconButton(
-                                        onPressed: () async {
-
-                                          final RenderSliver? epCommentSliver = sliverListKey.currentContext?.findRenderObject() as RenderSliver? ;
-
-                                          final RenderBox? epInfoBox = epInfoKey.currentContext?.findRenderObject() as RenderBox?;
+                        //padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
+                        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: [
 
 
-                                          if(epCommentSliver !=null && epInfoBox != null){
 
-                                            double resultOffset = 
+                            Positioned.fill(
+                              child: CustomScrollView(
+                                controller: scrollViewController,
+                                physics:physics,
+                                slivers: [
                                             
-                                              0.45*(scrollViewController.position.maxScrollExtent) - (AppBar().preferredSize.height + epInfoBox.size.height)
-                                            ;
-
-                                            debugPrint("epCommentSliver: ${epCommentSliver.geometry?.scrollExtent}/${scrollViewController.position.maxScrollExtent} epInfoBox:${epInfoBox.size.height}, result:$resultOffset");
-
-                                            scrollViewController.animateTo(
-                                              resultOffset,
-                                              duration: const Duration(milliseconds: 300),
-                                              curve: Curves.fastLinearToSlowEaseIn
-                                            ).then((value){
-                                              debugPrint("epCommentSliver current Offset:${scrollViewController.offset}/${scrollViewController.position.maxScrollExtent}");
-                                            });
-
-
-                                            
-                                          }
-
-                                          
-                                        },
-                                        icon: const Icon(Icons.wrap_text),
-                                      ),
-                          
-                                      IconButton(
-                                        onPressed: () => debugPrint("epCommentSliver current Offset:${scrollViewController.offset}/${scrollViewController.position.maxScrollExtent}"),
-                                        icon: const Icon(Icons.record_voice_over),
-                                      ),
-                          
-
-                                      IconButton(
-                                        onPressed: () async {
-                                          if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
-                                          await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
-                                          }
-                                        },
-                                        icon: Transform.rotate(
-                                          angle: -45,
-                                          child: const Icon(Icons.link),
-                                        )
-                                      ),
-                          
-                          
-                                    ],
-                                  )
-                                  
-                                  
-                          
-                                ),
+                                  MultiSliver(
+                                    pushPinnedChildren: true,
+                                    children: [
                                 
-                          
-                                EpInfo(
-                                  key: epInfoKey,
-                                  epsInfo: epModel.epsData,selectedEp: selectedEp
-                                ),
-                              ],
-                            ),
-                          
-                            MultiSliver(
-                              pushPinnedChildren: true,
-                              children: [
-                          
-                                SliverPinnedHeader(
-                                  
-                                  
-                                    child: ValueListenableBuilder(
-                                      valueListenable: offsetNotifier,
-                                      builder: (_,offset,child) {
-
-                                        WidgetsBinding.instance.addPostFrameCallback((timeStamp){
-                                          sliverViewStartOffset = (epInfoKey.currentContext?.size!.height ?? 300)+120;
-                                          opacityDegree = min(0.8,offset/sliverViewStartOffset);
-                                          debugPrint("opacity: $offset / $sliverViewStartOffset");
-                                        });
-
-                                       
-                                        return FutureBuilder(
-                                          future: epsInformationFuture,
-                                          builder: (_,snapshot){
-
-                                            WidgetsBinding.instance.addPostFrameCallback((_){
-                                              commentProgress = ((offset-sliverViewStartOffset)/(scrollViewController.position.maxScrollExtent - sliverViewStartOffset)).clamp(0, 1);
-                                            });
-
-
-                                            return AnimatedSize(
-                                              duration: const Duration(milliseconds: 300),
-                                              child:ColoredBox(
-                                                color: BangumiThemeColor.sea.color.withValues(alpha:opacityDegree),
-                                                child: SizedBox(
-                                                  height: opacityDegree == 0.8 ? 120 : 60,
-                                                  child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  children: [
-                                                
-                                                
-                                                    SizedBox(
-                                                      height: 60,
-                                                      child: EpTogglePanel(currentEp: selectedEp,totalEps: widget.totalEps)
-                                                    ),
-                                                
-                                                
-                                                    AnimatedSize(
-                                                      duration: const Duration(milliseconds: 300),
+                                      SliverPinnedHeader(
+                                        child: AppBar(
+                                          title: Text("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}"),
+                                          backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
+                                
+                                          actions: [
+                              
+                                            IconButton(
+                                              onPressed: () async {
+                                                if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
+                                                await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
+                                                }
+                                              },
+                                              icon: Transform.rotate(
+                                                angle: -45,
+                                                child: const Icon(Icons.link),
+                                              )
+                                            ),
+                                
+                                          ],
+                                        )
+                                
+                                      ),
+                                      
+                                
+                                      EpInfo(
+                                        key: epInfoKey,
+                                        epsInfo: epModel.epsData,selectedEp: selectedEp
+                                      ),
+                                    ],
+                                  ),
+                                
+                                  MultiSliver(
+                                    pushPinnedChildren: true,
+                                    children: [
+                                
+                                      SliverPinnedHeader(
+                                          child: ValueListenableBuilder(
+                                            valueListenable: offsetNotifier,
+                                            builder: (_,offset,child) {
+                              
+                                              WidgetsBinding.instance.addPostFrameCallback((timeStamp){
+                                                sliverViewStartOffset = (epInfoKey.currentContext?.size!.height ?? 300)+120;
+                                                opacityDegree = min(0.8,offset/sliverViewStartOffset);
+                                                debugPrint("opacity: $offset / $sliverViewStartOffset");
+                                              });
+                              
+                                             
+                                              return FutureBuilder(
+                                                future: epsInformationFuture,
+                                                builder: (_,snapshot){
+                              
+                                                  WidgetsBinding.instance.addPostFrameCallback((_){
+                                                    commentProgress = ((offset-sliverViewStartOffset)/(scrollViewController.position.maxScrollExtent - sliverViewStartOffset)).clamp(0, 1);
+                                                  });
+                              
+                              
+                                                  return AnimatedSize(
+                                                    duration: const Duration(milliseconds: 300),
+                                                    child:ColoredBox(
+                                                      color: BangumiThemeColor.sea.color.withValues(alpha:opacityDegree),
                                                       child: SizedBox(
-                                                          height: opacityDegree == 0.8 ? 60 : 0,
-                                                          child: EpCommentsProgressSlider(
-                                                            commnetProgress: commentProgress,
-                                                            offstage: opacityDegree == 0.8 ? false : true,
-                                                            onChanged: (progress){
-                                                              scrollViewController.jumpTo(progress*(scrollViewController.position.maxScrollExtent - sliverViewStartOffset) + sliverViewStartOffset);
-                                                              debugPrint("maxScrollExtent:${scrollViewController.position.maxScrollExtent}");
-                                                            }
+                                                        height: opacityDegree == 0.8 ? 120 : 60,
+                                                        child: Column(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        children: [
+                                                      
+                                                      
+                                                          SizedBox(
+                                                            height: 60,
+                                                            child: EpTogglePanel(currentEp: selectedEp,totalEps: widget.totalEps)
                                                           ),
                                                       
-                                                      )
-                                                    ),
                                                       
+                                                          AnimatedSize(
+                                                            duration: const Duration(milliseconds: 300),
+                                                            child: SizedBox(
+                                                              height: opacityDegree == 0.8 ? 60 : 0,
+                                                              child: EpCommentsProgressSlider(
+                                                                commnetProgress: commentProgress,
+                                                                offstage: opacityDegree == 0.8 ? false : true,
+                                                                onChanged: (progress){
+                                                                  scrollViewController.jumpTo(progress*(scrollViewController.position.maxScrollExtent - sliverViewStartOffset) + sliverViewStartOffset);
+                                                                  commentProgress = progress;
+                                                                  debugPrint("maxScrollExtent:${scrollViewController.position.maxScrollExtent}");
+                                                                }
+                                                              ),
+                                                            
+                                                            )
+                                                          ),
+                                                            
+                                                      
+                                                        ],
+                                                      ),
+                                                      
+                                                      ),
+                                                    )
+                                                 
+                              
+                                                  );
                                                 
-                                                  ],
-                                                ),
-                                                
-                                                ),
-                                              )
-                   
-
-                                            );
+                                                }
+                                              );
+                                            }
+                                          )
                                           
-                                          }
-                                        );
-                                      }
-                                    )
-                                    
+                                        ),
+                              
+                                      commentDetailchild!
+                                    ],
                                   ),
-
-                          
-                                commentDetailchild!
-                              ],
+                              
+                                        
+                                ],	
+                              ),
                             ),
-                                      
-                          ],	
+                          
+
+                            Positioned(
+                              bottom: 0,
+                              height: 60,
+                              width: MediaQuery.sizeOf(context).width,
+                              child: ValueListenableBuilder(
+                                valueListenable: offsetNotifier,
+                                builder: (_,offset,appbar) {
+                                  return Offstage(
+                                    offstage: offset <= sliverViewStartOffset,
+                                    child: appbar!
+                                  );
+                                },
+                                child: AppBar(
+                                  title: Text("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}"),
+                                  backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
+                                                    
+                                  actions: [
+                                                  
+                                    IconButton(
+                                      onPressed: () async {
+                                        if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
+                                          await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
+                                        }
+                                      },
+                                      icon: Transform.rotate(
+                                        angle: -45,
+                                        child: const Icon(Icons.link),
+                                      )
+                                    ),
+                                                    
+                                  ],
+                                ),
+                              ),
+                            ),
+
+
+                          ],
                         ),
                       );
                       
@@ -320,32 +324,6 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
     );
     
   }
-
-  //double getItemOffset(int index) {
-  //    if (index < 0 || index >= widget.epCommentGlobalKeySet.length) return 0;
-      
-  //    try {
-  //      final context = widget.epCommentGlobalKeySet.elementAt(index).currentContext;
-  //      if (context == null) return 0;
-        
-  //      // 获取RenderBox
-  //      final RenderBox box = context.findRenderObject() as RenderBox;
-  //      // 转换为全局坐标
-  //      final position = box.localToGlobal(Offset.zero);
-        
-  //      // 计算相对于ScrollView的offset
-  //      // 需要减去AppBar和其他固定位置组件的高度
-  //      final topPadding = MediaQuery.of(context).padding.top;
-  //      final appBarHeight = AppBar().preferredSize.height;
-  //      debugPrint("measure offset:${position.dy - topPadding - appBarHeight}");
-  //      return position.dy - topPadding - appBarHeight;
-  //    } 
-    
-  //    catch (e) {
-  //      debugPrint('Error measuring offset: $e');
-  //      return 0;
-  //    }
-  //  }
 
 }
 
@@ -426,11 +404,12 @@ class EpCommentPageDetails extends StatelessWidget {
 
 						bool isCommentLoading = epModel.epCommentData[currentEp] == null || epModel.epCommentData[currentEp]!.isEmpty;
 
-						return Skeletonizer.sliver(
-							enabled: isCommentLoading,
-							child: SliverList.separated(
+						return SliverPadding(
+              padding: const EdgeInsets.only(bottom: 50),
+              sliver: Skeletonizer.sliver(
+                enabled: isCommentLoading,
+                child: SliverList.separated(
                   key: sliverListKey,
-                  
                   itemCount: isCommentLoading ? 3 : epModel.epCommentData[currentEp]!.length+1,
                   itemBuilder: (_,epCommentIndex){
                     //Loading...
@@ -491,8 +470,7 @@ class EpCommentPageDetails extends StatelessWidget {
                   },
                   separatorBuilder: (_,__,) => const Divider(height: 1), 
                 ),
-              
-
+              ),
             );
 
 					}

@@ -21,10 +21,15 @@ class EpCommentsProgressSlider extends StatelessWidget {
       child: Row(
         children: [
       
-          Text(
-            "${(commnetProgress*100).toStringAsFixed(1)}%",
-            style: const TextStyle(
-              fontSize: 16,
+          SizedBox(
+            width: 60,
+            child: Center(
+              child: Text(
+                "${(commnetProgress*100).toStringAsFixed(1)}%",
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+              ),
             ),
           ),
       
@@ -36,7 +41,6 @@ class EpCommentsProgressSlider extends StatelessWidget {
               child: Slider(                          
                 value: commnetProgress, 
                 onChanged: onChanged,
-                
               ),
             ),
           ),
