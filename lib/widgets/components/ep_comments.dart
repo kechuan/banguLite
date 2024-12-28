@@ -5,16 +5,19 @@ import 'package:flutter/material.dart';
 
 class EpCommentView extends StatelessWidget {
   const EpCommentView({
-    super.key,
+    super.key, 
+    this.myKey,
     required this.epCommentData
   });
   
   final EpCommentDetails epCommentData;
+  final GlobalKey? myKey;
 
   @override
   Widget build(BuildContext context) {
 
     return ListTile(
+      key: myKey,
       title: EpCommentTile(epCommentData: epCommentData),
       subtitle: EpRepliedTile(epCommentData: epCommentData),
     );

@@ -135,21 +135,24 @@ class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepA
 
           int? itemCount = currentPageComments.length;
 
-          return ListView.separated(
-            itemCount: itemCount == 0 ? 1 : itemCount,
-            itemBuilder: (_, index){
-
-              if(itemCount == 0){
-                return const Center(child: Text("空空如也..."));
-              }
-
-              return BangumiCommentTile(
-                //commentData: currentPageComments[itemCount-1 - index]
-                commentData: currentPageComments[index]
-              );
-
-            },
-            separatorBuilder: (_, index) => const Divider(height: 2),
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
+            child: ListView.separated(
+              itemCount: itemCount == 0 ? 1 : itemCount,
+              itemBuilder: (_, index){
+            
+                if(itemCount == 0){
+                  return const Center(child: Text("空空如也..."));
+                }
+            
+                return BangumiCommentTile(
+                  //commentData: currentPageComments[itemCount-1 - index]
+                  commentData: currentPageComments[index]
+                );
+            
+              },
+              separatorBuilder: (_, index) => const Divider(height: 2),
+            ),
           );
         }
 

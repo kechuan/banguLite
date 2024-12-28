@@ -98,55 +98,58 @@ class BangumiRankBox extends StatelessWidget {
                 ),
               ),
 
-              ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 10,
-                itemExtent: (constraint.maxWidth/10),
-                physics: const NeverScrollableScrollPhysics(), //禁止用户滑动进度条
-                itemBuilder: (_,index){
-              
-                  double currentRankRatio;
-              
-                  if(bangumiDetails.ratingList["total"] == 0){
-                     currentRankRatio = 0;
-                  }
-              
-                  else{
-                    currentRankRatio = bangumiDetails.ratingList["count"]["${index+1}"] / bangumiDetails.ratingList["total"];
-                  }
-              
-              
-                  return Tooltip(
-                    verticalOffset: -24,
-                    triggerMode: TooltipTriggerMode.tap,
-                    message: "${bangumiDetails.ratingList["count"]["${index+1}"]} vote(s), ${(currentRankRatio*100).toStringAsFixed(2)}%",
-                    child: Padding(
-                      padding: PaddingH6,
-                      child: Stack(
-                        alignment: Alignment.bottomCenter,
-                        
-                        children: [
-                                  
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 300), 
-                            height: min(100,175*currentRankRatio), //理论上最大值应该是200 毕竟极端值 1:1 但不想顶到上方的Score区域
-                            color:Theme.of(context).scaffoldBackgroundColor,
-                          ),
-                                  
-                          Text(
-                            "${index+1}",
-                            style: TextStyle(fontSize: 10,color: currentRankRatio > 0.2 ?Colors.white : Colors.black)
-                          ),
-                                  
+              Padding(
+                padding: const EdgeInsets.only(bottom: 3),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 10,
+                  itemExtent: (constraint.maxWidth/10),
+                  physics: const NeverScrollableScrollPhysics(), //禁止用户滑动进度条
+                  itemBuilder: (_,index){
+                
+                    double currentRankRatio;
+                
+                    if(bangumiDetails.ratingList["total"] == 0){
+                       currentRankRatio = 0;
+                    }
+                
+                    else{
+                      currentRankRatio = bangumiDetails.ratingList["count"]["${index+1}"] / bangumiDetails.ratingList["total"];
+                    }
+                
+                
+                    return Tooltip(
+                      verticalOffset: -24,
+                      triggerMode: TooltipTriggerMode.tap,
+                      message: "${bangumiDetails.ratingList["count"]["${index+1}"]} vote(s), ${(currentRankRatio*100).toStringAsFixed(2)}%",
+                      child: Padding(
+                        padding: PaddingH6,
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
                           
-                        ],
+                          children: [
+                                    
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 300), 
+                              height: min(100,175*currentRankRatio), //理论上最大值应该是200 毕竟极端值 1:1 但不想顶到上方的Score区域
+                              color:Theme.of(context).scaffoldBackgroundColor,
+                            ),
+                                    
+                            Text(
+                              "${index+1}",
+                              style: TextStyle(fontSize: 10,color: currentRankRatio > 0.2 ?Colors.white : Colors.black)
+                            ),
+                                    
+                            
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                  
-                  
-                  
-                }
+                    );
+                    
+                    
+                    
+                  }
+                ),
               ),
             ],
           ),

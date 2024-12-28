@@ -163,83 +163,78 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
 												commentCount = currentTopicDetail.repliedComment!.isEmpty ? 0 : currentTopicDetail.repliedComment!.length;
 											}
 										}
-
-										
 								
-								
-										return Skeletonizer.sliver(
-											enabled: isCommentLoading,
-											child: SliverList.separated(
-												itemCount: (commentCount ?? 3)+1,
-												itemBuilder: (_,topicCommentIndex){
-													//Loading...
-													if(isCommentLoading){
-														return const SkeletonListTileTemplate(scaleType: ScaleType.small);
-													}
-
-													if(topicCommentIndex == 0){
-
-														return ListView(
-															physics: const NeverScrollableScrollPhysics(),
-															
-															shrinkWrap: true,
-															children: [
-																EpCommentView(
-																	epCommentData: EpCommentDetails()
-																		..avatarUrl = widget.topicInfo.creatorAvatarUrl
-																		..nickName =  widget.topicInfo.creatorNickName
-																		..sign = widget.topicInfo.creatorSign
-																		..comment = currentTopicDetail.content
-																		..commentTimeStamp = currentTopicDetail.createdTime
-																		//..epCommentIndex = "0"
-															
-															
-																		
-																),
-															
-																Padding(
-																	padding: const EdgeInsets.all(16),
-																	child: Row(
-																		children: [
-																			const Text("回复",style: TextStyle(fontSize: 24)),
-																								
-																			const Padding(padding: PaddingH6),
-																								
-																			Text("$commentCount",style: const TextStyle(color: Colors.grey)),
-																								
-																								
-																		],
-																	),
-																),
-															
-															
-															],
-														);
-
-
-														//final TopicInfo = ;
-
-														
-													}
-								
-												
-												
-													//无评论的显示状态
-													if(currentTopicDetail.repliedComment!.isEmpty){
-														return const Center(
-															child: Padding(
-																padding: EdgeInsets.only(top:64),
-																child: Text("该集数暂无人评论...",style: TextStyle(fontSize: 16)),
-															),
-														);
-													}
-													
-												
-													return EpCommentView(epCommentData: currentTopicDetail.repliedComment![topicCommentIndex-1]);
-												},
-												separatorBuilder: (_,__,) => const Divider(height: 1), 
-											),
-										);
+										return SliverPadding(
+                      padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
+                      sliver: Skeletonizer.sliver(
+                        enabled: isCommentLoading,
+                        child: SliverList.separated(
+                          itemCount: (commentCount ?? 3)+1,
+                          itemBuilder: (_,topicCommentIndex){
+                            //Loading...
+                            if(isCommentLoading){
+                              return const SkeletonListTileTemplate(scaleType: ScaleType.small);
+                            }
+                      
+                            if(topicCommentIndex == 0){
+                      
+                              return ListView(
+                                physics: const NeverScrollableScrollPhysics(),
+                                
+                                shrinkWrap: true,
+                                children: [
+                                  EpCommentView(
+                                    epCommentData: EpCommentDetails()
+                                      ..avatarUrl = widget.topicInfo.creatorAvatarUrl
+                                      ..nickName =  widget.topicInfo.creatorNickName
+                                      ..sign = widget.topicInfo.creatorSign
+                                      ..comment = currentTopicDetail.content
+                                      ..commentTimeStamp = currentTopicDetail.createdTime
+                                      //..epCommentIndex = "0"
+                                
+                                
+                                      
+                                  ),
+                                
+                                  Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Row(
+                                      children: [
+                                        const Text("回复",style: TextStyle(fontSize: 24)),
+                                                  
+                                        const Padding(padding: PaddingH6),
+                                                  
+                                        Text("$commentCount",style: const TextStyle(color: Colors.grey)),
+                                                  
+                                                  
+                                      ],
+                                    ),
+                                  ),
+                                
+                                
+                                ],
+                              );
+                      
+                      
+                            }
+                      
+                            //无评论的显示状态
+                            if(currentTopicDetail.repliedComment!.isEmpty){
+                              return const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.only(top:64),
+                                  child: Text("该集数暂无人评论...",style: TextStyle(fontSize: 16)),
+                                ),
+                              );
+                            }
+                            
+                          
+                            return EpCommentView(epCommentData: currentTopicDetail.repliedComment![topicCommentIndex-1]);
+                          },
+                          separatorBuilder: (_,__,) => const Divider(height: 1)
+                        ),
+                      ),
+                    );
 								
 									}
 								),

@@ -99,12 +99,28 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
           }
 
           
-          default : return const Card(child: Center(child: CircularProgressIndicator(),));
+          default : return const Card(
+            child: SizedBox(
+              height: 200,
+              width: 200,
+              child: Center(
+                child: CircularProgressIndicator()
+              ),
+            )
+          );
             
         }
 
 
-        return const CircularProgressIndicator();
+        return const Card(
+          child: SizedBox(
+            height: 200,
+            width: 200,
+            child: Center(
+              child: CircularProgressIndicator()
+            ),
+          )
+        );
 
         
 

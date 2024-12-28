@@ -4,14 +4,9 @@
 			"path": "lib/catalogs/bangumi_ep_page.dart",
 			"bookmarks": [
 				{
-					"line": 212,
+					"line": 351,
 					"column": 38,
 					"label": "EPInfo"
-				},
-				{
-					"line": 311,
-					"column": 36,
-					"label": "BBCode测试"
 				}
 			]
 		},

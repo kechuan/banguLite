@@ -82,30 +82,33 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                       
                       Skeletonizer(
                         enabled: commentListData.isEmpty,
-                        child: ListView.separated(
-                          physics: const ScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: commentListData.isEmpty ? 3 : commentListData.length,
-                          separatorBuilder: (_, index) => const Divider(height: 2),
-                          itemBuilder: (_,index){
-                            
-                            //原本获取过来的数据是 Offset: 390 391 392 ... 400 这样给你展示的 所以默认状态下会变成越滚动越晚的消息
-                            //但一般人们的信息习惯是优先看到消息最新(晚)的消息才对 所以排序得更改一下
-                            
-                          
-                            if(commentListData.isEmpty){
-                              return const SkeletonListTileTemplate();
-                            }
-                            
-                            //无评论的显示状态
-                            if(commentListData.length == 1 && commentListData[0].userId == 0){
-                              return const Center(
-                                child: Text("该番剧暂无人评论..."),
-                              );
-                            }
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
+                          child: ListView.separated(
+                            physics: const ScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: commentListData.isEmpty ? 3 : commentListData.length,
+                            separatorBuilder: (_, index) => const Divider(height: 2),
+                            itemBuilder: (_,index){
                               
-                            return BangumiCommentTile(commentData: commentListData[index]);
-                          }
+                              //原本获取过来的数据是 Offset: 390 391 392 ... 400 这样给你展示的 所以默认状态下会变成越滚动越晚的消息
+                              //但一般人们的信息习惯是优先看到消息最新(晚)的消息才对 所以排序得更改一下
+                              
+                            
+                              if(commentListData.isEmpty){
+                                return const SkeletonListTileTemplate();
+                              }
+                              
+                              //无评论的显示状态
+                              if(commentListData.length == 1 && commentListData[0].userId == 0){
+                                return const Center(
+                                  child: Text("该番剧暂无人评论..."),
+                                );
+                              }
+                                
+                              return BangumiCommentTile(commentData: commentListData[index]);
+                            }
+                          ),
                         ),
                       ),
                       
