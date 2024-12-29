@@ -1,4 +1,5 @@
 import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
 class BuildInfoBox extends StatelessWidget{
@@ -23,9 +24,9 @@ class BuildInfoBox extends StatelessWidget{
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("放送日期: ${informationList["air_date"]}",style: const TextStyle(fontWeight: FontWeight.bold),),
-            Text("总集数: ${informationList["eps"]}",style: const TextStyle(fontWeight: FontWeight.bold),),
-            Text("更新日期: ${informationList["air_weekday"]}",style: const TextStyle(fontWeight: FontWeight.bold),)
+            ScalableText("放送日期: ${informationList["air_date"]}",style: const TextStyle(fontWeight: FontWeight.bold),),
+            ScalableText("总集数: ${informationList["eps"]}",style: const TextStyle(fontWeight: FontWeight.bold),),
+            ScalableText("更新日期: ${informationList["air_weekday"]}",style: const TextStyle(fontWeight: FontWeight.bold),)
           ],
         ):
         null

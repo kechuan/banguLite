@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/models/ep_details.dart';
 import 'package:bangu_lite/widgets/components/ep_replied_comment_dialog.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
 class EpRepliedTile extends ListTile {
@@ -43,11 +44,11 @@ class EpRepliedTile extends ListTile {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("${epCommentData.repliedComment![index].nickName}:"),
+                        ScalableText("${epCommentData.repliedComment![index].nickName}:"),
                   
                         const Padding(padding: PaddingH6),
     
-                        Expanded(child: Text("${epCommentData.repliedComment![index].comment}"),)
+                        Expanded(child: ScalableText("${epCommentData.repliedComment![index].comment}"),)
 
                       ],
                     ),
@@ -63,7 +64,7 @@ class EpRepliedTile extends ListTile {
 
               ShowCommentTap(
                 epCommentData: epCommentData,
-                child: Text(
+                child: ScalableText(
                   "> 点击查看 ${epCommentData.repliedComment!.length} 条评论",
                   style: const TextStyle(color: Colors.blueAccent),
                 )

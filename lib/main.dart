@@ -52,39 +52,46 @@ class MainApp extends StatelessWidget {
       create: (_) => IndexModel(),
       child: Builder(
         builder: (context) {
-          return MaterialApp(
-            theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: BangumiThemeColor.sea.color),
-                fontFamily: 'MiSansFont',
-            ),
-              darkTheme: ThemeData(
-                brightness: Brightness.dark,
-                fontFamily: 'MiSansFont',
-                colorScheme: ColorScheme.dark(
-                  primary: BangumiThemeColor.sea.color,
-                  onPrimary: Colors.white, //unSelected颜色
-                  secondary: Colors.white,
-                  onSecondary:BangumiThemeColor.sea.color, //onSelected 的颜色
-                  surface: Colors.black,
+          return Selector<IndexModel,BangumiThemeColor>(
+            selector: (_, indexModel) => indexModel.currentThemeColor,
+            shouldRebuild: (previous, next) => previous!=next,
+            builder: (_, currentThemeColor, child){
+              return MaterialApp(
+                theme: ThemeData(
+                  colorScheme: ColorScheme.fromSeed(seedColor: currentThemeColor.color),
+                  fontFamily: 'MiSansFont',
+                ),
+                darkTheme: ThemeData( 
+                  brightness: Brightness.dark,
+                  fontFamily: 'MiSansFont',
                   
-                  outline: Colors.white,
-                    
-          
-                )
-              ),
-              themeMode: context.watch<IndexModel>().themeMode,
-              
-            initialRoute: Routes.index,
-            //navigatorObservers: [],
-            navigatorObservers: [Lifecycle.lifecycleRouteObserver],
-            onGenerateRoute: (RouteSettings settings) {
-              return onGenerateRoute(
-                settings: settings,
-                getRouteSettings: getRouteSettings,
+                  colorScheme: ColorScheme.dark(
+                    primary: currentThemeColor.color,
+                    onPrimary: Colors.white, //unSelected颜色
+                    secondary: Colors.white,
+                    onSecondary:currentThemeColor.color, //onSelected 的颜色
+                    surface: Colors.black,
+                    outline: Colors.white,
+                  )
+                ),
+                themeMode: context.watch<IndexModel>().themeMode,
+                  
+                initialRoute: Routes.index,
+                //navigatorObservers: [],
+                navigatorObservers: [Lifecycle.lifecycleRouteObserver],
+                onGenerateRoute: (RouteSettings settings) {
+                  return onGenerateRoute(
+                    settings: settings,
+                    getRouteSettings: getRouteSettings,
+                  );
+                }
               );
-            },
-          
-          
+            }
+            
+
+            
+            
+            
           );
         }
       ),

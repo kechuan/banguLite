@@ -34,7 +34,11 @@ void appRouteMethod(BuildContext context,String link){
             else{
               if(context.mounted) Navigator.pushNamed(context, Routes.subjectDetail,arguments: {"subjectID":resID});
             }
-        }
+          }
+
+          else{
+            launchUrlString(link);
+          }
 
       }
     }

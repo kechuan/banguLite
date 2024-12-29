@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
 class BangumiRankBox extends StatelessWidget {
@@ -52,7 +53,7 @@ class BangumiRankBox extends StatelessWidget {
                             
                             children: [
                           
-                              Text(
+                              ScalableText(
                                 "${bangumiDetails.ratingList["score"]?.toDouble()}",
                                 style: TextStyle(
                                   color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*(((bangumiDetails.ratingList["score"] as num))/10).toInt()), 0, 1),
@@ -60,13 +61,13 @@ class BangumiRankBox extends StatelessWidget {
                                   decoration: bangumiDetails.ratingList["rank"]!=0 ? null : TextDecoration.lineThrough ,
                                   decorationThickness: 5,
                                   decorationColor: Theme.of(context).scaffoldBackgroundColor,
-                                  fontSize: 16
+                                  
                                 )
                               ),
                           
                               const Padding(padding: PaddingH6),
                           
-                              Text(convertScoreRank(bangumiDetails.ratingList["score"]?.toDouble()),style: const TextStyle(fontSize: 16)),
+                              ScalableText(convertScoreRank(bangumiDetails.ratingList["score"]?.toDouble()),style: const TextStyle()),
                           
                           
                             ],
@@ -76,12 +77,12 @@ class BangumiRankBox extends StatelessWidget {
                       
                           Row(
                             children: [
-                              //Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey)),
+                              //ScalableText("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey)),
                           
                               const Padding(padding: EdgeInsets.only(left: 6)),
                           
                           
-                              Text(bangumiDetails.ratingList["rank"]!=0 ? 'Rank ${convertSubjectType(bangumiDetails.type)} #${bangumiDetails.ratingList["rank"]}' : "暂无排名"),
+                              ScalableText(bangumiDetails.ratingList["rank"]!=0 ? 'Rank ${convertSubjectType(bangumiDetails.type)} #${bangumiDetails.ratingList["rank"]}' : "暂无排名"),
                                           
                             ],
                           )
@@ -90,7 +91,7 @@ class BangumiRankBox extends StatelessWidget {
                         ],
                       ),
 
-                      Text("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey)),
+                      ScalableText("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey)),
                     
                     
                     ],
@@ -135,7 +136,7 @@ class BangumiRankBox extends StatelessWidget {
                               color:Theme.of(context).scaffoldBackgroundColor,
                             ),
                                     
-                            Text(
+                            ScalableText(
                               "${index+1}",
                               style: TextStyle(fontSize: 10,color: currentRankRatio > 0.2 ?Colors.white : Colors.black)
                             ),

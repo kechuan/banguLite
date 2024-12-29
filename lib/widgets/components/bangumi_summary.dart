@@ -1,3 +1,4 @@
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
 class BangumiSummary extends StatelessWidget {
@@ -24,10 +25,10 @@ class BangumiSummary extends StatelessWidget {
           children: [
              Padding(
               padding: EdgeInsets.symmetric(vertical: 8), //16
-              child: Text("简介",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)), // 24*(aspectRatio) => 34
+              child: ScalableText("简介",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)), // 24*(aspectRatio) => 34
             ),
         
-            Center(child: Text("该番剧暂无简介..."),)
+            Center(child: ScalableText("该番剧暂无简介..."),)
           ],
         ),
       );
@@ -55,7 +56,7 @@ class BangumiSummary extends StatelessWidget {
                   
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 8), //16
-                        child: Text("简介",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)), // 24*(aspectRatio) => 34
+                        child: ScalableText("简介",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)), // 24*(aspectRatio) => 34
                       ),
                   
                       expandedStatus ? 
@@ -78,7 +79,7 @@ class BangumiSummary extends StatelessWidget {
                           ),
                           child: TextButton(
                             onPressed: ()=> expandedSummaryNotifier.value = false, 
-                            child: const Text("收缩",style: TextStyle(fontSize: 16),
+                            child: const ScalableText("收缩"
                             
                           )),
                         )) :
@@ -117,9 +118,9 @@ class BangumiSummary extends StatelessWidget {
       child: 
         SizedBox(
           width: double.infinity, //强制让文字(滚动组件)内容占满整个宽度
-          child: SelectableText(
+          child: ScalableText(
             summary ?? "no Data",
-            style: const TextStyle(overflow: TextOverflow.ellipsis,fontSize: 16),          
+            style: const TextStyle(overflow: TextOverflow.ellipsis),          
           ),
         )
         

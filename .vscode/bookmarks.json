@@ -4,7 +4,7 @@
 			"path": "lib/catalogs/bangumi_ep_page.dart",
 			"bookmarks": [
 				{
-					"line": 330,
+					"line": 333,
 					"column": 38,
 					"label": "EPInfo"
 				}
@@ -14,7 +14,7 @@
 			"path": "lib/widgets/components/ep_select.dart",
 			"bookmarks": [
 				{
-					"line": 62,
+					"line": 63,
 					"column": 14,
 					"label": "EpSelect"
 				}
@@ -24,7 +24,7 @@
 			"path": "lib/catalogs/bangumi_calendar_page.dart",
 			"bookmarks": [
 				{
-					"line": 113,
+					"line": 114,
 					"column": 35,
 					"label": "calendarPage——资讯页面"
 				}
@@ -54,7 +54,7 @@
 			"path": "lib/catalogs/more_topics_page.dart",
 			"bookmarks": [
 				{
-					"line": 16,
+					"line": 17,
 					"column": 0,
 					"label": "更多讨论列表——moreTopics"
 				}
@@ -64,7 +64,7 @@
 			"path": "lib/internal/custom_bbcode_tag.dart",
 			"bookmarks": [
 				{
-					"line": 12,
+					"line": 13,
 					"column": 0,
 					"label": "BBCodeTag"
 				}
@@ -74,7 +74,7 @@
 			"path": "lib/catalogs/bangumi_topic_page.dart",
 			"bookmarks": [
 				{
-					"line": 23,
+					"line": 24,
 					"column": 31,
 					"label": "subjectTopic——番剧单个topic详情"
 				}
@@ -84,7 +84,7 @@
 			"path": "lib/catalogs/bangumi_comment_page.dart",
 			"bookmarks": [
 				{
-					"line": 12,
+					"line": 13,
 					"column": 33,
 					"label": "subjectComment——番剧吐槽详情"
 				}
@@ -94,9 +94,19 @@
 			"path": "lib/catalogs/bangumi_detail_page.dart",
 			"bookmarks": [
 				{
-					"line": 24,
+					"line": 25,
 					"column": 32,
 					"label": "subjectDetail——番剧详情"
+				}
+			]
+		},
+		{
+			"path": "lib/catalogs/settings_page.dart",
+			"bookmarks": [
+				{
+					"line": 15,
+					"column": 2,
+					"label": "settingsPage——设置页"
 				}
 			]
 		}

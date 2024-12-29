@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/widgets/fragments/animated_wave_footer.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -110,7 +111,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                   spacing: 12,
                                   children:  [
                                 
-                                    const Text("筛选动画"),
+                                    const ScalableText("筛选动画"),
                                 
                                     Icon(Icons.filter_list,size: min(35,MediaQuery.sizeOf(context).width/20)),
                                   ],
@@ -253,7 +254,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                   debugPrint("index:$index");
                               
                                   if(messageList.isEmpty){
-                                    return const Center(child: Text("没有搜索到内容.."));
+                                    return const Center(child: ScalableText("没有搜索到内容.."));
                                   }
                                       
                                   if(index>messageList.length - 1){
@@ -398,7 +399,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                           SizedBox(
                             height: 80,
                             child: Center(
-                              child: Text(showMessage),
+                              child: ScalableText(showMessage),
                             ),
                           ),
 

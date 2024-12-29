@@ -13,6 +13,7 @@ import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/widgets/components/ep_comments.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comments_progress_slider.dart';
 import 'package:bangu_lite/widgets/fragments/ep_toggle_panel.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
@@ -109,21 +110,10 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
 
               body: NotificationListener<ScrollNotification>(
                 onNotification: (notification) {
-                    //final double notificationOffset = notification.metrics.pixels; //scrollview 的 offset : 注意不要让更内层的scrollView影响到它监听
-                  
-                    
-                    WidgetsBinding.instance.addPostFrameCallback((timeStamp){
-                      //offsetNotifier.value = max(notificationOffset - ((epInfoKey.currentContext?.size!.height ?? 300)+120),0);
-                      offsetNotifier.value = notification.metrics.pixels;
-
-                      //debugPrint("notification offset:$notificationOffset, epInfoKey height:${epInfoKey.currentContext?.size!.height}, offsetNotifier:${offsetNotifier.value}");
-                      //target 404:start
-
-                    });
-                  
-                    return false;
+                  WidgetsBinding.instance.addPostFrameCallback((_)=>offsetNotifier.value = notification.metrics.pixels);
+                  return false;
                 },
-                  child: Selector<EpModel,int>(
+                child: Selector<EpModel,int>(
                     selector: (_, epModel) => epModel.selectedEp,
                     shouldRebuild: (previous, next) => previous != next,
                     builder: (_,selectedEp,commentDetailchild){
@@ -153,7 +143,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
                                 
                                       SliverPinnedHeader(
                                         child: AppBar(
-                                          title: Text("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}"),
+                                          title: ScalableText("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}"),
                                           backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
                                 
                                           actions: [
@@ -188,27 +178,31 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
                                     children: [
                                 
                                       SliverPinnedHeader(
-                                          child: ValueListenableBuilder(
-                                            valueListenable: offsetNotifier,
-                                            builder: (_,offset,child) {
-                              
-                                              WidgetsBinding.instance.addPostFrameCallback((timeStamp){
-                                                sliverViewStartOffset = (epInfoKey.currentContext?.size!.height ?? 300)+120;
-                                                opacityDegree = min(0.8,offset/sliverViewStartOffset);
-                                                debugPrint("opacity: $offset / $sliverViewStartOffset");
-                                              });
-                              
-                                             
-                                              return FutureBuilder(
-                                                future: epsInformationFuture,
-                                                builder: (_,snapshot){
-                              
-                                                  WidgetsBinding.instance.addPostFrameCallback((_){
-                                                    commentProgress = ((offset-sliverViewStartOffset)/(scrollViewController.position.maxScrollExtent - sliverViewStartOffset)).clamp(0, 1);
-                                                  });
-                              
-                              
-                                                  return AnimatedSize(
+                                        child: ValueListenableBuilder(
+                                          valueListenable: offsetNotifier,
+                                          builder: (_,offset,child) {
+                            
+                                            WidgetsBinding.instance.addPostFrameCallback((timeStamp){
+
+                                              //epInfo范围的总高度 => [120: Appbar+epPanel 高度]
+                                              sliverViewStartOffset = (epInfoKey.currentContext?.size!.height ?? 300)+120; 
+
+                                              //越过epInfo时开始激活
+                                              opacityDegree = min(0.8,offset/sliverViewStartOffset);
+
+                                              //剔除 sliverViewStartOffset 的高度进行计算 
+                                              commentProgress = ((offset-sliverViewStartOffset)/(scrollViewController.position.maxScrollExtent - sliverViewStartOffset)).clamp(0, 1);
+                                              //debugPrint("opacity: $offset / $sliverViewStartOffset");
+                                            });
+                            
+                                            
+                                            return FutureBuilder(
+                                              future: epsInformationFuture,
+                                              builder: (_,snapshot){
+
+                                                return Padding(
+                                                  padding: EdgeInsets.only(top:MediaQuery.paddingOf(context).top),
+                                                  child: AnimatedSize(
                                                     duration: const Duration(milliseconds: 300),
                                                     child:ColoredBox(
                                                       color: BangumiThemeColor.sea.color.withValues(alpha:opacityDegree),
@@ -218,12 +212,10 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
                                                         mainAxisAlignment: MainAxisAlignment.start,
                                                         children: [
                                                       
-                                                      
                                                           SizedBox(
                                                             height: 60,
                                                             child: EpTogglePanel(currentEp: selectedEp,totalEps: widget.totalEps)
                                                           ),
-                                                      
                                                       
                                                           AnimatedSize(
                                                             duration: const Duration(milliseconds: 300),
@@ -248,16 +240,17 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
                                                       
                                                       ),
                                                     )
-                                                 
-                              
-                                                  );
-                                                
-                                                }
-                                              );
-                                            }
-                                          )
-                                          
-                                        ),
+                                                  
+                                                                              
+                                                  ),
+                                                );
+                                              
+                                              }
+                                            );
+                                          }
+                                        )
+                                        
+                                      ),
                               
                                       commentDetailchild!
                                     ],
@@ -281,25 +274,35 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
                                     child: appbar!
                                   );
                                 },
-                                child: AppBar(
-                                  title: Text("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}"),
-                                  backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
-                                                    
-                                  actions: [
-                                                  
-                                    IconButton(
-                                      onPressed: () async {
-                                        if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
-                                          await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
-                                        }
-                                      },
-                                      icon: Transform.rotate(
-                                        angle: -45,
-                                        child: const Icon(Icons.link),
-                                      )
-                                    ),
-                                                    
-                                  ],
+
+                                child: ColoredBox(
+                                  color: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                  
+                                       IconButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).maybePop();
+                                          },
+                                          icon: const Icon(Icons.arrow_back),
+                                        ),
+                                  
+                                      ScalableText("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}",style: const TextStyle(),),
+                                  
+                                      IconButton(
+                                        onPressed: () async {
+                                          if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
+                                            await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
+                                          }
+                                        },
+                                        icon: Transform.rotate(
+                                          angle: -45,
+                                          child: const Icon(Icons.link),
+                                        )
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -355,16 +358,16 @@ class EpInfo extends StatelessWidget {
         ListTile(
           title: Row(
             children: [
-              Text("${epsInfo[selectedEp]!.nameCN ?? epsInfo[selectedEp]!.name}"),
+              ScalableText("${epsInfo[selectedEp]!.nameCN ?? epsInfo[selectedEp]!.name}"),
               const Padding(padding: PaddingH6),
-              Text("${epsInfo[selectedEp]!.airDate}",style: const TextStyle(fontSize: 14,color: Colors.grey)),
+              ScalableText("${epsInfo[selectedEp]!.airDate}",style: const TextStyle(fontSize: 14,color: Colors.grey)),
             ],
           ),
           
         ),
     
         ListTile(
-          title:  SelectableText("${epsInfo[selectedEp]!.description}"),
+          title:  ScalableText("${epsInfo[selectedEp]!.description}"),
         ),
     
        
@@ -428,11 +431,11 @@ class EpCommentPageDetails extends StatelessWidget {
                         padding: const EdgeInsets.all(16),
                         child: Row(
                           children: [
-                            const Text("吐槽箱",style: TextStyle(fontSize: 24)),
+                            const ScalableText("吐槽箱",style: TextStyle(fontSize: 24)),
                                       
                             const Padding(padding: PaddingH6),
                                       
-                            Text("$commentCount",style: const TextStyle(color: Colors.grey)),
+                            ScalableText("$commentCount",style: const TextStyle(color: Colors.grey)),
 
                             //BBCode测试
                             //BBCodeText(
@@ -459,7 +462,7 @@ class EpCommentPageDetails extends StatelessWidget {
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.only(top:64),
-                          child: Text("该集数暂无人评论...",style: TextStyle(fontSize: 16)),
+                          child: ScalableText("该集数暂无人评论..."),
                         ),
                       );
                     }

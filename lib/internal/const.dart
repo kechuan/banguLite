@@ -50,11 +50,15 @@ enum SortType{
 
 enum ScaleType{
 
-  small(),
-  medium(),
-  large();
+  min(0.85),
+  less(0.9),
+  medium(1.0),
+  more(1.1),
+  max(1.15);
 
-  const ScaleType();
+  final double fontScale;
+
+  const ScaleType(this.fontScale);
 }
 
 enum SeasonType{
@@ -108,19 +112,19 @@ enum ScoreRank{
 }
 
 
+
 enum BangumiThemeColor{
   sea(Color.fromARGB(255, 140, 205, 244)), //Primary: const Color.fromARGB(255, 140, 205, 244)
   macha(Color.fromARGB(255, 219, 245, 223)),
   ruby(Color.fromARGB(255, 255, 217, 217)),
   ;
-  
-  
 
   final Color color;
-
   const BangumiThemeColor(this.color);
 
 }
+
+
 
 const PaddingH6 = EdgeInsetsDirectional.symmetric(horizontal: 6);
 const PaddingH12 = EdgeInsetsDirectional.symmetric(horizontal: 12);

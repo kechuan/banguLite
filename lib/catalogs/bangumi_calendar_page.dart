@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -141,7 +142,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                               height: 60,
                               child: const Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text("本季热番",style: TextStyle(fontSize: 24)
+                                child: ScalableText("本季热番",style: TextStyle(fontSize: 24)
                               ))
                             )
                           ),
@@ -198,7 +199,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                   Positioned.fill(
                                                     child: weeklyBangumisRecommend!=null ?
                                                     CachedImageLoader(imageUrl: weeklyBangumisRecommend[currentIndex].coverUrl!) :
-                                                    const Center(child: Text("Loading"))
+                                                    const Center(child: ScalableText("Loading"))
                                                   ),
                                                   
                                                   Positioned.fill(
@@ -223,10 +224,10 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                                 SizedBox(
                                                                   width: constriant.maxWidth,
                                                                   child: ListTile(
-                                                                    title: Text(
+                                                                    title: ScalableText(
                                                                       weeklyBangumisRecommend?[currentIndex].name ?? "loading",
                                                                       maxLines: 2,
-                                                                      style: const TextStyle(fontSize: 16,color: Colors.white),
+                                                                      style: const TextStyle(color: Colors.white),
                                                                       overflow: TextOverflow.ellipsis,
                                                                     ),
                                                                     trailing: Container(
@@ -236,7 +237,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                                       ),
                                                                       child: Padding(
                                                                         padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 2),
-                                                                        child: Text(
+                                                                        child: ScalableText(
                                                                           "${weeklyBangumisRecommend?[currentIndex].ratingList["score"]?.toDouble() ?? "-.-"}",
                                                                           style: const TextStyle(fontSize: 14,color: Colors.black)
                                                                         ),
@@ -297,8 +298,8 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                   child: Row(
                                     children: [
                                   
-                                      //Text("星期${WeekDay.values[selectedDay].dayText}",style: const TextStyle(fontSize: 18)),
-                                      Text("星期${WeekDay.values[selectedDay - 1].dayText}",style: const TextStyle(fontSize: 18)),
+                                      //ScalableText("星期${WeekDay.values[selectedDay].dayText}",style: const TextStyle(fontSize: 18)),
+                                      ScalableText("星期${WeekDay.values[selectedDay - 1].dayText}",style: const TextStyle(fontSize: 18)),
                                   
                                       child!
                                   

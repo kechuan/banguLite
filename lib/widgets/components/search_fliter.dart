@@ -1,5 +1,6 @@
 
 
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/convert.dart';
@@ -91,7 +92,7 @@ class _SearchfliterState extends State<Searchfliter> {
               
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 6),
-                    child: Text("~"),
+                    child: ScalableText("~"),
                   ),
               
                   DateRangeSelect(
@@ -108,7 +109,7 @@ class _SearchfliterState extends State<Searchfliter> {
               Row(
                 children: [
               
-                  const Text("rankRange:"),
+                  const ScalableText("rankRange:"),
               
                   Row(
                     children: [
@@ -126,7 +127,7 @@ class _SearchfliterState extends State<Searchfliter> {
                                 
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12),
-                        child: Text("~"),
+                        child: ScalableText("~"),
                       ),
                                 
                                 
@@ -153,7 +154,7 @@ class _SearchfliterState extends State<Searchfliter> {
               Row(
                 children: [
                   
-                  const Text("tagInput:"),
+                  const ScalableText("tagInput:"),
                     
                   Padding(
                     padding: const EdgeInsets.only(left: 12),
@@ -194,9 +195,9 @@ class _SearchfliterState extends State<Searchfliter> {
               Row(
                 children: [
                   
-                  const Text("ratingRange:"),
+                  const ScalableText("ratingRange:"),
               
-                  Text("${ratingRange.start*10}"),
+                  ScalableText("${ratingRange.start*10}"),
         
                   //但好在还是可以间接的用Expanded来限制
                   Expanded(
@@ -217,7 +218,7 @@ class _SearchfliterState extends State<Searchfliter> {
                     ),
                   ),
               
-                  Text("${ratingRange.end*10}"),
+                  ScalableText("${ratingRange.end*10}"),
                 
                 
                 ],
@@ -268,7 +269,7 @@ class _SearchfliterState extends State<Searchfliter> {
                                           onPressed: (){},
                                           child: Row(
                                             children: [
-                                              Text(recordText),         
+                                              ScalableText(recordText),         
                                               const Padding(
                                                 padding: EdgeInsets.only(left: 12),
                                                 child: Icon(Icons.close),
@@ -285,7 +286,7 @@ class _SearchfliterState extends State<Searchfliter> {
                              child: Row(
                                children: [
                                  
-                                Text(tagsList[index]),
+                                ScalableText(tagsList[index]),
                                                
                                  const Padding(
                                    padding: EdgeInsets.only(left: 12),
@@ -302,7 +303,7 @@ class _SearchfliterState extends State<Searchfliter> {
                 ),
               ),
               
-              kDebugMode ? Text("AllData:${searchFliter.toString()}") :const SizedBox.shrink(),
+              kDebugMode ? ScalableText("AllData:${searchFliter.toString()}") :const SizedBox.shrink(),
         
               //Submit
               Row(
@@ -347,7 +348,7 @@ class _SearchfliterState extends State<Searchfliter> {
                           };
                       });
                       
-                    }, child: const Text("submit")
+                    }, child: const ScalableText("submit")
                   )
                 ]
               ),

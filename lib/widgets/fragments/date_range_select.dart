@@ -1,3 +1,4 @@
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
@@ -56,7 +57,7 @@ class DateRangeSelect extends StatelessWidget {
                     return PopupMenuItem(
                       
                       value: DateTime.now().year - (index~/2),
-                      child: Text("${ DateTime.now().year - (index~/2) }"),
+                      child: ScalableText("${ DateTime.now().year - (index~/2) }"),
                     );
                   }
                 )
@@ -65,7 +66,7 @@ class DateRangeSelect extends StatelessWidget {
           ),
         ),
 
-        const Text("年"),
+        const ScalableText("年"),
 
         SizedBox(
           width: 50,
@@ -81,7 +82,7 @@ class DateRangeSelect extends StatelessWidget {
                     value: index+1,
                     child: Align(
                       alignment: const Alignment(0.5,0),
-                      child: Text("${index+1}")
+                      child: ScalableText("${index+1}")
                     ),
                   );
                 }
@@ -91,7 +92,7 @@ class DateRangeSelect extends StatelessWidget {
           ),
         ),
 
-        const Text("月"),
+        const ScalableText("月"),
       ],
     );
     

@@ -12,6 +12,9 @@ class IndexModel extends ChangeNotifier {
   DateTime dataTime = DateTime.now();
   BangumiThemeColor currentThemeColor = BangumiThemeColor.sea;
   ThemeMode themeMode = ThemeMode.system;
+
+  ScaleType currentScale = AppFontSize.scale;
+
   int selectedWeekDay = DateTime.now().weekday;
 
 
@@ -19,13 +22,21 @@ class IndexModel extends ChangeNotifier {
 
   Map<String, List<BangumiDetails>> calendarBangumis = {}; //除了 星期一-日之外 还有一个 最热门 的属性存放评分7.0+的番剧
 
-  
-
   void updateThemeMode(ThemeMode mode) {
     themeMode = mode;
     notifyListeners();
   }
 
+  void updateThemeColor(BangumiThemeColor themeColor){
+    currentThemeColor = themeColor;
+    notifyListeners();
+  }
+
+  void updateFontSize(ScaleType scale) {
+    AppFontSize.scale = scale;
+    currentScale = scale;
+    notifyListeners();
+  }
 
   Future<void> reloadCalendar(){
     loadFuture = null;
@@ -70,6 +81,19 @@ class IndexModel extends ChangeNotifier {
   @override
   void notifyListeners() {
     super.notifyListeners();
+  }
+
+}
+
+class AppFontSize {
+  static ScaleType scale = ScaleType.medium;
+
+  static double  get s16 => 16 * scale.fontScale;
+  static double getScaledSize(double fontSize) => fontSize * scale.fontScale;
+
+  static init(){
+    //Hive 存放
+    scale = ScaleType.medium;
   }
 
 }

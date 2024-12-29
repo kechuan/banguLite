@@ -6,6 +6,7 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/eps_info.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -81,7 +82,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                           (index) => SizedBox(
                             height: 60,
                             width: 100,
-                            child: Center(child: Text("${(index*100)+1}~${min((index+1)*100,widget.totalEps)}"))
+                            child: Center(child: ScalableText("${(index*100)+1}~${min((index+1)*100,widget.totalEps)}"))
                           )
                           
                         ),
@@ -94,7 +95,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                     Center(
                       child: Padding(
                         padding: PaddingV12,
-                        child: Text("${widget.name}"),
+                        child: ScalableText("${widget.name}"),
                       )
                     ):
                   const SizedBox.shrink(),
@@ -196,7 +197,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                     },
                                             
                                     child: Center(
-                                      child: Text(
+                                      child: ScalableText(
                                         convertCollectionName(currentInfo,currentEpIndex),
                                         style: const TextStyle(color: Colors.black)
                                       ),

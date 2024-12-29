@@ -1,4 +1,5 @@
 import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
@@ -31,7 +32,7 @@ class IndexPortial extends StatelessWidget {
                     children: [
                       Icon(Icons.live_tv_rounded,size: 32),
                       Padding(padding: EdgeInsets.symmetric(horizontal: 12)),
-                      Text("BanguLite",style: TextStyle(fontSize: 16)),
+                      ScalableText("BanguLite"),
                     ],
                   ),
 

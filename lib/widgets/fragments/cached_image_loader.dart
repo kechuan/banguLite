@@ -1,4 +1,5 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +66,7 @@ class CachedImageLoader extends StatelessWidget {
                     ),
                     
                     child: Center(
-                      child: Text("loading... ${showProgressIndicator ? progress : ""}"), //loading
+                      child: ScalableText("loading... ${showProgressIndicator ? progress : ""}"), //loading
                     ),
                   );
                 },

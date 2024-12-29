@@ -2,6 +2,7 @@
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/get_task_information.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +70,7 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                               children: [
                                 ConstrainedBox(
                                   constraints: const BoxConstraints(maxWidth: 200),
-                                  child: Text(
+                                  child: ScalableText(
                                     !isValid ? "图片无法加载" : "点击查看图片",
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(color: !isValid ? Colors.grey : null),
@@ -78,9 +79,9 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
 
                                 ...?isValid ? [
                                   const Padding(padding: PaddingV6),
-                                  Text("size: ${convertTypeSize(pictureRequestInformation.contentLength ?? 0)}"),
+                                  ScalableText("size: ${convertTypeSize(pictureRequestInformation.contentLength ?? 0)}"),
                                   const Padding(padding: PaddingV6),
-                                  Text("type: ${pictureRequestInformation.contentType}"),
+                                  ScalableText("type: ${pictureRequestInformation.contentType}"),
                                 ] : null
              
                               ],

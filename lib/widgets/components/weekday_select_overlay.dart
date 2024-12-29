@@ -3,6 +3,7 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -130,7 +131,7 @@ class WeekDaySelectOverlay{
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children:  [
                                  const SizedBox.shrink(),
-                                 const Text("天数选择",style: TextStyle(fontSize: 16)),
+                                 const ScalableText("天数选择"),
                                  IconButton(onPressed: ()=> opacityListenable.value = 0.0, icon: const Icon(Icons.close))
                               ],
                             ),
@@ -150,7 +151,7 @@ class WeekDaySelectOverlay{
                                     child: ListTile(
                                       selectedTileColor: const Color.fromARGB(255, 147, 220, 149),
                                       selected: index == context.read<IndexModel>().selectedWeekDay - 1,
-                                      title: Text(WeekDay.values[index].dayText),
+                                      title: ScalableText(WeekDay.values[index].dayText),
                                       onTap: () {
 
                                         opacityListenable.value = 0.0;

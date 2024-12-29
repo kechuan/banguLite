@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
 class AnimatedSortSelector extends StatelessWidget {
@@ -75,7 +76,7 @@ class AnimatedSortSelector extends StatelessWidget {
             child: currentType == selectedType ? 
              Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: Text( labelText ?? "测试",style: const TextStyle(fontSize: 12)),
+              child: ScalableText( labelText ?? "测试",style: const TextStyle(fontSize: 12)),
             ) : 
             const SizedBox.shrink(),
           ),

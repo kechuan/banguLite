@@ -8,6 +8,7 @@ import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_review.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_topics.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
@@ -80,7 +81,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
               appBar: AppBar(
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha:0.6),
                 
-                title: ValueListenableBuilder(valueListenable: appbarTitleNotifier, builder: (_,appbarTitle,__)=>Text(appbarTitle,style: const TextStyle(color: Colors.black),)),
+                title: ValueListenableBuilder(valueListenable: appbarTitleNotifier, builder: (_,appbarTitle,__)=>ScalableText(appbarTitle,style: const TextStyle(color: Colors.black),)),
                 leading: IconButton(
                   onPressed: ()=>Navigator.of(context).pop(),
                   icon: const Icon(Icons.arrow_back)

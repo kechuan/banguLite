@@ -1,3 +1,4 @@
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 
@@ -50,7 +51,7 @@ class BangumiListTile extends ListTile {
                       maxWidth: constraint.maxWidth - imageSize.width, //calculate
                       
                     ),
-                    child: Text(
+                    child: ScalableText(
                       bangumiTitle ?? "name",
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -94,10 +95,10 @@ class BangumiGridTile extends StatelessWidget {
         
       footer: ListTile(
         title: Center(
-          child: Text(
+          child: ScalableText(
             bangumiTitle ?? "loading",
             maxLines: 2,
-            style: const TextStyle(fontSize: 16,color: Colors.white),
+            style: const TextStyle(color: Colors.white),
             overflow: TextOverflow.ellipsis,
           ),
         )

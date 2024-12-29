@@ -6,6 +6,7 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
@@ -61,6 +62,7 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
       'AppRoute',
       (link) {
         if(!isActived) return;
+        if(!context.mounted) return;
         appRouteMethod(context,link);
       }
     );
@@ -131,14 +133,14 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
               indicatorColor: BangumiThemeColor.sea.color,
               unselectedLabelColor: BangumiThemeColor.sea.color,
               labelColor: BangumiThemeColor.sea.color,
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelPadding: EdgeInsets.symmetric(horizontal: MediaQuery.sizeOf(context).width/min(widget.totalPageLength*2.5,16)), // 同屏数量*2
               
               tabs: 
                 List.generate(
                   widget.totalPageLength,
                   (index) => SizedBox(
-                    height: 60,
-                    width: MediaQuery.sizeOf(context).width/(widget.totalPageLength).clamp(1, 7), //最多存在7个
-                    child: Center(child: Text("${index+1}"))
+                    child: Tab(child: ScalableText("${index+1}"))
                   )
                 ),
             ),
@@ -152,25 +154,13 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
         child: PageView.builder(
           controller: widget.commentPageController,
           onPageChanged: (newPageIndex){
-        
             commentModel.changePage(newPageIndex+1);
-        
-            debugPrint("PageView Changed:${newPageIndex+1}");
-
             commentTabController.animateTo(newPageIndex);
-            
-            ////用于解决移动端允许拖拽commentPage以响应上方的tabController
-            ////但是它会令 tabController本身被受限 其本质原因是animateToPage。
-            //if(newPageIndex != commentTabController.index){
-            //  debugPrint("redirect commentTabController:$newPageIndex");
-            //  commentTabController.animateTo(newPageIndex);
-            //}
-        
+            debugPrint("PageView Changed:${newPageIndex+1}");
           },
           itemCount: widget.totalPageLength,
           itemBuilder: (_,index)=> CommentCachePage(
             currentPageIndex: index,
-            //commentsData: commentsData, //在loading的途中直接载入
             id: widget.subjectID,
           ),
         ),
@@ -194,12 +184,12 @@ class CommentLoading extends StatelessWidget {
               tabs: [
                 SizedBox(
                   height: 60,
-                  child: Center(child: Text("1"))
+                  child: Center(child: ScalableText("1"))
                 )
               ],
             ),
         
-            toolbarHeight: 50,
+            toolbarHeight: 60,
             
           ),
           body: const TabBarView(

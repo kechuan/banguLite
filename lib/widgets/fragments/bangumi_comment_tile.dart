@@ -1,4 +1,5 @@
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/comment_details.dart';
@@ -16,6 +17,7 @@ class BangumiCommentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      
       title: Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: Wrap(
@@ -34,7 +36,7 @@ class BangumiCommentTile extends StatelessWidget {
             //const FlutterLogo(),
             Image.asset("assets/icons/icon.png"),
         
-            Text(commentData.nickName ?? "nameID",style: const TextStyle(color: Colors.blue)),
+            ScalableText(commentData.nickName ?? "nameID",style: const TextStyle(color: Colors.blue)),
           ],
         ),
       ),
@@ -42,20 +44,23 @@ class BangumiCommentTile extends StatelessWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          BBCodeText(
+          ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(physics: const NeverScrollableScrollPhysics()),
+            child: BBCodeText(
               data: convertBangumiCommentSticker(commentData.comment ?? "comment"),
               stylesheet: BBStylesheet(
                 tags: allEffectTag,
                 selectableText: true,
-                defaultText: const TextStyle(fontFamily: 'MiSansFont',fontSize: 16)
+                defaultText: const TextStyle(fontFamily: 'MiSansFont')
               ),
             ),
+          ),
           Row(
             children: [
   
               Builder(builder: (_){
                 DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(commentData.commentTimeStamp!*1000);
-                return Text(
+                return ScalableText(
                   "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"
                 );
               }),
@@ -65,7 +70,7 @@ class BangumiCommentTile extends StatelessWidget {
               Row(
                 children: [
                   const Icon(Icons.arrow_upward_outlined),
-                  Text('(${commentData.rate})')
+                  ScalableText('(${commentData.rate})')
                 ],
               )
             ],
