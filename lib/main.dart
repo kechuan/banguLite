@@ -53,7 +53,7 @@ class MainApp extends StatelessWidget {
       child: Builder(
         builder: (context) {
           return Selector<IndexModel,BangumiThemeColor>(
-            selector: (_, indexModel) => indexModel.currentThemeColor,
+            selector: (_, indexModel) => indexModel.userConfig.currentThemeColor!,
             shouldRebuild: (previous, next) => previous!=next,
             builder: (_, currentThemeColor, child){
               return MaterialApp(
@@ -74,7 +74,7 @@ class MainApp extends StatelessWidget {
                     outline: Colors.white,
                   )
                 ),
-                themeMode: context.watch<IndexModel>().themeMode,
+                themeMode: context.watch<IndexModel>().userConfig.themeMode,
                   
                 initialRoute: Routes.index,
                 //navigatorObservers: [],

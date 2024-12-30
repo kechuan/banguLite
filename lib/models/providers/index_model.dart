@@ -1,40 +1,67 @@
 
 import 'dart:async';
 
+import 'package:bangu_lite/hive/config_model.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/hive.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
 
 class IndexModel extends ChangeNotifier {
-  IndexModel();
+  IndexModel(){
+    initModel();
+  }
 
   DateTime dataTime = DateTime.now();
-  BangumiThemeColor currentThemeColor = BangumiThemeColor.sea;
-  ThemeMode themeMode = ThemeMode.system;
-
-  ScaleType currentScale = AppFontSize.scale;
-
   int selectedWeekDay = DateTime.now().weekday;
-
 
   static Completer? loadFuture; //适用作用目标只有一个的对象里
 
-  Map<String, List<BangumiDetails>> calendarBangumis = {}; //除了 星期一-日之外 还有一个 最热门 的属性存放评分7.0+的番剧
+  int cachedImageSize = 0;
+
+  //除了 星期一-日之外 还有一个 最热门 的属性存放评分7.0+的番剧
+  Map<String, List<BangumiDetails>> calendarBangumis = {}; 
+  AppConfig userConfig = defaultAPPConfig();
+
+  void initModel() async {
+    loadConfigData();
+    updateCachedSize();
+  }
+
+  void loadConfigData(){
+
+    for(AppConfig currentConfig in MyHive.appConfigDataBase.values){
+      userConfig = currentConfig;
+    }
+
+  }
 
   void updateThemeMode(ThemeMode mode) {
-    themeMode = mode;
+    userConfig.themeMode = mode;
     notifyListeners();
   }
 
   void updateThemeColor(BangumiThemeColor themeColor){
-    currentThemeColor = themeColor;
+    userConfig.currentThemeColor = themeColor;
     notifyListeners();
   }
 
   void updateFontSize(ScaleType scale) {
     AppFontSize.scale = scale;
-    currentScale = scale;
+    userConfig.fontScale = scale;
+    notifyListeners();
+  }
+
+  void updateFollowThemeColor(bool detailfollowStatus){
+    userConfig.detailfollowThemeColor = detailfollowStatus;
+    notifyListeners();
+  }
+
+  Future<void> updateCachedSize() async {
+    cachedImageSize = await compute(getTotalSizeOfFilesInDir, MyHive.cachedImageDir);
     notifyListeners();
   }
 

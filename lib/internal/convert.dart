@@ -1,4 +1,5 @@
 
+import 'dart:io';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
@@ -197,8 +198,25 @@ String convertEPInfoType(int? type){
   return resultEPType.replaceFirst(resultEPType[0], resultEPType[0].toUpperCase());
 }
 
-
-
 bool judgeDarknessMode(BuildContext context){
   return Theme.of(context).brightness == Brightness.dark ? true : false;
+}
+
+Future<int> getTotalSizeOfFilesInDir(final FileSystemEntity fileSystemEntity) async {
+  if (fileSystemEntity is File && fileSystemEntity.existsSync()) {
+    return await fileSystemEntity.length();
+  }
+  
+  if (fileSystemEntity is Directory && fileSystemEntity.existsSync()) {
+    List children = fileSystemEntity.listSync();
+    int total = 0;
+    if (children.isNotEmpty){
+      for (final FileSystemEntity child in children) {
+        total += await getTotalSizeOfFilesInDir(child);
+      }
+    }
+      
+    return total;
+  }
+  return 0;
 }

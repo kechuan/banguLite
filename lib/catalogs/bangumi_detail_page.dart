@@ -91,7 +91,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
                   ToggleThemeModeButton(
                     onThen: (){
                       //debugPrint("trigged onThen");
-                      bangumiModel.getThemeColor(bangumiModel.imageColor ?? BangumiThemeColor.sea.color,darkMode: indexModel.themeMode == ThemeMode.dark);
+                      bangumiModel.getThemeColor(bangumiModel.imageColor ?? BangumiThemeColor.sea.color,darkMode: indexModel.userConfig.themeMode == ThemeMode.dark);
                     }
                   ),
 
