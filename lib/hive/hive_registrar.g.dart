@@ -9,6 +9,7 @@ extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(AppConfigAdapter());
     registerAdapter(BangumiThemeColorAdapter());
+    registerAdapter(ColorAdapter());
     registerAdapter(ScaleTypeAdapter());
     registerAdapter(ThemeModeAdapter());
   }

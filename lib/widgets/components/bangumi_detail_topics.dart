@@ -53,8 +53,7 @@ class BangumiDetailTopics extends StatelessWidget {
                 shape: const Border(),
                 onExpansionChanged: (topicCollapseStatus) => topicCollapseStatusNotifier.value = topicCollapseStatus,
                 title: Row(
-                      
-                    children: [
+                   children: [
                          Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8), //16
                           child: Row(
@@ -107,6 +106,7 @@ class BangumiDetailTopics extends StatelessWidget {
               
                         return ListView.builder(
                           shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: min(6,topicsList.length),
                           itemBuilder: (context, index) {
               
@@ -116,10 +116,11 @@ class BangumiDetailTopics extends StatelessWidget {
                                         
                             return Theme(
                               data: ThemeData(
-                                colorSchemeSeed: bangumiModel.bangumiThemeColor,
+                                colorSchemeSeed: judgeDetailRenderColor(context,bangumiModel.bangumiThemeColor),
                                 fontFamily: 'MiSansFont'
                               ),
                               child: Card(
+                                
                                 child: ListTile(
                                  
                                   title: ScalableText("${topicsList[index].topicName}"),

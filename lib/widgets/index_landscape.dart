@@ -3,12 +3,14 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
 import 'package:bangu_lite/catalogs/bangumi_sort_page.dart';
 import 'package:bangu_lite/delegates/search_delegates.dart';
+import 'package:provider/provider.dart';
 
 class IndexLandscape extends StatelessWidget {
   const IndexLandscape({
@@ -20,6 +22,8 @@ class IndexLandscape extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final indexModel = context.read<IndexModel>();
     
     return ValueListenableBuilder(
       valueListenable: selectedPageIndexNotifier,
@@ -45,10 +49,9 @@ class IndexLandscape extends StatelessWidget {
 
                   InkResponse(
                     onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        Routes.settings,
-                      );
+                      
+                      indexModel.updateCachedSize();
+                      Navigator.pushNamed(context,Routes.settings);
                     },
                     child: Icon(Icons.settings,size: min(30,MediaQuery.sizeOf(context).width/15)),
                   ),

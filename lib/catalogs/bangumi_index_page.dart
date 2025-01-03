@@ -8,7 +8,6 @@ import 'package:bangu_lite/widgets/index_landscape.dart';
 import 'package:bangu_lite/widgets/index_portial.dart';
 import 'package:flutter/services.dart';
 
-
 @FFRoute(name: '/index')
 
 class BangumiIndexPage extends StatelessWidget {

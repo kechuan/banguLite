@@ -69,11 +69,6 @@ class _BangumiStarPageState extends State<BangumiStarPage> {
                 }
               );
               
-
-              //showDialog(
-              //  context: context,
-              //  builder: 
-              //);
             },
             icon: const Icon(Icons.close)
           )

@@ -23,6 +23,7 @@ class EpTogglePanel extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final EpModel epModel = context.read<EpModel>();
+    //final IndexModel indexModel = context.read<IndexModel>();
     
     //迟早变成 SliverAppbar
     return Container(
@@ -45,9 +46,7 @@ class EpTogglePanel extends StatelessWidget {
     
                     Builder(
                       builder: (_){
-                        //终末
-    
-    
+
                         //越过边境线 需求加载
                         if( currentEp != 1 && epModel.epsData[currentEp-1] == null){
     
@@ -72,7 +71,10 @@ class EpTogglePanel extends StatelessWidget {
                           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3),
                           child: ScalableText(
                             convertCollectionName(epModel.epsData[max(1,currentEp-1)]!, max(1,currentEp-1)),
-                            style: TextStyle(color: currentEp == 1 ? Colors.grey :Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,fontFamily: "MiSansFont"),
+                            style: TextStyle(
+                              color: currentEp == 1 ? Colors.grey : judgeDarknessMode(context) ? Colors.white : Colors.black,
+                              fontFamily: "MiSansFont"
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         );
@@ -122,9 +124,8 @@ class EpTogglePanel extends StatelessWidget {
                         return ConstrainedBox(
                           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3) ,
                           child: ScalableText(
-                            convertCollectionName(epModel.epsData[min(totalEps,currentEp+1)]!, min(totalEps,currentEp+1)),
-                            //"Ep. ${min(totalEps,currentEp+1)} ${epModel.epsData[min(totalEps,currentEp+1)]!.nameCN!.isEmpty ? epModel.epsData[min(totalEps,currentEp+1)]?.name : epModel.epsData[min(totalEps,currentEp+1)]?.nameCN ?? "loading"}",
-                            style: TextStyle(color: currentEp == totalEps ? Colors.grey :Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,fontFamily: "MiSansFont"),
+                            convertCollectionName(epModel.epsData[min(totalEps,currentEp+1)]!, min(totalEps,currentEp+1)),                            
+                            style: TextStyle(color: currentEp == totalEps ? Colors.grey :judgeDarknessMode(context) ? Colors.white : Colors.black,fontFamily: "MiSansFont"),
                             overflow: TextOverflow.ellipsis,
                           ),
                         );

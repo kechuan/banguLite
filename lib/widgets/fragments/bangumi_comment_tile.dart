@@ -1,4 +1,5 @@
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/convert.dart';
@@ -51,7 +52,7 @@ class BangumiCommentTile extends StatelessWidget {
               stylesheet: BBStylesheet(
                 tags: allEffectTag,
                 selectableText: true,
-                defaultText: const TextStyle(fontFamily: 'MiSansFont')
+                defaultText: TextStyle(fontFamily: 'MiSansFont',fontSize: AppFontSize.s16)
               ),
             ),
           ),

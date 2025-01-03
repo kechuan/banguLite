@@ -56,7 +56,7 @@ class BangumiRankBox extends StatelessWidget {
                               ScalableText(
                                 "${bangumiDetails.ratingList["score"]?.toDouble()}",
                                 style: TextStyle(
-                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*(((bangumiDetails.ratingList["score"] as num))/10).toInt()), 0, 1),
+                                  color: judgeDarknessMode(context) ? Colors.white : Color.fromRGBO(255-(255*((bangumiDetails.ratingList["score"] ?? 0)/10)).toInt(), (255*(((bangumiDetails.ratingList["score"] as num))/10).toInt()), 0, 1),
                                   fontWeight: FontWeight.bold,
                                   decoration: bangumiDetails.ratingList["rank"]!=0 ? null : TextDecoration.lineThrough ,
                                   decorationThickness: 5,
@@ -82,7 +82,7 @@ class BangumiRankBox extends StatelessWidget {
                               const Padding(padding: EdgeInsets.only(left: 6)),
                           
                           
-                              ScalableText(bangumiDetails.ratingList["rank"]!=0 ? 'Rank ${convertSubjectType(bangumiDetails.type)} #${bangumiDetails.ratingList["rank"]}' : "暂无排名"),
+                              ScalableText(bangumiDetails.ratingList["rank"]!=0 ? 'Rank ${convertSubjectType(bangumiDetails.type)} #${bangumiDetails.ratingList["rank"]}' : "Rank ${convertSubjectType(bangumiDetails.type)} #-"),
                                           
                             ],
                           )

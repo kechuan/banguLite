@@ -1,6 +1,5 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
-import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -32,20 +31,13 @@ class CachedImageLoader extends StatelessWidget {
               return CachedNetworkImage(
                 imageUrl: imageUrl!,
                 imageBuilder: (_,imageProvider){
-                  return UnVisibleResponse(
-                    onTap: (){
-                      //debugPrint("photoViewStatus: $photoViewStatus");
-                      //photoViewStatus == true ? photoView(context,imageProvider) : null ;
-                    },
-
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: imageProvider,
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.circular(16)
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
                       ),
+                      borderRadius: BorderRadius.circular(16)
                     ),
                   );
                 },
@@ -66,7 +58,7 @@ class CachedImageLoader extends StatelessWidget {
                     ),
                     
                     child: Center(
-                      child: ScalableText("loading... ${showProgressIndicator ? progress : ""}"), //loading
+                      child: ScalableText("loading... ${showProgressIndicator ? progress.progress : ""}"), //loading
                     ),
                   );
                 },

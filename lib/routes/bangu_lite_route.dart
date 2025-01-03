@@ -13,6 +13,7 @@ import 'package:bangu_lite/models/topic_info.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/widgets.dart';
 
+import '../catalogs/about_page.dart';
 import '../catalogs/bangumi_comment_page.dart';
 import '../catalogs/bangumi_detail_page.dart';
 import '../catalogs/bangumi_ep_page.dart';
@@ -135,6 +136,16 @@ FFRouteSettings getRouteSettings({
           topicInfo: asT<TopicInfo>(
             safeArguments['topicInfo'],
           )!,
+        ),
+      );
+    case 'about':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => AboutPage(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
         ),
       );
     case 'settings':

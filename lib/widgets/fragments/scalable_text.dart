@@ -8,19 +8,29 @@ class ScalableText extends Text {
     super.maxLines,
     super.overflow,
     super.style,
+    this.selectable = false
   }) : super('');
 
   final String text;
+  final bool selectable;
 
 
   @override
   Widget build(BuildContext context) {
 
-    double? originalSize = style?.fontSize;
+    TextStyle? currentStyle = style ?? const TextStyle();
+    double? originalSize = currentStyle.fontSize;
 
-    return Text(
+    return selectable ?
+    SelectableText(
       text,
-      style: style?.copyWith(
+      style: currentStyle.copyWith(
+        fontSize: originalSize != null ? AppFontSize.getScaledSize(originalSize) : AppFontSize.getScaledSize(AppFontSize.s16)
+      ),
+    ) :
+    Text(
+      text,
+      style: currentStyle.copyWith(
         fontSize: originalSize != null ? AppFontSize.getScaledSize(originalSize) : AppFontSize.getScaledSize(AppFontSize.s16)
       ),
     );

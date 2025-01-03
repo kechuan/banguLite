@@ -66,22 +66,34 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                             width: 200,
                             child: Column(
                               
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                ConstrainedBox(
-                                  constraints: const BoxConstraints(maxWidth: 200),
-                                  child: ScalableText(
-                                    !isValid ? "图片无法加载" : "点击查看图片",
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(color: !isValid ? Colors.grey : null),
-                                  )
+                                const Spacer(),
+
+                                Expanded(
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(maxWidth: 200),
+                                    child: ScalableText(
+                                      !isValid ? "图片无法加载" : "点击查看图片",
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(color: !isValid ? Colors.grey : null),
+                                    )
+                                  ),
                                 ),
+
+
+                                ...?!isValid ? [
+                                  ScalableText(pictureRequestInformation.statusMessage ?? ""),
+                                  const Padding(padding: PaddingV12),
+                                  
+                                ] : null,
 
                                 ...?isValid ? [
                                   const Padding(padding: PaddingV6),
                                   ScalableText("size: ${convertTypeSize(pictureRequestInformation.contentLength ?? 0)}"),
                                   const Padding(padding: PaddingV6),
                                   ScalableText("type: ${pictureRequestInformation.contentType}"),
+                                  const Padding(padding: PaddingV6),
                                 ] : null
              
                               ],
@@ -89,7 +101,10 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                           );
                         }
                   
-                        return CachedNetworkImage(imageUrl: widget.imageUrl);
+                        return CachedNetworkImage(imageUrl: widget.imageUrl,fit: BoxFit.cover,);
+             
+                        //return CachedImageLoader(imageUrl: widget.imageUrl,photoViewStatus:true); 
+                        //problem: not work with DecorationImage
                         
                       }
                     ),

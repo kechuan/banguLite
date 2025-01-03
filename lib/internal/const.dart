@@ -38,6 +38,17 @@ enum ViewType{
 
 }
 
+enum AbiType{
+  arm64("安卓64位"),
+  armeabi("安卓32位"),
+  windows("windows");
+
+  final String abiName;
+
+  const AbiType(this.abiName);
+  
+}
+
 enum SortType{
   rank("rank"),
   heat("heat"),
@@ -137,4 +148,5 @@ const PaddingH12V6 = EdgeInsetsDirectional.symmetric(horizontal: 12,vertical: 6)
 
 const Padding6 = EdgeInsetsDirectional.all(6);
 const Padding12 = EdgeInsetsDirectional.all(12);
+const Padding16 = EdgeInsetsDirectional.all(16);
 

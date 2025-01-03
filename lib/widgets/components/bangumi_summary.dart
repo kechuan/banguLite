@@ -79,9 +79,8 @@ class BangumiSummary extends StatelessWidget {
                           ),
                           child: TextButton(
                             onPressed: ()=> expandedSummaryNotifier.value = false, 
-                            child: const ScalableText("收缩"
-                            
-                          )),
+                            child: const ScalableText("收缩")
+                          ),
                         )) :
                       const SizedBox.shrink()
                   
@@ -117,8 +116,9 @@ class BangumiSummary extends StatelessWidget {
       },
       child: 
         SizedBox(
-          width: double.infinity, //强制让文字(滚动组件)内容占满整个宽度
+          width: double.infinity,
           child: ScalableText(
+            selectable: true,
             summary ?? "no Data",
             style: const TextStyle(overflow: TextOverflow.ellipsis),          
           ),

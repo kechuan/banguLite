@@ -229,8 +229,7 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                                 ),
                               );
                             }
-                            
-                          
+
                             return EpCommentView(epCommentData: currentTopicDetail.repliedComment![topicCommentIndex-1]);
                           },
                           separatorBuilder: (_,__,) => const Divider(height: 1)

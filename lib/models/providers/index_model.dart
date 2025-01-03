@@ -28,7 +28,7 @@ class IndexModel extends ChangeNotifier {
 
   void initModel() async {
     loadConfigData();
-    updateCachedSize();
+    
   }
 
   void loadConfigData(){
@@ -39,30 +39,55 @@ class IndexModel extends ChangeNotifier {
 
   }
 
-  void updateThemeMode(ThemeMode mode) {
+  void updateThemeMode(ThemeMode mode,{bool? config}) {
     userConfig.themeMode = mode;
     notifyListeners();
+    if(config == true) updateConfig();
+    
   }
 
   void updateThemeColor(BangumiThemeColor themeColor){
     userConfig.currentThemeColor = themeColor;
+	userConfig.isSelectedCustomColor = false;
     notifyListeners();
+    updateConfig();
+  }
+
+  void updateCustomColor(Color customColor){
+	userConfig.customColor = customColor;
+	userConfig.isSelectedCustomColor = true;
+    notifyListeners();
+    updateConfig();
   }
 
   void updateFontSize(ScaleType scale) {
     AppFontSize.scale = scale;
     userConfig.fontScale = scale;
     notifyListeners();
+    updateConfig();
   }
 
   void updateFollowThemeColor(bool detailfollowStatus){
-    userConfig.detailfollowThemeColor = detailfollowStatus;
+    userConfig.isfollowThemeColor = detailfollowStatus;
     notifyListeners();
+    updateConfig();
+  }
+
+  void resetConfig(){
+    MyHive.appConfigDataBase.clear();
+    userConfig = defaultAPPConfig();
+    AppFontSize.scale = ScaleType.medium;
+    notifyListeners();
+  }
+
+  void updateConfig(){
+	  MyHive.appConfigDataBase.put("currentTheme", userConfig);
   }
 
   Future<void> updateCachedSize() async {
     cachedImageSize = await compute(getTotalSizeOfFilesInDir, MyHive.cachedImageDir);
     notifyListeners();
+    updateConfig();
   }
 
   Future<void> reloadCalendar(){
@@ -103,10 +128,14 @@ class IndexModel extends ChangeNotifier {
   void updateSelectedWeekDay(int newWeekDay){
     selectedWeekDay = newWeekDay;
     notifyListeners();
+    updateConfig();
   }
+
+
 
   @override
   void notifyListeners() {
+	
     super.notifyListeners();
   }
 
@@ -115,7 +144,7 @@ class IndexModel extends ChangeNotifier {
 class AppFontSize {
   static ScaleType scale = ScaleType.medium;
 
-  static double  get s16 => 16 * scale.fontScale;
+  static double get s16 => 16 * scale.fontScale;
   static double getScaledSize(double fontSize) => fontSize * scale.fontScale;
 
   static init(){

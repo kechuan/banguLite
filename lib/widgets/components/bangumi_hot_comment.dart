@@ -8,7 +8,6 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_tile.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -204,14 +203,13 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                             child: ValueListenableBuilder(
                               valueListenable: isOldCommentSort,
                               builder: (_,isOldCommentSort,child) {
-                                return SvgPicture.asset(
-                                  'assets/icons/time_sort_old.svg',
-                                  semanticsLabel: "从旧到新排序",
-                                  height: 32,
-                                  width: 32,
-                                  color: isOldCommentSort ?Colors.black : null,
-                                  
+                                return Icon(
+                                  Icons.history_outlined,
+                                  color: isOldCommentSort ? Colors.black : Colors.grey,
+                                  semanticLabel: "从旧到新排序",
+                                  size: 32,
                                 );
+
                               }
                             )
                           ),

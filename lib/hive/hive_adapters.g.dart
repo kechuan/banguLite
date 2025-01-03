@@ -21,13 +21,14 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
       ..fontScale = fields[1] as ScaleType?
       ..themeMode = fields[2] as ThemeMode?
       ..customColor = fields[3] as Color?
-      ..detailfollowThemeColor = fields[4] as bool?;
+      ..isSelectedCustomColor = fields[5] as bool?
+      ..isfollowThemeColor = fields[6] as bool?;
   }
 
   @override
   void write(BinaryWriter writer, AppConfig obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.currentThemeColor)
       ..writeByte(1)
@@ -36,8 +37,10 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
       ..write(obj.themeMode)
       ..writeByte(3)
       ..write(obj.customColor)
-      ..writeByte(4)
-      ..write(obj.detailfollowThemeColor);
+      ..writeByte(5)
+      ..write(obj.isSelectedCustomColor)
+      ..writeByte(6)
+      ..write(obj.isfollowThemeColor);
   }
 
   @override
@@ -178,6 +181,40 @@ class ScaleTypeAdapter extends TypeAdapter<ScaleType> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ScaleTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ColorAdapter extends TypeAdapter<Color> {
+  @override
+  final int typeId = 4;
+
+  @override
+  Color read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Color(
+      (fields[0] as num).toInt(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Color obj) {
+    writer
+      ..writeByte(1)
+      ..writeByte(0)
+      ..write(obj.value);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ColorAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

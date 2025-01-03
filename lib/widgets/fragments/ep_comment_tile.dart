@@ -2,6 +2,7 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,19 @@ class EpCommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    bool commentBlockStatus = false;
+
+    if(
+      ( epCommentData.state == CommentState.adminCloseTopic.index ||
+        epCommentData.state == CommentState.userDelete.index ||
+        epCommentData.state == CommentState.adminDelete.index
+      ) && epCommentData.state != null
+    ){
+      commentBlockStatus = true;
+    }
+
+
     return ListTile(
       
       title: Column(
@@ -90,29 +104,27 @@ class EpCommentTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //ScalableText("${epCommentData.state}"),
-            if(
-              ( epCommentData.state == CommentState.adminCloseTopic.index ||
-                epCommentData.state == CommentState.userDelete.index ||
-                epCommentData.state == CommentState.adminDelete.index
-              ) &&  epCommentData.state != null
-            )
+            
+            commentBlockStatus ?
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const ScalableText("发言已隐藏"),
                   ScalableText("原因: ${CommentState.values[epCommentData.state!].reason}")
                 ],
-              ),
-            
-            BBCodeText(
-              data: convertBangumiCommentSticker(epCommentData.comment ?? "comment"),
-              stylesheet: BBStylesheet(
-                tags: allEffectTag,
-                selectableText: true,
-                defaultText: const TextStyle(fontFamily: 'MiSansFont')
-              ),
-            ),
+              )
+            : const SizedBox.shrink(),
+
+            !commentBlockStatus ? 
+              BBCodeText(
+                data: convertBangumiCommentSticker(epCommentData.comment ?? "comment"),
+                stylesheet: BBStylesheet(
+                  tags: allEffectTag,
+                  selectableText: true,
+                  defaultText: TextStyle(fontFamily: 'MiSansFont',fontSize: AppFontSize.s16)
+                ),
+              ) 
+            : const SizedBox.shrink(),
         
             const Row(
               mainAxisAlignment: MainAxisAlignment.end,

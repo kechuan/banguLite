@@ -14,6 +14,7 @@ class MyHive {
 
   static late final Directory filesDir; //存储目录
   static late final Directory cachedImageDir;
+  static late final Directory? downloadDir;
 
   static late final Box<Map> starBangumisDataBase;
   static late final Box<AppConfig> appConfigDataBase;
@@ -24,6 +25,8 @@ class MyHive {
 
       //指向 /data/data/<package_name>/files
       filesDir = await getApplicationDocumentsDirectory();
+
+      downloadDir = await getDownloadsDirectory();
 
       //指向 /data/data/<package_name>/cache
       await getApplicationCacheDirectory().then((directory){
@@ -42,6 +45,8 @@ class MyHive {
       await getTemporaryDirectory().then((directory){
         cachedImageDir = Directory('${directory.path}${Platform.pathSeparator}libCachedImageData');
       });
+
+      downloadDir = await getDownloadsDirectory();
 
     }
     

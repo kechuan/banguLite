@@ -48,7 +48,7 @@ class EpRepliedTile extends ListTile {
                   
                         const Padding(padding: PaddingH6),
     
-                        Expanded(child: ScalableText("${epCommentData.repliedComment![index].comment}"),)
+                        Expanded(child: ScalableText("${epCommentData.repliedComment![index].comment}"))
 
                       ],
                     ),

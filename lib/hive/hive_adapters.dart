@@ -11,6 +11,7 @@ part 'hive_adapters.g.dart';
     AdapterSpec<BangumiThemeColor>(),
     AdapterSpec<ThemeMode>(),
     AdapterSpec<ScaleType>(),
+    AdapterSpec<Color>(),
   ]    
 )
 // Annotations must be on some element

@@ -9,6 +9,7 @@ import 'package:bangu_lite/models/eps_info.dart';
 
 @FFAutoImport()
 import 'package:bangu_lite/models/providers/ep_model.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 
 import 'package:bangu_lite/widgets/components/ep_comments.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comments_progress_slider.dart';
@@ -18,7 +19,6 @@ import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -143,7 +143,9 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
                                 
                                       SliverPinnedHeader(
                                         child: AppBar(
-                                          title: ScalableText("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}"),
+                                          //title: ScalableText("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}"),
+                                          
+                                          title: ScalableText("${convertCollectionName(epModel.epsData[selectedEp],selectedEp)} ${epModel.epsData[selectedEp]!.nameCN}"),
                                           backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
                                 
                                           actions: [
@@ -200,12 +202,14 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
                                               future: epsInformationFuture,
                                               builder: (_,snapshot){
 
+                                                final indexModel = context.read<IndexModel>();
+
                                                 return Padding(
                                                   padding: EdgeInsets.only(top:MediaQuery.paddingOf(context).top),
                                                   child: AnimatedSize(
                                                     duration: const Duration(milliseconds: 300),
                                                     child:ColoredBox(
-                                                      color: BangumiThemeColor.sea.color.withValues(alpha:opacityDegree),
+                                                      color: indexModel.userConfig.currentThemeColor!.color.withValues(alpha:opacityDegree),
                                                       child: SizedBox(
                                                         height: opacityDegree == 0.8 ? 120 : 60,
                                                         child: Column(
@@ -344,6 +348,8 @@ class EpInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    
 
     if(epsInfo.isEmpty){
       return const Skeletonizer(

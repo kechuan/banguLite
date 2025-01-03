@@ -9,7 +9,8 @@ class AppConfig extends HiveObject{
   ScaleType? fontScale;
   ThemeMode? themeMode;
   Color? customColor;
-  bool? detailfollowThemeColor;
+  bool? isSelectedCustomColor;
+  bool? isfollowThemeColor;
 
   @override
   String toString() {
@@ -19,7 +20,8 @@ class AppConfig extends HiveObject{
       fontScale:$fontScale
       themeMode:$themeMode
       customColor:$customColor
-      follow:$detailfollowThemeColor
+      isSelectedCustomColor:$isSelectedCustomColor
+      follow:$isfollowThemeColor
     ]""";
   }
 }
@@ -30,6 +32,7 @@ AppConfig defaultAPPConfig(){
     ..currentThemeColor = BangumiThemeColor.sea
     ..fontScale = ScaleType.medium
     ..themeMode = ThemeMode.system
-    ..detailfollowThemeColor = false
+    ..isfollowThemeColor = false
+    ..isSelectedCustomColor = false
   ;
 }

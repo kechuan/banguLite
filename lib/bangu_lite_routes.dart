@@ -15,6 +15,7 @@ const List<String> routeNames = <String>[
   '/subjectDetail',
   '/subjectEp',
   '/subjectTopic',
+  'about',
   'settings',
 ];
 
@@ -80,6 +81,11 @@ class Routes {
   ///
   /// BangumiTopicPage : [TopicModel(required) topicModel, TopicInfo(required) topicInfo]
   static const String subjectTopic = '/subjectTopic';
+
+  /// 'about'
+  ///
+  /// [name] : 'about'
+  static const String about = 'about';
 
   /// 'settings'
   ///

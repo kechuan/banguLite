@@ -57,7 +57,7 @@ class _SearchfliterState extends State<Searchfliter> {
   @override
   Widget build(BuildContext context) {
 
-    Theme.of(context).brightness == Brightness.dark ? 
+    judgeDarknessMode(context) ? 
     inputBorderShow = true :
     inputBorderShow = false;
 
