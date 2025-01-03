@@ -9,6 +9,7 @@ import 'package:bangu_lite/widgets/components/bangumi_detail_images.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_infobox.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_tags.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_rank_box.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_button.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -84,8 +85,8 @@ class IntroPortrait extends StatelessWidget {
 
                         Expanded(
                           child: ListTile(
-                            title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
-                            subtitle: Text(bangumiDetails.informationList["alias"] ?? "")
+                            title: ScalableText("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
+                            subtitle: ScalableText(bangumiDetails.informationList["alias"] ?? "")
                           )
                         ),
 
@@ -172,7 +173,7 @@ class IntroPortrait extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("放送详情"),
+                    const ScalableText("放送详情"),
                   
                     Row(
                       
@@ -190,7 +191,7 @@ class IntroPortrait extends StatelessWidget {
                               convertAiredEps(bangumiDetails.informationList["air_date"]) >= bangumiDetails.informationList["eps"] ||
                               bangumiDetails.informationList["eps"] > 500 //不确定长度
                             ){
-                              return Text("共${bangumiDetails.informationList["eps"]}集");
+                              return ScalableText("共${bangumiDetails.informationList["eps"]}集");
                             }
 
                             if(bangumiDetails.informationList["eps"] != 0){
@@ -210,8 +211,8 @@ class IntroPortrait extends StatelessWidget {
                               }
                             }
 
-                            return Text("$airedEps/${bangumiDetails.informationList["eps"]}");
-                            //return Text("${convertAiredEps(bangumiDetails.informationList["air_date"])}/${bangumiDetails.informationList["eps"]}");
+                            return ScalableText("$airedEps/${bangumiDetails.informationList["eps"]}");
+                            //return ScalableText("${convertAiredEps(bangumiDetails.informationList["air_date"])}/${bangumiDetails.informationList["eps"]}");
                           }
                         ),
 
@@ -285,8 +286,8 @@ class IntroLandscape extends StatelessWidget {
                         Clipboard.setData(ClipboardData(text: '${bangumiDetails.informationList["alias"] ?? ""}'));
                         fadeToaster(context:context,message:"alias已复制");
                       },
-                      title: Text("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
-                      subtitle: Text(bangumiDetails.informationList["alias"] ?? ""),
+                      title: ScalableText("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
+                      subtitle: ScalableText(bangumiDetails.informationList["alias"] ?? ""),
                       trailing: StarButton(bangumiDetails: bangumiDetails)
                     )
                 ),

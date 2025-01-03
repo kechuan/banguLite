@@ -1,9 +1,16 @@
+import 'dart:math';
+
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
+import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
 import 'package:bangu_lite/catalogs/bangumi_sort_page.dart';
 import 'package:bangu_lite/delegates/search_delegates.dart';
+import 'package:provider/provider.dart';
 
 class IndexLandscape extends StatelessWidget {
   const IndexLandscape({
@@ -15,6 +22,8 @@ class IndexLandscape extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final indexModel = context.read<IndexModel>();
     
     return ValueListenableBuilder(
       valueListenable: selectedPageIndexNotifier,
@@ -28,9 +37,27 @@ class IndexLandscape extends StatelessWidget {
               selectedIndex: currentPageIndex,
               
               leading: railLeading!,
-              trailing: const Padding(
-                padding: EdgeInsets.only(top: 120), //magic number
-                child: ToggleThemeModeButton(),
+              trailing: Column(
+                children: [
+
+                  const Padding(
+                    padding: EdgeInsets.only(top: 120), //magic number
+                    child: ToggleThemeModeButton(),
+                  ),
+
+                  const Padding(padding: PaddingV12),
+
+                  InkResponse(
+                    onTap: () {
+                      
+                      indexModel.updateCachedSize();
+                      Navigator.pushNamed(context,Routes.settings);
+                    },
+                    child: Icon(Icons.settings,size: min(30,MediaQuery.sizeOf(context).width/15)),
+                  ),
+
+
+                ],
               ),
             
               destinations: const [
@@ -38,19 +65,19 @@ class IndexLandscape extends StatelessWidget {
                 NavigationRailDestination(
                   icon: Icon(Icons.local_fire_department_outlined),
                   selectedIcon: Icon(Icons.local_fire_department_rounded),
-                  label: Text('资讯')
+                  label: ScalableText('资讯')
                 ),
                     
                 NavigationRailDestination(
                   icon: Icon(Icons.filter_alt_outlined),
                   selectedIcon: Icon(Icons.filter_alt),
-                  label: Text('筛选')
+                  label: ScalableText('筛选')
                 ),
             
                 NavigationRailDestination(
                   icon: Icon(Icons.rss_feed_outlined),
                   selectedIcon: Icon(Icons.rss_feed),
-                  label: Text('订阅')
+                  label: ScalableText('订阅')
                 ),
             
             
@@ -81,7 +108,7 @@ class IndexLandscape extends StatelessWidget {
         child: Column(
           children: [
             const Icon(Icons.live_tv_rounded),
-            const Text("BanguLite"),
+            const ScalableText("BanguLite"),
 
             Padding(
               padding: const EdgeInsets.only(top: 30),

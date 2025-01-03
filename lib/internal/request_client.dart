@@ -1,6 +1,12 @@
 
+import 'dart:io';
+
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/hive.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
+import 'package:github/github.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class HttpApiClient{
@@ -43,7 +49,7 @@ class BangumiAPIUrls {
 }
 
 class BangumiWebUrls{
-  static const String baseUrl = "https://bgm.tv";
+  static const String baseUrl = "https://bangumi.tv";
 
   static String subject(int subjectID) => '$baseUrl/subject/$subjectID';
   static String subjectComment(int subjectID) => '$baseUrl/subject/$subjectID/comments';
@@ -90,6 +96,70 @@ class BangumiDatas {
   };
 }
 
+class GithubRepository{
+  static const String link = "https://github.com/kechuan/banguLite/releases";
+  static const String version = "0.5.0";
+}
+
+Future<Release?> pullLatestRelease() async {
+
+  final github = GitHub();
+  Release? latestRelease;
+
+  try {
+
+    await github.repositories.getLatestRelease(RepositorySlug("kechuan", "banguLite")).then((release){
+      if(GithubRepository.version == release.tagName) return latestRelease;
+      latestRelease = release;
+    });
+
+  } 
+  
+  catch (e) {
+    debugPrint('获取 tags 时出错: $e');
+  }
+
+  return latestRelease; 
+
+}
+
+void downloadApplication(String? assestUrl) async {
+  if(assestUrl == null || MyHive.downloadDir == null) return;
+
+  String storagePath = "${MyHive.downloadDir!.path}${Platform.pathSeparator}${assestUrl.split('/').last}";
+
+  await HttpApiClient.client.download(
+    assestUrl,
+    storagePath,
+    onReceiveProgress:(count, total) => debugPrint("${((count/total)*100).toStringAsFixed(3)}%"),
+  ).then((_) async {
+    
+
+    if(MyHive.downloadDir?.uri != null){
+      if (await canLaunchUrl(MyHive.downloadDir!.uri)){
+        launchUrl(MyHive.downloadDir!.uri);
+      }
+    }
+
+    
+  }).catchError((dioException){
+    //debugPrint(dioException);
+
+    switch (dioException.type) {
+      case DioExceptionType.badResponse: {
+        debugPrint('链接不存在或拒绝访问'); 
+        break;
+      }
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout: {
+        debugPrint('请求超时');
+        break;
+      }
+    }
+  });
+
+}
 
 void downloadSticker() async {
 
@@ -115,5 +185,5 @@ void downloadSticker() async {
     )
   );
 
-
 }
+

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_tile.dart';
@@ -142,7 +143,7 @@ class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepA
               itemBuilder: (_, index){
             
                 if(itemCount == 0){
-                  return const Center(child: Text("空空如也..."));
+                  return const Center(child: ScalableText("空空如也..."));
                 }
             
                 return BangumiCommentTile(
@@ -221,7 +222,7 @@ class WaitingBuilder extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children:  [
-                  Text("数据加载失败, 请点击重试"),
+                  ScalableText("数据加载失败, 请点击重试"),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Icon(Icons.refresh),

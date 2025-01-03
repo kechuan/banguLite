@@ -5,6 +5,7 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
 import 'package:bangu_lite/models/topic_info.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -52,13 +53,12 @@ class BangumiDetailTopics extends StatelessWidget {
                 shape: const Border(),
                 onExpansionChanged: (topicCollapseStatus) => topicCollapseStatusNotifier.value = topicCollapseStatus,
                 title: Row(
-                      
-                    children: [
+                   children: [
                          Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8), //16
                           child: Row(
                             children: [
-                              const Text("讨论版",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
+                              const ScalableText("讨论版",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
                               ValueListenableBuilder(
                                 valueListenable: topicCollapseStatusNotifier,
                                 builder: (_,topicCollapseStatus,child){
@@ -88,7 +88,7 @@ class BangumiDetailTopics extends StatelessWidget {
                               );
 
                             },
-                            child: Text("更多讨论 >",style: TextStyle(decoration: TextDecoration.underline,fontSize: 16,color: topicsList.isEmpty || topicsList[0].topicID == 0 ? Colors.grey : null)),  
+                            child: ScalableText("更多讨论 >",style: TextStyle(decoration: TextDecoration.underline,color: topicsList.isEmpty || topicsList[0].topicID == 0 ? Colors.grey : null)),  
                           )
                         )
               
@@ -102,10 +102,11 @@ class BangumiDetailTopics extends StatelessWidget {
                     child: Builder(
                       builder: (_) {
                         if(topicsList.isEmpty) return const SkeletonListTileTemplate();
-                        if(topicsList[0].topicID == 0) return const Center(child: Text("该番剧暂无讨论版..."));
+                        if(topicsList[0].topicID == 0) return const Center(child: ScalableText("该番剧暂无讨论版..."));
               
                         return ListView.builder(
                           shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: min(6,topicsList.length),
                           itemBuilder: (context, index) {
               
@@ -115,14 +116,15 @@ class BangumiDetailTopics extends StatelessWidget {
                                         
                             return Theme(
                               data: ThemeData(
-                                colorSchemeSeed: bangumiModel.bangumiThemeColor,
+                                colorSchemeSeed: judgeDetailRenderColor(context,bangumiModel.bangumiThemeColor),
                                 fontFamily: 'MiSansFont'
                               ),
                               child: Card(
+                                
                                 child: ListTile(
                                  
-                                  title: Text("${topicsList[index].topicName}"),
-                                  trailing: Text(convertDateTimeToString(topicCreateTime)),
+                                  title: ScalableText("${topicsList[index].topicName}"),
+                                  trailing: ScalableText(convertDateTimeToString(topicCreateTime)),
                                   onTap: () {
                                     Navigator.pushNamed(
                                       context,

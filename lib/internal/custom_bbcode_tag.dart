@@ -3,6 +3,7 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/widgets/fragments/comment_image_panel.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
@@ -153,7 +154,7 @@ class AdapterQuoteDisplay extends StatelessWidget{
                         //color: Colors.white,
                         border:Border(bottom: BorderSide(color: Colors.grey, width: 1))
                       ),
-                    child: Text("$author said:", style: headerTextStyle),
+                    child: ScalableText("$author said:", style: headerTextStyle),
                     
                   ),
                 Builder(
@@ -227,7 +228,7 @@ class BangumiStickerTag extends AdvancedTag{
     final image = Image.asset(
 		imageUrl,
 		scale: imageUrl.contains(RegExp(r'(124)|(125)')) ? 1.6 : 0.8,
-        errorBuilder: (context, error, stack) => Text("[$tag]")
+        errorBuilder: (context, error, stack) => ScalableText("[$tag]")
 	  );
 
     return [

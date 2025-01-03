@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
@@ -52,39 +51,52 @@ class MainApp extends StatelessWidget {
       create: (_) => IndexModel(),
       child: Builder(
         builder: (context) {
-          return MaterialApp(
-            theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: BangumiThemeColor.sea.color),
-                fontFamily: 'MiSansFont',
-            ),
-              darkTheme: ThemeData(
-                brightness: Brightness.dark,
-                fontFamily: 'MiSansFont',
-                colorScheme: ColorScheme.dark(
-                  primary: BangumiThemeColor.sea.color,
-                  onPrimary: Colors.white, //unSelected颜色
-                  secondary: Colors.white,
-                  onSecondary:BangumiThemeColor.sea.color, //onSelected 的颜色
-                  surface: Colors.black,
-                  
-                  outline: Colors.white,
-                    
-          
-                )
-              ),
-              themeMode: context.watch<IndexModel>().themeMode,
-              
-            initialRoute: Routes.index,
-            //navigatorObservers: [],
-            navigatorObservers: [Lifecycle.lifecycleRouteObserver],
-            onGenerateRoute: (RouteSettings settings) {
-              return onGenerateRoute(
-                settings: settings,
-                getRouteSettings: getRouteSettings,
-              );
+          return Selector<IndexModel,Color>(
+            selector: (_, indexModel){
+              if(indexModel.userConfig.isSelectedCustomColor == true){
+                return indexModel.userConfig.customColor!;
+              }
+
+              return indexModel.userConfig.currentThemeColor!.color;
             },
-          
-          
+            shouldRebuild: (previous, next) => previous!=next,
+            builder: (_, currentColor, child){
+              return MaterialApp(
+                theme: ThemeData(
+                  colorScheme: ColorScheme.fromSeed(seedColor: currentColor),
+                  fontFamily: 'MiSansFont',
+                ),
+                darkTheme: ThemeData( 
+                  brightness: Brightness.dark,
+                  fontFamily: 'MiSansFont',
+                  
+                  colorScheme: ColorScheme.dark(
+                    primary: currentColor,
+                    onPrimary: Colors.white, //unSelected颜色
+                    secondary: Colors.white,
+                    onSecondary:currentColor, //onSelected 的颜色
+                    surface: Colors.black,
+                    outline: Colors.white,
+                  )
+                ),
+                themeMode: context.watch<IndexModel>().userConfig.themeMode,
+                  
+                initialRoute: Routes.index,
+                //navigatorObservers: [],
+                navigatorObservers: [Lifecycle.lifecycleRouteObserver],
+                onGenerateRoute: (RouteSettings settings) {
+                  return onGenerateRoute(
+                    settings: settings,
+                    getRouteSettings: getRouteSettings,
+                  );
+                }
+              );
+            }
+            
+
+            
+            
+            
           );
         }
       ),

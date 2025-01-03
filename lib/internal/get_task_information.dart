@@ -13,6 +13,9 @@ class RequestByteInformation{
   String? fileName = "pictureName";
   String? contentType;
 
+  
+  String? statusMessage;
+
   void printInformation() => debugPrint("contentLength:$contentLength fileName:$fileName contentType:$contentType");
 
 }
@@ -39,20 +42,28 @@ Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
           pictureRequestInformation
             ..fileName = response.headers.value("name")
             ..contentType = response.headers.value(HttpHeaders.contentTypeHeader)
-            ..contentLength = byteParse(response.headers.value(HttpHeaders.contentRangeHeader) ?? "0");
+            ..contentLength = byteParse(response.headers.value(HttpHeaders.contentRangeHeader) ?? "0")
+            ..statusMessage = response.statusMessage
+          ;
         
-        pictureRequestInformation.printInformation();
+        //pictureRequestInformation.printInformation();
       }
 
     }
     ).catchError((error){
       switch (error.type) {
-        case DioExceptionType.badResponse: {debugPrint('$imageUrl 不存在'); break;}
+        case DioExceptionType.badResponse: {
+          debugPrint('$imageUrl 图片不存在或拒绝访问'); 
+          pictureRequestInformation.statusMessage = "图片不存在或拒绝访问";
+          break;
+        }
         case DioExceptionType.connectionTimeout:
         case DioExceptionType.sendTimeout:
-        case DioExceptionType.receiveTimeout:
+        case DioExceptionType.receiveTimeout: {
           debugPrint('$imageUrl 超时');
+          pictureRequestInformation.statusMessage = "请求超时";
           break;
+        }
       }
     });
 

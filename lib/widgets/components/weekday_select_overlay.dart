@@ -3,6 +3,7 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -107,7 +108,7 @@ class WeekDaySelectOverlay{
           
           child: Stack(
             children: [
-
+          
               Positioned(
                 height: 100,
                 width:  min(350, MediaQuery.sizeOf(context).width),
@@ -130,7 +131,7 @@ class WeekDaySelectOverlay{
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children:  [
                                  const SizedBox.shrink(),
-                                 const Text("天数选择",style: TextStyle(fontSize: 16)),
+                                 const ScalableText("天数选择",style: TextStyle(color: Colors.black)),
                                  IconButton(onPressed: ()=> opacityListenable.value = 0.0, icon: const Icon(Icons.close))
                               ],
                             ),
@@ -141,6 +142,7 @@ class WeekDaySelectOverlay{
                                 itemCount: 7,
                                 itemExtent: 50, 
                                 itemBuilder: (_,index){
+                                  final indexModel = context.read<IndexModel>();
                                   return DecoratedBox(
                                     decoration: BoxDecoration(
                                       border: WeekDay.values[index].dayIndex == DateTime.now().weekday ? 
@@ -149,16 +151,12 @@ class WeekDaySelectOverlay{
                                     ),
                                     child: ListTile(
                                       selectedTileColor: const Color.fromARGB(255, 147, 220, 149),
-                                      selected: index == context.read<IndexModel>().selectedWeekDay - 1,
-                                      title: Text(WeekDay.values[index].dayText),
+                                      selected: index == indexModel.selectedWeekDay - 1,
+                                      title: ScalableText(WeekDay.values[index].dayText,style:const TextStyle(color: Colors.black)),
                                       onTap: () {
-
                                         opacityListenable.value = 0.0;
-
                                         debugPrint("weekDaySelect click:${index+1}");
-                                        
- 
-                                        context.read<IndexModel>().updateSelectedWeekDay(index+1);
+                                        indexModel.updateSelectedWeekDay(index+1);
                                       },
                                       
                                     ),

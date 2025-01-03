@@ -1,3 +1,4 @@
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
@@ -16,7 +17,7 @@ class BangumiPictureViewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("图片查看"),
+        title: const ScalableText("图片查看"),
         backgroundColor: Colors.transparent,
       ),
       body: PhotoView(

@@ -1,12 +1,12 @@
 
 import 'dart:async';
 
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/widgets/index_landscape.dart';
 import 'package:bangu_lite/widgets/index_portial.dart';
 import 'package:flutter/services.dart';
-
 
 @FFRoute(name: '/index')
 
@@ -38,7 +38,7 @@ class BangumiIndexPage extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               backgroundColor:Color.fromARGB(240, 99, 188, 243),
-              content: Text("再返回一次以退出",style: TextStyle(color: Colors.black)),
+              content: ScalableText("再返回一次以退出",style: TextStyle(color: Colors.black)),
             )
           );
           

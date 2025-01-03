@@ -56,8 +56,6 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
 
         for(Map<String,dynamic> currentBangumi in todayBangumis){
 
-          
-
           BangumiDetails bangumiDetails = BangumiDetails();
 
           bangumiDetails = loadDetailsData(currentBangumi);
@@ -65,7 +63,7 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
           if(
             judgeInSeasonBangumi(currentBangumi["air_date"]) &&
             bangumiDetails.ratingList["score"] > 7.0 && 
-            bangumiDetails.ratingList["total"] > 500
+            bangumiDetails.ratingList["total"] > (judgeTransitionalSeason() ? 10 : 500)
           ){
               popularInSeasonBangumis.add(bangumiDetails);
           }

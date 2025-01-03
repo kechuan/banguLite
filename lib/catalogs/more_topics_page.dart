@@ -1,6 +1,7 @@
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class MoreTopicsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Topics: $title"),
+        title: ScalableText("Topics: $title"),
       ),
       body: EasyRefresh(
         child: ListView.builder(
@@ -50,13 +51,13 @@ class MoreTopicsPage extends StatelessWidget {
                   arguments: {"topicInfo":topicsList[index],"topicModel":topicModel}
               );
                 },
-                title: Text("${topicsList[index].topicName}",maxLines: 2,overflow: TextOverflow.ellipsis,),
+                title: ScalableText("${topicsList[index].topicName}",maxLines: 2,overflow: TextOverflow.ellipsis,),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Row(
                     children: [
                   
-                      Text("${topicsList[index].creatorNickName}"),
+                      ScalableText("${topicsList[index].creatorNickName}"),
                   
                       const Spacer(),
                   
@@ -64,14 +65,14 @@ class MoreTopicsPage extends StatelessWidget {
                         spacing: 6,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          Text(convertDateTimeToString(DateTime.fromMillisecondsSinceEpoch(topicsList[index].createdTime!*1000))),
+                          ScalableText(convertDateTimeToString(DateTime.fromMillisecondsSinceEpoch(topicsList[index].createdTime!*1000))),
                           Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
                             spacing: 3,
                             children: [
                               Icon(MdiIcons.chat,size: 12),
                               //const Iconify(Zondicons.chat_bubble_dots,size: 12),
-                              Text("${topicsList[index].repliesCount}"),
+                              ScalableText("${topicsList[index].repliesCount}"),
                             ],
                           ),
                         ],

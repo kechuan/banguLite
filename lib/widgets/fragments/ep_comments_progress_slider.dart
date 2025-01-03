@@ -1,4 +1,5 @@
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
 class EpCommentsProgressSlider extends StatelessWidget {
@@ -24,10 +25,10 @@ class EpCommentsProgressSlider extends StatelessWidget {
           SizedBox(
             width: 60,
             child: Center(
-              child: Text(
+              child: ScalableText(
                 "${(commnetProgress*100).toStringAsFixed(1)}%",
                 style: const TextStyle(
-                  fontSize: 16,
+                  
                 ),
               ),
             ),

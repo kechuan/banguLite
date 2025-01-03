@@ -38,6 +38,17 @@ enum ViewType{
 
 }
 
+enum AbiType{
+  arm64("安卓64位"),
+  armeabi("安卓32位"),
+  windows("windows");
+
+  final String abiName;
+
+  const AbiType(this.abiName);
+  
+}
+
 enum SortType{
   rank("rank"),
   heat("heat"),
@@ -50,11 +61,15 @@ enum SortType{
 
 enum ScaleType{
 
-  small(),
-  medium(),
-  large();
+  min(0.85),
+  less(0.9),
+  medium(1.0),
+  more(1.1),
+  max(1.15);
 
-  const ScaleType();
+  final double fontScale;
+
+  const ScaleType(this.fontScale);
 }
 
 enum SeasonType{
@@ -108,19 +123,19 @@ enum ScoreRank{
 }
 
 
+
 enum BangumiThemeColor{
   sea(Color.fromARGB(255, 140, 205, 244)), //Primary: const Color.fromARGB(255, 140, 205, 244)
   macha(Color.fromARGB(255, 219, 245, 223)),
   ruby(Color.fromARGB(255, 255, 217, 217)),
   ;
-  
-  
 
   final Color color;
-
   const BangumiThemeColor(this.color);
 
 }
+
+
 
 const PaddingH6 = EdgeInsetsDirectional.symmetric(horizontal: 6);
 const PaddingH12 = EdgeInsetsDirectional.symmetric(horizontal: 12);
@@ -133,4 +148,5 @@ const PaddingH12V6 = EdgeInsetsDirectional.symmetric(horizontal: 12,vertical: 6)
 
 const Padding6 = EdgeInsetsDirectional.all(6);
 const Padding12 = EdgeInsetsDirectional.all(12);
+const Padding16 = EdgeInsetsDirectional.all(16);
 

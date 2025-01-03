@@ -1,5 +1,6 @@
 
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/bangu_lite_routes.dart';
@@ -7,7 +8,6 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_tile.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -102,7 +102,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                               //无评论的显示状态
                               if(commentListData.length == 1 && commentListData[0].userId == 0){
                                 return const Center(
-                                  child: Text("该番剧暂无人评论..."),
+                                  child: ScalableText("该番剧暂无人评论..."),
                                 );
                               }
                                 
@@ -125,7 +125,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   
                   children: [
-                    const Text("吐槽",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
+                    const ScalableText("吐槽",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
         
                     Row(
 
@@ -155,7 +155,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                                   arguments: {"commentModel":context.read<CommentModel>(),"subjectID":widget.id,"name":widget.name}
                                 );
                               },
-                              child: const Text("吐槽合集",style: TextStyle(decoration: TextDecoration.underline,fontSize: 16)),
+                              child: const ScalableText("吐槽合集",style: TextStyle(decoration: TextDecoration.underline)),
                             ),
                           ),
                         ),
@@ -203,14 +203,13 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                             child: ValueListenableBuilder(
                               valueListenable: isOldCommentSort,
                               builder: (_,isOldCommentSort,child) {
-                                return SvgPicture.asset(
-                                  'assets/icons/time_sort_old.svg',
-                                  semanticsLabel: "从旧到新排序",
-                                  height: 32,
-                                  width: 32,
-                                  color: isOldCommentSort ?Colors.black : null,
-                                  
+                                return Icon(
+                                  Icons.history_outlined,
+                                  color: isOldCommentSort ? Colors.black : Colors.grey,
+                                  semanticLabel: "从旧到新排序",
+                                  size: 32,
                                 );
+
                               }
                             )
                           ),

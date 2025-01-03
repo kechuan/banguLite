@@ -1,4 +1,5 @@
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
 const String largePadding =  """
@@ -23,7 +24,7 @@ const String smallPadding =  """
 class SkeletonListTileTemplate extends StatelessWidget {
   const SkeletonListTileTemplate({
     super.key,
-    this.scaleType = ScaleType.large
+    this.scaleType = ScaleType.max
 
   });
 
@@ -35,17 +36,17 @@ class SkeletonListTileTemplate extends StatelessWidget {
     String paddingScale = largePadding;
 
     switch(scaleType){
-      case ScaleType.large: paddingScale = largePadding; break;
+      case ScaleType.max: paddingScale = largePadding; break;
       case ScaleType.medium: paddingScale = mediumnPadding; break;
-      case ScaleType.small: paddingScale = smallPadding; break;
+      case ScaleType.min: paddingScale = smallPadding; break;
       default: paddingScale = largePadding; break;
     }
 
     return  ListTile(
-      title: const Text("骨架似乎无法识别修饰类的改变。只能使用现有的Widget"),
+      title: const ScalableText("骨架似乎无法识别修饰类的改变。只能使用现有的Widget"),
       subtitle:  Padding(
         padding: const EdgeInsets.only(top:16),
-        child: Text(paddingScale),
+        child: ScalableText(paddingScale),
       ),
       leading: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 8),

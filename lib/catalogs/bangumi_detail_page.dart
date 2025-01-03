@@ -1,5 +1,6 @@
 
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
@@ -8,6 +9,7 @@ import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_review.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_topics.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
@@ -61,8 +63,8 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
           return Theme(
             data: ThemeData(
               brightness: Theme.of(context).brightness,
-              primaryColor: linearColor,
-              scaffoldBackgroundColor: linearColor,
+              primaryColor: judgeDetailRenderColor(context,linearColor),
+              scaffoldBackgroundColor: judgeDetailRenderColor(context,linearColor),
               fontFamily: 'MiSansFont',
             ),
             child:detailScaffold!,
@@ -73,14 +75,12 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
 
             final IndexModel indexModel = context.read<IndexModel>();
             final BangumiModel bangumiModel = context.read<BangumiModel>();
-            //final TopicModel topicModel = context.read<TopicModel>();
-            
 
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha:0.6),
                 
-                title: ValueListenableBuilder(valueListenable: appbarTitleNotifier, builder: (_,appbarTitle,__)=>Text(appbarTitle,style: const TextStyle(color: Colors.black),)),
+                title: ValueListenableBuilder(valueListenable: appbarTitleNotifier, builder: (_,appbarTitle,__)=>ScalableText(appbarTitle,style: const TextStyle(color: Colors.black),)),
                 leading: IconButton(
                   onPressed: ()=>Navigator.of(context).pop(),
                   icon: const Icon(Icons.arrow_back)
@@ -89,8 +89,12 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
 
                   ToggleThemeModeButton(
                     onThen: (){
-                      //debugPrint("trigged onThen");
-                      bangumiModel.getThemeColor(bangumiModel.imageColor ?? BangumiThemeColor.sea.color,darkMode: indexModel.themeMode == ThemeMode.dark);
+
+                      bangumiModel.getThemeColor(
+                        judgeDetailRenderColor(context,bangumiModel.imageColor),
+                        darkMode: judgeDarknessMode(context)
+                      );
+                      
                     }
                   ),
 
@@ -162,16 +166,13 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
                                       enabled: currentSubjectDetail==null,
                                       child: Selector<BangumiModel,Color?>(
                                         selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
-                                        //selector: (_, bangumiModel) => judgeDarknessMode(context) ? bangumiModel.getThemeColor(context,darkMode: true) : bangumiModel.bangumiThemeColor ,
                                         shouldRebuild: (previous, next) => previous!=next,
                                         builder: (_,linearColor,detailChild) {
 
                                           return TweenAnimationBuilder<Color?>(
                                             tween: ColorTween(
-                                              begin: BangumiThemeColor.sea.color,
-                                              //end: linearColor ?? Colors.white,
-                                              //begin: Theme.of(context).brightness == Brightness.dark ? Colors.black : const BangumiThemeColor.sea.color,
-                                              end: Theme.of(context).brightness == Brightness.dark ? Colors.black : linearColor ?? Colors.white,
+                                              begin: indexModel.userConfig.currentThemeColor?.color,
+                                              end: judgeDarknessMode(context) ? Colors.black : judgeDetailRenderColor(context,linearColor),
                                             ),
                                             duration: const Duration(milliseconds: 500),
                                             builder: (_, linearColor, __) {
@@ -182,7 +183,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
                                                     begin: Alignment.topCenter,
                                                     end: Alignment.bottomCenter,
                                                     colors: [
-                                                      Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
+                                                      judgeDarknessMode(context) ? Colors.black : Colors.white,
                                                       linearColor!,
                                                     ]
                                                   )
@@ -191,17 +192,13 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
                                                 
                                               );
 
-                                             
-
-                                             
                                             },
-                                            
                                             
                                           );
 
                                         },
                                         child: SliverPadding(
-                                          padding: const EdgeInsets.all(16),
+                                          padding: Padding16,
                                           sliver: SliverList(
                                             delegate: SliverChildListDelegate(
                                               [

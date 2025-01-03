@@ -9,6 +9,7 @@ import 'package:bangu_lite/models/topic_details.dart';
 import 'package:bangu_lite/models/topic_info.dart';
 
 import 'package:bangu_lite/widgets/components/ep_comments.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
@@ -53,6 +54,7 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
       'AppRoute',
       (link) {
         if(!isActived) return;
+        if(!mounted) return;
         appRouteMethod(context,link);
       }
     );
@@ -108,7 +110,7 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
 												children: [
 													SliverPinnedHeader(
 														child: AppBar(
-															title: Text("${widget.topicInfo.topicName}"),
+															title: ScalableText("${widget.topicInfo.topicName}"),
 															
 															backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
 							
@@ -173,7 +175,7 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                           itemBuilder: (_,topicCommentIndex){
                             //Loading...
                             if(isCommentLoading){
-                              return const SkeletonListTileTemplate(scaleType: ScaleType.small);
+                              return const SkeletonListTileTemplate(scaleType: ScaleType.min);
                             }
                       
                             if(topicCommentIndex == 0){
@@ -200,11 +202,11 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                                     padding: const EdgeInsets.all(16),
                                     child: Row(
                                       children: [
-                                        const Text("回复",style: TextStyle(fontSize: 24)),
+                                        const ScalableText("回复",style: TextStyle(fontSize: 24)),
                                                   
                                         const Padding(padding: PaddingH6),
                                                   
-                                        Text("$commentCount",style: const TextStyle(color: Colors.grey)),
+                                        ScalableText("$commentCount",style: const TextStyle(color: Colors.grey)),
                                                   
                                                   
                                       ],
@@ -223,12 +225,11 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                               return const Center(
                                 child: Padding(
                                   padding: EdgeInsets.only(top:64),
-                                  child: Text("该集数暂无人评论...",style: TextStyle(fontSize: 16)),
+                                  child: ScalableText("该集数暂无人评论..."),
                                 ),
                               );
                             }
-                            
-                          
+
                             return EpCommentView(epCommentData: currentTopicDetail.repliedComment![topicCommentIndex-1]);
                           },
                           separatorBuilder: (_,__,) => const Divider(height: 1)
@@ -279,16 +280,16 @@ class TopicInfoWidget extends StatelessWidget {
         ListTile(
           title: Row(
             children: [
-              Text("${topicInfoData.topicName}"),
+              ScalableText("${topicInfoData.topicName}"),
               const Padding(padding: PaddingH6),
-            //  Text("${topicInfoData.}",style: const TextStyle(fontSize: 14,color: Colors.grey)),
+            //  ScalableText("${topicInfoData.}",style: const TextStyle(fontSize: 14,color: Colors.grey)),
             ],
           ),
           
         ),
 
         //ListTile(
-        //  title:  SelectableText("${topicInfoData.!.description}"),
+        //  title:  ScalableText("${topicInfoData.!.description}"),
         //),
 
        

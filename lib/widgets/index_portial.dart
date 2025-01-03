@@ -1,9 +1,13 @@
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
 import 'package:bangu_lite/catalogs/bangumi_sort_page.dart';
 import 'package:bangu_lite/delegates/search_delegates.dart';
+import 'package:provider/provider.dart';
 
 class IndexPortial extends StatelessWidget {
   const IndexPortial({
@@ -15,6 +19,9 @@ class IndexPortial extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final indexModel = context.read<IndexModel>();
+
     return ValueListenableBuilder(
       valueListenable: selectedPageIndexNotifier,
       builder: (_,currentPageIndex,railLeading) {
@@ -31,7 +38,7 @@ class IndexPortial extends StatelessWidget {
                     children: [
                       Icon(Icons.live_tv_rounded,size: 32),
                       Padding(padding: EdgeInsets.symmetric(horizontal: 12)),
-                      Text("BanguLite",style: TextStyle(fontSize: 16)),
+                      ScalableText("BanguLite"),
                     ],
                   ),
 
@@ -41,14 +48,17 @@ class IndexPortial extends StatelessWidget {
             ),
             
             actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: IconButton(
-                  onPressed: ()=> showSearch(
-                    context: context,
-                    delegate: CustomSearchDelegate()
-                  ),
-                  icon: const Icon(Icons.search)),
+              IconButton(
+                onPressed: ()=> showSearch(context: context,delegate: CustomSearchDelegate()),
+                icon: const Icon(Icons.search)
+              ),
+
+              IconButton(
+                onPressed: (){
+                  indexModel.updateCachedSize();
+                  Navigator.pushNamed(context,Routes.settings);
+                },
+                icon: const Icon(Icons.settings)
               )
             ],
           ),

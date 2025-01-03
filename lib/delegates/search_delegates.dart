@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/bangu_lite_routes.dart';
@@ -45,7 +46,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
   Widget buildSuggestions(BuildContext context) {
 
     if(query.isEmpty){
-      return const Center(child: Text("沉舟侧畔千帆过 病树前头万木春"));
+      return const Center(child: ScalableText("沉舟侧畔千帆过 病树前头万木春"));
     }
 
     return FutureBuilder(
@@ -63,7 +64,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
 
                   case ConnectionState.done:{
 
-                    if(!searchSnapshot.hasData) return const Center(child: Text("暂无信息"));
+                    if(!searchSnapshot.hasData) return const Center(child: ScalableText("暂无信息"));
 
                      List<BangumiDetails> searchData = searchSnapshot.data!;
 
@@ -89,7 +90,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
                           searchData[index].name = convertAmpsSymbol(searchData[index].name);
 
                           return ListTile(
-                            title: Text(searchData[index].name!),
+                            title: ScalableText(searchData[index].name!),
                             onTap: () {
                               query = '${searchData[index].name}';
                               showResults(context);
@@ -193,7 +194,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
 
             }
 
-            return const Center(child: Text("暂无信息"));
+            return const Center(child: ScalableText("暂无信息"));
 
           }
 

@@ -1,5 +1,6 @@
 
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/warp_page_dialog.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,7 @@ class BangumiCommentPage extends StatelessWidget  {
       builder: (context,child) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(name ?? "comments Detail"),
+            title: ScalableText(name ?? "comments Detail"),
             actions: [
               //when loaded, show more or empty
               //jumpPage

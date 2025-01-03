@@ -1,4 +1,5 @@
 import 'package:bangu_lite/internal/max_number_input_formatter.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -39,7 +40,7 @@ class WarpPageDialog extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
           
-              const Text("跳转到页面..",style: TextStyle(fontSize: 24)),
+              const ScalableText("跳转到页面..",style: TextStyle(fontSize: 24)),
           
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
@@ -61,7 +62,7 @@ class WarpPageDialog extends StatelessWidget {
                             return Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Text("${index+1}"),
+                                ScalableText("${index+1}"),
                                 const Divider(height: 1)
                               ],
                             );
@@ -93,7 +94,7 @@ class WarpPageDialog extends StatelessWidget {
                               ],
                             ),
                           ),
-                          Text("/$commentTotalPage 页")
+                          ScalableText("/$commentTotalPage 页")
                         ],
                       ),
                     )
@@ -109,19 +110,11 @@ class WarpPageDialog extends StatelessWidget {
                     children: [
                       TextButton(
                         onPressed: ()=> Navigator.of(context).pop(),
-                        child: const Text("取消",style: TextStyle(fontSize: 16),)
+                        child: const ScalableText("取消")
                       ),
                       TextButton(
                         onPressed: onConfirmPressed ?? (){},
-                        //onPressed: (){
-                        //  Navigator.of(context).pop();
-
-                        //  final int newPageIndex = (int.tryParse(jumpPageEditingController.text) ?? pageSelectorController.selectedItem);
-
-                        //  context.read<CommentModel>().changePage(newPageIndex);
-                        //  commentPageController.jumpToPage(newPageIndex);
-                        //},
-                        child: const Text("确定",style: TextStyle(fontSize: 16))
+                        child: const ScalableText("确定")
                       )
                     ]
                   )

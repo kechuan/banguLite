@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +20,7 @@ class ToggleThemeModeButton extends StatelessWidget {
 
         final indexModel = context.read<IndexModel>();
 
-        if(indexModel.themeMode == ThemeMode.dark || Theme.of(context).brightness == Brightness.dark){
+        if(indexModel.userConfig.themeMode == ThemeMode.dark || judgeDarknessMode(context)){
           indexModel.updateThemeMode(ThemeMode.light);
         }
         else{
@@ -30,12 +31,12 @@ class ToggleThemeModeButton extends StatelessWidget {
           
       },
       child: Selector<IndexModel,ThemeMode>(
-        selector: (_, indexModel) => indexModel.themeMode,
+        selector: (_, indexModel) => indexModel.userConfig.themeMode!,
         shouldRebuild: (previous, next) => previous!=next,
         builder: (_, currentTheme, child){
           return Icon(
             //currentTheme == ThemeMode.dark ? 
-            Theme.of(context).brightness == Brightness.dark ? 
+            judgeDarknessMode(context) ? 
             Icons.dark_mode_outlined :
             Icons.wb_sunny_outlined
             ,size: min(30,MediaQuery.sizeOf(context).width/15));

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +79,7 @@ class BuildDetailImages extends StatelessWidget {
             ),
             
             child: const Center(
-              child: Text("loading..."),
+              child: ScalableText("loading..."),
             ),
           );
         

@@ -2,7 +2,9 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
@@ -16,6 +18,19 @@ class EpCommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    bool commentBlockStatus = false;
+
+    if(
+      ( epCommentData.state == CommentState.adminCloseTopic.index ||
+        epCommentData.state == CommentState.userDelete.index ||
+        epCommentData.state == CommentState.adminDelete.index
+      ) && epCommentData.state != null
+    ){
+      commentBlockStatus = true;
+    }
+
+
     return ListTile(
       
       title: Column(
@@ -37,7 +52,7 @@ class EpCommentTile extends StatelessWidget {
           
               const Padding(padding: PaddingH6),
           
-              Text(epCommentData.nickName ?? "nameID",style: const TextStyle(color: Colors.blue)),
+              ScalableText(epCommentData.nickName ?? "nameID",style: const TextStyle(color: Colors.blue)),
           
               const Padding(padding: PaddingH6),
           
@@ -53,13 +68,13 @@ class EpCommentTile extends StatelessWidget {
                   alignment: WrapAlignment.end,
                   children: [
                           
-                    //Text("#${epCommentData.epCommentIndex}"),
-                    Text(epCommentData.epCommentIndex== null ? "" : "#${epCommentData.epCommentIndex}"),
+                    //ScalableText("#${epCommentData.epCommentIndex}"),
+                    ScalableText(epCommentData.epCommentIndex== null ? "" : "#${epCommentData.epCommentIndex}"),
                           
                     Builder(
                       builder: (_){
                         DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(epCommentData.commentTimeStamp!*1000);
-                        return Text(
+                        return ScalableText(
                           "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"
                         );
                       }
@@ -76,7 +91,7 @@ class EpCommentTile extends StatelessWidget {
           const SizedBox.shrink() :
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: SelectableText("(${epCommentData.sign})",style:const TextStyle(fontSize: 16,color: Colors.grey)),
+            child: ScalableText("(${epCommentData.sign})",style:const TextStyle(color: Colors.grey)),
           ),
         
         
@@ -89,29 +104,27 @@ class EpCommentTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //Text("${epCommentData.state}"),
-            if(
-              ( epCommentData.state == CommentState.adminCloseTopic.index ||
-                epCommentData.state == CommentState.userDelete.index ||
-                epCommentData.state == CommentState.adminDelete.index
-              ) &&  epCommentData.state != null
-            )
+            
+            commentBlockStatus ?
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("发言已隐藏",style: TextStyle(fontSize: 16)),
-                  Text("原因: ${CommentState.values[epCommentData.state!].reason}")
+                  const ScalableText("发言已隐藏"),
+                  ScalableText("原因: ${CommentState.values[epCommentData.state!].reason}")
                 ],
-              ),
-            
-            BBCodeText(
-              data: convertBangumiCommentSticker(epCommentData.comment ?? "comment"),
-              stylesheet: BBStylesheet(
-                tags: allEffectTag,
-                selectableText: true,
-                defaultText: const TextStyle(fontFamily: 'MiSansFont',fontSize: 16)
-              ),
-            ),
+              )
+            : const SizedBox.shrink(),
+
+            !commentBlockStatus ? 
+              BBCodeText(
+                data: convertBangumiCommentSticker(epCommentData.comment ?? "comment"),
+                stylesheet: BBStylesheet(
+                  tags: allEffectTag,
+                  selectableText: true,
+                  defaultText: TextStyle(fontFamily: 'MiSansFont',fontSize: AppFontSize.s16)
+                ),
+              ) 
+            : const SizedBox.shrink(),
         
             const Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -131,7 +144,7 @@ class EpCommentTile extends StatelessWidget {
                 //            border: Border.all(),
                 //            borderRadius: BorderRadius.circular(12)
                 //          ),
-                //          child: const Text("test 3"),
+                //          child: const ScalableText("test 3"),
                 //        ),
                 //      );
                 //    }
