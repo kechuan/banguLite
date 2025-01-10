@@ -74,10 +74,11 @@ enum ScaleType{
 
 enum SeasonType{
 
+  winter("冬",1),
   spring("春",4),
   summer("夏",7),
-  autumn("秋",10),
-  winter("冬",1);
+  autumn("秋",10);
+  
 
   final String seasonText;
   final int month;
@@ -125,8 +126,9 @@ enum ScoreRank{
 
 
 enum BangumiThemeColor{
-  sea(Color.fromARGB(255, 140, 205, 244)), //Primary: const Color.fromARGB(255, 140, 205, 244)
+  ice(Color.fromARGB(255, 219, 251, 255)),
   macha(Color.fromARGB(255, 219, 245, 223)),
+  sea(Color.fromARGB(255, 140, 205, 244)), //Primary: const Color.fromARGB(255, 140, 205, 244)
   ruby(Color.fromARGB(255, 255, 217, 217)),
   ;
 

@@ -23,7 +23,16 @@ class IndexModel extends ChangeNotifier {
   int cachedImageSize = 0;
 
   //除了 星期一-日之外 还有一个 最热门 的属性存放评分7.0+的番剧
-  Map<String, List<BangumiDetails>> calendarBangumis = {}; 
+  Map<String, List<BangumiDetails>> calendarBangumis = {
+    "星期一":[],
+    "星期二":[],
+    "星期三":[],
+    "星期四":[],
+    "星期五":[],
+    "星期六":[],
+    "星期日":[],
+    "最热门":[]
+  }; 
   AppConfig userConfig = defaultAPPConfig();
 
   void initModel() async {
@@ -80,9 +89,7 @@ class IndexModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateConfig(){
-	  MyHive.appConfigDataBase.put("currentTheme", userConfig);
-  }
+  void updateConfig()=>MyHive.appConfigDataBase.put("currentTheme", userConfig);
 
   Future<void> updateCachedSize() async {
     cachedImageSize = await compute(getTotalSizeOfFilesInDir, MyHive.cachedImageDir);
@@ -90,12 +97,12 @@ class IndexModel extends ChangeNotifier {
     updateConfig();
   }
 
-  Future<void> reloadCalendar(){
+  Future<void> reloadCalendar({Future<List<BangumiDetails>> Function()? switchCalendar}){
     loadFuture = null;
-    return loadCalendar();
+    return loadCalendar(switchCalendar:switchCalendar);
   }
 
-  Future<void> loadCalendar() async {
+  Future<void> loadCalendar({Future<List<BangumiDetails>> Function()? switchCalendar}) async {
 
     if(loadFuture!=null) return loadFuture!.future;
 
@@ -104,22 +111,31 @@ class IndexModel extends ChangeNotifier {
     debugPrint("timestamp: ${DateTime.now()} calendar start");
     loadFuture = loadCompleter;
 
-    await HttpApiClient.client.get(BangumiAPIUrls.calendar).then((response){
-      debugPrint("timestamp: ${DateTime.now()} calendar get");
+    if(switchCalendar!=null){
 
-      calendarBangumis = loadCalendarData(response,animeFliter: true);
+      await switchCalendar().then((detailsList){
+        debugPrint("timestamp: ${DateTime.now()} calendar get");
+        calendarBangumis = searchDataAdapter(detailsList);
+      });
 
-      debugPrint("timestamp: ${DateTime.now()} calendar done");
 
-      dataTime = DateTime.now();
+    }
 
-      loadCompleter.complete();
-      notifyListeners();
-      loadFuture = null;
+    else{
 
-    });
+      await HttpApiClient.client.get(BangumiAPIUrls.calendar).then((response){
+        debugPrint("timestamp: ${DateTime.now()} calendar get");
+        calendarBangumis = loadCalendarData(response,animeFliter: true);
+      });
 
-    
+    }
+
+    dataTime = DateTime.now();
+    debugPrint("timestamp: $dataTime calendar done");
+
+    loadCompleter.complete();
+    notifyListeners();
+    //loadFuture = null;
 
     return loadCompleter.future;
 
@@ -131,13 +147,6 @@ class IndexModel extends ChangeNotifier {
     updateConfig();
   }
 
-
-
-  @override
-  void notifyListeners() {
-	
-    super.notifyListeners();
-  }
 
 }
 

@@ -3,9 +3,13 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
+import 'package:bangu_lite/widgets/warp_season_dialog.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 
@@ -34,6 +38,9 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
   final LayerLink buttonLayerLink = LayerLink(); //composition
   final ValueNotifier<bool> transitionalSeasonNotifier = ValueNotifier<bool>(false);
 
+  final ValueNotifier<String> currentSeasonNotifier = ValueNotifier<String>("${DateTime.now().year} ${judgeSeasonRange(DateTime.now().month).seasonText}");
+
+
   Timer generateScrollList(){
     return Timer.periodic(const Duration(milliseconds: 3600), (timer) {
       
@@ -57,8 +64,6 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
     if(carouselTimer!=null){
       carouselTimer?.cancel();
     }
-
-    //WeekDaySelectOverlay.weekDaySelectOverlay?.closeWeekDaySelectFieldOverlay();
     super.onPause();
   }
 
@@ -69,10 +74,8 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
     super.onResume();
   }
 
-
   @override
   void didPushNext() {
-    //debugPrint("push");
     WeekDaySelectOverlay.weekDaySelectOverlay?.closeWeekDaySelectFieldOverlay();
     super.didPushNext();
   }
@@ -94,13 +97,14 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
 
   @override
   Widget build(BuildContext context) {
+    final indexModel = context.read<IndexModel>();
+
+
     return EasyRefresh.builder(
       header: const MaterialHeader(),
-      onRefresh: ()=> calendarLoadFuture = context.read<IndexModel>().reloadCalendar(),
+      onRefresh: ()=> calendarLoadFuture = indexModel.reloadCalendar(),
       
       childBuilder: (_,physic){
-
-        final indexModel = context.read<IndexModel>();
 
         if(calendarLoadFuture==null){
           return const Scaffold(
@@ -141,10 +145,70 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                               ),
                               
                               height: 60,
-                              child: const Align(
-                                alignment: Alignment.centerLeft,
-                                child: ScalableText("本季热番",style: TextStyle(fontSize: 24)
-                              ))
+                              child: Row(
+                                spacing: 12,
+                                children: [
+
+                                  const ScalableText("本季热番",style: TextStyle(fontSize: 24)),
+                                  //const Spacer(),
+                                  InkResponse(
+                                    containedInkWell: true,
+                                    onTap: () {
+
+                                      //final refreshCalendar = context.read<IndexModel>().reloadCalendar();
+                                      // final Function(int,int) refreshCalendar;
+
+                                      showDialog(
+                                        context: context,
+                                        builder: (_)=> WarpSeasonDialog(selectedYear: DateTime.now().year,selectedSeasonType: judgeSeasonRange(DateTime.now().month),)
+                                      ).then((selectSeason) async {
+                                        if(selectSeason==null) return;
+                                        //debugPrint("selectSeasonRange:$selectSeason");
+                                        currentSeasonNotifier.value = "${selectSeason.keys.first} ${selectSeason.values.first.seasonText}";
+
+                                        if(
+                                          selectSeason.keys.first == DateTime.now().year &&
+                                          selectSeason.values.first.seasonText == judgeSeasonRange(DateTime.now().month).seasonText
+                                        ){
+                                          calendarLoadFuture = indexModel.reloadCalendar();
+                                        }
+
+                                        else{
+                                          List<String> requestDateRange = [">=${selectSeason.keys.first}-${convertDigitNumString(selectSeason.values.first.month-3)}-01","<${selectSeason.keys.first}-${convertDigitNumString(selectSeason.values.first.month)}-01"];
+
+                                            sortSearchHandler(
+                                              airDateRange: requestDateRange,
+                                              searchLimit: 1 //因为api限制最大20页 那就直接试探包算了
+                                          ).then((response){
+                                            if(response.data != null){
+                                              int totalBangumiLength = response.data["total"];
+
+                                              calendarLoadFuture = indexModel.reloadCalendar(
+                                                switchCalendar: (()=>bangumiTimeRangeSearch(
+                                                  totalBangumiLength: totalBangumiLength,
+                                                  airDateRange: requestDateRange,
+                                                ))
+                                              );
+                                            }
+                                          });
+                                        }
+
+                                        
+
+                                      });
+                                    },
+                                    focusColor: Colors.transparent,
+                                    child: Row(
+                                      children: [
+                                        ScalableText(currentSeasonNotifier.value,style:const TextStyle(fontSize: 24)),
+                                        const Icon(Icons.arrow_drop_down)
+                                      ],
+                                    ),
+                                  )
+                                  
+                                          
+                                ],
+                              )
                             )
                           ),
 
@@ -164,35 +228,36 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                         child: InfiniteCarousel.builder(
                                           center: false,
                                           loop: true,
-                                          itemCount: calendarBangumis["最热门"]?.length ?? 8,
-                                          itemExtent: max(200,MediaQuery.sizeOf(context).width/4), //主轴约束
-                                          velocityFactor:0.8, //滚动速度
+                                          itemCount: calendarBangumis["最热门"]!.isEmpty ? 1 : calendarBangumis["最热门"]!.length,
+                                          itemExtent: calendarBangumis["最热门"]!.isEmpty ? MediaQuery.sizeOf(context).width : max(200,MediaQuery.sizeOf(context).width/4), //主轴约束
+                                          velocityFactor: 0.8 , //滚动速度
                                           controller: _infiniteScrollController,
                                           itemBuilder: (_, currentIndex, itemCount){
                                             
                                             List<BangumiDetails>? weeklyBangumisRecommend = calendarBangumis["最热门"];
-                                                                    
+
+                                            if(weeklyBangumisRecommend!.isEmpty){
+                                               return const Center(
+                                                child: ScalableText("暂无热门番剧"),
+                                              );
+                                            }
+                                                              
                                             return Padding(
                                               padding: const EdgeInsets.symmetric(horizontal: 12),
-                                                child: InkResponse( 
-                                                  hoverColor: Colors.transparent,
-                                                  highlightColor: Colors.transparent,
+                                                child: UnVisibleResponse( 
+
                                                   containedInkWell: true,
-                                                  borderRadius: BorderRadius.circular(24),
+                                                  
                                                   onTap: (){
                                                                     
-                                                    if(weeklyBangumisRecommend!=null){
-                                                      debugPrint("$currentIndex => ${currentIndex % weeklyBangumisRecommend.length} => ${weeklyBangumisRecommend[currentIndex % weeklyBangumisRecommend.length].name} ");
-                                                        
-                                                      Navigator.pushNamed(
-                                                        context,
-                                                        Routes.subjectDetail,
-                                                        arguments: {"subjectID":weeklyBangumisRecommend[currentIndex % weeklyBangumisRecommend.length].id},
-                                                      );
-                                                  
+                                                    debugPrint("$currentIndex => ${currentIndex % weeklyBangumisRecommend.length} => ${weeklyBangumisRecommend[currentIndex % weeklyBangumisRecommend.length].name} ");
                                                       
-                                                    }
-                                                                    
+                                                    Navigator.pushNamed(
+                                                      context,
+                                                      Routes.subjectDetail,
+                                                      arguments: {"subjectID":weeklyBangumisRecommend[currentIndex % weeklyBangumisRecommend.length].id},
+                                                    );
+                                                            
                                                   },
                                                   child: DecoratedBox(
                                                     decoration: BoxDecoration(
@@ -204,9 +269,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                       children: [
                                                         
                                                         Positioned.fill(
-                                                          child: weeklyBangumisRecommend!=null ?
-                                                          CachedImageLoader(imageUrl: weeklyBangumisRecommend[currentIndex].coverUrl!) :
-                                                          const Center(child: ScalableText("Loading"))
+                                                          child: CachedImageLoader(imageUrl: weeklyBangumisRecommend[currentIndex].coverUrl!)
                                                         ),
                                                         
                                                         Positioned.fill(
@@ -232,7 +295,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                                         width: constriant.maxWidth,
                                                                         child: ListTile(
                                                                           title: ScalableText(
-                                                                            weeklyBangumisRecommend?[currentIndex].name ?? "loading",
+                                                                            weeklyBangumisRecommend[currentIndex].name ?? "loading",
                                                                             maxLines: 2,
                                                                             style: const TextStyle(color: Colors.white),
                                                                             overflow: TextOverflow.ellipsis,
@@ -245,7 +308,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                                             child: Padding(
                                                                               padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 2),
                                                                               child: ScalableText(
-                                                                                "${weeklyBangumisRecommend?[currentIndex].ratingList["score"]?.toDouble() ?? "-.-"}",
+                                                                                "${weeklyBangumisRecommend[currentIndex].ratingList["score"]?.toDouble() ?? "-.-"}",
                                                                                 style: const TextStyle(fontSize: 14,color: Colors.black)
                                                                               ),
                                                                             )
@@ -320,7 +383,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                           return previous!=next;
                         },
                         builder: (_, weekday, child) {
-                          final selectedDay = context.read<IndexModel>().selectedWeekDay;
+                          final selectedDay = indexModel.selectedWeekDay;
             
                           return MultiSliver(
                             pushPinnedChildren: true,

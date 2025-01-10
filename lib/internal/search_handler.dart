@@ -1,7 +1,7 @@
 import 'dart:async';
 
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/widgets.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
 
@@ -36,71 +36,72 @@ Future<List<BangumiDetails>> searchHandler(String query) async {
 
 }
 
-Future<List<BangumiDetails>> sortSearchHandler(
-  String keyword,
+Future<Response> sortSearchHandler(
   {
+    String? keyword,
     List<String>? airDateRange,
     List<String>? rankRange,
     List<String>? ratingRange,
 
     int? searchOffset,
+    int? searchLimit,
     List<String>? tagsList,
+    List<int>? subjectType,
     
     String? sortType,
   }
   ) async {
 
-  Response<dynamic> responseData = await HttpApiClient.client.post(
+  return await HttpApiClient.client.post(
     BangumiAPIUrls.bangumiSubjectSort,
-    queryParameters: BangumiQuerys.sortQuery..['offset'] = searchOffset ?? 0,
+    queryParameters: BangumiQuerys.sortQuery
+      ..['offset'] = searchOffset ?? BangumiQuerys.sortQuery["offset"]!
+      ..['limit'] = searchLimit ?? BangumiQuerys.sortQuery["limit"]!,
 
     //data: BangumiDatas.sortData
 
     data: BangumiDatas.sortData
-      ..['keyword'] = keyword
-      ..['sort'] = sortType ?? ""
+      ..['keyword'] = keyword ?? BangumiDatas.sortData["keyword"]
+      ..['sort'] = sortType ?? BangumiDatas.sortData["sort"]
       ..['filter'] = {
-        "type": [2],
+        "type": subjectType ?? BangumiDatas.sortData["filter"]["type"],
         "tag": [...?tagsList],
         "nsfw": false,
         "rank" : rankRange != null ? [rankRange.first,rankRange.last] : [],
         "air_date" : airDateRange != null ? [airDateRange.first,airDateRange.last] : [],
         "rating" : ratingRange != null ? [ratingRange.first,ratingRange.last] : [],
-
       }
 
   );
 
-  List<BangumiDetails> searchResult = [];
+}
 
-  if(responseData.data != null){
+Future<List<BangumiDetails>> bangumiTimeRangeSearch({required int totalBangumiLength, required List<String> airDateRange}) async {
 
-    Map<String,dynamic> searchData = responseData.data;
+  final List<BangumiDetails> searchResultList = [];
 
-    List<dynamic> bangumiList = searchData["data"];
+  Completer<List<BangumiDetails>> searchCompleter = Completer();
 
-    debugPrint(responseData.data.toString());
+  await Future.wait(
+    List.generate(
+      convertSegement(totalBangumiLength, 20),
+      (index){
+        return sortSearchHandler(
+          airDateRange: airDateRange,
+          searchLimit: 20,
+          searchOffset: index*20
+        ).then((response){
+          if(response.data!=null) searchResultList.addAll(loadSearchData(response.data));
+          if(searchResultList.length == totalBangumiLength) searchCompleter.complete(searchResultList);
+          //存在最后一个加载完之后直接抛出List的风险 因此使用completer
 
-    for(Map currentBangumi in bangumiList){
-      BangumiDetails bangumiDetail = BangumiDetails();
+        });
+      }
+    )
+  );
 
-      bangumiDetail.name = currentBangumi["name_cn"].isEmpty ? currentBangumi["name"] : currentBangumi["name_cn"];
-      bangumiDetail.id = currentBangumi["id"];
-      bangumiDetail.coverUrl = currentBangumi["image"];
-
-      bangumiDetail.ratingList = {
-        "total": currentBangumi["total"] ?? 0,
-        "score": currentBangumi["score"] ?? 0,
-        "rank": currentBangumi["rank"] ?? 0, //返回的是一个数值0
-      };
-
-      searchResult.add(bangumiDetail);
-    }
-
-  }
-
-  debugPrint("keyword: $keyword, sort parse done");
-
-  return searchResult;
+  //return searchResultList;
+  return searchCompleter.future;
 
 }
+

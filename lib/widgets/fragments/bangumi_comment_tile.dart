@@ -10,34 +10,63 @@ import 'package:flutter_bbcode/flutter_bbcode.dart';
 class BangumiCommentTile extends StatelessWidget {
   const BangumiCommentTile({
     super.key,
-    required this.commentData
+    required this.commentData,
+    this.themeColor
   });
 
   final CommentDetails commentData;
+  final Color? themeColor;
 
   @override
   Widget build(BuildContext context) {
+
+    int ratingScore = commentData.rate ?? 0;
+
     return ListTile(
-      
       title: Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
+        child: Row(
           spacing: 12,
           children: [
         
-          commentData.avatarUrl!=null ? 
-                
-            SizedBox(
-              height: 50,
-              width: 50,
-              child: CachedImageLoader(imageUrl: commentData.avatarUrl!,photoViewStatus: true,)
-            ) : 
-                
-            //const FlutterLogo(),
+            commentData.avatarUrl!=null ? 
+              SizedBox(
+                height: 50,
+                width: 50,
+                child: CachedImageLoader(imageUrl: commentData.avatarUrl!,photoViewStatus: true,)
+              ) : 
             Image.asset("assets/icons/icon.png"),
-        
-            ScalableText(commentData.nickName ?? "nameID",style: const TextStyle(color: Colors.blue)),
+          
+            ScalableText(commentData.nickName ?? "nameID",style: TextStyle(color: themeColor)),
+
+            const Spacer(),
+
+            //因为tile的title给的交叉轴也是unbounded的 所以需要约束
+            SizedBox(
+              height: 30,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemExtent: 25,
+                shrinkWrap: true,
+                itemCount: 5,
+                
+                itemBuilder: (_,score){
+                  if(ratingScore > (score+1)*2){
+                    return Icon(Icons.star,color: themeColor);
+                  }
+
+                  else if(ratingScore == (score*2)+1){
+                    return Icon(Icons.star_half,color: themeColor);
+                  }
+
+                  else{
+                    return Icon(Icons.star_outline,color: themeColor);
+                  }
+
+                },
+              ),
+            )
+
           ],
         ),
       ),
@@ -56,26 +85,13 @@ class BangumiCommentTile extends StatelessWidget {
               ),
             ),
           ),
-          Row(
-            children: [
-  
-              Builder(builder: (_){
-                DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(commentData.commentTimeStamp!*1000);
-                return ScalableText(
-                  "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"
-                );
-              }),
-                
-              const Spacer(),  
-  
-              Row(
-                children: [
-                  const Icon(Icons.arrow_upward_outlined),
-                  ScalableText('(${commentData.rate})')
-                ],
-              )
-            ],
-          )
+
+          Builder(builder: (_){
+            DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(commentData.commentTimeStamp!*1000);
+            return ScalableText(
+              "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"
+            );
+          })
         ],
       ),
     );

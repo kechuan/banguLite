@@ -14,7 +14,7 @@
 			"path": "lib/widgets/components/ep_select.dart",
 			"bookmarks": [
 				{
-					"line": 63,
+					"line": 62,
 					"column": 14,
 					"label": "EpSelect"
 				}
@@ -24,7 +24,7 @@
 			"path": "lib/catalogs/bangumi_calendar_page.dart",
 			"bookmarks": [
 				{
-					"line": 115,
+					"line": 118,
 					"column": 35,
 					"label": "calendarPage——资讯页面"
 				}
@@ -44,7 +44,7 @@
 			"path": "lib/models/providers/ep_model.dart",
 			"bookmarks": [
 				{
-					"line": 30,
+					"line": 29,
 					"column": 54,
 					"label": "获取EPInfo信息"
 				}
@@ -54,7 +54,7 @@
 			"path": "lib/catalogs/more_topics_page.dart",
 			"bookmarks": [
 				{
-					"line": 17,
+					"line": 16,
 					"column": 0,
 					"label": "更多讨论列表——moreTopics"
 				}
@@ -64,7 +64,7 @@
 			"path": "lib/internal/custom_bbcode_tag.dart",
 			"bookmarks": [
 				{
-					"line": 13,
+					"line": 12,
 					"column": 0,
 					"label": "BBCodeTag"
 				}
@@ -94,7 +94,7 @@
 			"path": "lib/catalogs/bangumi_detail_page.dart",
 			"bookmarks": [
 				{
-					"line": 26,
+					"line": 25,
 					"column": 32,
 					"label": "subjectDetail——番剧详情"
 				}

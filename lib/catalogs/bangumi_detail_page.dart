@@ -1,6 +1,6 @@
 
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
@@ -48,7 +48,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => BangumiModel()),
+        ChangeNotifierProvider(create: (_) => BangumiModel(subjectID: widget.subjectID)),
         ChangeNotifierProvider(create: (_) => EpModel(subjectID: widget.subjectID,selectedEp: 1)),
         ChangeNotifierProvider(create: (_) => CommentModel()),
         ChangeNotifierProvider(create: (_) => TopicModel(subjectID: widget.subjectID,)),
@@ -92,7 +92,8 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
 
                       bangumiModel.getThemeColor(
                         judgeDetailRenderColor(context,bangumiModel.imageColor),
-                        darkMode: judgeDarknessMode(context)
+                        darkMode: !judgeDarknessMode(context) 
+                        //这里是为了 切换。是 target! 而不是状态 因此得取反向的值。
                       );
                       
                     }
@@ -140,12 +141,10 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
                       },
                       builder: (_,subjectID,child) {
                   
-                        //final bangumiModel = context.read<BangumiModel>();
-                    
                         debugPrint("subjectID: $subjectID => ${widget.subjectID}");
                     
                         return FutureBuilder(
-                          future: bangumiModel.loadDetails(widget.subjectID),
+                          future: bangumiModel.loadDetails(),
                           builder: (_,snapshot){
 
                             if(snapshot.connectionState == ConnectionState.done){
@@ -154,7 +153,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
                     
                             return EasyRefresh.builder(
                               header: const MaterialHeader(),
-                              onRefresh: ()=> bangumiModel.loadDetails(subjectID,refresh:true),
+                              onRefresh: ()=> bangumiModel.loadDetails(refresh:true),
                               childBuilder: (_,physic){
                   
                                 

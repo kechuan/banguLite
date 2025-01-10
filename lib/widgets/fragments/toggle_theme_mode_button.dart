@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

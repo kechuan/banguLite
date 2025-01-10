@@ -187,7 +187,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
                                             WidgetsBinding.instance.addPostFrameCallback((timeStamp){
 
                                               //epInfo范围的总高度 => [120: Appbar+epPanel 高度]
-                                              sliverViewStartOffset = (epInfoKey.currentContext?.size!.height ?? 300)+120; 
+                                              sliverViewStartOffset = (epInfoKey.currentContext?.size!.height ?? 300)+(2*kToolbarHeight); //120
 
                                               //越过epInfo时开始激活
                                               opacityDegree = min(0.8,offset/sliverViewStartOffset);

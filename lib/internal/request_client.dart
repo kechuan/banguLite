@@ -84,7 +84,7 @@ class BangumiDatas {
   //神奇的数据装载。。 rank方面的数据 还不如拆分成 minRank & maxRank 。。
   static Map<String,dynamic> get sortData => {
     "keyword": '',
-    "sort": "rank",
+    "sort": 'rank',
     "filter": {
       "type": [2],
       "tag": [],

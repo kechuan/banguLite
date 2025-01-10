@@ -21,7 +21,7 @@ types:
         index: 6
   BangumiThemeColor:
     typeId: 1
-    nextIndex: 3
+    nextIndex: 4
     fields:
       sea:
         index: 0
@@ -29,6 +29,8 @@ types:
         index: 1
       ruby:
         index: 2
+      ice:
+        index: 3
   ThemeMode:
     typeId: 2
     nextIndex: 3

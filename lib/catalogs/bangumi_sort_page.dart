@@ -443,9 +443,8 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
 
 
   void loadData(
-    String keyword,
-
     {
+      String? keyword,
       SortType? sortType,
       int? searchOffset,
       List<String>? tagsList,
@@ -461,8 +460,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
 
 
     sortSearchHandler(
-      keyword,
-
+      keyword: keyword,
       airDateRange: airDateRange,
       rankRange: rankRange,
       ratingRange: ratingRange,
@@ -472,38 +470,44 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
       searchOffset:searchOffset,
 
       
-    ).then((bangumiDetails){
+    ).then((searchResponse){
 
-      messageList.addAll(bangumiDetails);
+      if(searchResponse.data!=null){
+        
+        messageList.addAll(loadSearchData(searchResponse.data));
 
-      //debugPrint("bangumiSort: ${messageList}");
+        //debugPrint("bangumiSort: ${messageList}");
 
-      messageListStreamKey.currentState?.insertAllItems(
-        recordLength == 0 ? 0 : recordLength - 1 ,
-        messageList.length - recordLength,
-        duration: const Duration(milliseconds: 500)
-      );
-
-      messageGridStreamKey.currentState?.insertAllItems(
-        recordLength == 0 ? 0 : recordLength - 1 ,
-        messageList.length - recordLength,
-        duration: const Duration(milliseconds: 500)
-      );
-
-
-      loadCountNotifier.value+=1;
-
-      WidgetsBinding.instance.addPostFrameCallback((timestamp){
-        if(bangumiDetails.isEmpty) return;
-
-        sortScrollController.animateTo(
-          sortScrollController.position.pixels + (166*3), // BangumiListTile的iconSize是150 加上padding就是 166
-          //sortScrollController.position.maxScrollExtent, //直接滚到底部
-          duration: const Duration(milliseconds: 150),  
-          //滚动实际效果和动画时间相关。越长实际滚的offset越低 这实在太离谱了
-          curve: Curves.linear
+        messageListStreamKey.currentState?.insertAllItems(
+          recordLength == 0 ? 0 : recordLength - 1 ,
+          messageList.length - recordLength,
+          duration: const Duration(milliseconds: 500)
         );
-      });
+
+        messageGridStreamKey.currentState?.insertAllItems(
+          recordLength == 0 ? 0 : recordLength - 1 ,
+          messageList.length - recordLength,
+          duration: const Duration(milliseconds: 500)
+        );
+
+
+        loadCountNotifier.value+=1;
+
+        WidgetsBinding.instance.addPostFrameCallback((timestamp){
+          if(searchResponse.data.isEmpty) return;
+
+          sortScrollController.animateTo(
+            sortScrollController.position.pixels + (166*3), // BangumiListTile的iconSize是150 加上padding就是 166
+            //sortScrollController.position.maxScrollExtent, //直接滚到底部
+            duration: const Duration(milliseconds: 150),  
+            //滚动实际效果和动画时间相关。越长实际滚的offset越低 这实在太离谱了
+            curve: Curves.linear
+          );
+        });
+        
+      }
+
+      
     });
   }
 
@@ -533,7 +537,6 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
 
     
     loadData(
-      '',
       sortType: browserSortTypeNotifier.value,
       searchOffset: loadCountNotifier.value*10,
       airDateRange:configData["air_date"],
@@ -549,7 +552,6 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
     loadCountNotifier.value+=1;
 
     loadData(
-      '',
       sortType: browserSortTypeNotifier.value,
       searchOffset: loadCountNotifier.value*10,
       airDateRange:configData["air_date"],

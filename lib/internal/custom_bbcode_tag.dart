@@ -1,6 +1,6 @@
 
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/widgets/fragments/comment_image_panel.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';

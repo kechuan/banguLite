@@ -3,8 +3,9 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 
+///打开 subjectID 之后对应的details信息返回
 class BangumiDetails {
 
 	int? id;
@@ -52,9 +53,9 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
 
         List<BangumiDetails> weekdayBangumis = [];
         
-        List todayBangumis = currentDayBangumis["items"];
+        List currentDayBangumiList = currentDayBangumis["items"];
 
-        for(Map<String,dynamic> currentBangumi in todayBangumis){
+        for(Map<String,dynamic> currentBangumi in currentDayBangumiList){
 
           BangumiDetails bangumiDetails = BangumiDetails();
 
@@ -63,7 +64,7 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
           if(
             judgeInSeasonBangumi(currentBangumi["air_date"]) &&
             bangumiDetails.ratingList["score"] > 7.0 && 
-            bangumiDetails.ratingList["total"] > (judgeTransitionalSeason() ? 10 : 500)
+            bangumiDetails.ratingList["total"] > (judgeTransitionalSeason() ? 10 : 25)
           ){
               popularInSeasonBangumis.add(bangumiDetails);
           }
@@ -77,8 +78,6 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
         weekCalender.addAll({
           currentDayBangumis["weekday"]["cn"]:weekdayBangumis //星期X: 当日番剧添加
         });
-
-        
         
       }
 
@@ -93,6 +92,80 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
     return weekCalender;
   }
 
+List<BangumiDetails> loadSearchData(Map<String,dynamic> bangumiData){
+
+  List<BangumiDetails> searchResult = [];
+
+  List<dynamic> bangumiList = bangumiData["data"];
+
+    for(Map currentBangumi in bangumiList){
+      BangumiDetails bangumiDetail = BangumiDetails();
+
+      bangumiDetail.name = currentBangumi["name_cn"].isEmpty ? currentBangumi["name"] : currentBangumi["name_cn"];
+      bangumiDetail.id = currentBangumi["id"];
+      bangumiDetail.coverUrl = currentBangumi["image"];
+      bangumiDetail.informationList = {
+        "air_date": currentBangumi["date"]
+      };
+
+      bangumiDetail.ratingList = {
+        "total": currentBangumi["rating"]["total"] ?? 0,
+        "score": currentBangumi["rating"]["score"] ?? 0,
+        "rank": currentBangumi["rating"]["rank"] ?? 0, //返回的是一个数值0
+      };
+
+      searchResult.add(bangumiDetail);
+    }
+
+  return searchResult;
+
+}
+
+Map<String,List<BangumiDetails>> searchDataAdapter(List<BangumiDetails> bangumiSearchDetailsList){
+
+  final Map<String,List<BangumiDetails>> searchWeekList = {
+    "星期一":[],
+    "星期二":[],
+    "星期三":[],
+    "星期四":[],
+    "星期五":[],
+    "星期六":[],
+    "星期日":[],
+    "最热门":[]
+  };
+
+
+  for(BangumiDetails currentBangumi in bangumiSearchDetailsList){
+    
+    
+  int weekday = DateTime.tryParse(currentBangumi.informationList["air_date"] ?? "")?.weekday ?? 0;
+
+    switch(weekday){
+      case 1: {searchWeekList["星期一"]!.add(currentBangumi);break;}
+      case 2: {searchWeekList["星期二"]!.add(currentBangumi);break;}
+      case 3: {searchWeekList["星期三"]!.add(currentBangumi);break;}
+      case 4: {searchWeekList["星期四"]!.add(currentBangumi);break;}
+      case 5: {searchWeekList["星期五"]!.add(currentBangumi);break;}
+      case 6: {searchWeekList["星期六"]!.add(currentBangumi);break;}
+      case 7: {searchWeekList["星期日"]!.add(currentBangumi);break;}
+      default: break;
+    }
+
+    if(
+      currentBangumi.ratingList["score"] > 7.0 && 
+      currentBangumi.ratingList["total"] > 500
+      )
+    {
+      searchWeekList["最热门"]!.add(currentBangumi);
+    }
+    
+
+  }
+
+
+  return searchWeekList;
+
+}
 
 BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag = false}) {
 
@@ -172,6 +245,7 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
 
     return bangumiDetails;
   }
+
 
 
 

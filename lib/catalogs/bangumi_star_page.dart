@@ -70,7 +70,7 @@ class _BangumiStarPageState extends State<BangumiStarPage> {
               );
               
             },
-            icon: const Icon(Icons.close)
+            icon: const Icon(Icons.delete_forever_outlined)
           )
         ],
         leading: const SizedBox.shrink(),

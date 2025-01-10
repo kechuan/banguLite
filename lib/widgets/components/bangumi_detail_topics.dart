@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
 import 'package:bangu_lite/models/topic_info.dart';
@@ -111,8 +112,6 @@ class BangumiDetailTopics extends StatelessWidget {
                           itemBuilder: (context, index) {
               
                             final topicCreateTime = DateTime.fromMillisecondsSinceEpoch(topicsList[index].createdTime!*1000);
-                            //final topicUpdateTime = DateTime.fromMillisecondsSinceEpoch(topicsList[index].lastRepliedTime!*1000);
-                            
                                         
                             return Theme(
                               data: ThemeData(

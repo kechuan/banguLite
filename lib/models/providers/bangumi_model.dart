@@ -8,40 +8,34 @@ import 'package:bangu_lite/models/bangumi_details.dart';
 
 
 class BangumiModel extends ChangeNotifier {
-  BangumiModel();
+  BangumiModel({
+    required this.subjectID
+  });
 
-  //int _subjectID = 0;
-  //int get subjectID => _subjectID;
-
-  int? subjectID = 0;
+  int subjectID = 0;
 
   BangumiDetails? bangumiDetails;
 
   Color? bangumiThemeColor;
   Color? imageColor;
-  //Color? bangumiDarkThemeColor;
 
-  Future<void> loadDetails(int? newID,{bool? refresh}) async {
+  Future<void> loadDetails({bool? refresh}) async {
 
-    if(newID==null) return;
+    if(subjectID==0) return;
 
-    if(newID!=subjectID || refresh == true){
-      subjectID = newID;
+    if(bangumiDetails != null && refresh != true) return;
 
-      final detailInformation = await HttpApiClient.client.get("${BangumiAPIUrls.subject}/$subjectID");
+    final detailInformation = await HttpApiClient.client.get("${BangumiAPIUrls.subject}/$subjectID");
 
-      if(detailInformation.data!=null){
-        bangumiDetails = loadDetailsData(detailInformation.data,detailFlag:true);
-      }
-
+    if(detailInformation.data!=null){
+      bangumiDetails = loadDetailsData(detailInformation.data,detailFlag:true);
     }
 
     WidgetsBinding.instance.addPostFrameCallback((timestamp){
       notifyListeners();
     });
-
-
   }
+
 
   void getThemeColor(Color imageProviderColor,{bool? darkMode}){
 
@@ -50,7 +44,6 @@ class BangumiModel extends ChangeNotifier {
     if(!BangumiThemeColor.values.any((currentTheme) => currentTheme.color == imageProviderColor)){
       imageColor ??= imageProviderColor;
     }
-
     
     Color resultColor = imageProviderColor;
 
@@ -63,17 +56,15 @@ class BangumiModel extends ChangeNotifier {
 
         resultColor = newHSLColor.toColor();
 
-        //bangumiDarkThemeColor = resultColor;
-
       }
     }
 
     else{
       if(resultColor.computeLuminance()<0.5){
-        HSLColor hslColor = HSLColor.fromColor(resultColor); //亮度过低 转换HSL色度
-        double newLightness = (hslColor.lightness + 0.3).clamp(0.8, 1.0); // 确保不超过 1.0
+        HSLColor hslColor = HSLColor.fromColor(resultColor);
+        double newLightness = (hslColor.lightness + 0.3).clamp(0.8, 1.0);
 
-        double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.4); //偏透明色
+        double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.4);
         HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
 
         resultColor = newHSLColor.toColor();
@@ -82,7 +73,6 @@ class BangumiModel extends ChangeNotifier {
     }
 
     bangumiThemeColor = resultColor;
-
 
     debugPrint("[detailPage] ID: $subjectID, Color:$imageProviderColor => $resultColor, Lumi:${resultColor.computeLuminance()}");
     notifyListeners();

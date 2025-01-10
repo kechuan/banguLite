@@ -1,5 +1,7 @@
 
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +37,9 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
   Widget build(BuildContext context) {
 
       if(widget.id == 0) return const SizedBox.shrink();
+
+      //final indexModel = context.read<IndexModel>();
+      final bangumiModel = context.read<BangumiModel>();
 
       commentFuture ??= context.read<CommentModel>().loadComments(widget.id);
 
@@ -106,7 +111,11 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                                 );
                               }
                                 
-                              return BangumiCommentTile(commentData: commentListData[index]);
+                              return BangumiCommentTile(
+                                commentData: commentListData[index],
+                                //themeColor: judgeCurrentThemeColor(context)
+                                themeColor:judgeDetailRenderColor(context,bangumiModel.imageColor)
+                              );
                             }
                           ),
                         ),

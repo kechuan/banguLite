@@ -12,10 +12,27 @@ class CommentModel extends ChangeNotifier {
   
   CommentModel();
 
+  ///subject的评论详情, 一页的长度为10个 [CommentDetails]
+  ///透过 [loadComments] 函数进行装载, 并在 [dispose] 时移除数据.
+  ///
+  ///该数据一共被我认为的设立三种状态: 
+  ///- null
+  ///- []
+  ///- [...]
+  ///
+  ///其演变流程为:null => [] => [...] (Reset => null)
+  ///
+  /// 数据为null: 请求时 直接变为数据空 [] 意为 [activing]
+  /// 
+  /// 数据为[]: 再被请求时 直接return; 相当于 [completer] 的使用方式
+  /// 
+  /// 当[] => [...]时 触发 [notifiedListener] 意为 [done]
+  /// 
+  /// 而加载失败时 []就会被重新remove变回 null 意为 [fail]
+  /// 
+  /// [...]状态时再被请求时 如没有 refresh Flag 类似的标识时 return.
   final Map<int,List<CommentDetails>> commentsData = {}; 
 
-  //commentPage
-  //int commentID = 0;
   int commentLength = 0;
   int currentPageIndex = 1;
 
@@ -35,6 +52,9 @@ class CommentModel extends ChangeNotifier {
     });
   }
 
+  ///触发 [isReverse] flag与否以进行 最新/最早 评论的切换
+  ///
+  ///请求到数据后会透过 [notifyListeners] 通知UI组件这个数据已准备好
   Future<void> loadComments(int subjectID,{int pageIndex = 1,bool isReverse = false, int pageRange = 10}) async {
 
     if(subjectID == 0) return;
@@ -73,15 +93,6 @@ class CommentModel extends ChangeNotifier {
 
     //judge request start
 
-    /*
-      数据有3个状态 null,[],[...]  null => [] => [...] (Reset => null)
-      null请求时 直接变为[] 意为activing
-      []再被请求时 直接return; 相当于completer的使用方式
-      当[]变为[...]时 通知notified
-      [...]状态时再被请求时 如没有 refresh Flag类似的标识时 return;
-    */
-
-
     //duplicate request Data Handler
     if(commentsData.isNotEmpty && commentsData[pageIndex] != null){
 
@@ -111,15 +122,17 @@ class CommentModel extends ChangeNotifier {
     //2024.10.01 update 官方数据似乎终于把 1 放到 最新的数据 而非最旧的数据了。
     try{
 
+      int currentRequestRange = (pageRange)*(pageIndex - 1).abs();
+
       final detailInformation = await HttpApiClient.client.get(
       BangumiAPIUrls.comment(subjectID),
       queryParameters: BangumiQuerys.commentQuery
 
-      // 末数 比如 55-50 => 5 这样就不会请求一整页的数据 而是请求残余页的条目数
-      ..["limit"] = min(pageRange , (commentLength - (pageRange)*(pageIndex - 1)).abs()) 
+      // 末数 比如 55-(10*(6-1)) => 5 这样就不会请求一整页的数据 而是请求残余页的条目数
+      ..["limit"] = min(pageRange , (commentLength - currentRequestRange)) 
       ..["offset"] =  isReverse ?
-                      (pageRange)*(pageIndex - 1) > commentLength ? commentLength - pageRange : (pageRange)*(pageIndex - 1) :
-                      pageRange > commentLength ? 0 : (pageRange)*(pageIndex - 1).abs()
+                      (currentRequestRange > commentLength ? commentLength - pageRange : currentRequestRange) :
+                      pageRange > commentLength ? 0 : currentRequestRange
 
       //old Data
       //..["limit"] = min(pageRange , (commentLength - (pageRange)*(pageIndex)).abs()) 
@@ -128,7 +141,10 @@ class CommentModel extends ChangeNotifier {
       //pageRange > commentLength ? 0 : (commentLength - (pageRange)*(pageIndex)).abs()
 
                 
-    );
+    ).catchError((error){
+        commentsData.remove(pageIndex);
+        return Response(requestOptions: RequestOptions());
+    });
 
       if(detailInformation.data!=null){
         commentsData[pageIndex] = loadCommentResponse(detailInformation);
@@ -161,6 +177,12 @@ class CommentModel extends ChangeNotifier {
   @override
   void notifyListeners() {
     super.notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    commentsData.clear();
+    super.dispose();
   }
 
 }

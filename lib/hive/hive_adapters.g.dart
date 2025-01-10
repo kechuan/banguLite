@@ -62,11 +62,13 @@ class BangumiThemeColorAdapter extends TypeAdapter<BangumiThemeColor> {
   BangumiThemeColor read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return BangumiThemeColor.sea;
+        return  BangumiThemeColor.macha;
       case 1:
-        return BangumiThemeColor.macha;
+        return BangumiThemeColor.sea;
       case 2:
         return BangumiThemeColor.ruby;
+      case 3:
+        return BangumiThemeColor.ice;
       default:
         return BangumiThemeColor.sea;
     }
@@ -75,12 +77,14 @@ class BangumiThemeColorAdapter extends TypeAdapter<BangumiThemeColor> {
   @override
   void write(BinaryWriter writer, BangumiThemeColor obj) {
     switch (obj) {
-      case BangumiThemeColor.sea:
-        writer.writeByte(0);
       case BangumiThemeColor.macha:
+        writer.writeByte(0);
+      case BangumiThemeColor.sea:
         writer.writeByte(1);
       case BangumiThemeColor.ruby:
         writer.writeByte(2);
+      case BangumiThemeColor.ice:
+        writer.writeByte(3);
     }
   }
 
