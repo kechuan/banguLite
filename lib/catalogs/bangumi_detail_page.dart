@@ -5,7 +5,6 @@ import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
-import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_review.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_topics.dart';
@@ -73,7 +72,6 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
         child: Builder(
           builder: (context) {
 
-            final IndexModel indexModel = context.read<IndexModel>();
             final BangumiModel bangumiModel = context.read<BangumiModel>();
 
             return Scaffold(

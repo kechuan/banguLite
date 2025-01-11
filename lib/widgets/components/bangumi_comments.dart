@@ -6,7 +6,6 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
-import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -103,7 +102,6 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
     if(widget.totalPageLength == 0 || widget.subjectID == 0) return const CommentLoading();
 
     final commentModel = context.read<CommentModel>();
-    final indexModel = context.read<IndexModel>();
 
     //数据预装载 最大期望3页
     int loadPageCount = convertTotalCommentPage(widget.totalPageLength,10);

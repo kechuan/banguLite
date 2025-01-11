@@ -129,8 +129,6 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
                           alignment: Alignment.bottomCenter,
                           children: [
 
-
-
                             Positioned.fill(
                               child: CustomScrollView(
                                 controller: scrollViewController,
@@ -153,7 +151,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
                                             IconButton(
                                               onPressed: () async {
                                                 if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
-                                                await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
+                                                  await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
                                                 }
                                               },
                                               icon: Transform.rotate(

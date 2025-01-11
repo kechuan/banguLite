@@ -104,7 +104,7 @@ class BangumiDatas {
 
 class GithubRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases";
-  static const String version = "0.5.0";
+  static const String version = "0.5.2";
 }
 
 Future<Release?> pullLatestRelease() async {
