@@ -82,6 +82,8 @@ Future<List<BangumiDetails>> bangumiTimeRangeSearch({required int totalBangumiLe
 
   Completer<List<BangumiDetails>> searchCompleter = Completer();
 
+  int completeFlag = convertSegement(totalBangumiLength, 20);
+
   await Future.wait(
     List.generate(
       convertSegement(totalBangumiLength, 20),
@@ -91,8 +93,9 @@ Future<List<BangumiDetails>> bangumiTimeRangeSearch({required int totalBangumiLe
           searchLimit: 20,
           searchOffset: index*20
         ).then((response){
-          if(response.data!=null) searchResultList.addAll(loadSearchData(response.data));
-          if(searchResultList.length == totalBangumiLength) searchCompleter.complete(searchResultList);
+          if(response.data!=null) searchResultList.addAll(loadSearchData(response.data,animateFliter: true));
+          completeFlag-=1;
+          if(completeFlag == 0) searchCompleter.complete(searchResultList);
           //存在最后一个加载完之后直接抛出List的风险 因此使用completer
 
         });

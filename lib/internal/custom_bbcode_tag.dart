@@ -23,12 +23,7 @@ final allEffectTag = [
 	LateLoadImgTag(),
 	UrlTag(
     onTap: (link) async {
-      if(await canLaunchUrlString(link)){
-        //debugPrint("prevent");
-
-        bus.emit('AppRoute', link);
-        //await launchUrlString(link);
-      }
+      await canLaunchUrlString(link).then((launchable)=>bus.emit('AppRoute', link));
     }
     
   ),

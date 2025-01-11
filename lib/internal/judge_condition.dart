@@ -43,6 +43,7 @@ Color judgeCurrentThemeColor(BuildContext context){
     return indexModel.userConfig.customColor!;
   }
 
+
   return indexModel.userConfig.currentThemeColor!.color;
 
 }
@@ -55,10 +56,11 @@ Color judgeDetailRenderColor(BuildContext context,Color? imageColor){
 
   if(indexModel.userConfig.isfollowThemeColor == true){
     renderColor = judgeCurrentThemeColor(context);
+    
   }
 
   else{
-    renderColor = imageColor ?? indexModel.userConfig.currentThemeColor!.color;
+    renderColor = imageColor ?? judgeCurrentThemeColor(context);
   }
 
   return renderColor;

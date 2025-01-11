@@ -5,12 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 void appRouteMethod(BuildContext context,String link){
+  //TODO 问题 多次触发会触发多重触发 
   bus.on(
     'AppRoute',
     (link) {
 
         if(link is String){
-          if(link.startsWith(BangumiWebUrls.baseUrl)){
+          if(
+            link.startsWith(BangumiWebUrls.baseUrl) || 
+            link.startsWith(BangumiWebUrls.relativeUrl)
+          ){
 
             debugPrint("detected BangumiWebUrls: $link");
 
@@ -26,7 +30,7 @@ void appRouteMethod(BuildContext context,String link){
 
             if(
               //splitLink.length != 3 ||
-              link != BangumiWebUrls.subject(resID)
+              link != BangumiWebUrls.subject(resID) && link != BangumiWebUrls.relativeSubject(resID)
             ){
               launchUrlString(link);
             }

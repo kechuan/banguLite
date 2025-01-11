@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/search_handler.dart';
@@ -38,7 +39,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
   final LayerLink buttonLayerLink = LayerLink(); //composition
   final ValueNotifier<bool> transitionalSeasonNotifier = ValueNotifier<bool>(false);
 
-  final ValueNotifier<String> currentSeasonNotifier = ValueNotifier<String>("${DateTime.now().year} ${judgeSeasonRange(DateTime.now().month).seasonText}");
+  //final ValueNotifier<String> currentSeasonNotifier = ValueNotifier<String>("${DateTime.now().year} ${judgeSeasonRange(DateTime.now().month).seasonText}");
 
 
   Timer generateScrollList(){
@@ -99,7 +100,6 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
   Widget build(BuildContext context) {
     final indexModel = context.read<IndexModel>();
 
-
     return EasyRefresh.builder(
       header: const MaterialHeader(),
       onRefresh: ()=> calendarLoadFuture = indexModel.reloadCalendar(),
@@ -155,17 +155,25 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                     containedInkWell: true,
                                     onTap: () {
 
-                                      //final refreshCalendar = context.read<IndexModel>().reloadCalendar();
-                                      // final Function(int,int) refreshCalendar;
+                                      preventAsyncToasterExec() => fadeToaster(context: context, message: "正在切换季节番剧信息");
 
-                                      showDialog(
+                                      showGeneralDialog(
+                                        barrierDismissible: true,
+                                        barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
                                         context: context,
-                                        builder: (_)=> WarpSeasonDialog(selectedYear: DateTime.now().year,selectedSeasonType: judgeSeasonRange(DateTime.now().month),)
-                                      ).then((selectSeason) async {
-                                        if(selectSeason==null) return;
-                                        //debugPrint("selectSeasonRange:$selectSeason");
-                                        currentSeasonNotifier.value = "${selectSeason.keys.first} ${selectSeason.values.first.seasonText}";
+                                        pageBuilder: (_,inAnimation,outAnimation)=> WarpSeasonDialog(
+                                          selectedYear: indexModel.selectedYear,
+                                          selectedSeasonType: judgeSeasonRange(indexModel.selectedSeason.month)
+                                        ),
+                                        transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child),
+                                        transitionDuration: const Duration(milliseconds: 300)
+                                      )
+                                      .then((selectSeason) async {
 
+                                        if(selectSeason==null) return;
+
+                                        if(selectSeason is! Map<int,SeasonType>) return;
+                                        
                                         if(
                                           selectSeason.keys.first == DateTime.now().year &&
                                           selectSeason.values.first.seasonText == judgeSeasonRange(DateTime.now().month).seasonText
@@ -176,9 +184,11 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                         else{
                                           List<String> requestDateRange = [">=${selectSeason.keys.first}-${convertDigitNumString(selectSeason.values.first.month-3)}-01","<${selectSeason.keys.first}-${convertDigitNumString(selectSeason.values.first.month)}-01"];
 
-                                            sortSearchHandler(
-                                              airDateRange: requestDateRange,
-                                              searchLimit: 1 //因为api限制最大20页 那就直接试探包算了
+                                          preventAsyncToasterExec();
+
+                                          sortSearchHandler(
+                                            airDateRange: requestDateRange,
+                                            searchLimit: 1 //因为api限制最大20页 那就直接试探包算了
                                           ).then((response){
                                             if(response.data != null){
                                               int totalBangumiLength = response.data["total"];
@@ -189,18 +199,25 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                   airDateRange: requestDateRange,
                                                 ))
                                               );
+
                                             }
                                           });
                                         }
 
-                                        
+                                        indexModel.selectedYear = selectSeason.keys.first;
+                                        indexModel.selectedSeason = selectSeason.values.first;
 
                                       });
                                     },
                                     focusColor: Colors.transparent,
                                     child: Row(
                                       children: [
-                                        ScalableText(currentSeasonNotifier.value,style:const TextStyle(fontSize: 24)),
+                                        //重建代价低
+                                        Consumer<IndexModel>(
+                                          builder: (_,indexModel,child) {
+                                            return ScalableText("${indexModel.selectedYear} ${indexModel.selectedSeason.seasonText}",style:const TextStyle(fontSize: 24));
+                                          }
+                                        ),
                                         const Icon(Icons.arrow_drop_down)
                                       ],
                                     ),

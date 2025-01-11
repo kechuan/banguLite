@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:bangu_lite/internal/bus_register_method.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -131,9 +132,9 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
             child: TabBar(
               controller: commentTabController,
               isScrollable: true,
-              indicatorColor: indexModel.userConfig.currentThemeColor?.color,
-              unselectedLabelColor: indexModel.userConfig.currentThemeColor?.color,
-              labelColor: indexModel.userConfig.currentThemeColor?.color,
+              indicatorColor: judgeCurrentThemeColor(context),
+              unselectedLabelColor: judgeCurrentThemeColor(context),
+              labelColor: judgeCurrentThemeColor(context),
               indicatorSize: TabBarIndicatorSize.tab,
               labelPadding: EdgeInsets.symmetric(horizontal: MediaQuery.sizeOf(context).width/min(widget.totalPageLength*2.5,16)), // 同屏数量*2
               

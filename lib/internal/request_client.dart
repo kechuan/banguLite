@@ -50,12 +50,18 @@ class BangumiAPIUrls {
 
 class BangumiWebUrls{
   static const String baseUrl = "https://bangumi.tv";
+  static const String relativeUrl = "https://bgm.tv";
 
   static String subject(int subjectID) => '$baseUrl/subject/$subjectID';
   static String subjectComment(int subjectID) => '$baseUrl/subject/$subjectID/comments';
   static String subjectTopic(int topicID) => '$baseUrl/subject/topic/$topicID';
 
   static String ep(int epID) => '$baseUrl/ep/$epID';
+
+  static String relativeSubject(int subjectID) => '$relativeUrl/subject/$subjectID';
+  //static String relativeSubjectComment(int subjectID) => '$relativeUrl/subject/$subjectID/comments';
+  //static String relativeSubjectTopic(int topicID) => '$relativeUrl/subject/topic/$topicID';
+  //static String relativeEp(int epID) => '$relativeUrl/ep/$epID';
 
 }
 

@@ -48,7 +48,7 @@ class BangumiCommentTile extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 itemExtent: 25,
                 shrinkWrap: true,
-                itemCount: 5,
+                itemCount: ratingScore != 0 ? 5 : 0,
                 
                 itemBuilder: (_,score){
                   if(ratingScore > (score+1)*2){

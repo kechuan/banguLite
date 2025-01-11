@@ -59,6 +59,10 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
 
           BangumiDetails bangumiDetails = BangumiDetails();
 
+          if(animeFliter==true){
+            if(animationFliter(currentBangumi)) continue;
+          }
+
           bangumiDetails = loadDetailsData(currentBangumi);
 
           if(
@@ -92,13 +96,18 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
     return weekCalender;
   }
 
-List<BangumiDetails> loadSearchData(Map<String,dynamic> bangumiData){
+List<BangumiDetails> loadSearchData(Map<String,dynamic> bangumiData,{bool? animateFliter}){
 
   List<BangumiDetails> searchResult = [];
 
   List<dynamic> bangumiList = bangumiData["data"];
 
     for(Map currentBangumi in bangumiList){
+
+      if(animateFliter==true){
+        if(animationFliter(currentBangumi)) continue;
+      }
+
       BangumiDetails bangumiDetail = BangumiDetails();
 
       bangumiDetail.name = currentBangumi["name_cn"].isEmpty ? currentBangumi["name"] : currentBangumi["name_cn"];
@@ -246,7 +255,18 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
     return bangumiDetails;
   }
 
+bool animationFliter(Map currentBangumi){
+  //一刀切
+  if(
+    currentBangumi["name_cn"].isEmpty
+    //currentBangumi["tags"].any((currentTag) => currentTag["name"] == "国产")
+  ) {
+    return true;
+  }
 
+  return false;
+  
+}
 
 
 enum SubjectType {

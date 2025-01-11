@@ -108,6 +108,7 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
 
 											MultiSliver(
 												children: [
+                          
 													SliverPinnedHeader(
 														child: AppBar(
 															title: ScalableText("${widget.topicInfo.topicName}"),
@@ -119,7 +120,7 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
 																	IconButton(
 																		onPressed: () async {
 																			if(await canLaunchUrlString(BangumiWebUrls.subjectTopic(widget.topicInfo.topicID!))){
-																			await launchUrlString(BangumiWebUrls.subjectTopic(widget.topicInfo.topicID!));
+																			  await launchUrlString(BangumiWebUrls.subjectTopic(widget.topicInfo.topicID!));
 																			}
 																		},
 																		icon: Transform.rotate(

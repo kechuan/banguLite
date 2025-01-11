@@ -5,6 +5,7 @@ import 'package:bangu_lite/hive/config_model.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -16,11 +17,11 @@ class IndexModel extends ChangeNotifier {
   }
 
   DateTime dataTime = DateTime.now();
+  int selectedYear = DateTime.now().year;
   int selectedWeekDay = DateTime.now().weekday;
+  SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month);
 
   static Completer? loadFuture; //适用作用目标只有一个的对象里
-
-  int cachedImageSize = 0;
 
   //除了 星期一-日之外 还有一个 最热门 的属性存放评分7.0+的番剧
   Map<String, List<BangumiDetails>> calendarBangumis = {
@@ -33,7 +34,9 @@ class IndexModel extends ChangeNotifier {
     "星期日":[],
     "最热门":[]
   }; 
+
   AppConfig userConfig = defaultAPPConfig();
+  int cachedImageSize = 0;
 
   void initModel() async {
     loadConfigData();

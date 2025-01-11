@@ -170,7 +170,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
 
                                           return TweenAnimationBuilder<Color?>(
                                             tween: ColorTween(
-                                              begin: indexModel.userConfig.currentThemeColor?.color,
+                                              begin: judgeCurrentThemeColor(context),
                                               end: judgeDarknessMode(context) ? Colors.black : judgeDetailRenderColor(context,linearColor),
                                             ),
                                             duration: const Duration(milliseconds: 500),
