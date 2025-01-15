@@ -6,6 +6,7 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 
 class CommentImagePanel extends StatefulWidget {
   const CommentImagePanel({
@@ -31,7 +32,6 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
 
     loadInformationFuture ??= loadByteInformation(widget.imageUrl);
     
-
     return FutureBuilder(
       future: loadInformationFuture,
       builder: (_,snapshot) {
@@ -101,7 +101,13 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                           );
                         }
                   
-                        return CachedNetworkImage(imageUrl: widget.imageUrl,fit: BoxFit.cover,);
+                        return CachedNetworkImage(
+                          imageUrl: widget.imageUrl,
+                          fit: BoxFit.cover,
+                          imageBuilder: (_, imageProvider) {
+                            return PhotoView(imageProvider: imageProvider);
+                          },
+                        );
              
                         //return CachedImageLoader(imageUrl: widget.imageUrl,photoViewStatus:true); 
                         //problem: not work with DecorationImage

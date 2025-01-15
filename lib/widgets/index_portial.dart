@@ -91,7 +91,11 @@ class IndexPortial extends StatelessWidget {
                 label: "订阅",
               )
             ],
-            onDestinationSelected: (newIndex)=> selectedPageIndexNotifier.value = newIndex,
+            //onDestinationSelected: (newIndex)=> selectedPageIndexNotifier.value = newIndex,
+            onDestinationSelected: (newIndex){
+              FocusScope.of(context).unfocus();
+              selectedPageIndexNotifier.value = newIndex;
+            },
           ),
         );
     

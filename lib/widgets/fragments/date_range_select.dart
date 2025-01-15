@@ -1,4 +1,5 @@
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/warp_season_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
@@ -42,26 +43,23 @@ class DateRangeSelect extends StatelessWidget {
             maxWidth: 24,
           ),
           child: PopupMenuButton(
+            
             padding: const EdgeInsets.all(0),
             initialValue: DateTime.now().year,
             icon: const Icon(Icons.arrow_drop_down),
             onSelected: (value) => dateRangeEditingController.text = value.toString(),
-                    
+            constraints: const BoxConstraints(maxHeight: 200),
+
             itemBuilder: (_){
-              return [
-                ...List.generate(
-                  12, (index){
-          
-                    if( index % 2 == 1) return const PopupMenuDivider();
-          
-                    return PopupMenuItem(
-                      
-                      value: DateTime.now().year - (index~/2),
-                      child: ScalableText("${ DateTime.now().year - (index~/2) }"),
+              return List.generate(
+                (bangumiBaseYear%2000), (index){
+                  return PopupMenuItem(
+                      height: 50,
+                      value: DateTime.now().year - (index),
+                      child: ScalableText("${ DateTime.now().year - (index) }"),
                     );
-                  }
-                )
-              ];
+                }
+              );
             }
           ),
         ),

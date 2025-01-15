@@ -134,7 +134,7 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
               unselectedLabelColor: judgeCurrentThemeColor(context),
               labelColor: judgeCurrentThemeColor(context),
               indicatorSize: TabBarIndicatorSize.tab,
-              labelPadding: EdgeInsets.symmetric(horizontal: MediaQuery.sizeOf(context).width/min(widget.totalPageLength*2.5,16)), // 同屏数量*2
+              labelPadding: EdgeInsets.symmetric(horizontal: MediaQuery.sizeOf(context).width/min(widget.totalPageLength*2.5,14)), // 同屏数量*2
               
               tabs: 
                 List.generate(

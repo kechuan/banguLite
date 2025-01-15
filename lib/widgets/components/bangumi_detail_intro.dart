@@ -85,6 +85,15 @@ class IntroPortrait extends StatelessWidget {
 
                         Expanded(
                           child: ListTile(
+                            onTap: () {
+                              Clipboard.setData(ClipboardData(text: '${bangumiDetails.name}'));
+                              //showToast("标题已复制,长按复制alias",context:context);
+                              fadeToaster(context: context,message: "标题已复制,长按复制alias");
+                            },
+                            onLongPress: () {
+                              Clipboard.setData(ClipboardData(text: '${bangumiDetails.informationList["alias"] ?? ""}'));
+                              fadeToaster(context:context,message:"alias已复制");
+                            },
                             title: ScalableText("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
                             subtitle: ScalableText(bangumiDetails.informationList["alias"] ?? "")
                           )
@@ -222,7 +231,7 @@ class IntroPortrait extends StatelessWidget {
                           child: Icon(Icons.arrow_forward_ios,size: 16)
                         )
                       ]
-)
+                    )
                   
                   ]
                 )
@@ -330,10 +339,5 @@ class IntroLandscape extends StatelessWidget {
 
   }
 }
-
-
-
-
-
 
 

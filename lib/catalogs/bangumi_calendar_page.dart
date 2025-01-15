@@ -78,6 +78,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
   @override
   void didPushNext() {
     WeekDaySelectOverlay.weekDaySelectOverlay?.closeWeekDaySelectFieldOverlay();
+    FocusScope.of(context).unfocus();
     super.didPushNext();
   }
 
@@ -94,7 +95,6 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
     calendarLoadFuture = context.read<IndexModel>().loadCalendar();
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {

@@ -82,7 +82,10 @@ class IndexLandscape extends StatelessWidget {
             
             
               ],
-              onDestinationSelected: (newIndex) => selectedPageIndexNotifier.value = newIndex,
+              onDestinationSelected: (newIndex){
+                FocusScope.of(context).unfocus();
+                selectedPageIndexNotifier.value = newIndex;
+              }
             ),
 
             const VerticalDivider(width: 1),

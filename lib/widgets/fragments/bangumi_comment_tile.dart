@@ -45,13 +45,14 @@ class BangumiCommentTile extends StatelessWidget {
             SizedBox(
               height: 30,
               child: ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
                 scrollDirection: Axis.horizontal,
                 itemExtent: 25,
                 shrinkWrap: true,
                 itemCount: ratingScore != 0 ? 5 : 0,
                 
                 itemBuilder: (_,score){
-                  if(ratingScore > (score+1)*2){
+                  if(ratingScore >= (score+1)*2){
                     return Icon(Icons.star,color: themeColor);
                   }
 

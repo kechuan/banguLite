@@ -187,6 +187,7 @@ class SelectSeasonPortrait extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return SizedBox(
 		height: 100,
 		width: 150,
@@ -223,7 +224,7 @@ class SelectSeasonPortrait extends StatelessWidget {
 											color: convertPassedSeason(year, currentMonth)-1 < seasonTypeIndex ? Colors.grey : BangumiThemeColor.values[seasonTypeIndex].color , //unable will be grey.,,
 										),
 										
-										child: SizedBox(width: 150/2,height: 100/2,child: Center(child: Text(SeasonType.values[seasonTypeIndex].seasonText))),
+										child: SizedBox(width: 150/2,height: 100/2,child: Center(child: ScalableText(SeasonType.values[seasonTypeIndex].seasonText,style: const TextStyle(color: Colors.black),))),
 										),
 
 										Positioned(
