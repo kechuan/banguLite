@@ -213,9 +213,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                   builder: (_,fliterShow,child) {
                     return SliverToBoxAdapter(
                       child: AnimatedContainer(
-                        height: fliterShow ? 
-                        kDebugMode ? 400 : 300 : 
-                        0,
+                        height: fliterShow ? (kDebugMode ? 400 : 300) : 0,
                         duration: const Duration(milliseconds: 300),
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),

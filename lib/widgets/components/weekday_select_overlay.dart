@@ -112,7 +112,7 @@ class WeekDaySelectOverlay{
           
               Positioned(
                 height: 100,
-                width:  min(350, MediaQuery.sizeOf(context).width),
+                width: min(350, MediaQuery.sizeOf(context).width),
                 child: CompositedTransformFollower(
                   showWhenUnlinked:false,
                   offset: Offset(
