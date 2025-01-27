@@ -56,6 +56,9 @@ FFRouteSettings getRouteSettings({
           topicModel: asT<TopicModel>(
             safeArguments['topicModel'],
           )!,
+          bangumiThemeColor: asT<Color?>(
+            safeArguments['bangumiThemeColor'],
+          ),
           title: asT<String?>(
             safeArguments['title'],
           ),
@@ -88,6 +91,9 @@ FFRouteSettings getRouteSettings({
           subjectID: asT<int>(
             safeArguments['subjectID'],
           )!,
+          bangumiThemeColor: asT<Color?>(
+            safeArguments['bangumiThemeColor'],
+          ),
           name: asT<String?>(
             safeArguments['name'],
           ),
@@ -120,6 +126,9 @@ FFRouteSettings getRouteSettings({
           totalEps: asT<int>(
             safeArguments['totalEps'],
           )!,
+          bangumiThemeColor: asT<Color?>(
+            safeArguments['bangumiThemeColor'],
+          ),
         ),
       );
     case '/subjectTopic':

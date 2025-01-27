@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:provider/provider.dart';
 
-
+@Deprecated("since 0.5.2")
 class WeekDaySelectOverlay{
 
   WeekDaySelectOverlay._internal(
@@ -42,8 +42,6 @@ class WeekDaySelectOverlay{
   
 
   final opacityListenable = ValueNotifier<double>(0.0);
-  
-  
 
   bool isOverlayActived = false;
 

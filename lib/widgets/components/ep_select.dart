@@ -5,6 +5,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/eps_info.dart';
+import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +43,8 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
 
-    final EpModel epModel = context.read<EpModel>();
+    final epModel = context.read<EpModel>();
+    final bangumiModel = context.read<BangumiModel>();
 
     int segements = convertSegement(widget.totalEps,100);
 
@@ -50,7 +52,6 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
     epTabController ??= TabController(length: segements, vsync: this);
 
     DateTime currentTime = DateTime.now();
-
 
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) => true,
@@ -190,6 +191,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                           "subjectID":epModel.subjectID,
                                           "totalEps": widget.totalEps,
                                           "epModel": epModel,
+                                          "bangumiThemeColor": bangumiModel.bangumiThemeColor
                                         }
                                       );
                                   

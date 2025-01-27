@@ -10,13 +10,11 @@ class BuildEps extends StatelessWidget {
     required this.subjectID,
     required this.informationList,
 	  this.portialMode,
-    this.outerContext
   });
 
   final int subjectID;
   final Map<String, dynamic> informationList;
   final bool? portialMode;
-  final BuildContext? outerContext;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +35,8 @@ class BuildEps extends StatelessWidget {
           
           //debugPrint("airedEps:$airedEps");
 
-          bool overlapAirDate = convertAirDateTime(currentEpInfo.airDate) - DateTime.now().millisecondsSinceEpoch >= 0;
+          //bool overlapAirDate = convertAirDateTime(currentEpInfo.airDate) - DateTime.now().millisecondsSinceEpoch >= 0;
+          bool overlapAirDate = convertAirDateTime(currentEpInfo.airDate).difference(DateTime.now()) >= Duration.zero;
           overlapAirDate ? null : airedEps+=1;
 
           return overlapAirDate;

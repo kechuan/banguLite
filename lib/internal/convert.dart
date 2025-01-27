@@ -84,33 +84,40 @@ return  totalComments % pageRange == 0 ?
         totalComments~/pageRange + 1;
 }
 
-int convertAirDateTime(String? bangumiAirDate){
-	if(bangumiAirDate == null) return 0;
 
-  int? convertedTimeStamp;
+DateTime convertAirDateTime(String? bangumiAirDate){
+	if(bangumiAirDate == null) return DateTime(0);
 
-  convertedTimeStamp = DateTime.tryParse(bangumiAirDate)?.millisecondsSinceEpoch;
-  if(convertedTimeStamp !=null) return convertedTimeStamp;
+  DateTime? convertedDateTime;
+
+  convertedDateTime = DateTime.tryParse(bangumiAirDate);
+  if(convertedDateTime!=null) return convertedDateTime;
 
   List<String> dateSegments = bangumiAirDate.split("-");
-  if(dateSegments.length != 3) return 0;
+  if(dateSegments.length != 3) return DateTime(0);
 
   int bangumiYear = int.parse(dateSegments[0]);
   int bangumiMonth = int.parse(dateSegments[1]);
   int bangumiDay = int.parse(dateSegments[2]);
 
-  return DateTime(bangumiYear,bangumiMonth,bangumiDay).millisecondsSinceEpoch;
+  return DateTime(bangumiYear,bangumiMonth,bangumiDay);
 
 
 }
 
+String convertDateTimeToString(DateTime dateTime){
+  return dateTime.toIso8601String().substring(0,10);
+  //return "${dateTime.year}-${convertDigitNumString(dateTime.month)}-${convertDigitNumString(dateTime.day)} ${convertDigitNumString(dateTime.hour)}:${convertDigitNumString(dateTime.minute)}";
+}
+
+
 int convertAiredEps(String? bangumiAirDate){
 	if(bangumiAirDate == null) return 0;
 
-	int residualDateTime = (DateTime.now().millisecondsSinceEpoch - convertAirDateTime(bangumiAirDate));
+	int residualDateTime = (DateTime.now().millisecondsSinceEpoch - convertAirDateTime(bangumiAirDate).millisecondsSinceEpoch);
 
 	//放送开始附带一集 因此+1
-	int airedEps =  (residualDateTime ~/ const Duration(days: 7).inMilliseconds) + 1;
+	int airedEps = (residualDateTime ~/ const Duration(days: 7).inMilliseconds) + 1;
 
 	return airedEps;
 }
@@ -186,9 +193,7 @@ String convertScoreRank(double? score){
 
 }
 
-String convertDateTimeToString(DateTime dateTime){
-  return "${dateTime.year}-${convertDigitNumString(dateTime.month)}-${convertDigitNumString(dateTime.day)} ${convertDigitNumString(dateTime.hour)}:${convertDigitNumString(dateTime.minute)}";
-}
+
 
 String convertEPInfoType(int? type){
   String resultEPType = "Ep";

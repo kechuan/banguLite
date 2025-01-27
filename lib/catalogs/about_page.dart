@@ -68,24 +68,21 @@ class AboutPage extends StatelessWidget {
                     title: const ScalableText('检查更新'),
                     onTap: () async {
 
-                      preventAsyncContext() => fadeToaster(context: context, message: "暂无更新");
-                      showUpdateDialog(Release latestRelease) => showModalBottomSheet(
-                        context: context, 
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.sizeOf(context).width*5/6,
-                          maxHeight: MediaQuery.sizeOf(context).height*3/5+MediaQuery.paddingOf(context).bottom+20
-                        ),
-                        builder: (_)=> NewUpdateDialog(latestRelease:latestRelease)
-                      );
+                      Release release = Release();
+
+                      invokeAsyncToaster() => fadeToaster(context: context, message: "暂无更新");
+                      invokeShowUpdateDialog() => showUpdateDialog(context,release);
+                      
 
                       fadeToaster(context: context, message: "检查中...");
 
                       await pullLatestRelease().then((latestRelease){
 
-                        if(latestRelease==null){ preventAsyncContext();}
+                        if(latestRelease==null){ invokeAsyncToaster();}
 
                         else{
-                          showUpdateDialog(latestRelease);
+                          release = latestRelease;
+                          invokeShowUpdateDialog();
                         }
                         
                       });
@@ -108,4 +105,15 @@ class AboutPage extends StatelessWidget {
       ),
     );
   }
+}
+
+void showUpdateDialog(BuildContext context,Release latestRelease){
+  showModalBottomSheet(
+    context: context, 
+    constraints: BoxConstraints(
+      maxWidth: MediaQuery.sizeOf(context).width*5/6,
+      maxHeight: MediaQuery.sizeOf(context).height*3/5+MediaQuery.paddingOf(context).bottom+20
+    ),
+    builder: (_)=> NewUpdateDialog(latestRelease:latestRelease)
+  );
 }

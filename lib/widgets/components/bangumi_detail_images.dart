@@ -65,6 +65,20 @@ class BuildDetailImages extends StatelessWidget {
             ),
           );
         },
+        errorWidget: (context, url, error) {
+          return Container(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.orientationOf(context) == Orientation.landscape ? 300 : 200,
+              minWidth: MediaQuery.orientationOf(context) == Orientation.landscape ? 200 : 133,
+            ),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                color: Colors.grey.withValues(alpha: 0.5),
+              ),
+            child: const Center(child: ScalableText("Image not available")),
+          );
+        },
+        
         progressIndicatorBuilder: (_, __, progress) {
         
           return Container(

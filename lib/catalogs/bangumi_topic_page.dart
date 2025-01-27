@@ -8,7 +8,7 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/topic_details.dart';
 import 'package:bangu_lite/models/topic_info.dart';
 
-import 'package:bangu_lite/widgets/components/ep_comments.dart';
+import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:easy_refresh/easy_refresh.dart';

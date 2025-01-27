@@ -69,15 +69,15 @@ Color judgeDetailRenderColor(BuildContext context,Color? imageColor){
 
 SeasonType judgeSeasonRange(int currentMonth){
 
-  SeasonType currentSeasonType = SeasonType.spring;
+  SeasonType currentSeasonType = SeasonType.winter;
 
   SeasonType.values.any((currentSeason){
-    if(currentMonth >= currentSeason.month){
-      currentSeasonType = currentSeason;
-      return true;
+    if(currentMonth > currentSeason.month){
+      return false;
     }
 
-    return false;
+    currentSeasonType = currentSeason;
+    return true;
 
   });
 
