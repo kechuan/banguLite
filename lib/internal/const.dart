@@ -50,13 +50,22 @@ enum AbiType{
 }
 
 enum SortType{
-  rank("rank"),
-  heat("heat"),
-  score("score");
+  rank("rank","番剧排名"),
+  heat("heat","番剧热度"),
+  score("score","番剧评分"),
+  joinTime("joinTime","收藏时间"),
+  updateTime("updateTime","更新日期"),
+  airDate("airDate","放送日期")
+  
+  ;
 
-  final String sortType;
+  final String searchSortType;
+  final String label;
 
-  const SortType(this.sortType);
+  const SortType(
+    this.searchSortType,
+    this.label,
+  );
 }
 
 enum ScaleType{
@@ -105,15 +114,15 @@ enum CommentState {
 
 enum ScoreRank{
   none("未评分",0),
-  worst("不忍直视",1.5), // 1.5-
-  worse("很差",1.5), // 1.5~3
-  poor("差",3), //3 ~ 3.5
+  worst("不忍直视",1), // >1 因为最低的评分就是1
+  worse("很差",2), // 1~2
+  poor("差",2.5), //2~3
   bad("较差",3.5), //3.5~4.5
   medium("不过不失",4.5), //4.5~5.5
   pass("还行",5.5), //5.5~6.5
   great("推荐",6.5), //6.5~7.5
   excellent("力荐",7.5), //7.5 ~ 9
-  perfect("神作",9) //9+
+  perfect("神作",9) //9~10
   ;
 
   final String rankText;

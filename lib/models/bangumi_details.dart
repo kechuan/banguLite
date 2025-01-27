@@ -199,6 +199,7 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
       bangumiDetails.informationList = {
         "eps":bangumiData["eps"] == 0 ? bangumiData["total_episodes"] : bangumiData["eps"],
         "alias":bangumiData["name_cn"].isNotEmpty ? bangumiData["name"] : "",
+        "air_date": bangumiData["date"].toString()
       };
 	
       for(Map currentInformation in bangumiData["infobox"]){
@@ -211,12 +212,6 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
         }
 
         switch(currentInformation["key"]){
-          case "放送开始": {
-            bangumiDetails.informationList.addAll({
-              "air_date": bangumiData["date"].toString()
-            });
-            break;
-          }
 
           case "放送星期": {
             bangumiDetails.informationList.addAll({
@@ -226,12 +221,7 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
           }
         }
 
-        if(
-          bangumiDetails.informationList["air_date"] != null && 
-          bangumiDetails.informationList["air_weekday"] != null
-        ) {
-          break;
-        }
+        if(bangumiDetails.informationList["air_weekday"] != null) break;
 
 
       }

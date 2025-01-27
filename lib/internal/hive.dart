@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bangu_lite/hive/config_model.dart';
+import 'package:bangu_lite/models/star_details.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:bangu_lite/hive/hive_registrar.g.dart';
@@ -16,7 +17,8 @@ class MyHive {
   static late final Directory cachedImageDir;
   static late final Directory? downloadDir;
 
-  static late final Box<Map> starBangumisDataBase;
+  //static late final Box<Map<String,String?>> starBangumisDataBase;
+  static late final Box<StarBangumiDetails> starBangumisDataBase;
   static late final Box<AppConfig> appConfigDataBase;
 
   static Future<void> init() async {

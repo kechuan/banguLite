@@ -52,7 +52,6 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
         ChangeNotifierProvider(create: (_) => CommentModel()),
         ChangeNotifierProvider(create: (_) => TopicModel(subjectID: widget.subjectID,)),
       ],
-      //create: (_) => BangumiModel(),
       child: Selector<BangumiModel,Color?>(
         selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
         shouldRebuild: (previous, next) => previous!=next,

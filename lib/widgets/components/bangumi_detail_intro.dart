@@ -158,7 +158,6 @@ class IntroPortrait extends StatelessWidget {
                             subjectID: bangumiDetails.id!, 
                             informationList: bangumiDetails.informationList,
                             portialMode: true,
-                            outerContext: context
                           )
                         )
                       )
@@ -210,7 +209,7 @@ class IntroPortrait extends StatelessWidget {
                                   
                                   //debugPrint("airedEps:$airedEps");
 
-                                  bool overlapAirDate = convertAirDateTime(currentEpInfo.airDate) - DateTime.now().millisecondsSinceEpoch >= 0;
+                                  bool overlapAirDate = convertAirDateTime(currentEpInfo.airDate).difference(DateTime.now()) >= Duration.zero;
                                   overlapAirDate ? null : airedEps+=1;
 
                                   return overlapAirDate;

@@ -37,9 +37,21 @@ class CachedImageLoader extends StatelessWidget {
                         image: imageProvider,
                         fit: BoxFit.cover,
                       ),
-                      borderRadius: BorderRadius.circular(16)
+                      borderRadius: BorderRadius.circular(24)
                     ),
                   );
+                },
+
+                errorWidget: (_, url, error) {
+
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      color: Colors.grey.withValues(alpha: 0.5),
+                    ),
+                    child: const Center(child: ScalableText("Image not available")),
+                  );
+
                 },
                 
                 progressIndicatorBuilder: (_, url, progress) {

@@ -62,9 +62,9 @@ class BangumiThemeColorAdapter extends TypeAdapter<BangumiThemeColor> {
   BangumiThemeColor read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return  BangumiThemeColor.macha;
-      case 1:
         return BangumiThemeColor.sea;
+      case 1:
+        return BangumiThemeColor.macha;
       case 2:
         return BangumiThemeColor.ruby;
       case 3:
@@ -77,9 +77,9 @@ class BangumiThemeColorAdapter extends TypeAdapter<BangumiThemeColor> {
   @override
   void write(BinaryWriter writer, BangumiThemeColor obj) {
     switch (obj) {
-      case BangumiThemeColor.macha:
-        writer.writeByte(0);
       case BangumiThemeColor.sea:
+        writer.writeByte(0);
+      case BangumiThemeColor.macha:
         writer.writeByte(1);
       case BangumiThemeColor.ruby:
         writer.writeByte(2);
@@ -219,6 +219,66 @@ class ColorAdapter extends TypeAdapter<Color> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ColorAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class StarBangumiDetailsAdapter extends TypeAdapter<StarBangumiDetails> {
+  @override
+  final int typeId = 5;
+
+  @override
+  StarBangumiDetails read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return StarBangumiDetails()
+      ..name = fields[0] as String?
+      ..coverUrl = fields[1] as String?
+      ..eps = (fields[2] as num?)?.toInt()
+      ..score = (fields[3] as num?)?.toDouble()
+      ..airDate = fields[4] as String?
+      ..airWeekday = fields[5] as String?
+      ..bangumiID = (fields[7] as num?)?.toInt()
+      ..joinDate = fields[8] as String?
+      ..finishedDate = fields[9] as String?
+      ..rank = (fields[10] as num?)?.toInt();
+  }
+
+  @override
+  void write(BinaryWriter writer, StarBangumiDetails obj) {
+    writer
+      ..writeByte(10)
+      ..writeByte(0)
+      ..write(obj.name)
+      ..writeByte(1)
+      ..write(obj.coverUrl)
+      ..writeByte(2)
+      ..write(obj.eps)
+      ..writeByte(3)
+      ..write(obj.score)
+      ..writeByte(4)
+      ..write(obj.airDate)
+      ..writeByte(5)
+      ..write(obj.airWeekday)
+      ..writeByte(7)
+      ..write(obj.bangumiID)
+      ..writeByte(8)
+      ..write(obj.joinDate)
+      ..writeByte(9)
+      ..write(obj.finishedDate)
+      ..writeByte(10)
+      ..write(obj.rank);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StarBangumiDetailsAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

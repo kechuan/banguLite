@@ -15,11 +15,9 @@ import 'package:skeletonizer/skeletonizer.dart';
 class BangumiDetailTopics extends StatelessWidget {
   const BangumiDetailTopics({
     super.key,
-    //required this.subjectID,
     this.name
   });
 
-  //final int subjectID;
   final String? name;
   
   @override
@@ -41,7 +39,6 @@ class BangumiDetailTopics extends StatelessWidget {
           },
           shouldRebuild: (previous, next) {
             if(previous.isEmpty || next.isEmpty) return true;
-            //if(previous.last.topicID == 0 || next.last.topicID == 0) return true;
               return previous.last.topicID!=next.last.topicID;
             },
           builder: (_, topicsList, child) {
@@ -85,7 +82,12 @@ class BangumiDetailTopics extends StatelessWidget {
                               Navigator.pushNamed(
                                 context,
                                 Routes.moreTopics,
-                                arguments: {"topicsList":topicsList,"title":name,"topicModel":topicModel}
+                                arguments: {
+                                  "topicsList":topicsList,
+                                  "title":name,
+                                  "topicModel":topicModel,
+                                  "bangumiThemeColor":bangumiModel.bangumiThemeColor
+                                }
                               );
 
                             },

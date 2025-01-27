@@ -34,7 +34,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// MoreTopicsPage : [List<TopicInfo>(required) topicsList, TopicModel(required) topicModel, String? title]
+  /// MoreTopicsPage : [List<TopicInfo>(required) topicsList, TopicModel(required) topicModel, Color? bangumiThemeColor, String? title]
   static const String moreTopics = '/moreTopics';
 
   /// '/photoView'
@@ -52,7 +52,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiCommentPage : [CommentModel(required) commentModel, int(required) subjectID, String? name]
+  /// BangumiCommentPage : [CommentModel(required) commentModel, int(required) subjectID, Color? bangumiThemeColor, String? name]
   static const String subjectComment = '/subjectComment';
 
   /// '/subjectDetail'
@@ -70,7 +70,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiEpPage : [EpModel(required) epModel, int(required) totalEps]
+  /// BangumiEpPage : [EpModel(required) epModel, int(required) totalEps, Color? bangumiThemeColor]
   static const String subjectEp = '/subjectEp';
 
   /// '/subjectTopic'

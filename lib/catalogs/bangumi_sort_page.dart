@@ -464,7 +464,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
       ratingRange: ratingRange,
       tagsList: tagsList,
 
-      sortType: sortType?.name,
+      sortType: sortType?.searchSortType,
       searchOffset:searchOffset,
 
       

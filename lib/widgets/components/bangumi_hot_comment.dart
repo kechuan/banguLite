@@ -161,7 +161,12 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                                 Navigator.pushNamed(
                                   context,
                                   Routes.subjectComment,
-                                  arguments: {"commentModel":context.read<CommentModel>(),"subjectID":widget.id,"name":widget.name}
+                                  arguments: {
+                                    "commentModel":context.read<CommentModel>(),
+                                    "subjectID":widget.id,
+                                    "name":widget.name,
+                                    "bangumiThemeColor":bangumiModel.bangumiThemeColor
+                                  }
                                 );
                               },
                               child: const ScalableText("吐槽合集",style: TextStyle(decoration: TextDecoration.underline)),
