@@ -1,6 +1,11 @@
+import 'dart:io';
+
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/delegates/star_sort_strategy.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/star_details.dart';
@@ -25,17 +30,14 @@ class BangumiStarPage extends StatelessWidget {
     return Scaffold(
       
       appBar: AppBar(
+		surfaceTintColor: Colors.transparent,
         toolbarHeight: 60,
         title: const Padding(
-          padding: EdgeInsets.only(left: 20),
-          child: ScalableText("订阅界面"),
+          padding: PaddingH6,
+          child: ScalableText("番剧收藏",style: TextStyle(fontSize: 18),),
         ),
         
         actions: [
-
-        //  IconButton(
-        //    onPressed: ()=>indexModel.updateStar(), icon: const Icon(Icons.refresh)
-        //  ),
 
           ValueListenableBuilder(
             valueListenable: sortTypeNotifier,
@@ -180,6 +182,7 @@ class BangumiStarPage extends StatelessWidget {
                   slivers: seasonTypeSort(
                     context:context,
                     sortStrategy: currentStrategy,
+					sortType: sortType
                   )
                 );
               },
@@ -201,9 +204,32 @@ class BangumiStarPage extends StatelessWidget {
 List<Widget> seasonTypeSort({
   required BuildContext context,
   required SortStrategy sortStrategy,
+  required SortType sortType
 }) {
-  final indexModel = context.read<IndexModel>();
-  final dataSource = MyHive.starBangumisDataBase.values.toList();
+  	final indexModel = context.read<IndexModel>();
+  	List<StarBangumiDetails> dataSource = MyHive.starBangumisDataBase.values.toList();
+
+	//debugPrint("${indexModel.starsUpdateRating[0]["rank"]}/${indexModel.starsUpdateRating[0]["score"]}");
+	//debugPrint("${indexModel.starsUpdateRating[1]["rank"]}/${indexModel.starsUpdateRating[1]["score"]}");
+
+	//debugPrint("timestamp: ${DateTime.now()} seasonTypeSort rebuild");
+
+	if(
+		sortType == SortType.rank || 
+		sortType == SortType.score
+	){
+		dataSource = List.generate(
+			indexModel.starsUpdateRating.length,
+			(index){
+				//indexModel.starsUpdateRating[startIndex + index]["rank"]!.toInt()
+
+				return dataSource[index]
+					..rank = indexModel.starsUpdateRating[index]["rank"]!.toInt()
+					..score = indexModel.starsUpdateRating[index]["score"]!.toDouble()
+				;
+			}
+		);
+	}
 
   // 使用策略进行排序
   dataSource.sort((prev, next) => sortStrategy.getSort(prev)
@@ -260,7 +286,13 @@ Widget buildSectionHeader(BuildContext context, String text) {
         border: Border(bottom: Divider.createBorderSide(context)),
         color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
       ),
-      child: ScalableText(text, style: const TextStyle(fontSize: 18)),
+	child: SizedBox(
+		height: 50,
+		child: Align(
+			alignment: Alignment.centerLeft,
+			child: ScalableText(text, style: const TextStyle(fontSize: 18))
+		)
+	),
     ),
   );
 }
@@ -289,9 +321,10 @@ Widget buildSectionList(
           bangumiTitle: item.name,
           imageUrl: item.coverUrl,
           trailing: SizedBox(
-			width: 150,
+			width: 250,
 			child: Row(
-			  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+			  mainAxisAlignment: MainAxisAlignment.end,
+			  spacing: 12,
 			  children: [
 							
 				Builder(
@@ -300,16 +333,92 @@ Widget buildSectionList(
 						String resultContent = "";
 						switch(sortType){
 							
-							case SortType.rank:{resultContent="${item.rank}"; break;}
-							case SortType.score:{resultContent="${item.score}"; break;}
+							case SortType.rank:{
+
+								int starRank = MyHive.starBangumisDataBase.values.elementAt(startIndex + index).rank!;
+
+								if(indexModel.starsUpdateRating[startIndex + index]["rank"] == item.rank){
+									resultContent="${item.rank}";
+								}
+
+								else{
+									resultContent="收藏时: $starRank -> ${item.rank}"; 
+								}
+
+								break;
+							}
+							case SortType.score:{
+
+								double starScore = MyHive.starBangumisDataBase.values.elementAt(startIndex + index).score!;
+								
+								if(indexModel.starsUpdateRating[startIndex + index]["score"] == item.score){
+									resultContent="${item.score}";
+								}
+
+								else{
+									resultContent="收藏时: $starScore -> ${item.score}"; 
+								}
+
+
+								break;
+							}
+
 							case SortType.joinTime:{resultContent="${item.joinDate}"; break;}
 							case SortType.airDate:{resultContent="${item.airDate}"; break;}
 							
 							default:{}
 						}
 
+						
+
 						return ScalableText(resultContent);
 					}
+				),
+
+				Builder(
+				  builder: (_) {
+
+					if(
+						sortType == SortType.updateTime && 
+						DateTime.now().compareTo(convertDateTime(item.finishedDate)) < 0 //连载中才显示
+					){
+						final ValueNotifier<bool> subscribeNotifier = ValueNotifier<bool>(false);
+
+						return ValueListenableBuilder(
+						  valueListenable: subscribeNotifier,
+						  builder: (_,subscribeStatus,child) {
+						    return IconButton(
+						    	icon: subscribeStatus ? const Icon(Icons.notifications) : const Icon(Icons.notifications_outlined),
+						    	onPressed: () async {
+
+									invokeAsyncCreateToaser()=> fadeToaster(context: context, message: "已将该番剧设置为更新通知提醒");
+									invokeAsyncCancelToaser()=> fadeToaster(context: context, message: "已取消通知提醒");
+									
+
+									if(Platform.isAndroid){
+										const testIntent = AndroidIntent(
+											action: 'android.intent.action.VIEW',
+											type: 'resource/folder',
+											package: 'com.android.documentsui',
+										);
+
+										await testIntent.launch();
+									}
+
+									subscribeNotifier.value ? invokeAsyncCancelToaser() : invokeAsyncCreateToaser();
+
+									subscribeNotifier.value = !subscribeNotifier.value;
+
+									
+						    	},
+						    );
+						  }
+						);
+					}
+
+					return const SizedBox.shrink();
+
+				  }
 				),
 
 				IconButton(

@@ -14,7 +14,7 @@ abstract class SortStrategy {
 class AirDateSortStrategy implements SortStrategy {
   @override
   int getSort(StarBangumiDetails details) => 
-      convertAirDateTime(details.airDate).millisecondsSinceEpoch;
+      convertDateTime(details.airDate).millisecondsSinceEpoch;
 
   @override
   String generateHeaderText(int airms) {
@@ -35,6 +35,11 @@ class UpdateTimeSortStrategy implements SortStrategy {
   int getSort(StarBangumiDetails details){
 
     int resultWeekDate = 0;
+
+	DateTime finishedTime = convertDateTime(details.finishedDate);
+
+	//已完结
+	if(DateTime.now().compareTo(finishedTime) > 0) return resultWeekDate;
 
     WeekDay.values.any((currentDay){
 
@@ -67,7 +72,7 @@ class UpdateTimeSortStrategy implements SortStrategy {
      
     });
 
-    return resultText.isEmpty? '未定义' : '星期$resultText';
+    return resultText.isEmpty? '已完结' : '星期$resultText';
   }
 
  @override
@@ -78,7 +83,7 @@ class UpdateTimeSortStrategy implements SortStrategy {
 class JoinTimeSortStrategy implements SortStrategy {
 	@override
 	int getSort(StarBangumiDetails details) => 
-		convertAirDateTime(details.joinDate).millisecondsSinceEpoch;
+		convertDateTime(details.joinDate).millisecondsSinceEpoch;
 
 	@override
 	String generateHeaderText(int joinms) {
@@ -91,22 +96,6 @@ class JoinTimeSortStrategy implements SortStrategy {
 
   @override
   SortType currentSort = SortType.joinTime;
-}
-
-// 连载中/已完结排序
-class ONAirSortStrategy implements SortStrategy {
-  @override
-  int getSort(StarBangumiDetails details){
-    return convertAirDateTime(details.finishedDate).millisecondsSinceEpoch;
-  }
-
-  @override
-  String generateHeaderText(int finishedms) {
-    return DateTime.now().millisecondsSinceEpoch < finishedms ? '连载中' : '已完结';
-  }
-
-  @override
-  SortType currentSort = SortType.airDate;
 }
 
 //评分信息排序 

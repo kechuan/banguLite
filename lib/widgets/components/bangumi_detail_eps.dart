@@ -35,8 +35,8 @@ class BuildEps extends StatelessWidget {
           
           //debugPrint("airedEps:$airedEps");
 
-          //bool overlapAirDate = convertAirDateTime(currentEpInfo.airDate) - DateTime.now().millisecondsSinceEpoch >= 0;
-          bool overlapAirDate = convertAirDateTime(currentEpInfo.airDate).difference(DateTime.now()) >= Duration.zero;
+          //bool overlapAirDate = convertDateTime(currentEpInfo.airDate) - DateTime.now().millisecondsSinceEpoch >= 0;
+          bool overlapAirDate = convertDateTime(currentEpInfo.airDate).difference(DateTime.now()) >= Duration.zero;
           overlapAirDate ? null : airedEps+=1;
 
           return overlapAirDate;
