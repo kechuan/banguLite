@@ -75,8 +75,8 @@ class IndexLandscape extends StatelessWidget {
                 ),
             
                 NavigationRailDestination(
-                  icon: Icon(Icons.rss_feed_outlined),
-                  selectedIcon: Icon(Icons.rss_feed),
+                  icon: Icon(Icons.star_border),
+                  selectedIcon: Icon(Icons.star),
                   label: ScalableText('收藏')
                 ),
             

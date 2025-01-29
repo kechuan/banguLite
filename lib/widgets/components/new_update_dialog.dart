@@ -1,14 +1,15 @@
 
 import 'dart:io';
 
-import 'package:android_intent_plus/android_intent.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/internal/platforms/android_intent.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/update_client.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/general_transition_dialog.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +53,7 @@ class NewUpdateDialog extends StatelessWidget {
               builder: (_, progress, __) {
                 return Stack(
                   children: [
+
                     Offstage(
                       offstage: updateClient.progressNotifier.value == 0,
                       child: Text("存储位置:${MyHive.downloadDir?.path}"),
@@ -59,14 +61,12 @@ class NewUpdateDialog extends StatelessWidget {
 
                     Offstage(
                       offstage: updateClient.progressNotifier.value != 0,
-                      child: const ScalableText("(长按复制下载链接)"),
+                      child: const ScalableText("(长按项目以复制下载链接)"),
                     ),
                   ],
                 );
               },
             ),
-
-           
 
             ValueListenableBuilder(
               valueListenable: updateClient.progressNotifier,
@@ -92,7 +92,11 @@ class NewUpdateDialog extends StatelessWidget {
                                 ),
                               ),
 
-                              ScalableText("${(progress*100).toStringAsFixed(2)}%")
+                              Offstage(
+                                offstage: progress == 1,
+                                child: ScalableText("${(progress*100).toStringAsFixed(2)}%"),
+                              ),
+                              
                             ],
                           ),
                         ),
@@ -132,7 +136,11 @@ class NewUpdateDialog extends StatelessWidget {
                     trailing: IconButton(
                       onPressed: (){
                         UpdateClient.getInstance().totalSize = latestRelease.assets![index].size ?? 0;
-                        downloadApplication(latestRelease.assets![index].browserDownloadUrl,updateClient.progressNotifier);
+                        downloadApplication(
+                          context,
+                          latestRelease.assets![index].browserDownloadUrl,
+                          updateClient.progressNotifier
+                        );
                       },
                       icon: const Icon(Icons.download)
                     ),
@@ -183,58 +191,77 @@ class NewUpdateDialog extends StatelessWidget {
                             
   }
 
-  void downloadApplication(String? assestUrl, ValueNotifier<double> progressNotifier) async {
+  void downloadApplication(
+    BuildContext context,
+    String? assestUrl,
+    ValueNotifier<double> progressNotifier
+  ) async {
     if(assestUrl == null || MyHive.downloadDir == null) return;
 
+    invokeDialog() => showTransitionAlertDialog(
+      context,
+      title: "安装授权已取消",
+      content: "如要安装应用 则需要授于本应用安装权限.或者自行在文件管理器安装",
+      confirmAction: () async => await checkInstallPermission()
+    );
+
     String storagePath = "${MyHive.downloadDir!.path}${Platform.pathSeparator}${assestUrl.split('/').last}";
+    File downloadedFile = File(storagePath);
+    bool fileExist = false;
 
-    UpdateClient.getInstance().startDownload();
+    fileExist = await downloadedFile.exists();
 
-    await HttpApiClient.client.download(
-      assestUrl,
-      storagePath,
-      onReceiveProgress:(count, total)=>progressNotifier.value = (count/total)
-    ).then((_) async {
+    //hash when..
+    if(fileExist){
+      installApk(downloadedFile,fallback: invokeDialog);
+    }
 
-      UpdateClient.getInstance().finishDownload();
-      if(MyHive.downloadDir?.uri != null){
+    else{
+      UpdateClient.getInstance().startDownloadTimer();
 
-        if(Platform.isAndroid){
-          const fallbackIntent = AndroidIntent(
-            action: 'android.intent.action.VIEW',
-            type: 'resource/folder',
-            package: 'com.android.documentsui',
-          );
-        
-          await fallbackIntent.launch();
+      await HttpApiClient.client.download(
+        assestUrl,
+        storagePath,
+        onReceiveProgress:(count, total)=>progressNotifier.value = (count/total)
+      ).then((_) async {
+
+        UpdateClient.getInstance().finishDownload();
+        if(MyHive.downloadDir?.uri != null){
+
+          if(Platform.isAndroid){
+            installApk(downloadedFile);
+          }
+
+          else{
+            if (await canLaunchUrl(MyHive.downloadDir!.uri)){
+              launchUrl(MyHive.downloadDir!.uri);
+            }
+          }
+
         }
 
-        else{
-          if (await canLaunchUrl(MyHive.downloadDir!.uri)){
-            launchUrl(MyHive.downloadDir!.uri);
+        
+      }).catchError((dioException){
+        //debugPrint(dioException);
+
+        switch (dioException.type) {
+          case DioExceptionType.badResponse: {
+            debugPrint('链接不存在或拒绝访问'); 
+            break;
+          }
+          case DioExceptionType.connectionTimeout:
+          case DioExceptionType.sendTimeout:
+          case DioExceptionType.receiveTimeout: {
+            debugPrint('请求超时');
+            break;
           }
         }
+      });
+    }
 
-      }
 
-      
-    }).catchError((dioException){
-      //debugPrint(dioException);
-
-      switch (dioException.type) {
-        case DioExceptionType.badResponse: {
-          debugPrint('链接不存在或拒绝访问'); 
-          break;
-        }
-        case DioExceptionType.connectionTimeout:
-        case DioExceptionType.sendTimeout:
-        case DioExceptionType.receiveTimeout: {
-          debugPrint('请求超时');
-          break;
-        }
-      }
-    });
+  }
 
 }
 
-}
+

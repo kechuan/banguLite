@@ -17,7 +17,7 @@ class UpdateClient {
   final ValueNotifier<double> progressNotifier = ValueNotifier<double>(0);
  
 
-  void startDownload(){
+  void startDownloadTimer(){
     speedTimer = Timer.periodic(
       const Duration(milliseconds: 500), 
       (_){
