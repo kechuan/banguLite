@@ -86,8 +86,8 @@ class IndexPortial extends StatelessWidget {
               ),
 
               NavigationDestination(
-                icon: Icon(Icons.rss_feed_outlined),
-                selectedIcon: Icon(Icons.rss_feed),
+                icon: Icon(Icons.star_border),
+                selectedIcon: Icon(Icons.star),
                 label: '收藏',
               )
             ],

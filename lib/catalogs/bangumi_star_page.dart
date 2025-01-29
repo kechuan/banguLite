@@ -1,6 +1,4 @@
-import 'dart:io';
 
-import 'package:android_intent_plus/android_intent.dart';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/delegates/star_sort_strategy.dart';
 import 'package:bangu_lite/internal/const.dart';
@@ -11,6 +9,7 @@ import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/star_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/general_transition_dialog.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -111,41 +110,18 @@ class BangumiStarPage extends StatelessWidget {
           IconButton(
             onPressed: (){
 
-              showGeneralDialog(
-                barrierDismissible: true,
-                barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
-                context: context,
-                pageBuilder: (_,inAnimation,outAnimation){
-                  return AlertDialog(
-                    title: const ScalableText("重置确认"),
-                    content: const ScalableText("要清空所有的订阅信息吗?"),
-                    actions:[
-                      TextButton(
-                        onPressed: (){
-
-                          debugPrint("stars List: ${MyHive.starBangumisDataBase.keys.length}");
-                          //debugPrint("value List: ${starConfigtoMap(MyHive.starBangumisDataBase.values.elementAt(2))}");
-
-                          Navigator.of(context).pop();
-                        }, child: const ScalableText("取消")
-                      ),
-                      TextButton(
-                        onPressed: (){
-
-                          MyHive.starBangumisDataBase.clear();
-                          indexModel.updateStar();
-                          
-                          Navigator.of(context).pop();
-                        }, 
-                        child: const ScalableText("确认")
-                      )
-                    ]
-                  );
-                },
-                transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child),
-                transitionDuration: const Duration(milliseconds: 300)
+              showTransitionAlertDialog(
+                context,
+                title: "重置确认",
+                content: "要清空所有的订阅信息吗?",
+                cancelAction: ()=>debugPrint("stars List: ${MyHive.starBangumisDataBase.keys.length}"),
+                confirmAction: (){
+                  MyHive.starBangumisDataBase.clear();
+                  indexModel.starsUpdateRating.clear();
+                  indexModel.updateStar();
+                }
               );
-            
+
             },
             icon: const Icon(Icons.delete_forever_outlined)
           ),
@@ -347,6 +323,7 @@ Widget buildSectionList(
 
 								break;
 							}
+
 							case SortType.score:{
 
 								double starScore = MyHive.starBangumisDataBase.values.elementAt(startIndex + index).score!;
@@ -395,15 +372,15 @@ Widget buildSectionList(
 									invokeAsyncCancelToaser()=> fadeToaster(context: context, message: "已取消通知提醒");
 									
 
-									if(Platform.isAndroid){
-										const testIntent = AndroidIntent(
-											action: 'android.intent.action.VIEW',
-											type: 'resource/folder',
-											package: 'com.android.documentsui',
-										);
+									//if(Platform.isAndroid){
+									//	const testIntent = AndroidIntent(
+									//		action: 'android.intent.action.VIEW',
+									//		type: 'resource/folder',
+									//		package: 'com.android.documentsui',
+									//	);
 
-										await testIntent.launch();
-									}
+									//	await testIntent.launch();
+									//}
 
 									subscribeNotifier.value ? invokeAsyncCancelToaser() : invokeAsyncCreateToaser();
 

@@ -26,14 +26,12 @@ import 'package:bangu_lite/models/providers/topic_model.dart';
 class BangumiTopicPage extends StatefulWidget {
   const BangumiTopicPage({
     super.key,
-    //required this.topicID,
     required this.topicModel,
 	  required this.topicInfo
   });
 
   final TopicModel topicModel;
   final TopicInfo topicInfo;
-//  final int topicID;
 
   @override
   State<BangumiTopicPage> createState() => _BangumiTopicPageState();
@@ -42,14 +40,15 @@ class BangumiTopicPage extends StatefulWidget {
 class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
 
 
-  bool isActived = true; 
+  bool isActived = true;
+  Future? topicFuture;
+  final ScrollController scrollController = ScrollController();
   
   //在极端状况之下 说不定会出现 (BangumiDetailPageA)EpPage => BangumiDetailPageB => EpPageB...
   //此时 整个路由链存活的 EpPageState 都会触发这个 AppRoute 那就麻烦了, 因此需要加以管控
 
   @override
   void initState() {
-
     bus.on(
       'AppRoute',
       (link) {
@@ -77,73 +76,73 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
   @override
   Widget build(BuildContext context) {
 
-    Future? topicFuture;
+    final topicModel = widget.topicModel;
 
-    //return const SizedBox.shrink();
-
-       return ChangeNotifierProvider.value(
-			value: widget.topicModel,
+    return ChangeNotifierProvider.value(
+			value: topicModel,
 			builder: (context,child){
-
-				final topicModel = widget.topicModel;
 
 
 				topicFuture ??= topicModel.loadTopic(widget.topicInfo.topicID!);
 
 				return EasyRefresh.builder(
+          scrollController: scrollController,
 					header: const MaterialHeader(),
 
 					childBuilder: (_,physics) {
 					
-						return Scaffold( //Listview need materialDesign
+						return Scaffold(
 
 							body: Selector<TopicModel,TopicDetails>(
 								selector: (_, topicModel) => topicModel.topicDetailData[widget.topicInfo.topicID!] ?? TopicDetails(),
 								shouldRebuild: (previous, next) => previous != next,
 								builder: (_,topicDetailData,topicComment) {
 
-									return CustomScrollView(
-										physics:physics,
-										slivers: [
-
-											MultiSliver(
-												children: [
-                          
-													SliverPinnedHeader(
-														child: AppBar(
-															title: ScalableText("${widget.topicInfo.topicName}"),
-															
-															backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
-							
-																actions: [
-								
-																	IconButton(
-																		onPressed: () async {
-																			if(await canLaunchUrlString(BangumiWebUrls.subjectTopic(widget.topicInfo.topicID!))){
-																			  await launchUrlString(BangumiWebUrls.subjectTopic(widget.topicInfo.topicID!));
-																			}
-																		},
-																		icon: Transform.rotate(
-																			angle: -45,
-																			child: const Icon(Icons.link),
-																		)
-																	),
-								
-								
-																],
-															)
-													),
-
-													topicComment!
-									
-												]
-											)
-
-										
-										],
-										
-										
-									);
+									return Scrollbar(
+                    thumbVisibility: true,
+                    controller: scrollController,
+                      child: CustomScrollView(
+                        controller: scrollController,
+                        physics:physics,
+                        slivers: [
+                      
+                          MultiSliver(
+                            children: [
+                                                
+                              SliverPinnedHeader(
+                                child: AppBar(
+                                  title: ScalableText("${widget.topicInfo.topicName}"),
+                                  
+                                  backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
+                                    
+                                    actions: [
+                                      
+                                      IconButton(
+                                        onPressed: () async {
+                                          if(await canLaunchUrlString(BangumiWebUrls.subjectTopic(widget.topicInfo.topicID!))){
+                                            await launchUrlString(BangumiWebUrls.subjectTopic(widget.topicInfo.topicID!));
+                                          }
+                                        },
+                                        icon: Transform.rotate(
+                                          angle: -45,
+                                          child: const Icon(Icons.link),
+                                        )
+                                      ),
+                                      
+                                      
+                                    ],
+                                  )
+                              ),
+                      
+                              topicComment!
+                      
+                            ]
+                          )
+                      
+                        ],
+                        
+                      ),
+                    );
 									
 								},
 									
@@ -186,6 +185,7 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                                 
                                 shrinkWrap: true,
                                 children: [
+
                                   EpCommentView(
                                     epCommentData: EpCommentDetails()
                                       ..avatarUrl = widget.topicInfo.creatorAvatarUrl
@@ -193,10 +193,6 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                                       ..sign = widget.topicInfo.creatorSign
                                       ..comment = currentTopicDetail.content
                                       ..commentTimeStamp = currentTopicDetail.createdTime
-                                      //..epCommentIndex = "0"
-                                
-                                
-                                      
                                   ),
                                 
                                   Padding(
@@ -213,11 +209,9 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                                       ],
                                     ),
                                   ),
-                                
-                                
+
                                 ],
                               );
-                      
                       
                             }
                       
@@ -226,7 +220,7 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                               return const Center(
                                 child: Padding(
                                   padding: EdgeInsets.only(top:64),
-                                  child: ScalableText("该集数暂无人评论..."),
+                                  child: ScalableText("该帖子暂无人评论..."),
                                 ),
                               );
                             }

@@ -1,12 +1,8 @@
 
-import 'dart:io';
-
 import 'package:bangu_lite/internal/convert.dart';
-import 'package:bangu_lite/internal/hive.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:github/github.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 
 class HttpApiClient{
@@ -104,7 +100,8 @@ class BangumiDatas {
 
 class GithubRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases";
-  static const String version = "0.5.3";
+  static const String version = "0.5.5";
+  static const String packageName = "io.flutter.banguLite";
 }
 
 Future<Release?> pullLatestRelease() async {
@@ -129,43 +126,6 @@ Future<Release?> pullLatestRelease() async {
 
 }
 
-void downloadApplication(String? assestUrl) async {
-  if(assestUrl == null || MyHive.downloadDir == null) return;
-
-  String storagePath = "${MyHive.downloadDir!.path}${Platform.pathSeparator}${assestUrl.split('/').last}";
-
-  await HttpApiClient.client.download(
-    assestUrl,
-    storagePath,
-    onReceiveProgress:(count, total) => debugPrint("${((count/total)*100).toStringAsFixed(3)}%"),
-  ).then((_) async {
-    
-
-    if(MyHive.downloadDir?.uri != null){
-      if (await canLaunchUrl(MyHive.downloadDir!.uri)){
-        launchUrl(MyHive.downloadDir!.uri);
-      }
-    }
-
-    
-  }).catchError((dioException){
-    //debugPrint(dioException);
-
-    switch (dioException.type) {
-      case DioExceptionType.badResponse: {
-        debugPrint('链接不存在或拒绝访问'); 
-        break;
-      }
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout: {
-        debugPrint('请求超时');
-        break;
-      }
-    }
-  });
-
-}
 
 void downloadSticker() async {
 

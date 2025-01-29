@@ -22,10 +22,8 @@ final allEffectTag = [
 	//ImgTag(),
 	LateLoadImgTag(),
 	UrlTag(
-    onTap: (link) async {
-      await canLaunchUrlString(link).then((launchable)=>bus.emit('AppRoute', link));
-    }
-    
+    onTap: (link) async => 
+      await canLaunchUrlString(link).then((launchable)=>bus.emit('AppRoute', link))
   ),
 	//QuoteTag(),
   AdapterQuoteTag(),
