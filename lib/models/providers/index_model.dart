@@ -40,14 +40,15 @@ class IndexModel extends ChangeNotifier {
   AppConfig userConfig = defaultAPPConfig();
   int cachedImageSize = 0;
 
+  List<Map<String,num>> starsUpdateRating = [];
+
   void initModel() async {
     loadConfigData();
+    await updateStarDetail();
   }
 
   void loadConfigData(){
-    for(AppConfig currentConfig in MyHive.appConfigDataBase.values){
-      userConfig = currentConfig;
-    }
+    userConfig = MyHive.appConfigDataBase.get("currentTheme") ?? defaultAPPConfig();
   }
 
   void updateThemeMode(ThemeMode mode,{bool? config}) {
@@ -82,6 +83,22 @@ class IndexModel extends ChangeNotifier {
     userConfig.isfollowThemeColor = detailfollowStatus;
     notifyListeners();
     updateConfig();
+  }
+
+  Future<void> updateStarDetail() async {
+    List<int> starsList = [];
+
+    for(int currentStarID in MyHive.starBangumisDataBase.keys){
+      starsList.add(currentStarID);
+    }
+
+    starsUpdateRating = await compute(
+      loadStarsDetail,
+      starsList
+    );
+
+    debugPrint("timestamp: ${DateTime.now()} update Star done");
+
   }
 
   void resetConfig(){

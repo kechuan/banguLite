@@ -1,16 +1,18 @@
 import 'package:hive_ce/hive.dart';
 
 class StarBangumiDetails extends HiveObject{
+  int? bangumiID;
   String? name;
   String? coverUrl;
   int? eps;
-  int? bangumiID;
-  int? rank;
-  double? score;
+  
   String? airWeekday;
   String? joinDate;
   String? airDate;
   String? finishedDate;
+
+  int? rank;
+  double? score;
 
 }
 

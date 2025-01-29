@@ -84,16 +84,15 @@ return  totalComments % pageRange == 0 ?
         totalComments~/pageRange + 1;
 }
 
-
-DateTime convertAirDateTime(String? bangumiAirDate){
-	if(bangumiAirDate == null) return DateTime(0);
+DateTime convertDateTime(String? bangumiDate){
+	if(bangumiDate == null) return DateTime(0);
 
   DateTime? convertedDateTime;
 
-  convertedDateTime = DateTime.tryParse(bangumiAirDate);
+  convertedDateTime = DateTime.tryParse(bangumiDate);
   if(convertedDateTime!=null) return convertedDateTime;
 
-  List<String> dateSegments = bangumiAirDate.split("-");
+  List<String> dateSegments = bangumiDate.split("-");
   if(dateSegments.length != 3) return DateTime(0);
 
   int bangumiYear = int.parse(dateSegments[0]);
@@ -111,10 +110,10 @@ String convertDateTimeToString(DateTime dateTime){
 }
 
 
-int convertAiredEps(String? bangumiAirDate){
-	if(bangumiAirDate == null) return 0;
+int convertAiredEps(String? bangumiDate){
+	if(bangumiDate == null) return 0;
 
-	int residualDateTime = (DateTime.now().millisecondsSinceEpoch - convertAirDateTime(bangumiAirDate).millisecondsSinceEpoch);
+	int residualDateTime = (DateTime.now().millisecondsSinceEpoch - convertDateTime(bangumiDate).millisecondsSinceEpoch);
 
 	//放送开始附带一集 因此+1
 	int airedEps = (residualDateTime ~/ const Duration(days: 7).inMilliseconds) + 1;
@@ -225,5 +224,6 @@ Future<int> getTotalSizeOfFilesInDir(final FileSystemEntity fileSystemEntity) as
       
     return total;
   }
+  
   return 0;
 }
