@@ -86,12 +86,8 @@ class IndexModel extends ChangeNotifier {
   }
 
   Future<void> updateStarDetail() async {
-    List<int> starsList = [];
-
-    for(int currentStarID in MyHive.starBangumisDataBase.keys){
-      starsList.add(currentStarID);
-    }
-
+    List<int> starsList = MyHive.starBangumisDataBase.keys as List<int>;
+    
     starsUpdateRating = await compute(
       loadStarsDetail,
       starsList
