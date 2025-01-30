@@ -1,7 +1,10 @@
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/max_number_input_formatter.dart';
+import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 class WarpPageDialog extends StatelessWidget {
   const WarpPageDialog({
@@ -128,4 +131,35 @@ class WarpPageDialog extends StatelessWidget {
       ),
     );
   }
+}
+
+void showWrapPageDialog(BuildContext context,PageController commentPageController){
+  showDialog(
+    context: context,
+    builder: (_){
+
+      final commentModel = context.read<CommentModel>();
+
+      final FixedExtentScrollController pageSelectorController = 
+      FixedExtentScrollController(initialItem: commentModel.currentPageIndex - 1);
+
+      final TextEditingController jumpPageEditingController = TextEditingController();
+
+      return WarpPageDialog(
+        pageSelectorController: pageSelectorController,
+        jumpPageEditingController: jumpPageEditingController,
+        commentTotalPage: convertTotalCommentPage(commentModel.commentLength, 10),
+        onConfirmPressed: () {
+          Navigator.of(context).pop();
+
+          final int newPageIndex = (int.tryParse(jumpPageEditingController.text) ?? pageSelectorController.selectedItem + 1);
+
+          commentModel.changePage(newPageIndex - 1);
+          commentPageController.jumpToPage(newPageIndex - 1);
+        },
+      );
+
+      
+    }
+  );
 }

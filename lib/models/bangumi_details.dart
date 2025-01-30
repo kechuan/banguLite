@@ -1,6 +1,8 @@
 
+import 'dart:async';
 import 'dart:math';
 
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -199,6 +201,7 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
       bangumiDetails.informationList = {
         "eps":bangumiData["eps"] == 0 ? bangumiData["total_episodes"] : bangumiData["eps"],
         "alias":bangumiData["name_cn"].isNotEmpty ? bangumiData["name"] : "",
+        "air_date": bangumiData["date"].toString()
       };
 	
       for(Map currentInformation in bangumiData["infobox"]){
@@ -211,12 +214,6 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
         }
 
         switch(currentInformation["key"]){
-          case "放送开始": {
-            bangumiDetails.informationList.addAll({
-              "air_date": bangumiData["date"].toString()
-            });
-            break;
-          }
 
           case "放送星期": {
             bangumiDetails.informationList.addAll({
@@ -226,12 +223,7 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
           }
         }
 
-        if(
-          bangumiDetails.informationList["air_date"] != null && 
-          bangumiDetails.informationList["air_weekday"] != null
-        ) {
-          break;
-        }
+        if(bangumiDetails.informationList["air_weekday"] != null) break;
 
 
       }
@@ -268,6 +260,37 @@ bool animationFliter(Map currentBangumi){
   
 }
 
+//获取 收藏 番剧的信息
+Future<List<Map<String,num>>> loadStarsDetail(List<int> starsIDList) async {
+
+  Completer<List<Map<String,num>>> starUpdateCompleter = Completer();
+
+  int completeFlag = starsIDList.length;
+
+  final resultRating = List.generate(
+    starsIDList.length, (_)=>{"score": 0.0,"rank": 0}
+  );
+
+  await Future.wait(
+    List.generate(
+      starsIDList.length,
+      (index) async {
+        await HttpApiClient.client.get("${BangumiAPIUrls.subject}/${starsIDList[index]}").then((response){
+          final ratingList = loadDetailsData(response.data).ratingList;
+
+          resultRating[index]["score"] = ratingList["score"];
+          resultRating[index]["rank"] = ratingList["rank"];
+
+          completeFlag -= 1;
+          if(completeFlag==0) starUpdateCompleter.complete(resultRating);
+        });
+      }
+      )
+  );
+
+  return starUpdateCompleter.future;
+
+}
 
 enum SubjectType {
   book(1), // 书籍

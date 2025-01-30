@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:bangu_lite/internal/bus_register_method.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -18,11 +17,13 @@ class CommentView extends StatefulWidget {
     super.key,
     required this.totalPageLength,
     required this.subjectID,
+    this.bangumiThemeColor,
     required this.commentPageController,
   });
 
   final int totalPageLength;
   final int subjectID;
+  final Color? bangumiThemeColor;
   final PageController commentPageController;
 
   @override
@@ -73,16 +74,21 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
     );
     
       commentTabController.addListener((){
+        //疑问:
+        //如果不添加这种设置 在左右划屏幕的时候 就会直接被取消动画 而
+        //但如果添加了这种设置 那么主动点击的时候。。就直接被return掉了
 
-       
-        if(commentTabController.index - widget.commentPageController.page!.toInt().abs() < 2) return;
+        //只能这样了 阈值设置在 1 之内 好在jumpPage的时候只能是整数值
+
+        if((commentTabController.index - widget.commentPageController.page!).abs() < 0.9){
+          return;
+        }
+
         widget.commentPageController.jumpToPage(
           commentTabController.index, 
         );
       });
     
-
-
 
     super.initState();
   }
@@ -91,8 +97,6 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
   void dispose() {
     commentTabController.dispose();
     widget.commentPageController.dispose();
-    
-    
     super.dispose();
   }
 
@@ -115,26 +119,29 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
       )
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: const SizedBox.shrink(),  
-        flexibleSpace: Theme(
-          data: ThemeData(
-            scrollbarTheme: const ScrollbarThemeData(
-              thickness: WidgetStatePropertyAll(0.0) //it work
-              //trackVisibility: WidgetStatePropertyAll(false), //not work. strange.
-              //thumbVisibility: WidgetStatePropertyAll(false),
-            )
-          ),
-          child: EasyRefresh(
+    return Theme(
+      data: ThemeData(
+        colorSchemeSeed: widget.bangumiThemeColor,
+        fontFamily: 'MiSansFont',
+        scrollbarTheme: const ScrollbarThemeData(
+          thickness: WidgetStatePropertyAll(0.0) //it work
+          //trackVisibility: WidgetStatePropertyAll(false), //not work. strange.
+          //thumbVisibility: WidgetStatePropertyAll(false),
+        ),
+        
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          leading: const SizedBox.shrink(),  
+          flexibleSpace: EasyRefresh(
             child: TabBar(
               controller: commentTabController,
               isScrollable: true,
-              indicatorColor: judgeCurrentThemeColor(context),
-              unselectedLabelColor: judgeCurrentThemeColor(context),
-              labelColor: judgeCurrentThemeColor(context),
+              //indicatorColor: judgeCurrentThemeColor(context),
+              //unselectedLabelColor: judgeCurrentThemeColor(context),
+              //labelColor: judgeCurrentThemeColor(context),
               indicatorSize: TabBarIndicatorSize.tab,
-              labelPadding: EdgeInsets.symmetric(horizontal: MediaQuery.sizeOf(context).width/min(widget.totalPageLength*2.5,16)), // 同屏数量*2
+              labelPadding: EdgeInsets.symmetric(horizontal: MediaQuery.sizeOf(context).width/min(widget.totalPageLength*2.5,14)), // 同屏数量*2
               
               tabs: 
                 List.generate(
@@ -145,26 +152,26 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
                 ),
             ),
           ),
+          toolbarHeight: 60,
+          
         ),
-        toolbarHeight: 60,
-        
-      ),
-      body: EasyRefresh(
-        triggerAxis: Axis.horizontal,
-        child: PageView.builder(
-          controller: widget.commentPageController,
-          onPageChanged: (newPageIndex){
-            commentModel.changePage(newPageIndex+1);
-            commentTabController.animateTo(newPageIndex);
-            debugPrint("PageView Changed:${newPageIndex+1}");
-          },
-          itemCount: widget.totalPageLength,
-          itemBuilder: (_,index)=> CommentCachePage(
-            currentPageIndex: index,
-            id: widget.subjectID,
+        body: EasyRefresh(
+          triggerAxis: Axis.horizontal,
+          child: PageView.builder(
+            controller: widget.commentPageController,
+            onPageChanged: (newPageIndex){
+              commentModel.changePage(newPageIndex+1);
+              commentTabController.animateTo(newPageIndex);
+              debugPrint("PageView Changed:${newPageIndex+1}");
+            },
+            itemCount: widget.totalPageLength,
+            itemBuilder: (_,index)=> CommentCachePage(
+              currentPageIndex: index,
+              id: widget.subjectID,
+            ),
           ),
-        ),
-      )
+        )
+      ),
     );
   
   }

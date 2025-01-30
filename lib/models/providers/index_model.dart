@@ -23,6 +23,8 @@ class IndexModel extends ChangeNotifier {
 
   static Completer? loadFuture; //适用作用目标只有一个的对象里
 
+  int starUpdateFlag = 0;
+
   //除了 星期一-日之外 还有一个 最热门 的属性存放评分7.0+的番剧
   Map<String, List<BangumiDetails>> calendarBangumis = {
     "星期一":[],
@@ -38,17 +40,15 @@ class IndexModel extends ChangeNotifier {
   AppConfig userConfig = defaultAPPConfig();
   int cachedImageSize = 0;
 
+  List<Map<String,num>> starsUpdateRating = [];
+
   void initModel() async {
     loadConfigData();
-    
+    await updateStarDetail();
   }
 
   void loadConfigData(){
-
-    for(AppConfig currentConfig in MyHive.appConfigDataBase.values){
-      userConfig = currentConfig;
-    }
-
+    userConfig = MyHive.appConfigDataBase.get("currentTheme") ?? defaultAPPConfig();
   }
 
   void updateThemeMode(ThemeMode mode,{bool? config}) {
@@ -83,6 +83,18 @@ class IndexModel extends ChangeNotifier {
     userConfig.isfollowThemeColor = detailfollowStatus;
     notifyListeners();
     updateConfig();
+  }
+
+  Future<void> updateStarDetail() async {
+    List<int> starsList = MyHive.starBangumisDataBase.keys as List<int>;
+    
+    starsUpdateRating = await compute(
+      loadStarsDetail,
+      starsList
+    );
+
+    debugPrint("timestamp: ${DateTime.now()} update Star done");
+
   }
 
   void resetConfig(){
@@ -150,6 +162,10 @@ class IndexModel extends ChangeNotifier {
     updateConfig();
   }
 
+  void updateStar(){
+    starUpdateFlag+=1;
+    notifyListeners();
+  }
 
 }
 

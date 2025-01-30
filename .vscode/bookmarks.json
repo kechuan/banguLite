@@ -4,7 +4,7 @@
 			"path": "lib/catalogs/bangumi_ep_page.dart",
 			"bookmarks": [
 				{
-					"line": 335,
+					"line": 344,
 					"column": 38,
 					"label": "EPInfo"
 				}
@@ -14,7 +14,7 @@
 			"path": "lib/widgets/components/ep_select.dart",
 			"bookmarks": [
 				{
-					"line": 62,
+					"line": 63,
 					"column": 14,
 					"label": "EpSelect"
 				}
@@ -24,7 +24,7 @@
 			"path": "lib/catalogs/bangumi_calendar_page.dart",
 			"bookmarks": [
 				{
-					"line": 118,
+					"line": 123,
 					"column": 35,
 					"label": "calendarPage——资讯页面"
 				}
@@ -84,7 +84,7 @@
 			"path": "lib/catalogs/bangumi_comment_page.dart",
 			"bookmarks": [
 				{
-					"line": 13,
+					"line": 14,
 					"column": 33,
 					"label": "subjectComment——番剧吐槽详情"
 				}

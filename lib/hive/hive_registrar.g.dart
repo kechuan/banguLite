@@ -11,6 +11,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(BangumiThemeColorAdapter());
     registerAdapter(ColorAdapter());
     registerAdapter(ScaleTypeAdapter());
+    registerAdapter(StarBangumiDetailsAdapter());
     registerAdapter(ThemeModeAdapter());
   }
 }

@@ -2,11 +2,15 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/search_handler.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 const int bangumiBaseYear = 2013;
 
@@ -26,7 +30,7 @@ class WarpSeasonDialog extends StatelessWidget {
     final FixedExtentScrollController yearSelectorController = FixedExtentScrollController(initialItem: (selectedYear - bangumiBaseYear));  
 
     final ValueNotifier<int> yearNotifier = ValueNotifier<int>(selectedYear);
-	final ValueNotifier<SeasonType> seasonTypeNotifier = ValueNotifier<SeasonType>(selectedSeasonType);
+	  final ValueNotifier<SeasonType> seasonTypeNotifier = ValueNotifier<SeasonType>(selectedSeasonType);
 
     DateTime currentTime = DateTime.now();
     int currentYear = currentTime.year;
@@ -50,32 +54,32 @@ class WarpSeasonDialog extends StatelessWidget {
                   children: [
 
                     	SizedBox(
-							height: 120,
-							width: max(100,MediaQuery.sizeOf(context).width < 500 ? 100 : 150),
-							child: ListWheelScrollView.useDelegate(
-							onSelectedItemChanged: (value) => yearNotifier.value = value+2013,
-							itemExtent: 50,
-							controller: yearSelectorController,
-							physics: const FixedExtentScrollPhysics(),
-							childDelegate: ListWheelChildBuilderDelegate(
-								childCount: (currentYear - bangumiBaseYear)+1,
-								builder: (_,index){
-								return Column(
-									mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-									children: [
-									ScalableText("${bangumiBaseYear+index}"),
-									const Divider(height: 1)
-									],
-								);
-								}
-							),
-						
-							),
-						),
+                        height: 120,
+                        width: max(100,MediaQuery.sizeOf(context).width < 500 ? 100 : 150),
+                        child: ListWheelScrollView.useDelegate(
+                        onSelectedItemChanged: (value) => yearNotifier.value = value+2013,
+                        itemExtent: 50,
+                        controller: yearSelectorController,
+                        physics: const FixedExtentScrollPhysics(),
+                        childDelegate: ListWheelChildBuilderDelegate(
+                          childCount: (currentYear - bangumiBaseYear)+1,
+                          builder: (_,index){
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                            ScalableText("${bangumiBaseYear+index}"),
+                            const Divider(height: 1)
+                            ],
+                          );
+                          }
+                        ),
+                      
+                        ),
+                      ),
 
-						MediaQuery.orientationOf(context) == Orientation.landscape ?
-                    	SelectSeasonLandscape(yearNotifier: yearNotifier, seasonTypeNotifier: seasonTypeNotifier, selectedYear: selectedYear, currentMonth: currentMonth) :
-						SelectSeasonPortrait(yearNotifier: yearNotifier, seasonTypeNotifier: seasonTypeNotifier, selectedYear: selectedYear, currentMonth: currentMonth)
+                      MediaQuery.orientationOf(context) == Orientation.landscape ?
+                      SelectSeasonLandscape(yearNotifier: yearNotifier, seasonTypeNotifier: seasonTypeNotifier, selectedYear: selectedYear, currentMonth: currentMonth) :
+                      SelectSeasonPortrait(yearNotifier: yearNotifier, seasonTypeNotifier: seasonTypeNotifier, selectedYear: selectedYear, currentMonth: currentMonth)
 
                   ],
                 ),
@@ -84,11 +88,12 @@ class WarpSeasonDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed: ()=> Navigator.of(context).pop(),
+                      onPressed: ()=>Navigator.of(context).pop(),
                       child: const ScalableText("取消")
                     ),
                     TextButton(
-                      onPressed: ()=>Navigator.of(context).pop({yearNotifier.value:seasonTypeNotifier.value}), 
+                      //onPressed: ()=>Navigator.of(context).pop({yearNotifier.value:seasonTypeNotifier.value}), 
+                      onPressed: ()=>Navigator.of(context).pop(DateTime(yearNotifier.value,seasonTypeNotifier.value.month)), 
                       child: const ScalableText("确认")
                     )
                   ],
@@ -187,6 +192,7 @@ class SelectSeasonPortrait extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return SizedBox(
 		height: 100,
 		width: 150,
@@ -223,7 +229,7 @@ class SelectSeasonPortrait extends StatelessWidget {
 											color: convertPassedSeason(year, currentMonth)-1 < seasonTypeIndex ? Colors.grey : BangumiThemeColor.values[seasonTypeIndex].color , //unable will be grey.,,
 										),
 										
-										child: SizedBox(width: 150/2,height: 100/2,child: Center(child: Text(SeasonType.values[seasonTypeIndex].seasonText))),
+										child: SizedBox(width: 150/2,height: 100/2,child: Center(child: ScalableText(SeasonType.values[seasonTypeIndex].seasonText,style: const TextStyle(color: Colors.black),))),
 										),
 
 										Positioned(
@@ -261,4 +267,76 @@ class SelectSeasonPortrait extends StatelessWidget {
 		)
 	);
   }
+}
+
+void showSeasonDialog(BuildContext context,Future? calendarLoadFuture){
+
+  invokeAsyncToasterExec() => fadeToaster(context: context, message: "正在切换季节番剧信息");
+
+  final indexModel = context.read<IndexModel>();
+  
+    showGeneralDialog(
+      barrierDismissible: true,
+      barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
+      context: context,
+      pageBuilder: (_,inAnimation,outAnimation)=> WarpSeasonDialog(
+        selectedYear: indexModel.selectedYear,
+        selectedSeasonType: judgeSeasonRange(indexModel.selectedSeason.month)
+      ),
+      transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child),
+      transitionDuration: const Duration(milliseconds: 300)
+    )
+    .then((selectSeason) async {
+
+      DateTime currentTime = DateTime.now();
+
+      if(selectSeason==null) return;
+
+      if(selectSeason is! DateTime) return;
+      
+      if(
+        selectSeason.year == currentTime.year &&
+        selectSeason.month == currentTime.month
+      ){
+        calendarLoadFuture = indexModel.reloadCalendar();
+      }
+
+  
+      else{
+
+        int searchYear = selectSeason.year;
+        int searchMonth = selectSeason.month;
+
+        List<String> requestDateRange = [
+          ">=$searchYear-${convertDigitNumString(searchMonth)}-01",
+          "<${(searchMonth+3)/12 > 1 ? searchYear+1 : searchYear}-${convertDigitNumString((searchMonth+3)%12)}-01"
+        ];
+
+        debugPrint("requestDateRange:$requestDateRange");
+
+        invokeAsyncToasterExec();
+
+        sortSearchHandler(
+          airDateRange: requestDateRange,
+          searchLimit: 1 //因为api限制最大20页 那就直接试探包算了
+        ).then((response){
+          if(response.data != null){
+          int totalBangumiLength = response.data["total"];
+
+          calendarLoadFuture = indexModel.reloadCalendar(
+            switchCalendar: (()=>bangumiTimeRangeSearch(
+            totalBangumiLength: totalBangumiLength,
+            airDateRange: requestDateRange,
+            ))
+          );
+
+          }
+        });
+      }
+
+      indexModel.selectedYear = selectSeason.year;
+      indexModel.selectedSeason = judgeSeasonRange(selectSeason.month);
+
+    });
+
 }

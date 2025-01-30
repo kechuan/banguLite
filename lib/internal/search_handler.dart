@@ -81,8 +81,8 @@ Future<List<BangumiDetails>> bangumiTimeRangeSearch({required int totalBangumiLe
   final List<BangumiDetails> searchResultList = [];
 
   Completer<List<BangumiDetails>> searchCompleter = Completer();
-
   int completeFlag = convertSegement(totalBangumiLength, 20);
+
 
   await Future.wait(
     List.generate(

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- 根据 APK 存储位置配置 -->
+    <external-files-path
+        name="external_files"
+        path="/" />
+</paths>

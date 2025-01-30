@@ -76,22 +76,26 @@ class IndexPortial extends StatelessWidget {
               NavigationDestination(
                 icon: Icon(Icons.local_fire_department_outlined),
                 selectedIcon: Icon(Icons.local_fire_department_rounded),
-                label: "资讯",
+                label: '资讯',
               ),
       
               NavigationDestination(
                 icon: Icon(Icons.filter_alt_outlined),
                 selectedIcon: Icon(Icons.filter_alt),
-                label: "筛选",
+                label: '筛选',
               ),
 
               NavigationDestination(
-                icon: Icon(Icons.rss_feed_outlined),
-                selectedIcon: Icon(Icons.rss_feed),
-                label: "订阅",
+                icon: Icon(Icons.star_border),
+                selectedIcon: Icon(Icons.star),
+                label: '收藏',
               )
             ],
-            onDestinationSelected: (newIndex)=> selectedPageIndexNotifier.value = newIndex,
+            //onDestinationSelected: (newIndex)=> selectedPageIndexNotifier.value = newIndex,
+            onDestinationSelected: (newIndex){
+              FocusScope.of(context).unfocus();
+              selectedPageIndexNotifier.value = newIndex;
+            },
           ),
         );
     

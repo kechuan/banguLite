@@ -20,10 +20,6 @@ class _SearchfliterState extends State<Searchfliter> {
 
   RangeValues ratingRange = const RangeValues(0, 1);
 
-  final List<String> tagsList = [
-    //"日本","动漫","2D","芳文社","2024年9月","哎！弄一碗面给你尝尝","芝士雪豹"
-  ];
-
   final TextEditingController yearEditingControllerStart = TextEditingController(text: "${DateTime.now().year}");
   final TextEditingController yearEditingControllerEnd = TextEditingController(text: "${DateTime.now().year}");
 
@@ -35,10 +31,12 @@ class _SearchfliterState extends State<Searchfliter> {
   final GlobalKey<AnimatedListState> animatedTagsListKey = GlobalKey<AnimatedListState>();
 
   Map<String,dynamic> searchFliter = BangumiDatas.sortData;
-
   Map<int,int> monthSelect = {};
+  final List<String> tagsList = [];
 
   bool inputBorderShow = false;
+
+  final ValueNotifier<bool> tagsListEmptyNotifier = ValueNotifier<bool>(false);
 
   @override
   void initState() {
@@ -176,9 +174,13 @@ class _SearchfliterState extends State<Searchfliter> {
                   //细节: label得到的icon是会顺应 colorSchme主题色的
                   TextButton.icon(
                     onPressed: (){
+
+                      if(tagsEditingController.text.isEmpty) return;
                     
                       tagsList.add(tagsEditingController.text);
                       
+                      tagsListEmptyNotifier.value = updateTagsListStatus();
+
                       animatedTagsListKey.currentState?.insertItem(
                         tagsList.isEmpty ? 0 : tagsList.length-1,
                         duration: const Duration(milliseconds: 300)
@@ -224,87 +226,91 @@ class _SearchfliterState extends State<Searchfliter> {
                 
                 ],
               ),
-        
-        
-        
+
               //TagsList Show
-              ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxHeight: 55,
-                ),
-                child: NotificationListener<ScrollUpdateNotification>(
-                  onNotification: (notification) => true, //捕获冒泡滚动 不要让上层响应
-                  child: AnimatedList.separated(
-                    key: animatedTagsListKey,
-                    scrollDirection: Axis.horizontal,
-                    initialItemCount: tagsList.length,
-                    separatorBuilder: (_,index,animation) => const Padding(padding: EdgeInsets.symmetric(horizontal: 12)),
-                    removedSeparatorBuilder: (_, index, animation) => const SizedBox.shrink(),
-                    itemBuilder: (listContext,index,animation){
-      
-                    if(tagsList.isEmpty) return const SizedBox.shrink();
-      
-      
-                     return SlideTransition(
-                      position: animation.drive(Tween<Offset>(begin: const Offset(-1, 0),end: Offset.zero)), 
-                      // begin/end 是相对于insert状态来说的 如果是remove行为则应该是反向
-                       child: FadeTransition(
-                        opacity: animation,
-                         child: Padding(
-                           padding: const EdgeInsets.symmetric(vertical: 5),
-                           child: ElevatedButton(
-                             onPressed: (){
-                           
-                              final String recordText = tagsList[index];
-                           
-                              tagsList.removeAt(index);
-                           
-                               AnimatedList.of(listContext).removeItem(
-                                 index,
-                                 (_,animation){
-                                    return FadeTransition(
-                                      opacity: animation.drive(Tween<double>(begin: 0,end: 1)),
-                                      child: SlideTransition(
-                                        position: animation.drive(Tween<Offset>(begin: const Offset(-1, 0),end: Offset.zero)),
-                                        child: ElevatedButton(
-                                          onPressed: (){},
-                                          child: Row(
-                                            children: [
-                                              ScalableText(recordText),         
-                                              const Padding(
-                                                padding: EdgeInsets.only(left: 12),
-                                                child: Icon(Icons.close),
-                                              ),
-                                            ],
-                                          ),
-                                          )
-                                      ),
-                                    );
-                                 }
-                              );
-                             },
-                             
-                             child: Row(
-                               children: [
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                child: ValueListenableBuilder(
+                  valueListenable: tagsListEmptyNotifier,
+                  builder: (_,isEmpty,child) {
+                    return SizedBox(
+                      height: isEmpty ? 0 : 55,
+                      child: NotificationListener<ScrollUpdateNotification>(
+                        onNotification: (notification) => true, //捕获冒泡滚动 不要让上层响应
+                        child: AnimatedList.separated(
+                          key: animatedTagsListKey,
+                          scrollDirection: Axis.horizontal,
+                          initialItemCount: tagsList.length,
+                          separatorBuilder: (_,index,animation) => const Padding(padding: EdgeInsets.symmetric(horizontal: 12)),
+                          removedSeparatorBuilder: (_, index, animation) => const SizedBox.shrink(),
+                          itemBuilder: (listContext,index,animation){
+                            
+                          if(tagsList.isEmpty) return const SizedBox.shrink();
+                            
+                            
+                           return SlideTransition(
+                            position: animation.drive(Tween<Offset>(begin: const Offset(-1, 0),end: Offset.zero)), 
+                            // begin/end 是相对于insert状态来说的 如果是remove行为则应该是反向
+                             child: FadeTransition(
+                              opacity: animation,
+                               child: Padding(
+                                 padding: const EdgeInsets.symmetric(vertical: 5),
+                                 child: ElevatedButton(
+                                   onPressed: (){
+
+                                    final String recordText = tagsList[index];
+                                    tagsList.removeAt(index);
+                                    tagsListEmptyNotifier.value = updateTagsListStatus();
                                  
-                                ScalableText(tagsList[index]),
-                                               
-                                 const Padding(
-                                   padding: EdgeInsets.only(left: 12),
-                                   child: Icon(Icons.close),
+                                     AnimatedList.of(listContext).removeItem(
+                                       index,
+                                       (_,animation){
+                                          return FadeTransition(
+                                            opacity: animation.drive(Tween<double>(begin: 0,end: 1)),
+                                            child: SlideTransition(
+                                              position: animation.drive(Tween<Offset>(begin: const Offset(-1, 0),end: Offset.zero)),
+                                              child: ElevatedButton(
+                                                onPressed: (){},
+                                                child: Row(
+                                                  children: [
+                                                    ScalableText(recordText),         
+                                                    const Padding(
+                                                      padding: EdgeInsets.only(left: 12),
+                                                      child: Icon(Icons.close),
+                                                    ),
+                                                  ],
+                                                ),
+                                                )
+                                            ),
+                                          );
+                                       }
+                                    );
+                                   },
+                                   
+                                   child: Row(
+                                     children: [
+                                       
+                                      ScalableText(tagsList[index]),
+                                                     
+                                       const Padding(
+                                         padding: EdgeInsets.only(left: 12),
+                                         child: Icon(Icons.close),
+                                       ),
+                                     ],
+                                   ),
                                  ),
-                               ],
+                               ),
                              ),
-                           ),
-                         ),
-                       ),
-                     );
-                    }
-                  ),
+                           );
+                          }
+                        ),
+                      ),
+                    );
+                  }
                 ),
               ),
               
-              kDebugMode ? ScalableText("AllData:${searchFliter.toString()}") :const SizedBox.shrink(),
+              kDebugMode ? ScalableText("AllData:${searchFliter.toString()}") : const SizedBox.shrink(),
         
               //Submit
               Row(
@@ -363,4 +369,6 @@ class _SearchfliterState extends State<Searchfliter> {
   
   
   }
+
+  bool updateTagsListStatus() => tagsList.isEmpty ? true : false;
 }

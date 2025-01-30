@@ -10,9 +10,14 @@ import 'package:flutter/services.dart';
 
 @FFRoute(name: '/index')
 
-class BangumiIndexPage extends StatelessWidget {
-  BangumiIndexPage({super.key});
+class BangumiIndexPage extends StatefulWidget {
+  const BangumiIndexPage({super.key});
 
+  @override
+  State<BangumiIndexPage> createState() => _BangumiIndexPageState();
+}
+
+class _BangumiIndexPageState extends State<BangumiIndexPage> {
   final ValueNotifier<int> selectedPageIndexNotifier = ValueNotifier<int>(0);
 
   @override

@@ -75,14 +75,17 @@ class IndexLandscape extends StatelessWidget {
                 ),
             
                 NavigationRailDestination(
-                  icon: Icon(Icons.rss_feed_outlined),
-                  selectedIcon: Icon(Icons.rss_feed),
-                  label: ScalableText('订阅')
+                  icon: Icon(Icons.star_border),
+                  selectedIcon: Icon(Icons.star),
+                  label: ScalableText('收藏')
                 ),
             
             
               ],
-              onDestinationSelected: (newIndex) => selectedPageIndexNotifier.value = newIndex,
+              onDestinationSelected: (newIndex){
+                FocusScope.of(context).unfocus();
+                selectedPageIndexNotifier.value = newIndex;
+              }
             ),
 
             const VerticalDivider(width: 1),

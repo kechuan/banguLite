@@ -3,13 +3,14 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:provider/provider.dart';
 
-
+@Deprecated("since 0.5.2")
 class WeekDaySelectOverlay{
 
   WeekDaySelectOverlay._internal(
@@ -41,8 +42,6 @@ class WeekDaySelectOverlay{
   
 
   final opacityListenable = ValueNotifier<double>(0.0);
-  
-  
 
   bool isOverlayActived = false;
 
@@ -111,7 +110,7 @@ class WeekDaySelectOverlay{
           
               Positioned(
                 height: 100,
-                width:  min(350, MediaQuery.sizeOf(context).width),
+                width: min(350, MediaQuery.sizeOf(context).width),
                 child: CompositedTransformFollower(
                   showWhenUnlinked:false,
                   offset: Offset(
@@ -122,7 +121,7 @@ class WeekDaySelectOverlay{
                   child: ClipRRect(
                     borderRadius:BorderRadius.circular(16),
                     child: Material(
-                      color: BangumiThemeColor.macha.color,
+                      color: judgeCurrentThemeColor(context),
                       child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -132,7 +131,7 @@ class WeekDaySelectOverlay{
                               children:  [
                                  const SizedBox.shrink(),
                                  const ScalableText("天数选择",style: TextStyle(color: Colors.black)),
-                                 IconButton(onPressed: ()=> opacityListenable.value = 0.0, icon: const Icon(Icons.close))
+                                 IconButton(onPressed: ()=> opacityListenable.value = 0.0, icon: const Icon(Icons.close,color: Colors.black))
                               ],
                             ),
                         

@@ -2,11 +2,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/convert.dart';
-import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
-import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
@@ -17,7 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/widgets/components/weekday_select_overlay.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:provider/provider.dart';
@@ -35,22 +31,22 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
   Future? calendarLoadFuture;
   Timer? carouselTimer;
 
-  final InfiniteScrollController _infiniteScrollController = InfiniteScrollController();
-  final LayerLink buttonLayerLink = LayerLink(); //composition
+  final InfiniteScrollController infiniteScrollController = InfiniteScrollController();
+  
   final ValueNotifier<bool> transitionalSeasonNotifier = ValueNotifier<bool>(false);
-
-  //final ValueNotifier<String> currentSeasonNotifier = ValueNotifier<String>("${DateTime.now().year} ${judgeSeasonRange(DateTime.now().month).seasonText}");
+  final ValueNotifier<bool> weekdaySelectOffstageNotifier = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> weekdaySelectOffstageAnimatedNotifier = ValueNotifier<bool>(false);
 
 
   Timer generateScrollList(){
     return Timer.periodic(const Duration(milliseconds: 3600), (timer) {
       
-      if(!_infiniteScrollController.hasClients) {
+      if(!infiniteScrollController.hasClients) {
         carouselTimer?.cancel();
         return;
       }
 
-      _infiniteScrollController.nextItem(
+      infiniteScrollController.nextItem(
         duration: const Duration(milliseconds: 800),
         curve: Curves.easeInOut,
       );
@@ -77,7 +73,8 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
 
   @override
   void didPushNext() {
-    WeekDaySelectOverlay.weekDaySelectOverlay?.closeWeekDaySelectFieldOverlay();
+    //WeekDaySelectOverlay.weekDaySelectOverlay?.closeWeekDaySelectFieldOverlay();
+    FocusScope.of(context).unfocus();
     super.didPushNext();
   }
 
@@ -95,14 +92,22 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     final indexModel = context.read<IndexModel>();
 
     return EasyRefresh.builder(
       header: const MaterialHeader(),
-      onRefresh: ()=> calendarLoadFuture = indexModel.reloadCalendar(),
+      onRefresh: (){
+
+       if(
+          indexModel.selectedYear == DateTime.now().year &&
+          indexModel.selectedSeason.seasonText == judgeSeasonRange(DateTime.now().month).seasonText
+        ){
+          calendarLoadFuture = indexModel.reloadCalendar();
+        }
+
+      },
       
       childBuilder: (_,physic){
 
@@ -153,62 +158,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                   //const Spacer(),
                                   InkResponse(
                                     containedInkWell: true,
-                                    onTap: () {
-
-                                      preventAsyncToasterExec() => fadeToaster(context: context, message: "正在切换季节番剧信息");
-
-                                      showGeneralDialog(
-                                        barrierDismissible: true,
-                                        barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
-                                        context: context,
-                                        pageBuilder: (_,inAnimation,outAnimation)=> WarpSeasonDialog(
-                                          selectedYear: indexModel.selectedYear,
-                                          selectedSeasonType: judgeSeasonRange(indexModel.selectedSeason.month)
-                                        ),
-                                        transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child),
-                                        transitionDuration: const Duration(milliseconds: 300)
-                                      )
-                                      .then((selectSeason) async {
-
-                                        if(selectSeason==null) return;
-
-                                        if(selectSeason is! Map<int,SeasonType>) return;
-                                        
-                                        if(
-                                          selectSeason.keys.first == DateTime.now().year &&
-                                          selectSeason.values.first.seasonText == judgeSeasonRange(DateTime.now().month).seasonText
-                                        ){
-                                          calendarLoadFuture = indexModel.reloadCalendar();
-                                        }
-
-                                        else{
-                                          List<String> requestDateRange = [">=${selectSeason.keys.first}-${convertDigitNumString(selectSeason.values.first.month-3)}-01","<${selectSeason.keys.first}-${convertDigitNumString(selectSeason.values.first.month)}-01"];
-
-                                          preventAsyncToasterExec();
-
-                                          sortSearchHandler(
-                                            airDateRange: requestDateRange,
-                                            searchLimit: 1 //因为api限制最大20页 那就直接试探包算了
-                                          ).then((response){
-                                            if(response.data != null){
-                                              int totalBangumiLength = response.data["total"];
-
-                                              calendarLoadFuture = indexModel.reloadCalendar(
-                                                switchCalendar: (()=>bangumiTimeRangeSearch(
-                                                  totalBangumiLength: totalBangumiLength,
-                                                  airDateRange: requestDateRange,
-                                                ))
-                                              );
-
-                                            }
-                                          });
-                                        }
-
-                                        indexModel.selectedYear = selectSeason.keys.first;
-                                        indexModel.selectedSeason = selectSeason.values.first;
-
-                                      });
-                                    },
+									                  onTap: ()=> showSeasonDialog(context,calendarLoadFuture),
                                     focusColor: Colors.transparent,
                                     child: Row(
                                       children: [
@@ -229,8 +179,6 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                             )
                           ),
 
-
-            
                           SliverPadding(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             sliver: SliverFixedExtentList( 
@@ -248,7 +196,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                           itemCount: calendarBangumis["最热门"]!.isEmpty ? 1 : calendarBangumis["最热门"]!.length,
                                           itemExtent: calendarBangumis["最热门"]!.isEmpty ? MediaQuery.sizeOf(context).width : max(200,MediaQuery.sizeOf(context).width/4), //主轴约束
                                           velocityFactor: 0.8 , //滚动速度
-                                          controller: _infiniteScrollController,
+                                          controller: infiniteScrollController,
                                           itemBuilder: (_, currentIndex, itemCount){
                                             
                                             List<BangumiDetails>? weeklyBangumisRecommend = calendarBangumis["最热门"];
@@ -399,7 +347,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                           debugPrint("receive rebuild day:$previous => $next");
                           return previous!=next;
                         },
-                        builder: (_, weekday, child) {
+                        builder: (_, weekday, selectChild) {
                           final selectedDay = indexModel.selectedWeekDay;
             
                           return MultiSliver(
@@ -407,58 +355,139 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                             children: [
                           
                               SliverPinnedHeader(
+                                child: ValueListenableBuilder(
+                                  valueListenable: weekdaySelectOffstageNotifier,
+                                  builder: (_, weekDayOffstage, child) {
+                                  return SizedBox(
+                                    height: !weekDayOffstage ? 120 : 60,
+                                    child: child!
+                                  );
+                                },
                                 child: Container(
-                                  height: 60,
+                                    
                                   padding: const EdgeInsets.symmetric(horizontal: 16),
                                   decoration: BoxDecoration(
                                     border: Border(
-                                      bottom: Divider.createBorderSide(context)
+                                    bottom: Divider.createBorderSide(context)
                                     ),
                                     color: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
                                   ),
-                                  child: Row(
+                                  
+                                                    
+                                  child: Column(
                                     children: [
                                   
-                                      //ScalableText("星期${WeekDay.values[selectedDay].dayText}",style: const TextStyle(fontSize: 18)),
-                                      ScalableText("星期${WeekDay.values[selectedDay - 1].dayText}",style: const TextStyle(fontSize: 18)),
-                                  
-                                      child!
-                                  
+                                      SizedBox(
+                                        height: 59, // Border:bottom = 1
+                                        child: Row(
+                                          children: [
+                                        
+                                            ScalableText("星期${WeekDay.values[selectedDay - 1].dayText}",style: const TextStyle(fontSize: 18)),
+                                            selectChild!
+                                                            
+                                          ],
+                                        ),
+                                      ),
+
+                                      ValueListenableBuilder(
+                                        valueListenable: weekdaySelectOffstageNotifier,
+                                        builder: (_, weekDayOffstage, tabRow) {
+                                          return Offstage(
+                                            offstage: weekDayOffstage,
+                                            child: SizedBox(
+                                              height: 60,
+                                              child: ValueListenableBuilder(
+                                                valueListenable: weekdaySelectOffstageAnimatedNotifier,
+                                                builder: (_, animatedStatus, animated) {
+                                              return TweenAnimationBuilder<double>(
+                                                duration: const Duration(milliseconds: 200),
+                                                tween: Tween(
+                                                  begin: 0,
+                                                  end: animatedStatus ? 0 : 1.0 ,
+                                                ),
+                                                onEnd: (){
+                                                  if(!animatedStatus) weekdaySelectOffstageNotifier.value = true;
+                                                  debugPrint("end: ${weekdaySelectOffstageNotifier.value}");
+                                                },
+                                                
+                                                builder: (_,animationProgress,child){
+                                                  return Opacity(
+                                                    opacity: 1.0-animationProgress,
+                                                    child: Transform.translate(
+                                                      offset: Offset(0, -animationProgress*60),
+                                                      child: tabRow!,
+                                                    ),
+                                                  );
+                                                }
+                                              );
+                                              }
+                                              ),
+                                            )
+                                          );
+                                        },
+                                        child: ColoredBox(
+                                          color: judgeCurrentThemeColor(context).withValues(alpha: 0.8),
+                                          child: DefaultTabController(
+                                            initialIndex: selectedDay - 1,
+                                            length: WeekDay.values.length,
+                                            child: TabBar(
+                                              labelPadding: const EdgeInsets.all(0),
+                                              onTap: (selectedIndex) {
+                                                debugPrint("Index:$selectedIndex");
+                                                indexModel.updateSelectedWeekDay(selectedIndex+1);
+                                              },
+                                              dividerColor: Colors.transparent,
+                                              indicatorSize: TabBarIndicatorSize.label,
+                                              tabs: List.generate(
+                                                WeekDay.values.length, (currentDay)=> Center(child: ScalableText(WeekDay.values[currentDay].dayText)),
+                                              )
+                                            ),
+                                          ),
+                                        ),
+                                                            
+                                      )
+                                    
                                     ],
                                   ),
                                 ),
-                              ),
-          
-                              SliverToBoxAdapter(
-                                child: BanguTileGridView(
-                                  bangumiLists: calendarBangumis.isEmpty ? [] : calendarBangumis.values.elementAt(selectedDay-1),
                                 ),
-                              )
+                                
+                                  
+                              ),
+                        
+                              SliverToBoxAdapter(
+									child: BanguTileGridView(
+										bangumiLists: calendarBangumis.isEmpty ? [] : calendarBangumis.values.elementAt(selectedDay-1),
+									),
+								)
             
                             ]
                               
-          
-                              
                           );
                         },
-                        child: CompositedTransformTarget(
-                          link: buttonLayerLink,
-                          child: InkResponse(
-                            borderRadius: BorderRadius.circular(24),
-                            containedInkWell: true,
-                            hoverColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: (){
-                              debugPrint("show seasons Select");
-                    
-                              WeekDaySelectOverlay(
-                                context: context,
-                                buttonLayerLink:buttonLayerLink,
-                              );
-                            },
-                            child: const Icon(Icons.arrow_drop_down,size: 32),
-                          ),
+                        child: InkResponse(
+							borderRadius: BorderRadius.circular(24),
+							containedInkWell: true,
+							hoverColor: Colors.transparent,
+							focusColor: Colors.transparent,
+							highlightColor: Colors.transparent,
+							onTap: (){
+								debugPrint("show seasons Select");
+
+								if(weekdaySelectOffstageNotifier.value){
+									weekdaySelectOffstageNotifier.value = false;
+								}
+
+								if(weekdaySelectOffstageAnimatedNotifier.value){
+									weekdaySelectOffstageAnimatedNotifier.value = false;
+								}
+
+								else{
+									weekdaySelectOffstageAnimatedNotifier.value = true;
+								}
+
+							},
+							child: const Icon(Icons.arrow_drop_down,size: 32),
                         ),
                         
                       ),
