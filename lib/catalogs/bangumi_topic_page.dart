@@ -100,6 +100,8 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
 
 									return Scrollbar(
                     thumbVisibility: true,
+                    interactive: true,
+                    thickness: 8,
                     controller: scrollController,
                       child: CustomScrollView(
                         controller: scrollController,

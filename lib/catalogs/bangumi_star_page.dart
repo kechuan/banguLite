@@ -352,51 +352,40 @@ Widget buildSectionList(
 					}
 				),
 
-				Builder(
-				  builder: (_) {
+				//Builder(
+				//  builder: (_) {
 
-					if(
-						sortType == SortType.updateTime && 
-						DateTime.now().compareTo(convertDateTime(item.finishedDate)) < 0 //连载中才显示
-					){
-						final ValueNotifier<bool> subscribeNotifier = ValueNotifier<bool>(false);
+				//	if(
+				//		sortType == SortType.updateTime && 
+				//		DateTime.now().compareTo(convertDateTime(item.finishedDate)) < 0 //连载中才显示
+				//	){
+				//		final ValueNotifier<bool> subscribeNotifier = ValueNotifier<bool>(false);
 
-						return ValueListenableBuilder(
-						  valueListenable: subscribeNotifier,
-						  builder: (_,subscribeStatus,child) {
-						    return IconButton(
-						    	icon: subscribeStatus ? const Icon(Icons.notifications) : const Icon(Icons.notifications_outlined),
-						    	onPressed: () async {
+				//		return ValueListenableBuilder(
+				//		  valueListenable: subscribeNotifier,
+				//		  builder: (_,subscribeStatus,child) {
+				//		    return IconButton(
+				//		    	icon: subscribeStatus ? const Icon(Icons.notifications) : const Icon(Icons.notifications_outlined),
+				//		    	onPressed: () async {
 
-									invokeAsyncCreateToaser()=> fadeToaster(context: context, message: "已将该番剧设置为更新通知提醒");
-									invokeAsyncCancelToaser()=> fadeToaster(context: context, message: "已取消通知提醒");
-									
+				//					invokeAsyncCreateToaser()=> fadeToaster(context: context, message: "已将该番剧设置为更新通知提醒");
+				//					invokeAsyncCancelToaser()=> fadeToaster(context: context, message: "已取消通知提醒");
 
-									//if(Platform.isAndroid){
-									//	const testIntent = AndroidIntent(
-									//		action: 'android.intent.action.VIEW',
-									//		type: 'resource/folder',
-									//		package: 'com.android.documentsui',
-									//	);
+				//					subscribeNotifier.value ? invokeAsyncCancelToaser() : invokeAsyncCreateToaser();
 
-									//	await testIntent.launch();
-									//}
-
-									subscribeNotifier.value ? invokeAsyncCancelToaser() : invokeAsyncCreateToaser();
-
-									subscribeNotifier.value = !subscribeNotifier.value;
+				//					subscribeNotifier.value = !subscribeNotifier.value;
 
 									
-						    	},
-						    );
-						  }
-						);
-					}
+				//		    	},
+				//		    );
+				//		  }
+				//		);
+				//	}
 
-					return const SizedBox.shrink();
+				//	return const SizedBox.shrink();
 
-				  }
-				),
+				//  }
+				//),
 
 				IconButton(
 					icon: const Icon(Icons.star),

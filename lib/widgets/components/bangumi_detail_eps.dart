@@ -1,4 +1,5 @@
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/widgets/components/ep_select.dart';
 import 'package:flutter/widgets.dart';
@@ -22,6 +23,7 @@ class BuildEps extends StatelessWidget {
     //注意 在这里 portial模式会在点击 放送详情之后才会加载EPModel 而 landscape则不会。。简直太神奇了
 
     final epModel = context.watch<EpModel>(); //那没办法 只能让你以watch形式监控了
+    final bangumiModel = context.read<BangumiModel>();
 
     int totalEps = informationList["eps"] ?? 0;
     //String airDate = informationList["air_date"] ?? "";
@@ -45,9 +47,7 @@ class BuildEps extends StatelessWidget {
 
       }
     }
-
-    //airedEps = convertAiredEps(informationList["air_date"]);
-
+    
     return totalEps == 0 ? 
       const SizedBox.shrink() :
       EpSelect(
@@ -55,7 +55,8 @@ class BuildEps extends StatelessWidget {
         airedEps: airedEps,
         name: informationList["alias"],
         portialMode: portialMode,
-        //outerContext: outerContext,
+        bangumiThemeColor: bangumiModel.bangumiThemeColor
+        
       );
   }
 }

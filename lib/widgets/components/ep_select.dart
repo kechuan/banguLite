@@ -19,12 +19,14 @@ class EpSelect extends StatefulWidget {
     required this.airedEps,
     this.name,
     this.portialMode,
+	this.bangumiThemeColor
   });
 
   final int totalEps;
   final int airedEps;
   final String? name;
   final bool? portialMode;
+  final Color? bangumiThemeColor;
   
 
   @override
@@ -44,7 +46,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
 
     final epModel = context.read<EpModel>();
-    final bangumiModel = context.read<BangumiModel>();
+    //final bangumiModel = context.read<BangumiModel>();
 
     int segements = convertSegement(widget.totalEps,100);
 
@@ -191,7 +193,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                           "subjectID":epModel.subjectID,
                                           "totalEps": widget.totalEps,
                                           "epModel": epModel,
-                                          "bangumiThemeColor": bangumiModel.bangumiThemeColor
+                                          "bangumiThemeColor": widget.bangumiThemeColor
                                         }
                                       );
                                   
