@@ -138,63 +138,100 @@ class ColorThemeTile extends ListTile{
               itemExtent: 50,
               itemBuilder: (_, index) {
     
-                return Padding(
-                  padding: PaddingH6,
-                  child: UnVisibleResponse(
-                    onTap: () {
-                      if(index != BangumiThemeColor.values.length){
-                        indexModel.updateThemeColor(BangumiThemeColor.values[index]);
-                      }
-    
-                      else{
-                        //show 调色板
-                        showModalBottomSheet(
-    
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          constraints: BoxConstraints(
-                            maxWidth: MediaQuery.sizeOf(context).width*5/6,
-                            maxHeight:MediaQuery.sizeOf(context).height*2/3+MediaQuery.paddingOf(context).bottom+20
+                return Stack(
+                  children: [
+
+                    SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: Padding(
+                        padding: PaddingH6,
+                        child: UnVisibleResponse(
+                          onTap: () {
+                            if(index != BangumiThemeColor.values.length){
+                              indexModel.updateThemeColor(BangumiThemeColor.values[index]);
+                            }
+                          
+                            else{
+                              //show 调色板
+                              showModalBottomSheet(
+                          
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                constraints: BoxConstraints(
+                                  maxWidth: MediaQuery.sizeOf(context).width*5/6,
+                                  maxHeight: MediaQuery.sizeOf(context).height*2/3+MediaQuery.paddingOf(context).bottom+20
+                                ),
+                                context: context,
+                                builder: (_){
+                                  final Color color = indexModel.userConfig.customColor ?? indexModel.userConfig.currentThemeColor!.color;
+                                  return HSLColorPicker(selectedColor:color);
+                                }
+                              ).then((newColor){
+                                if(newColor!=null) indexModel.updateCustomColor(newColor);
+                              });
+                            }
+                            
+                          },
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: index == BangumiThemeColor.values.length ? 
+                                LinearGradient(
+                                begin:Alignment.bottomCenter,
+                                end:Alignment.topCenter,
+                                stops:const [0.2,0.4,0.5,1],
+                                colors: [
+                                  Colors.red.withValues(alpha: 0.6),
+                                  Colors.green.withValues(alpha: 0.6),
+                                  Colors.blue.withValues(alpha: 0.6),
+                                  Colors.yellow.withValues(alpha: 0.6),
+                                ]
+                              ) : null,
+                              color: index != BangumiThemeColor.values.length ? BangumiThemeColor.values[index].color.withValues(alpha: 0.8) : null
+                            ),
+                            
                           ),
-                          context: context,
-                          builder: (_){
-                            final Color color = indexModel.userConfig.customColor ?? indexModel.userConfig.currentThemeColor!.color;
-                            return HSLColorPicker(selectedColor:color);
-                          }
-                        ).then((newColor){
-                          if(newColor!=null) indexModel.updateCustomColor(newColor);
-                        });
-                      }
-                      
-                    },
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: index == BangumiThemeColor.values.length ? 
-                          LinearGradient(
-                          begin:Alignment.bottomCenter,
-                          end:Alignment.topCenter,
-                          stops:const [0.2,0.4,0.5,1],
-                          colors: [
-                            Colors.red.withValues(alpha: 0.6),
-                            Colors.green.withValues(alpha: 0.6),
-                            Colors.blue.withValues(alpha: 0.6),
-                            Colors.yellow.withValues(alpha: 0.6),
-                          ]
-                        ) : null,
-                        color: index != BangumiThemeColor.values.length ? BangumiThemeColor.values[index].color.withValues(alpha: 0.8) : null
+                        ),
                       ),
-                      
                     ),
-                  ),
+
+                    Selector<IndexModel,BangumiThemeColor?>(
+                      selector: (_,indexModel) => indexModel.userConfig.currentThemeColor,
+                      shouldRebuild: (previous, next){
+                        if(indexModel.userConfig.isSelectedCustomColor == true) return true;
+                        return previous!=next;
+                      },
+                      builder: (_,themeColor,child) {
+                        return Center(
+                          child: Builder(
+                            builder: (context) {
+                              if(index == BangumiThemeColor.values.length){
+                                return Offstage(
+                                  offstage: !(indexModel.userConfig.isSelectedCustomColor == true),
+                                  child: Icon(Icons.done,color: judgeCurrentThemeColor(context))
+                                );
+                              }
+
+                              return Offstage(
+                                offstage: !(themeColor == BangumiThemeColor.values.elementAt(index) && indexModel.userConfig.isSelectedCustomColor == false),
+                                child: Icon(Icons.done,color: judgeCurrentThemeColor(context))
+                              );
+                            }
+                          ),
+                        );
+                      }
+                    ),
+                     
+                    
+                  ],
                 );
               },
             ),
           )
         ],
       ),
-      subtitle: 
-      Selector<IndexModel,bool?>(
+      subtitle: Selector<IndexModel,bool?>(
         selector: (_, indexModel) => indexModel.userConfig.isfollowThemeColor,
         shouldRebuild: (previous, next) => previous!=next,
         builder: (_,followStatus,child){
@@ -371,32 +408,6 @@ class ConfigTile extends ListTile{
           );
         },
         title: Align(alignment: Alignment.centerLeft,child: ScalableText("重置设置",style: TextStyle(fontSize: AppFontSize.s16))),
-    
-        //trailing: SizedBox(
-        //  width: 200,
-        //  child: Row(
-        //    children: [
-              
-        //      TextButton(
-        //        onPressed: (){
-        //          //MyHive.appConfigDataBase.put("currentTheme", indexModel.userConfig);
-        //          MyHive.appConfigDataBase.put("currentTheme", context.read<IndexModel>().userConfig);
-        //          //debugPrint("config:${indexModel.userConfig}");
-        //        }, 
-        //        child: const ScalableText("保存配置")
-        //      ),
-          
-        //      TextButton(
-        //        onPressed: (){
-        //          debugPrint("${MyHive.appConfigDataBase.values}");
-        //        }, 
-        //        child: const ScalableText("读取配置")
-        //      ),
-          
-        //    ],
-        //  ),
-        //),
-    
        
       
       ),

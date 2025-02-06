@@ -22,7 +22,7 @@ class BuildEps extends StatelessWidget {
 
     //注意 在这里 portial模式会在点击 放送详情之后才会加载EPModel 而 landscape则不会。。简直太神奇了
 
-    final epModel = context.watch<EpModel>(); //那没办法 只能让你以watch形式监控了
+    final epModel = context.read<EpModel>(); //那没办法 只能让你以watch形式监控了
     final bangumiModel = context.read<BangumiModel>();
 
     int totalEps = informationList["eps"] ?? 0;

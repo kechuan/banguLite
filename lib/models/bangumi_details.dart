@@ -249,11 +249,17 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
 
 bool animationFliter(Map currentBangumi){
   //一刀切
-  if(
-    currentBangumi["name_cn"].isEmpty
-    //currentBangumi["tags"].any((currentTag) => currentTag["name"] == "国产")
-  ) {
-    return true;
+  if(currentBangumi["name_cn"].isEmpty) {
+
+    //calendar 数据不包含 ["tags"]
+    if(currentBangumi["tags"] == null){
+      return true;
+    }
+
+    else{
+      return currentBangumi["tags"].any((currentTag) => currentTag["name"] == "国产");
+    }
+    
   }
 
   return false;

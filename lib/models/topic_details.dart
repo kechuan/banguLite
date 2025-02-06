@@ -1,102 +1,89 @@
 
-
-
-
 import 'package:bangu_lite/models/ep_details.dart';
 import 'package:dio/dio.dart';
 
 class TopicDetails {
-  int? id;
+  int? topicID;
   String? title;
   String? content;
   int? createdTime;
   int? state;
-  
-  List<EpCommentDetails>? repliedComment;
+
+  Map<int,Set<String>>? topicReactions;
+  List<EpCommentDetails>? topicRepliedComment;
 
 }
 
 TopicDetails loadTopicDetails(Response bangumiTopicDetailResponse){
 
 	Map topicList = bangumiTopicDetailResponse.data;
-
 	TopicDetails currentTopic = TopicDetails();
-
 	List topicRepliedListData = bangumiTopicDetailResponse.data["replies"];
 
-
-
-	final List<EpCommentDetails> topicRepliedList = loadTopicCommentDetails(topicRepliedListData);
-
 	currentTopic
-		..id = 	topicList["id"]
+		..topicID = topicList["id"]
 		..title = topicList["title"]
-		..content = topicList["text"]
+		..content = topicList["content"]
 		..state = topicList["state"]
 		..createdTime = topicList["createdAt"]
-		..repliedComment = topicRepliedList
+		..topicRepliedComment = loadEpCommentDetails(topicRepliedListData)
+    
+    //..topicRepliedComment = loadTopicCommentDetails(topicRepliedListData)
 	;
 
 	return currentTopic;
 
 }
 
-List<EpCommentDetails> loadTopicCommentDetails(List epCommentListData){
+//@Deprecated("25.2.1 API patch interface")
+//List<EpCommentDetails> loadTopicCommentDetails(
+//  List epCommentListData,
+//  {int? repilyCommentIndex}
+//){
 
-	//List epCommentListData = bangumiEpDetailResponse.data;
+//	final List<EpCommentDetails> currentEpCommentList = [];
 
-	final List<EpCommentDetails> currentEpCommentList = [];
+//	int currentCommentIndex = 0;
 
-	int currentCommentIndex = 0;
+//	for(Map currentEpCommentMap in epCommentListData){
+//		EpCommentDetails currentEpComment = EpCommentDetails();
 
-	for(Map currentEpCommentMap in epCommentListData){
-		EpCommentDetails currentEpComment = EpCommentDetails();
+//		currentCommentIndex++;
 
-		currentCommentIndex++;
+//			currentEpComment
+//        ..userID = currentEpCommentMap["creatorID"]
+//        ..commentTimeStamp = currentEpCommentMap["createdAt"]
+//        ..comment = currentEpCommentMap["content"]
+//        ..state = currentEpCommentMap["state"]
+        
+//        /* 
+//          2025.1 更新 v1接口把 topic 回复的 user/creator 数据剔除了 
+//          但非常神奇的是 又在回复里保留了这些数据
+//        */
 
-			currentEpComment
-        ..comment = currentEpCommentMap["text"]
-        ..state = currentEpCommentMap["state"]
-        ..commentTimeStamp = currentEpCommentMap["createdAt"]
-        ..userId = currentEpCommentMap["creator"]["id"]
-        ..avatarUrl = currentEpCommentMap["creator"]["avatar"]["large"]
-        ..nickName = currentEpCommentMap["creator"]["nickname"]
-        ..sign = currentEpCommentMap["creator"]["sign"]
-        ..epCommentIndex = "$currentCommentIndex"
-			;
+//        ..avatarUrl = currentEpCommentMap["creator"]?["avatar"]["large"]
+//        ..nickName = currentEpCommentMap["creator"]?["nickname"]
+//        ..sign = currentEpCommentMap["creator"]?["sign"]
+//        ..commentReactions = loadReactionDetails(currentEpCommentMap["reactions"])
+//        ..epCommentIndex = repilyCommentIndex != null ? "$repilyCommentIndex-$currentCommentIndex" : "$currentCommentIndex"
+//			;
 
-			if(currentEpCommentMap["replies"].isNotEmpty){
+//			if(
+//        currentEpCommentMap["replies"] != null &&
+//        currentEpCommentMap["replies"].isNotEmpty
+//      ){
 
-				int currentRepliedCommentIndex = 0;
+//        List<EpCommentDetails> currentEpCommentRepliedList = loadTopicCommentDetails(
+//          currentEpCommentMap["replies"],
+//          repilyCommentIndex: currentCommentIndex
+//        );
+//				currentEpComment.repliedComment = currentEpCommentRepliedList;
 
-				List<EpCommentDetails> currentEpCommentRepliedList = [];
+//			}
 
-				for(Map currentEpCommentMap in currentEpCommentMap["replies"]){
-					currentRepliedCommentIndex++;
-					EpCommentDetails currentEpRepliedComment = EpCommentDetails();
+//			currentEpCommentList.add(currentEpComment);
+//	} 
 
-					currentEpRepliedComment
-            ..comment = currentEpCommentMap["text"]
-            ..state = currentEpCommentMap["state"]
-            ..commentTimeStamp = currentEpCommentMap["createdAt"]
-              ..userId = currentEpCommentMap["creator"]["id"]
-              ..avatarUrl = currentEpCommentMap["creator"]["avatar"]["large"]
-              ..nickName = currentEpCommentMap["creator"]["nickname"]
-              ..sign = currentEpCommentMap["creator"]["sign"]
-						..epCommentIndex = "$currentCommentIndex-$currentRepliedCommentIndex"
-					;
+//	 return currentEpCommentList;
 
-					currentEpCommentRepliedList.add(currentEpRepliedComment);
-			
-				}
-
-				currentEpComment.repliedComment = currentEpCommentRepliedList;
-
-			}
-
-			currentEpCommentList.add(currentEpComment);
-	} 
-
-	 return currentEpCommentList;
-
-}
+//}

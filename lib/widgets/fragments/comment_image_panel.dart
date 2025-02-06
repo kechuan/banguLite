@@ -1,4 +1,5 @@
 
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/get_task_information.dart';
@@ -6,7 +7,6 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_view/photo_view.dart';
 
 class CommentImagePanel extends StatefulWidget {
   const CommentImagePanel({
@@ -100,12 +100,23 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                             ),
                           );
                         }
+
+
                   
                         return CachedNetworkImage(
                           imageUrl: widget.imageUrl,
-                          fit: BoxFit.cover,
+                          //fit: BoxFit.cover,
                           imageBuilder: (_, imageProvider) {
-                            return PhotoView(imageProvider: imageProvider);
+                            return UnVisibleResponse(
+                              onTap: (){
+                                  Navigator.pushNamed(
+                                  context,
+                                  Routes.photoView,
+                                  arguments: {"imageProvider":imageProvider},
+                                );
+                              },
+                              child: Image(image: imageProvider)
+                            );
                           },
                         );
              

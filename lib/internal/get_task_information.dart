@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:bangu_lite/internal/request_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 
@@ -28,7 +27,7 @@ int byteParse(String bytesRangeValue){
 Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
   RequestByteInformation pictureRequestInformation = RequestByteInformation();
 
-  await HttpApiClient.client
+  await Dio()
     .get(
       imageUrl,
       options: Options(
@@ -45,8 +44,7 @@ Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
             ..contentLength = byteParse(response.headers.value(HttpHeaders.contentRangeHeader) ?? "0")
             ..statusMessage = response.statusMessage
           ;
-        
-        //pictureRequestInformation.printInformation();
+
       }
 
     }

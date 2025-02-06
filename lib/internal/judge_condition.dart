@@ -67,7 +67,28 @@ Color judgeDetailRenderColor(BuildContext context,Color? imageColor){
 
 }
 
-SeasonType judgeSeasonRange(int currentMonth){
+//SeasonType judgeCurrentSeasonRange(int currentMonth,{bool? currentTime}){
+
+//  SeasonType currentSeasonType = SeasonType.winter;
+
+//  for(int currentSeasonIndex = 0; currentSeasonIndex<SeasonType.values.length; currentSeasonIndex++){
+//    if(currentMonth > SeasonType.values[currentSeasonIndex].month){
+//      continue;
+//    }
+
+//    else{
+//      if(currentSeasonIndex == 0) return currentSeasonType;
+//      currentSeasonType = SeasonType.values[currentSeasonIndex-1];
+//      break;
+//    }
+//  }
+
+  
+
+//  return currentSeasonType;
+//}
+
+SeasonType judgeSeasonRange(int currentMonth,{bool? currentTime}){
 
   SeasonType currentSeasonType = SeasonType.winter;
 
@@ -80,6 +101,11 @@ SeasonType judgeSeasonRange(int currentMonth){
     return true;
 
   });
+
+  if(currentTime == true){
+    if(currentSeasonType == SeasonType.winter) return currentSeasonType;
+    currentSeasonType = SeasonType.values.elementAt(currentSeasonType.index - 1);
+  }
 
   return currentSeasonType;
 }

@@ -33,7 +33,7 @@ List<TopicInfo> loadTopicsInfo(Response bangumiTopicsInfoResponse){
         ..creatorSign = currentTopicMap["creator"]["sign"]
         ..creatorAvatarUrl = currentTopicMap["creator"]["avatar"]["large"]
         ..createdTime = currentTopicMap["createdAt"]
-        ..repliesCount = currentTopicMap["repliesCount"]
+        ..repliesCount = currentTopicMap["replies"]
         //..lastRepliedNickName = currentTopicMap[""]
         ..lastRepliedTime = currentTopicMap["updatedAt"]
       ;

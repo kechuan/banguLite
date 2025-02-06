@@ -26,8 +26,10 @@ class BangumiListTile extends ListTile {
   Widget build(BuildContext context) {
     
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 20 //padding 1 * 2
+      contentPadding: const EdgeInsets.only(
+        //horizontal: 20 //padding 1 * 2
+        left: 20
+
       ),   
       title: Row(
         children: [
@@ -48,7 +50,8 @@ class BangumiListTile extends ListTile {
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       maxHeight: imageSize.height ,
-                      maxWidth: constraint.maxWidth - imageSize.width, //calculate
+                      maxWidth: (constraint.maxWidth - imageSize.width).clamp(0, constraint.maxWidth), //calculate
+                      //maxWidth: imageSize.width, //calculate
                       
                     ),
                     child: ScalableText(

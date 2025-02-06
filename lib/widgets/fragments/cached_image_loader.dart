@@ -70,7 +70,7 @@ class CachedImageLoader extends StatelessWidget {
                     ),
                     
                     child: Center(
-                      child: ScalableText("loading... ${showProgressIndicator ? progress.progress : ""}"), //loading
+                      child: ScalableText("loading... ${showProgressIndicator ? "${((progress.progress ?? 0.0)*100).toStringAsFixed(2)}%" : ""}"), //loading
                     ),
                   );
                 },

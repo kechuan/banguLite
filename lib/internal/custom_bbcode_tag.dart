@@ -219,9 +219,9 @@ class BangumiStickerTag extends AdvancedTag{
     String imageUrl = element.children.first.textContent;
 
     final image = Image.asset(
-		imageUrl,
-		scale: imageUrl.contains(RegExp(r'(124)|(125)')) ? 1.6 : 0.8,
-        errorBuilder: (context, error, stack) => ScalableText("[$tag]")
+      imageUrl,
+      scale: imageUrl.contains(RegExp(r'(124)|(125)')) ? 1.6 : 0.8,
+      errorBuilder: (context, error, stack) => ScalableText("[$tag]")
 	  );
 
     return [

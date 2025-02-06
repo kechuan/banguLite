@@ -37,7 +37,6 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
   final ValueNotifier<bool> weekdaySelectOffstageNotifier = ValueNotifier<bool>(true);
   final ValueNotifier<bool> weekdaySelectOffstageAnimatedNotifier = ValueNotifier<bool>(false);
 
-
   Timer generateScrollList(){
     return Timer.periodic(const Duration(milliseconds: 3600), (timer) {
       

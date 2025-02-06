@@ -19,7 +19,7 @@ class IndexModel extends ChangeNotifier {
   DateTime dataTime = DateTime.now();
   int selectedYear = DateTime.now().year;
   int selectedWeekDay = DateTime.now().weekday;
-  SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month);
+  SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month,currentTime: true);
 
   static Completer? loadFuture; //适用作用目标只有一个的对象里
 
@@ -60,14 +60,14 @@ class IndexModel extends ChangeNotifier {
 
   void updateThemeColor(BangumiThemeColor themeColor){
     userConfig.currentThemeColor = themeColor;
-	userConfig.isSelectedCustomColor = false;
+	  userConfig.isSelectedCustomColor = false;
     notifyListeners();
     updateConfig();
   }
 
   void updateCustomColor(Color customColor){
-	userConfig.customColor = customColor;
-	userConfig.isSelectedCustomColor = true;
+    userConfig.customColor = customColor;
+    userConfig.isSelectedCustomColor = true;
     notifyListeners();
     updateConfig();
   }
@@ -86,7 +86,11 @@ class IndexModel extends ChangeNotifier {
   }
 
   Future<void> updateStarDetail() async {
-    List<int> starsList = MyHive.starBangumisDataBase.keys as List<int>;
+    List<int> starsList = [];
+    
+    for(dynamic bangumiID in MyHive.starBangumisDataBase.keys){
+      starsList.add(bangumiID);
+    }
     
     starsUpdateRating = await compute(
       loadStarsDetail,

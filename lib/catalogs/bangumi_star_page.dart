@@ -2,8 +2,6 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/delegates/star_sort_strategy.dart';
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/convert.dart';
-import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/star_details.dart';
@@ -23,13 +21,14 @@ class BangumiStarPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     ValueNotifier<SortType> sortTypeNotifier = ValueNotifier<SortType>(SortType.joinTime);
+    ValueNotifier<bool> reversedSortNotifer = ValueNotifier<bool>(false);
 
     final indexModel = context.read<IndexModel>();
 
     return Scaffold(
       
       appBar: AppBar(
-		surfaceTintColor: Colors.transparent,
+		    surfaceTintColor: Colors.transparent,
         toolbarHeight: 60,
         title: const Padding(
           padding: PaddingH6,
@@ -107,6 +106,18 @@ class BangumiStarPage extends StatelessWidget {
 
           const Padding(padding: PaddingH6),
 
+          ValueListenableBuilder(
+            valueListenable: reversedSortNotifer,
+             builder: (_,reversedStatus,__) {
+               return IconButton(
+                onPressed: ()=> reversedSortNotifer.value = !reversedSortNotifer.value,
+                icon: reversedStatus ? const Icon(Icons.history_outlined,color: Colors.black) : const Icon(Icons.history_outlined,color: Colors.grey,)
+              );
+             }
+           ),
+
+          const Padding(padding: PaddingH6),
+
           IconButton(
             onPressed: (){
 
@@ -138,31 +149,37 @@ class BangumiStarPage extends StatelessWidget {
         builder: (_,__,___){
           return EasyRefresh(
             child: ValueListenableBuilder(
-              valueListenable: sortTypeNotifier,
-              builder: (_, sortType, __) {
-
-                SortStrategy currentStrategy = AirDateSortStrategy();
+              valueListenable: reversedSortNotifer,
+              builder: (_,reversedStatus,child) {
+                return ValueListenableBuilder(
+                  valueListenable: sortTypeNotifier,
+                  builder: (_, sortType, __) {
                 
-                switch(sortType){
-                  case SortType.airDate: {currentStrategy = AirDateSortStrategy(); break;}
-				  case SortType.joinTime: {currentStrategy = JoinTimeSortStrategy(); break;}
-                  case SortType.updateTime: {currentStrategy = UpdateTimeSortStrategy(); break;}
-                  case SortType.rank: {currentStrategy = RankSortStrategy(); break;}
-                  case SortType.score: {currentStrategy = ScoreSortStrategy(); break;}
+                    SortStrategy currentStrategy = AirDateSortStrategy();
+                    
+                    switch(sortType){
+                      case SortType.airDate: {currentStrategy = AirDateSortStrategy(); break;}
+                			case SortType.joinTime: {currentStrategy = JoinTimeSortStrategy(); break;}
+                      case SortType.updateTime: {currentStrategy = UpdateTimeSortStrategy(); break;}
+                      case SortType.rank: {currentStrategy = RankSortStrategy(); break;}
+                      case SortType.score: {currentStrategy = ScoreSortStrategy(); break;}
+                      
+                      default: {}
+                
+                    }
+                
+                    return CustomScrollView(
+                      slivers: seasonTypeSort(
+                        context:context,
+                        sortStrategy: currentStrategy,
+                        sortType: sortType,
+                        isReversed: reversedStatus
+                      )
+                    );
+                  },
                   
-                  default: {}
-
-                }
-
-                return CustomScrollView(
-                  slivers: seasonTypeSort(
-                    context:context,
-                    sortStrategy: currentStrategy,
-					sortType: sortType
-                  )
                 );
-              },
-              
+              }
             ),
           );
       
@@ -180,13 +197,12 @@ class BangumiStarPage extends StatelessWidget {
 List<Widget> seasonTypeSort({
   required BuildContext context,
   required SortStrategy sortStrategy,
-  required SortType sortType
+  required SortType sortType,
+  bool? isReversed
 }) {
   	final indexModel = context.read<IndexModel>();
   	List<StarBangumiDetails> dataSource = MyHive.starBangumisDataBase.values.toList();
 
-	//debugPrint("${indexModel.starsUpdateRating[0]["rank"]}/${indexModel.starsUpdateRating[0]["score"]}");
-	//debugPrint("${indexModel.starsUpdateRating[1]["rank"]}/${indexModel.starsUpdateRating[1]["score"]}");
 
 	//debugPrint("timestamp: ${DateTime.now()} seasonTypeSort rebuild");
 
@@ -208,17 +224,23 @@ List<Widget> seasonTypeSort({
 	}
 
   // 使用策略进行排序
-  dataSource.sort((prev, next) => sortStrategy.getSort(prev)
-      .compareTo(sortStrategy.getSort(next)));
+  dataSource.sort((prev, next) => sortStrategy
+    .getSort(prev)
+    .compareTo(sortStrategy.getSort(next)));
 
   // 根据排序内容 生成的分组信息(headerText) 其记录着排序过后的 每个分组的起始下标
   final Map<String, int> groupIndices = {};
 
   for (int starIndex = 0; starIndex < dataSource.length; starIndex++) {
-    final headerText = sortStrategy.generateHeaderText(
-      sortStrategy.getSort(dataSource[starIndex])
-    );
-	groupIndices[headerText] ??= starIndex;
+
+    String headerText = "";
+
+    headerText = sortStrategy.generateHeaderText(
+        sortStrategy.getSort(dataSource[starIndex])
+      );
+
+    groupIndices[headerText] ??= starIndex;
+
   }
 
   // 计算各分组数量
@@ -226,22 +248,36 @@ List<Widget> seasonTypeSort({
 
   // 构建Sliver列表
   return List.generate(groupIndices.length, (index) {
-    final headerText = groupIndices.keys.elementAt(index); //当前所属组别
-    final startIndex = groupIndices.values.elementAt(index); //dataSource的起始下标
-    final itemCount = groupCounts[index]; //这个组别一共有多少个
+
+    String headerText = "";
+    int startIndex = 0;
+    int itemCount = 0;
+
+    if(isReversed == true){
+      headerText = groupIndices.keys.elementAt(((groupIndices.length-1) - index)); //当前所属组别
+      startIndex = groupIndices.values.elementAt(((groupIndices.length-1) - index)); //dataSource的起始下标
+      itemCount = groupCounts[((groupIndices.length-1) - index)]; //这个组别一共有多少个
+    }
+
+    else{
+      headerText = groupIndices.keys.elementAt(index); //当前所属组别
+      startIndex = groupIndices.values.elementAt(index); //dataSource的起始下标
+      itemCount = groupCounts[index]; //这个组别一共有多少个
+    }
 
     return MultiSliver(
       pushPinnedChildren: true,
       children: [
         buildSectionHeader(context, headerText),
         buildSectionList(
-			context,
-			data:dataSource,
-			startIndex:startIndex,
-			itemCount:itemCount,
-			indexModel:indexModel,
-			sortType:sortStrategy.currentSort
-		),
+          context,
+          data:dataSource,
+          startIndex:startIndex,
+          itemCount:itemCount,
+          indexModel:indexModel,
+          sortType:sortStrategy.currentSort,
+          isReversed: isReversed
+        ),
       ],
     );
   });
@@ -262,13 +298,13 @@ Widget buildSectionHeader(BuildContext context, String text) {
         border: Border(bottom: Divider.createBorderSide(context)),
         color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
       ),
-	child: SizedBox(
-		height: 50,
-		child: Align(
-			alignment: Alignment.centerLeft,
-			child: ScalableText(text, style: const TextStyle(fontSize: 18))
-		)
-	),
+      child: SizedBox(
+        height: 50,
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: ScalableText(text, style: const TextStyle(fontSize: 18))
+        )
+      ),
     ),
   );
 }
@@ -277,13 +313,15 @@ Widget buildSectionHeader(BuildContext context, String text) {
 Widget buildSectionList(
   BuildContext context,
   {
-	required List<StarBangumiDetails> data,
-	required int startIndex,
-	required int itemCount,
-	required IndexModel indexModel,
-	required SortType sortType
+    required List<StarBangumiDetails> data,
+    required int startIndex,
+    required int itemCount,
+    required IndexModel indexModel,
+    required SortType sortType,
+    bool? isReversed
   }
 ) {
+
   return Padding(
     padding: PaddingH6V12,
     child: ListView.builder(
@@ -291,121 +329,120 @@ Widget buildSectionList(
       itemCount: itemCount,
       shrinkWrap: true,
       itemBuilder: (_, index) {
-        final item = data[startIndex + index];
+
+        StarBangumiDetails starBangumiDetail = StarBangumiDetails();
+
+        if(isReversed == true){
+          starBangumiDetail = data[startIndex + (itemCount-1) - index];
+        }
+
+        else{
+          starBangumiDetail = data[startIndex + index];
+        }
+
+        
         return BangumiListTile(
           imageSize: const Size(100, 150),
-          bangumiTitle: item.name,
-          imageUrl: item.coverUrl,
+          bangumiTitle: starBangumiDetail.name,
+          imageUrl: starBangumiDetail.coverUrl,
           trailing: SizedBox(
-			width: 250,
-			child: Row(
-			  mainAxisAlignment: MainAxisAlignment.end,
-			  spacing: 12,
-			  children: [
-							
-				Builder(
-					builder: (_){
+            width: 160,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              spacing: 12,
+              children: [
+                    
+                Builder(
+                  builder: (_) {
 
-						String resultContent = "";
-						switch(sortType){
-							
-							case SortType.rank:{
+                    String resultText = getUpdateText(
+                      starsUpdateRating:indexModel.starsUpdateRating,
+                      item:starBangumiDetail,
+                      sortType:sortType,
+                      resultIndex:startIndex + index
+                    );
 
-								int starRank = MyHive.starBangumisDataBase.values.elementAt(startIndex + index).rank!;
-
-								if(indexModel.starsUpdateRating[startIndex + index]["rank"] == item.rank){
-									resultContent="${item.rank}";
-								}
-
-								else{
-									resultContent="收藏时: $starRank -> ${item.rank}"; 
-								}
-
-								break;
-							}
-
-							case SortType.score:{
-
-								double starScore = MyHive.starBangumisDataBase.values.elementAt(startIndex + index).score!;
-								
-								if(indexModel.starsUpdateRating[startIndex + index]["score"] == item.score){
-									resultContent="${item.score}";
-								}
-
-								else{
-									resultContent="收藏时: $starScore -> ${item.score}"; 
-								}
+                    return ScalableText(
+                      resultText,
+                      style: TextStyle(fontSize: resultText.length > 8 ? 14 : null),
+                      maxLines: 2,
+                    );
+                  }
+                ),
 
 
-								break;
-							}
+                IconButton(
+                  icon: const Icon(Icons.star),
+                  onPressed: () {
+                    MyHive.starBangumisDataBase.delete(starBangumiDetail.bangumiID);
+                    indexModel.updateStar();
+                  },
+                ),
 
-							case SortType.joinTime:{resultContent="${item.joinDate}"; break;}
-							case SortType.airDate:{resultContent="${item.airDate}"; break;}
-							
-							default:{}
-						}
-
-						
-
-						return ScalableText(resultContent);
-					}
-				),
-
-				//Builder(
-				//  builder: (_) {
-
-				//	if(
-				//		sortType == SortType.updateTime && 
-				//		DateTime.now().compareTo(convertDateTime(item.finishedDate)) < 0 //连载中才显示
-				//	){
-				//		final ValueNotifier<bool> subscribeNotifier = ValueNotifier<bool>(false);
-
-				//		return ValueListenableBuilder(
-				//		  valueListenable: subscribeNotifier,
-				//		  builder: (_,subscribeStatus,child) {
-				//		    return IconButton(
-				//		    	icon: subscribeStatus ? const Icon(Icons.notifications) : const Icon(Icons.notifications_outlined),
-				//		    	onPressed: () async {
-
-				//					invokeAsyncCreateToaser()=> fadeToaster(context: context, message: "已将该番剧设置为更新通知提醒");
-				//					invokeAsyncCancelToaser()=> fadeToaster(context: context, message: "已取消通知提醒");
-
-				//					subscribeNotifier.value ? invokeAsyncCancelToaser() : invokeAsyncCreateToaser();
-
-				//					subscribeNotifier.value = !subscribeNotifier.value;
-
-									
-				//		    	},
-				//		    );
-				//		  }
-				//		);
-				//	}
-
-				//	return const SizedBox.shrink();
-
-				//  }
-				//),
-
-				IconButton(
-					icon: const Icon(Icons.star),
-					onPressed: () {
-						MyHive.starBangumisDataBase.delete(item.bangumiID);
-						indexModel.updateStar();
-					},
-				),
-
-			
-			  ],
-			),
-		  ),
+            
+              ],
+            ),
+          ),
           onTap: () => Navigator.pushNamed(
             context,
             Routes.subjectDetail,
-            arguments: {"subjectID": item.bangumiID},
+            arguments: {"subjectID": starBangumiDetail.bangumiID},
           ),
         );
       },
     ),
   );
+}
+
+
+String getUpdateText(
+  {
+    required List<Map<String, num>> starsUpdateRating,
+    required StarBangumiDetails item,
+    required SortType sortType,
+    required int resultIndex,
+  }
+){
+  String resultContent = "";
+
+  switch(sortType){
+                    
+    case SortType.rank:{
+
+      int starRank = MyHive.starBangumisDataBase.values.elementAt(resultIndex).rank!;
+
+      if(starsUpdateRating[resultIndex]["rank"] == item.rank){
+        resultContent="${item.rank}";
+      }
+
+      else{
+        resultContent="收藏时: $starRank\n现在时: ${item.rank}"; 
+      }
+
+      break;
+    }
+
+    case SortType.score:{
+
+      double starScore = MyHive.starBangumisDataBase.values.elementAt(resultIndex).score!;
+      
+      if(starsUpdateRating[resultIndex]["score"] == item.score){
+        resultContent="${item.score}";
+      }
+
+      else{
+        resultContent="收藏时: $starScore\n现在时: ${item.score}"; 
+      }
+
+
+      break;
+    }
+
+    case SortType.joinTime:{resultContent="${item.joinDate}"; break;}
+    case SortType.airDate:{resultContent="${item.airDate}"; break;}
+    
+    default:{}
+  }
+
+  return resultContent;
 }

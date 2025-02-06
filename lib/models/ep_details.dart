@@ -1,26 +1,28 @@
 
 
 class EpCommentDetails{
-    int? userId;
+    int? userID;
     String? epCommentIndex;
 
     String? nickName; //
     String? avatarUrl;
     String? sign;
+    int? state;
     String? comment;
+    int? commentTimeStamp;
+
+    Map<int,Set<String>>? commentReactions;
+
     List<EpCommentDetails>? repliedComment;
     
-    int? commentTimeStamp;
-	  int? state;
     
-
 }
 
 
-//List<EpCommentDetails> loadEpCommentDetails(Response bangumiEpDetailResponse){
-List<EpCommentDetails> loadEpCommentDetails(List epCommentListData){
-
-	//List epCommentListData = bangumiEpDetailResponse.data;
+List<EpCommentDetails> loadEpCommentDetails(
+  List epCommentListData,
+  {int? repilyCommentIndex}
+){
 
 	final List<EpCommentDetails> currentEpCommentList = [];
 
@@ -35,37 +37,26 @@ List<EpCommentDetails> loadEpCommentDetails(List epCommentListData){
         ..comment = currentEpCommentMap["content"]
         ..state = currentEpCommentMap["state"]
         ..commentTimeStamp = currentEpCommentMap["createdAt"]
-        ..userId = currentEpCommentMap["user"]["id"]
-        ..avatarUrl = currentEpCommentMap["user"]["avatar"]["large"]
-        ..nickName = currentEpCommentMap["user"]["nickname"]
-        ..sign = currentEpCommentMap["user"]["sign"]
-        ..epCommentIndex = "$currentCommentIndex"
+
+        //user => epComment / creator => topicComment
+        ..userID = currentEpCommentMap["user"]?["id"] ?? currentEpCommentMap["creatorID"]
+        ..avatarUrl = currentEpCommentMap["user"]?["avatar"]["large"] ?? currentEpCommentMap["creator"]?["avatar"]["large"]
+        ..nickName = currentEpCommentMap["user"]?["nickname"] ?? currentEpCommentMap["creator"]?["nickname"]
+        ..sign = currentEpCommentMap["user"]?["sign"] ?? currentEpCommentMap["creator"]?["sign"]
+
+        //..epCommentIndex = "$currentCommentIndex"
+        ..epCommentIndex = repilyCommentIndex != null ? "$repilyCommentIndex-$currentCommentIndex" : "$currentCommentIndex"
 			;
 
-			if(currentEpCommentMap["replies"].isNotEmpty){
+			if(
+        currentEpCommentMap["replies"]!=null &&
+        currentEpCommentMap["replies"].isNotEmpty 
+      ){
 
-				int currentRepliedCommentIndex = 0;
-
-				List<EpCommentDetails> currentEpCommentRepliedList = [];
-
-				for(Map currentEpCommentMap in currentEpCommentMap["replies"]){
-					currentRepliedCommentIndex++;
-					EpCommentDetails currentEpRepliedComment = EpCommentDetails();
-
-					currentEpRepliedComment
-					..comment = currentEpCommentMap["content"]
-          ..state = currentEpCommentMap["state"]
-					..commentTimeStamp = currentEpCommentMap["createdAt"]
-          ..epCommentIndex = "$currentCommentIndex-$currentRepliedCommentIndex"
-						..userId = currentEpCommentMap["user"]["id"]
-						..avatarUrl = currentEpCommentMap["user"]["avatar"]["large"]
-						..nickName = currentEpCommentMap["user"]["nickname"]
-						..sign = currentEpCommentMap["user"]["sign"]
-					;
-
-					currentEpCommentRepliedList.add(currentEpRepliedComment);
-			
-				}
+				List<EpCommentDetails> currentEpCommentRepliedList = loadEpCommentDetails(
+          currentEpCommentMap["replies"],
+          repilyCommentIndex: currentCommentIndex
+        );
 
 				currentEpComment.repliedComment = currentEpCommentRepliedList;
 
@@ -78,3 +69,22 @@ List<EpCommentDetails> loadEpCommentDetails(List epCommentListData){
 
 }
 
+Map<int,Set<String>> loadReactionDetails(List? reactionListData){
+  Map<int,Set<String>> reactionCount = {};
+
+  if(reactionListData == null) return reactionCount;
+
+  for(Map currentReaction in reactionListData){
+
+    reactionCount.addAll({
+      currentReaction["value"] : 
+      currentReaction["users"].map<String>(
+        //(currentUser) => currentUser["nickname"]
+        (currentUser) => currentUser["nickname"].toString()
+      ).toSet()
+    });
+    
+  }
+
+  return reactionCount;
+}

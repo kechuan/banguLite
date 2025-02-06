@@ -67,12 +67,10 @@ class TopicModel extends ChangeNotifier{
 
   Future<void> loadTopic(int topicID) async {
 
-    
-
     if(topicID == 0) return;
 
     if(topicDetailData[topicID] != null){
-      debugPrint("$topicID already loaded or in processing");
+      debugPrint("topic: $topicID already loaded or in processing");
       return;
     }
 

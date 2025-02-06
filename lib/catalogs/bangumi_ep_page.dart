@@ -436,7 +436,7 @@ class EpCommentPageDetails extends StatelessWidget {
                     if(epCommentIndex == 0){
                       int commentCount = 0;
 
-                      if(epModel.epCommentData[epModel.selectedEp]![0].userId != 0){
+                      if(epModel.epCommentData[epModel.selectedEp]![0].userID != 0){
                         commentCount = epModel.epCommentData[epModel.selectedEp]!.length;
                       }
 
@@ -471,7 +471,7 @@ class EpCommentPageDetails extends StatelessWidget {
                     }
                   
                     //无评论的显示状态
-                    if(epModel.epCommentData[currentEp]![0].userId == 0){
+                    if(epModel.epCommentData[currentEp]![0].userID == 0){
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.only(top:64),

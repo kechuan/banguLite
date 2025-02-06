@@ -154,17 +154,13 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
 
 										final TopicDetails? currentTopicDetail = topicModel.topicDetailData[widget.topicInfo.topicID!]; 
 								
-								
-										bool isCommentLoading = 
-											currentTopicDetail == null ||
-											currentTopicDetail.id == null
-										;
+										bool isCommentLoading = currentTopicDetail == null ||	currentTopicDetail.topicID == null;
 								
 										int? commentCount;
 								
 										if(!isCommentLoading){
-											if(currentTopicDetail.id != 0){
-												commentCount = currentTopicDetail.repliedComment!.isEmpty ? 0 : currentTopicDetail.repliedComment!.length;
+											if(currentTopicDetail.topicID != 0){
+												commentCount = currentTopicDetail.topicRepliedComment!.isEmpty ? 0 : currentTopicDetail.topicRepliedComment!.length;
 											}
 										}
 								
@@ -218,7 +214,7 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                             }
                       
                             //无评论的显示状态
-                            if(currentTopicDetail.repliedComment!.isEmpty){
+                            if(currentTopicDetail.topicRepliedComment!.isEmpty){
                               return const Center(
                                 child: Padding(
                                   padding: EdgeInsets.only(top:64),
@@ -227,7 +223,7 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                               );
                             }
 
-                            return EpCommentView(epCommentData: currentTopicDetail.repliedComment![topicCommentIndex-1]);
+                            return EpCommentView(epCommentData: currentTopicDetail.topicRepliedComment![topicCommentIndex-1]);
                           },
                           separatorBuilder: (_,__,) => const Divider(height: 1)
                         ),

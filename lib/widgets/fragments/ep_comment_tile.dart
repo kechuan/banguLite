@@ -38,23 +38,21 @@ class EpCommentTile extends StatelessWidget {
         children: [
 
           Row(
+            spacing: 12,
             crossAxisAlignment: CrossAxisAlignment.center,
             
             children: [
           
               epCommentData.avatarUrl!=null ? 
-              SizedBox(
-                height: 50,
-                width: 50,
-                child: CachedImageLoader(imageUrl: epCommentData.avatarUrl!)
-              ) : 
-              Image.asset("assets/icons/icon.png"),
+                SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: CachedImageLoader(imageUrl: epCommentData.avatarUrl!)
+                ) : 
+                //Image.asset("assets/icons/icon.png"),
+              const SizedBox.shrink(),
           
-              const Padding(padding: PaddingH6),
-          
-              ScalableText(epCommentData.nickName ?? "nameID",style: const TextStyle(color: Colors.blue)),
-          
-              const Padding(padding: PaddingH6),
+              ScalableText("${epCommentData.nickName ?? epCommentData.userID ?? ""}",style: const TextStyle(color: Colors.blue)),
           
               const Spacer(),
           
@@ -87,14 +85,16 @@ class EpCommentTile extends StatelessWidget {
             ],
           ),
 
-          epCommentData.sign!.isEmpty ?
-          const SizedBox.shrink() :
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: ScalableText("(${epCommentData.sign})",style:const TextStyle(color: Colors.grey)),
-          ),
-        
-        
+          Builder(builder: (_){
+            if(epCommentData.sign == null || epCommentData.sign!.isEmpty){
+                return const SizedBox.shrink();
+            }
+            return Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: ScalableText("(${epCommentData.sign})",style:const TextStyle(color: Colors.grey)),
+            );
+          }),
+
           
         ],
       ),
@@ -126,29 +126,60 @@ class EpCommentTile extends StatelessWidget {
               ) 
             : const SizedBox.shrink(),
         
-            const Row(
+             Row(
+              spacing: 12,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-        
-        
-                 Padding(padding: EdgeInsets.symmetric(horizontal: 12)),
-        
-        
+
+                
+
                 //贴表情区域 When?
-                //...List.generate(
-                //  1,(index){
-                //      return Padding(
-                //        padding: const EdgeInsets.symmetric(horizontal: 6),
-                //        child: DecoratedBox(
-                //          decoration: BoxDecoration(
-                //            border: Border.all(),
-                //            borderRadius: BorderRadius.circular(12)
-                //          ),
-                //          child: const ScalableText("test 3"),
-                //        ),
-                //      );
-                //    }
-                //),
+                ...List.generate(
+                  epCommentData.commentReactions?.length ?? 0,
+                  (index){
+                    
+                      int dataLikeIndex = epCommentData.commentReactions!.keys.elementAt(index);
+
+                      int stickerIndex = dataLikeIndex - 39 + 23;
+
+                      //我也不知道为什么别人前端的里 大部分 data-like-value 的差异都是39 就只有 0 是 44
+                      //data-like-value = 0 => "/img/smiles/tv/44.gif"
+                      //至于为什么是+23 那就是因为 bgm 与 tv 包的差异了 bgm包刚好是23个表情 因此偏移23
+                      
+                      if(dataLikeIndex == 0){
+                        stickerIndex = dataLikeIndex - 44 + 23;
+                      }
+
+
+                      return SizedBox(
+                        width: 70,
+                        height: 50,
+                        child: Container(
+							padding: const EdgeInsets.symmetric(horizontal: 6),
+							decoration: BoxDecoration(
+								border: Border.all(),
+								borderRadius: BorderRadius.circular(16),
+								color: Colors.grey.withValues(alpha: 0.4)
+							),
+							child: Tooltip(
+								message: "${epCommentData.commentReactions?[dataLikeIndex]?.join("、")}",
+								child: Row(
+									mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+									children: [
+									
+										Image.asset(
+											"assets/bangumiSticker/bgm$stickerIndex.gif",
+											scale: stickerIndex == 124 || stickerIndex == 125 ? 1.6 : 0.8,
+										),
+									
+										ScalableText("${epCommentData.commentReactions?[dataLikeIndex]?.length}"),
+									],
+								),
+							),
+						),
+                      );
+                    }
+                ),
         
               ],
             ),

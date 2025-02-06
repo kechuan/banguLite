@@ -11,6 +11,8 @@ class CommentDetails {
   int? commentTimeStamp;
   int? rate;
   int? type;
+
+  //Map<int,int>? reactions;
   
 }
 

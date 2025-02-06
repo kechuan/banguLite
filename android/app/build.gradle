@@ -68,12 +68,12 @@ android {
     flavorDimensions = ["flavor-type"]
 
     productFlavors{
-        development{
-            dimension "flavor-type"
-        }
-        staging{
-            dimension "flavor-type"
-        }
+        // development{
+        //     dimension "flavor-type"
+        // }
+        // staging{
+        //     dimension "flavor-type"
+        // }
         production{
             dimension "flavor-type"
         }

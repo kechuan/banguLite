@@ -1,6 +1,7 @@
 
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:github/github.dart';
 
@@ -75,7 +76,7 @@ class BangumiQuerys {
                           sortQuery = {"limit":10,"offset":0},
                           topicsQuery = {"limit":30,"offset":0},
                           epQuery = {"subject_id":0,"limit":100,"offset":0}
-                          ;
+  ;
                              
 
   
@@ -99,9 +100,12 @@ class BangumiDatas {
 }
 
 class GithubRepository{
-  static const String link = "https://github.com/kechuan/banguLite/releases";
-  static const String version = "0.5.5";
-  static const String packageName = "io.flutter.banguLite";
+  static const String link = "https://github.com/kechuan/banguLite/releases",
+                      projectName = "banguLite",
+                      packageName = "io.flutter.banguLite",
+                      version = "0.5.6",
+                      author = "kechuan"
+  ;
 }
 
 Future<Release?> pullLatestRelease() async {
@@ -111,7 +115,7 @@ Future<Release?> pullLatestRelease() async {
 
   try {
 
-    await github.repositories.getLatestRelease(RepositorySlug("kechuan", "banguLite")).then((release){
+    await github.repositories.getLatestRelease(RepositorySlug(GithubRepository.author, GithubRepository.projectName)).then((release){
       if(GithubRepository.version == release.tagName) return latestRelease;
       latestRelease = release;
     });
@@ -127,8 +131,7 @@ Future<Release?> pullLatestRelease() async {
 }
 
 
-void downloadSticker() async {
-
+void downloadSticker() async {  
   await Future.wait(
     List.generate(
       126, (index){

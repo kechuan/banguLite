@@ -3,6 +3,7 @@
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_eps.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_images.dart';
@@ -148,20 +149,25 @@ class IntroPortrait extends StatelessWidget {
                 //在 layout inspector 里能看到 此时它的层级关系是和 其他的Page一样直接属于materialApp的分支之下
                 //因此只能直接这样处理了
                 return ChangeNotifierProvider.value(
-                  value: context.watch<EpModel>(),
+                  value: context.watch<BangumiModel>(),
                   builder: (_,__) {
-                    return EasyRefresh(
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: BuildEps(
-                            subjectID: bangumiDetails.id!, 
-                            informationList: bangumiDetails.informationList,
-                            portialMode: true,
+                    return ChangeNotifierProvider.value(
+                      value: context.watch<EpModel>(),
+                      builder: (_,__) {
+                        return EasyRefresh(
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: BuildEps(
+                                subjectID: bangumiDetails.id!, 
+                                informationList: bangumiDetails.informationList,
+                                portialMode: true,
+                              )
+                            )
                           )
-                        )
-                      )
-                  
+                      
+                        );
+                      }
                     );
                   }
                 );

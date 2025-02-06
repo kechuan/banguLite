@@ -135,9 +135,9 @@ class EpModel extends ChangeNotifier{
 
 			epCommentData[selectedEp] = loadEpCommentDetails(response.data);
 
-			//空处理 userId = 0 代表为空
+			//空处理 userID = 0 代表为空
 			if(epCommentData[selectedEp]!.isEmpty){
-				epCommentData[selectedEp] = [EpCommentDetails()..userId = 0];
+				epCommentData[selectedEp] = [EpCommentDetails()..userID = 0];
 			}
 			
 			debugPrint("$subjectID load Ep.$selectedEp detail done");
