@@ -203,9 +203,6 @@ List<Widget> seasonTypeSort({
   	final indexModel = context.read<IndexModel>();
   	List<StarBangumiDetails> dataSource = MyHive.starBangumisDataBase.values.toList();
 
-
-	//debugPrint("timestamp: ${DateTime.now()} seasonTypeSort rebuild");
-
 	if(
 		sortType == SortType.rank || 
 		sortType == SortType.score
@@ -224,20 +221,22 @@ List<Widget> seasonTypeSort({
 	}
 
   // 使用策略进行排序
-  dataSource.sort((prev, next) => sortStrategy
-    .getSort(prev)
-    .compareTo(sortStrategy.getSort(next)));
+  dataSource.sort((prev, next) => 
+    sortStrategy.getSort(prev)
+      .compareTo(sortStrategy.getSort(next))
+  );
 
   // 根据排序内容 生成的分组信息(headerText) 其记录着排序过后的 每个分组的起始下标
   final Map<String, int> groupIndices = {};
+
 
   for (int starIndex = 0; starIndex < dataSource.length; starIndex++) {
 
     String headerText = "";
 
     headerText = sortStrategy.generateHeaderText(
-        sortStrategy.getSort(dataSource[starIndex])
-      );
+      sortStrategy.getSort(dataSource[starIndex])
+    );
 
     groupIndices[headerText] ??= starIndex;
 

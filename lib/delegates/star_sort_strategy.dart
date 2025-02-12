@@ -17,9 +17,9 @@ class AirDateSortStrategy implements SortStrategy {
       convertDateTime(details.airDate).millisecondsSinceEpoch;
 
   @override
-  String generateHeaderText(int airms) {
+  String generateHeaderText(int airTimestamp) {
 
-	final DateTime convertTime = DateTime.fromMillisecondsSinceEpoch(airms);
+	final DateTime convertTime = DateTime.fromMillisecondsSinceEpoch(airTimestamp);
 
     final season = judgeSeasonRange(convertTime.month);
     return '${convertTime.year}年 ${season.seasonText}';

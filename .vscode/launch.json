@@ -31,17 +31,7 @@
 			"args": [
 				"--flavor",
 				"development", //development or staging or production
-			]
-		},
 
-		{
-			"name": "banguLite(android_staging)",
-			"request": "launch",
-			"type": "dart",
-			"flutterMode": "profile",
-			"args": [
-				"--flavor",
-				"staging" //development or staging or production
 			]
 		},
 
@@ -52,7 +42,7 @@
 			"flutterMode": "release",
 			"args": [
 				"--flavor",
-				"production" //development or staging or production
+				"development" //development or staging or production
 			]
 		},
 

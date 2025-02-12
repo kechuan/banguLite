@@ -39,7 +39,10 @@ class BangumiAPIUrls {
   static const String newUrl = "https://next.bgm.tv";
 
   static String comment(int subjectID) => '$newUrl/p1/subjects/$subjectID/comments';
-  static String epComment(int epID) => '$newUrl/p1/subjects/-/episode/$epID/comments';
+
+  //25.1.10 更新
+  //static String epComment(int epID) => '$newUrl/p1/subjects/-/episode/$epID/comments';
+  static String epComment(int epID) => '$newUrl/p1/episodes/$epID/comments';
   static String topics(int subjectID) => '$newUrl/p1/subjects/$subjectID/topics';
   static String topicComment(int topicID) => '$newUrl/p1/subjects/-/topics/$topicID';
 
@@ -103,7 +106,7 @@ class GithubRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.5.6",
+                      version = "0.5.6+1",
                       author = "kechuan"
   ;
 }

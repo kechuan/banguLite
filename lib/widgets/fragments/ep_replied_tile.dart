@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/models/ep_details.dart';
-import 'package:bangu_lite/widgets/components/ep_replied_comment_dialog.dart';
+import 'package:bangu_lite/widgets/components/ep_replied_comment_sheet.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 

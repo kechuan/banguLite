@@ -39,8 +39,7 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
         switch(snapshot.connectionState){
 
           case ConnectionState.done:{
-            if(snapshot.hasData){
-              if(snapshot.data!=null){
+            if(snapshot.hasData && snapshot.data!=null){
 
                 RequestByteInformation pictureRequestInformation = snapshot.data;
 
@@ -82,10 +81,9 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                                 ),
 
 
-                                ...?!isValid ? [
+                                ...?(!isValid) ? [
                                   ScalableText(pictureRequestInformation.statusMessage ?? ""),
                                   const Padding(padding: PaddingV12),
-                                  
                                 ] : null,
 
                                 ...?isValid ? [
@@ -102,10 +100,10 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                         }
 
 
-                  
                         return CachedNetworkImage(
                           imageUrl: widget.imageUrl,
                           //fit: BoxFit.cover,
+                          progressIndicatorBuilder: (context, url, progress) => const LoadingCard(),
                           imageBuilder: (_, imageProvider) {
                             return UnVisibleResponse(
                               onTap: (){
@@ -127,39 +125,33 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                     ),
                   ),
                 );
-              }
             }
           }
 
-          
-          default : return const Card(
-            child: SizedBox(
-              height: 200,
-              width: 200,
-              child: Center(
-                child: CircularProgressIndicator()
-              ),
-            )
-          );
+          default: {}
             
         }
 
-
-        return const Card(
-          child: SizedBox(
-            height: 200,
-            width: 200,
-            child: Center(
-              child: CircularProgressIndicator()
-            ),
-          )
-        );
-
-        
-
-
+        return const LoadingCard();
 
       }
+    );
+  }
+}
+
+class LoadingCard extends StatelessWidget {
+  const LoadingCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Card(
+      child: SizedBox(
+        height: 200,
+        width: 200,
+        child: Center(
+          child: CircularProgressIndicator()
+        ),
+      )
     );
   }
 }

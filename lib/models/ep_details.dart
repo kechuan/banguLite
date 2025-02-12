@@ -31,7 +31,7 @@ List<EpCommentDetails> loadEpCommentDetails(
 	for(Map currentEpCommentMap in epCommentListData){
 		EpCommentDetails currentEpComment = EpCommentDetails();
 
-		currentCommentIndex++;
+		currentCommentIndex+=1;
 
 			currentEpComment
         ..comment = currentEpCommentMap["content"]
@@ -46,6 +46,7 @@ List<EpCommentDetails> loadEpCommentDetails(
 
         //..epCommentIndex = "$currentCommentIndex"
         ..epCommentIndex = repilyCommentIndex != null ? "$repilyCommentIndex-$currentCommentIndex" : "$currentCommentIndex"
+        ..commentReactions = loadReactionDetails(currentEpCommentMap["reactions"])
 			;
 
 			if(
