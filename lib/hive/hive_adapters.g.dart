@@ -22,13 +22,14 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
       ..themeMode = fields[2] as ThemeMode?
       ..customColor = fields[3] as Color?
       ..isSelectedCustomColor = fields[5] as bool?
-      ..isfollowThemeColor = fields[6] as bool?;
+      ..isFollowThemeColor = fields[6] as bool?
+      ..isManuallyImageLoad = fields[7] as bool?;
   }
 
   @override
   void write(BinaryWriter writer, AppConfig obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.currentThemeColor)
       ..writeByte(1)
@@ -40,7 +41,9 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
       ..writeByte(5)
       ..write(obj.isSelectedCustomColor)
       ..writeByte(6)
-      ..write(obj.isfollowThemeColor);
+      ..write(obj.isFollowThemeColor)
+      ..writeByte(7)
+      ..write(obj.isManuallyImageLoad);
   }
 
   @override

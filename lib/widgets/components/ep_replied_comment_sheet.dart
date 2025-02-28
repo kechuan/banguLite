@@ -21,7 +21,9 @@ class EpRepliedCommentDialog extends StatelessWidget {
       itemCount: (currentComment.repliedComment?.length ?? 1)+1,
       
       itemBuilder: (_,index){
-
+        
+        //和回帖评论的 Divider作区分 才这么写 
+        //因为 其divider长度 受padding影响 不一致区分
         if(index == 0){
             return Column(  
               children: [

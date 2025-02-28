@@ -244,8 +244,8 @@ class LateLoadImgTag extends AdvancedTag {
 
     String imageUrl = element.children.first.textContent;
 
-	//debugPrint("lateLoad textContent:${imageUrl}");
-	//目标: 只获取图片大小 并显示成一个Widget 直到。。你再次点击 以获取真正的图片.
+    //debugPrint("lateLoad textContent:${imageUrl}");
+    //目标: 只获取图片大小 并显示成一个Widget 直到。。你再次点击 以获取真正的图片.
 
     if (renderer.peekTapAction() != null) {
       return [

@@ -97,12 +97,19 @@ class BangumiCommentTile extends StatelessWidget {
           ),
 
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //mainAxisAlignment: MainAxisAlignment.end, 不生效 因为主轴已经被 Expanded 占满
             children: [
-              ScalableText("${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"),
-              CommentReaction(commentReactions: commentData.commentReactions,)
+              Expanded(
+                //那么只能在内部插入松约束 Align 来调节方位
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: CommentReaction(commentReactions: commentData.commentReactions),
+                ),
+              ),
             ],
-          )
+          ),
+
+          ScalableText("${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}")
 
         ],
       ),

@@ -22,7 +22,7 @@ class BangumiPictureViewPage extends StatelessWidget {
       ),
       body: PhotoView(
         
-        minScale: 0.3,
+        minScale: 0.1,
         maxScale: PhotoViewComputedScale.covered,
         imageProvider: imageProvider
       ),

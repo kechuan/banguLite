@@ -5,16 +5,18 @@ import 'package:dio/dio.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
 
+//@Deprecated
 Future<List<BangumiDetails>> searchHandler(String query) async {
 
-  Response<dynamic> responseData = await HttpApiClient.client.get(
-    '${BangumiAPIUrls.search}/$query',
+  Response<dynamic> responseData = await HttpApiClient.client.get(    
+    '${BangumiAPIUrls.search}/${Uri.encodeComponent(query)}',
     queryParameters: BangumiQuerys.searchQuery..["max_results"] = 10
   );
 
   List<BangumiDetails> searchResult = [];
 
   if(responseData.data != null){
+
 
     Map<String,dynamic> searchData = responseData.data;
 

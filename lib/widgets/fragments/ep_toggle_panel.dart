@@ -40,10 +40,10 @@ class EpTogglePanel extends StatelessWidget {
                 hoverColor: Colors.transparent,
                 onTap: () => epModel.updateSelectedEp(max(1,currentEp-1)),
                 child:  Row(
+                  spacing: 12,
                   children: [
     
                     const Icon(Icons.arrow_back_ios,size: 18),
-                    const Padding(padding: EdgeInsets.symmetric(horizontal: 6)),
     
                     Builder(
                       builder: (_){
@@ -96,12 +96,13 @@ class EpTogglePanel extends StatelessWidget {
                   if(epModel.epsData[(currentEp+1)]?.epID == null) return;
                   epModel.updateSelectedEp(min(currentEp+1,totalEps));
                 },
-                child:  Row(
+                child: Row(
+                  spacing: 12,
                   children: [
     
                     Builder(
                       builder: (_){
-    
+
                         //越过边境线 需求加载
                         if( epModel.epsData[currentEp+1]?.epID == null && currentEp+1 <= totalEps){
                           return Row(
@@ -132,8 +133,6 @@ class EpTogglePanel extends StatelessWidget {
                         );
                       }
                     ),
-    
-                    const Padding(padding: EdgeInsets.symmetric(horizontal: 6)),
                     const Icon(Icons.arrow_forward_ios,size: 18),
                   ],
                 ),

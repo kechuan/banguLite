@@ -54,7 +54,7 @@ class AnimatedSortSelector extends StatelessWidget {
               child: LayoutBuilder(
                 builder: (_,constraint) {
                   return Icon(
-                    labelIcon ?? Icons.question_mark ,
+                    labelIcon ?? Icons.question_mark,
                     size: constraint.maxHeight, 
                   );
                 }

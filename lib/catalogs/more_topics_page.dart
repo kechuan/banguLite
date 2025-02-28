@@ -34,6 +34,8 @@ class MoreTopicsPage extends StatelessWidget {
 
     return Theme(
       data: ThemeData(
+        brightness: Theme.of(context).brightness,
+        //primaryColor: judgeDetailRenderColor(context,linearColor),
         colorSchemeSeed: judgeDetailRenderColor(context,bangumiThemeColor),
         fontFamily: 'MiSansFont',
       ),
@@ -50,6 +52,7 @@ class MoreTopicsPage extends StatelessWidget {
             itemBuilder: (_,index){
               
               return Card(
+                color: judgeDetailRenderColor(context,bangumiThemeColor),
                 child: ListTile(
                   onTap: () {
                     Navigator.pushNamed(
@@ -78,7 +81,6 @@ class MoreTopicsPage extends StatelessWidget {
                               spacing: 3,
                               children: [
                                 Icon(MdiIcons.chat,size: 12),
-                                //const Iconify(Zondicons.chat_bubble_dots,size: 12),
                                 ScalableText("${topicsList[index].repliesCount}"),
                               ],
                             ),

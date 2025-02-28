@@ -3,10 +3,13 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/get_task_information.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class CommentImagePanel extends StatefulWidget {
   const CommentImagePanel({
@@ -26,9 +29,13 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
   RequestByteInformation pictureRequestInformation = RequestByteInformation();
   ValueNotifier<bool> imageLoadNotifier = ValueNotifier(false);
 
+  
+
   //final int size;
   @override
   Widget build(BuildContext context) {
+
+    final indexModel = context.read<IndexModel>();
 
     loadInformationFuture ??= loadByteInformation(widget.imageUrl);
     
@@ -43,16 +50,25 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
 
                 RequestByteInformation pictureRequestInformation = snapshot.data;
 
-                //pictureRequestInformation.printInformation();
-
                 bool isValid = pictureRequestInformation.contentLength != null;
+
+                debugPrint("loadStatus: ${indexModel.userConfig.isManuallyImageLoad}");
+
+                if(isValid && indexModel.userConfig.isManuallyImageLoad == false){
+                  imageLoadNotifier.value = true;
+                }
 
                 return Card(
                   shadowColor: Colors.white,
                   elevation: 6,
                   child: UnVisibleResponse(
                     onTap: (){
-                      if(!isValid) return;
+                      if(!isValid){
+                        canLaunchUrlString(widget.imageUrl).then((result){
+                          result ? launchUrlString(widget.imageUrl): null;
+                          return;
+                        });
+                      }
                       imageLoadNotifier.value = true;
                     },
                     child: ValueListenableBuilder(
@@ -80,29 +96,35 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                                   ),
                                 ),
 
-
-                                ...?(!isValid) ? [
-                                  ScalableText(pictureRequestInformation.statusMessage ?? ""),
-                                  const Padding(padding: PaddingV12),
-                                ] : null,
-
-                                ...?isValid ? [
-                                  const Padding(padding: PaddingV6),
-                                  ScalableText("size: ${convertTypeSize(pictureRequestInformation.contentLength ?? 0)}"),
-                                  const Padding(padding: PaddingV6),
-                                  ScalableText("type: ${pictureRequestInformation.contentType}"),
-                                  const Padding(padding: PaddingV6),
-                                ] : null
-             
+                                (!isValid) ? Padding(
+                                  padding: PaddingV12,
+                                  child: Column(
+                                    spacing: 12,
+                                    children: [
+                                      const ScalableText("打开外部浏览器以查看图片"),
+                                      ScalableText("link: ${widget.imageUrl}"),
+                                    ],
+                                  ),
+                                ): const SizedBox.shrink(),
+                                
+                                isValid ? Padding(
+                                  padding: PaddingV6,
+                                  child: Column(
+                                    spacing: 12,
+                                    children: [
+                                      ScalableText("size: ${convertTypeSize(pictureRequestInformation.contentLength ?? 0)}"),
+                                      ScalableText("type: ${pictureRequestInformation.contentType}"),
+                                    ],
+                                  ),
+                                ) : const SizedBox.shrink()
+                                
                               ],
                             ),
                           );
                         }
 
-
                         return CachedNetworkImage(
                           imageUrl: widget.imageUrl,
-                          //fit: BoxFit.cover,
                           progressIndicatorBuilder: (context, url, progress) => const LoadingCard(),
                           imageBuilder: (_, imageProvider) {
                             return UnVisibleResponse(
@@ -117,9 +139,6 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                             );
                           },
                         );
-             
-                        //return CachedImageLoader(imageUrl: widget.imageUrl,photoViewStatus:true); 
-                        //problem: not work with DecorationImage
                         
                       }
                     ),
@@ -144,14 +163,10 @@ class LoadingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Card(
-      child: SizedBox(
-        height: 200,
-        width: 200,
-        child: Center(
-          child: CircularProgressIndicator()
-        ),
-      )
+    return const SizedBox(
+      height: 200,
+      width: 200,
+      child: Center(child: CircularProgressIndicator()),
     );
   }
 }

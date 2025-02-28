@@ -25,14 +25,21 @@ class ScalableText extends Text {
     SelectableText(
       text,
       style: currentStyle.copyWith(
-        fontSize: originalSize != null ? AppFontSize.getScaledSize(originalSize) : AppFontSize.getScaledSize(AppFontSize.s16)
+        fontSize: originalSize != null ? 
+          AppFontSize.getScaledSize(originalSize) : 
+          AppFontSize.getScaledSize(AppFontSize.s16)
       ),
+      maxLines: maxLines,
     ) :
     Text(
       text,
       style: currentStyle.copyWith(
-        fontSize: originalSize != null ? AppFontSize.getScaledSize(originalSize) : AppFontSize.getScaledSize(AppFontSize.s16)
+        fontSize: originalSize != null ? 
+          AppFontSize.getScaledSize(originalSize) : 
+          AppFontSize.getScaledSize(AppFontSize.s16)
       ),
+      maxLines: maxLines,
+      overflow: overflow,
     );
   }
 }

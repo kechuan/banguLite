@@ -24,6 +24,7 @@ class SettingsPage extends StatelessWidget {
       FontSizeTile(),
       ColorThemeTile(),
       ThemeModeTile(),
+      CommentImageLoadModeTile(),
       ClearCacheTile(),
       ConfigTile(),
       AboutTile(),
@@ -66,7 +67,7 @@ class FontSizeTile extends ListTile {
     
               SizedBox(
                 height: 60,
-                width: 50*(ScaleType.values.length+0),
+                width: 50*(ScaleType.values.length.toDouble()),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
@@ -203,21 +204,23 @@ class ColorThemeTile extends ListTile{
                         return previous!=next;
                       },
                       builder: (_,themeColor,child) {
-                        return Center(
-                          child: Builder(
-                            builder: (context) {
-                              if(index == BangumiThemeColor.values.length){
+                        return IgnorePointer(
+                          child: Center(
+                            child: Builder(
+                              builder: (_) {
+                                if(index == BangumiThemeColor.values.length){
+                                  return Offstage(
+                                    offstage: !(indexModel.userConfig.isSelectedCustomColor == true),
+                                    child: Icon(Icons.done,color: judgeCurrentThemeColor(context))
+                                  );
+                                }
+                          
                                 return Offstage(
-                                  offstage: !(indexModel.userConfig.isSelectedCustomColor == true),
+                                  offstage: !(themeColor == BangumiThemeColor.values.elementAt(index) && indexModel.userConfig.isSelectedCustomColor == false),
                                   child: Icon(Icons.done,color: judgeCurrentThemeColor(context))
                                 );
                               }
-
-                              return Offstage(
-                                offstage: !(themeColor == BangumiThemeColor.values.elementAt(index) && indexModel.userConfig.isSelectedCustomColor == false),
-                                child: Icon(Icons.done,color: judgeCurrentThemeColor(context))
-                              );
-                            }
+                            ),
                           ),
                         );
                       }
@@ -232,7 +235,7 @@ class ColorThemeTile extends ListTile{
         ],
       ),
       subtitle: Selector<IndexModel,bool?>(
-        selector: (_, indexModel) => indexModel.userConfig.isfollowThemeColor,
+        selector: (_, indexModel) => indexModel.userConfig.isFollowThemeColor,
         shouldRebuild: (previous, next) => previous!=next,
         builder: (_,followStatus,child){
           return Padding(
@@ -242,7 +245,7 @@ class ColorThemeTile extends ListTile{
               children: [
                 const Text("番剧详细页是否跟随主题色"),
                 Switch(
-                  value: followStatus!, 
+                  value: followStatus ?? false, 
                   onChanged: (value){
                     indexModel.updateFollowThemeColor(value);
                   }
@@ -312,6 +315,46 @@ class ThemeModeTile extends ListTile{
 
 }
 
+class CommentImageLoadModeTile extends ListTile{
+  const CommentImageLoadModeTile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+
+    final indexModel = context.read<IndexModel>();
+
+    return SizedBox(
+      height: 80,
+      child: Center(
+        child: Selector<IndexModel,bool?>(
+            selector: (_, indexModel) => indexModel.userConfig.isManuallyImageLoad,
+            shouldRebuild: (previous, next) => previous!=next,
+            builder: (_,manualStatus,child){
+              return ListTile(
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("评论区是否手动加载图片"),
+                    Switch(
+                      value: manualStatus ?? true, 
+                      onChanged: (value) => indexModel.updateCommentImageLoadMode(value)
+                    ),
+                  ],
+                ),
+              );
+            }
+          ),
+      ),
+    );
+
+
+    
+      
+    
+  }
+
+}
+
 class ClearCacheTile extends ListTile{
   const ClearCacheTile({super.key});
 
@@ -325,45 +368,47 @@ class ClearCacheTile extends ListTile{
       builder: (_, cachedImageSize, child) {
         return SizedBox(
           height: 80,
-          child: ListTile(
-            onTap: () async {
-              //Dialog: DefaultCacheManager().emptyCache();
-              computingStatusNotifier.value = true;
+          child: Center(
+            child: ListTile(
+              onTap: () async {
+                //Dialog: DefaultCacheManager().emptyCache();
+                computingStatusNotifier.value = true;
+            
+                final indexModel = context.read<IndexModel>();
+            
+                await MyHive.cachedImageDir.delete(recursive: true).then((_){
+                  indexModel.updateCachedSize().then(
+                    (_)=>computingStatusNotifier.value = false
+                  );
+                          
+                });
+              },
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ScalableText("清除图像缓存",style: TextStyle(fontSize: AppFontSize.s16)),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: (){
+                          context.read<IndexModel>().updateCachedSize().then((_)=>computingStatusNotifier.value = false);
+                          computingStatusNotifier.value = true;
+                        },
+                        icon: const Icon(Icons.refresh)
+                      ),
+                      ValueListenableBuilder(
+                        valueListenable: computingStatusNotifier,
+                        builder: (_,computingStatus,child) {
+                          return computingStatus ? const ScalableText("Computing...") : ScalableText(convertTypeSize(cachedImageSize));
+                        }
+                      ),
+                    ],
+                  ),
+                ],
+              ),
 
-              final indexModel = context.read<IndexModel>();
-
-              await MyHive.cachedImageDir.delete(recursive: true).then((_){
-                indexModel.updateCachedSize().then(
-                  (_)=>computingStatusNotifier.value = false
-                );
-                        
-              });
-            },
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Align(alignment: Alignment.centerLeft,child: ScalableText("清除图像缓存",style: TextStyle(fontSize: AppFontSize.s16))),
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: (){
-                        context.read<IndexModel>().updateCachedSize().then((_)=>computingStatusNotifier.value = false);
-                        computingStatusNotifier.value = true;
-                      },
-                      icon: const Icon(Icons.refresh)
-                    ),
-                    ValueListenableBuilder(
-                      valueListenable: computingStatusNotifier,
-                      builder: (_,computingStatus,child) {
-                        return computingStatus ? const ScalableText("Computing...") : ScalableText(convertTypeSize(cachedImageSize));
-                      }
-                    ),
-                  ],
-                ),
-              ],
+            
             ),
-            //trailing: 
-          
           ),
         );
       }
@@ -374,6 +419,7 @@ class ClearCacheTile extends ListTile{
 
 }
 
+
 class ConfigTile extends ListTile{
   const ConfigTile({super.key});
 
@@ -381,35 +427,35 @@ class ConfigTile extends ListTile{
   Widget build(BuildContext context) {
     return SizedBox(
       height: 80,
-      child: ListTile(
-        onTap: (){
-          final indexModel = context.read<IndexModel>();
-          showDialog(
-            context: context,
-            builder: (_){
-              return AlertDialog(
-                title: const ScalableText("重置配置确认"),
-                content: const ScalableText("要恢复默认配置吗"),
-                actions:[
-                  TextButton(
-                    onPressed: ()=> Navigator.of(context).pop(),
-                    child: const ScalableText("取消")
-                  ),
-                  TextButton(
-                    onPressed: (){
-                      indexModel.resetConfig();
-                      Navigator.of(context).pop();
-                    }, 
-                    child: const ScalableText("确认")
-                  )
-                ]
-              );
-            }
-          );
-        },
-        title: Align(alignment: Alignment.centerLeft,child: ScalableText("重置设置",style: TextStyle(fontSize: AppFontSize.s16))),
-       
-      
+      child: Center(
+        child: ListTile(
+          onTap: (){
+            final indexModel = context.read<IndexModel>();
+            showDialog(
+              context: context,
+              builder: (_){
+                return AlertDialog(
+                  title: const ScalableText("重置配置确认"),
+                  content: const ScalableText("要恢复默认配置吗"),
+                  actions:[
+                    TextButton(
+                      onPressed: ()=> Navigator.of(context).pop(),
+                      child: const ScalableText("取消")
+                    ),
+                    TextButton(
+                      onPressed: (){
+                        indexModel.resetConfig();
+                        Navigator.of(context).pop();
+                      }, 
+                      child: const ScalableText("确认")
+                    )
+                  ]
+                );
+              }
+            );
+          },
+          title: ScalableText("重置设置",style: TextStyle(fontSize: AppFontSize.s16)),
+        ),
       ),
     );
       
@@ -426,16 +472,18 @@ class AboutTile extends ListTile{
     
     return SizedBox(
       height: 80,
-      child: ListTile(
-        onTap: (){
-          removeAsyncContextPush() => Navigator.pushNamed(context, Routes.about);
-          precacheImage(
-            const AssetImage('assets/icons/icon.png'),
-            context
-          ).then((_)=>removeAsyncContextPush());
-          
-        },
-        title: Align(alignment: Alignment.centerLeft,child: ScalableText("关于",style: TextStyle(fontSize: AppFontSize.s16)))
+      child: Center(
+        child: ListTile(
+          onTap: (){
+            removeAsyncContextPush() => Navigator.pushNamed(context, Routes.about);
+            precacheImage(
+              const AssetImage('assets/icons/icon.png'),
+              context
+            ).then((_)=>removeAsyncContextPush());
+            
+          },
+          title: ScalableText("关于",style: TextStyle(fontSize: AppFontSize.s16))
+        ),
       ),
     );
 

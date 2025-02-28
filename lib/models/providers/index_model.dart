@@ -58,30 +58,32 @@ class IndexModel extends ChangeNotifier {
     
   }
 
+
   void updateThemeColor(BangumiThemeColor themeColor){
     userConfig.currentThemeColor = themeColor;
 	  userConfig.isSelectedCustomColor = false;
-    notifyListeners();
     updateConfig();
   }
 
   void updateCustomColor(Color customColor){
     userConfig.customColor = customColor;
     userConfig.isSelectedCustomColor = true;
-    notifyListeners();
     updateConfig();
   }
 
   void updateFontSize(ScaleType scale) {
     AppFontSize.scale = scale;
     userConfig.fontScale = scale;
-    notifyListeners();
     updateConfig();
   }
 
   void updateFollowThemeColor(bool detailfollowStatus){
-    userConfig.isfollowThemeColor = detailfollowStatus;
-    notifyListeners();
+    userConfig.isFollowThemeColor = detailfollowStatus;
+    updateConfig();
+  }
+
+  void updateCommentImageLoadMode(bool imageLoadMode){
+    userConfig.isManuallyImageLoad = imageLoadMode;
     updateConfig();
   }
 
@@ -108,11 +110,13 @@ class IndexModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateConfig()=>MyHive.appConfigDataBase.put("currentTheme", userConfig);
+  void updateConfig(){
+    MyHive.appConfigDataBase.put("currentTheme", userConfig);
+    notifyListeners();
+  }
 
   Future<void> updateCachedSize() async {
     cachedImageSize = await compute(getTotalSizeOfFilesInDir, MyHive.cachedImageDir);
-    notifyListeners();
     updateConfig();
   }
 
@@ -162,7 +166,6 @@ class IndexModel extends ChangeNotifier {
 
   void updateSelectedWeekDay(int newWeekDay){
     selectedWeekDay = newWeekDay;
-    notifyListeners();
     updateConfig();
   }
 

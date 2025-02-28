@@ -113,7 +113,6 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                                 
                               return BangumiCommentTile(
                                 commentData: commentListData[index],
-                                //themeColor: judgeCurrentThemeColor(context)
                                 themeColor:judgeDetailRenderColor(context,bangumiModel.imageColor)
                               );
                             }
@@ -174,10 +173,6 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                           ),
                         ),
         
-                        //const Padding(
-                        //  padding: EdgeInsets.only(left: 16,right: 4), // right:4 + right:12
-                        //),
-
                         Padding(
                           padding: const EdgeInsets.only(left: 16),
                           child: InkResponse(
@@ -187,8 +182,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                             highlightColor: Colors.transparent,
                             hoverColor: Colors.transparent,
                             onTap: (){
-                              debugPrint("change way");
-                              //context.read<CommentModel>().toggleAutoRebuildStatus();
+                              debugPrint("change timeSort way");                              
                                   
                               final commentModel = context.read<CommentModel>();
                           

@@ -1,3 +1,4 @@
+
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/max_number_input_formatter.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
@@ -116,7 +117,7 @@ class WarpPageDialog extends StatelessWidget {
                         child: const ScalableText("取消")
                       ),
                       TextButton(
-                        onPressed: onConfirmPressed ?? (){},
+                        onPressed: onConfirmPressed?.call(),
                         child: const ScalableText("确定")
                       )
                     ]
@@ -134,14 +135,18 @@ class WarpPageDialog extends StatelessWidget {
 }
 
 void showWrapPageDialog(BuildContext context,PageController commentPageController){
-  showDialog(
+  showGeneralDialog(
+    barrierDismissible: true,
+    barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
     context: context,
-    builder: (_){
+    transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child),
+    transitionDuration: const Duration(milliseconds: 300),
+    pageBuilder: (_,inAnimation,outAnimation){
 
       final commentModel = context.read<CommentModel>();
 
       final FixedExtentScrollController pageSelectorController = 
-      FixedExtentScrollController(initialItem: commentModel.currentPageIndex - 1);
+        FixedExtentScrollController(initialItem: commentModel.currentPageIndex - 1);
 
       final TextEditingController jumpPageEditingController = TextEditingController();
 

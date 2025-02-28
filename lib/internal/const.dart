@@ -95,7 +95,6 @@ enum SeasonType{
   const SeasonType(this.seasonText,this.month);
 }
 
-
 enum CommentState {
   normal("正常"),
   adminCloseTopic("管理员关闭"),

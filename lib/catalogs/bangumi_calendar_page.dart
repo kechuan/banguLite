@@ -7,7 +7,7 @@ import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
-import 'package:bangu_lite/widgets/warp_season_dialog.dart';
+import 'package:bangu_lite/widgets/dialogs/warp_season_dialog.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 
@@ -362,9 +362,8 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                     child: child!
                                   );
                                 },
-                                child: Container(
+                                child: DecoratedBox(
                                     
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
                                   decoration: BoxDecoration(
                                     border: Border(
                                     bottom: Divider.createBorderSide(context)
@@ -376,15 +375,18 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                   child: Column(
                                     children: [
                                   
-                                      SizedBox(
-                                        height: 59, // Border:bottom = 1
-                                        child: Row(
-                                          children: [
-                                        
-                                            ScalableText("星期${WeekDay.values[selectedDay - 1].dayText}",style: const TextStyle(fontSize: 18)),
-                                            selectChild!
-                                                            
-                                          ],
+                                      Padding(
+                                        padding: PaddingH12,
+                                        child: SizedBox(
+                                          height: 59, // Border:bottom = 1
+                                          child: Row(
+                                            children: [
+                                          
+                                              ScalableText("星期${WeekDay.values[selectedDay - 1].dayText}",style: const TextStyle(fontSize: 18)),
+                                              selectChild!
+                                                              
+                                            ],
+                                          ),
                                         ),
                                       ),
 

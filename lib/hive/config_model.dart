@@ -4,13 +4,13 @@ import 'package:hive_ce/hive.dart';
 import 'package:bangu_lite/internal/const.dart';
 
 class AppConfig extends HiveObject{
-  
-  BangumiThemeColor? currentThemeColor;
-  ScaleType? fontScale;
-  ThemeMode? themeMode;
+  BangumiThemeColor? currentThemeColor = BangumiThemeColor.sea;
+  ScaleType? fontScale = ScaleType.medium;
+  ThemeMode? themeMode = ThemeMode.system;
   Color? customColor;
-  bool? isSelectedCustomColor;
-  bool? isfollowThemeColor;
+  bool? isSelectedCustomColor = false;
+  bool? isFollowThemeColor = false;
+  bool? isManuallyImageLoad = true;
 
   @override
   String toString() {
@@ -21,18 +21,10 @@ class AppConfig extends HiveObject{
       themeMode:$themeMode
       customColor:$customColor
       isSelectedCustomColor:$isSelectedCustomColor
-      follow:$isfollowThemeColor
+      follow:$isFollowThemeColor
+      ManuallyImageLoad:$isManuallyImageLoad
     ]""";
   }
 }
 
-
-AppConfig defaultAPPConfig(){
-  return AppConfig()
-    ..currentThemeColor = BangumiThemeColor.sea
-    ..fontScale = ScaleType.medium
-    ..themeMode = ThemeMode.system
-    ..isfollowThemeColor = false
-    ..isSelectedCustomColor = false
-  ;
-}
+AppConfig defaultAPPConfig() => AppConfig();

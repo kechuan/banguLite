@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 
 
-class BangumiDetailReview extends StatelessWidget {
-  const BangumiDetailReview({
+class BangumiDetailRecentReview extends StatelessWidget {
+  const BangumiDetailRecentReview({
     super.key,
     this.name
   });

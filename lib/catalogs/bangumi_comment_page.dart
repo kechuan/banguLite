@@ -2,7 +2,7 @@
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
-import 'package:bangu_lite/widgets/warp_page_dialog.dart';
+import 'package:bangu_lite/widgets/dialogs/warp_page_dialog.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 
@@ -35,6 +35,7 @@ class BangumiCommentPage extends StatelessWidget  {
     //给每个番剧页面都单独拉一个 CommentProvider 避免互相跳转之间打架
     return Theme(
       data: ThemeData(
+        brightness: Theme.of(context).brightness,
         colorSchemeSeed: judgeDetailRenderColor(context,bangumiThemeColor),
         fontFamily: 'MiSansFont',
       ),

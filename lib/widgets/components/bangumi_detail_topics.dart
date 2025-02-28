@@ -117,11 +117,10 @@ class BangumiDetailTopics extends StatelessWidget {
                                         
                             return Theme(
                               data: ThemeData(
-                                colorSchemeSeed: judgeDetailRenderColor(context,bangumiModel.bangumiThemeColor),
                                 fontFamily: 'MiSansFont'
                               ),
                               child: Card(
-                                
+                                color: judgeDetailRenderColor(context,bangumiModel.bangumiThemeColor),
                                 child: ListTile(
                                  
                                   title: ScalableText("${topicsList[index].topicName}"),

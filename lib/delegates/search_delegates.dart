@@ -12,6 +12,8 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 class CustomSearchDelegate extends SearchDelegate<String>{
 
+  List<BangumiDetails> searchResult = [];
+
   @override
   ThemeData appBarTheme(BuildContext context) {
     return super.appBarTheme(context).copyWith(
@@ -22,7 +24,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
-      IconButton(onPressed: ()=>query = "", icon: const Icon(Icons.close))
+      IconButton(onPressed: ()=> query = "", icon: const Icon(Icons.close))
     ];
   }
 
@@ -49,6 +51,8 @@ class CustomSearchDelegate extends SearchDelegate<String>{
       return const Center(child: ScalableText("沉舟侧畔千帆过 病树前头万木春"));
     }
 
+    debugPrint("search query: $query");
+
     return FutureBuilder(
       future: Future.delayed(const Duration(milliseconds: 400)).then((value){debugPrint("input done. searching");}),
       builder: (_,inputSnapshot){
@@ -56,30 +60,28 @@ class CustomSearchDelegate extends SearchDelegate<String>{
         switch(inputSnapshot.connectionState){
           case ConnectionState.done:{
 
+            debugPrint("suggestion get result done.");
+
             return FutureBuilder( //requsetAPI
-              future: searchHandler(query),
+              future: sortSearchHandler(keyword:query).then((result){
+                debugPrint("done: search query: $query, result: $result");
+                //searchResult = result;
+                return result;
+              }),
               builder: (_,searchSnapshot){
 
+                debugPrint("suggestion render done.");
+              
                 switch(searchSnapshot.connectionState){
 
                   case ConnectionState.done:{
 
                     if(!searchSnapshot.hasData) return const Center(child: ScalableText("暂无信息"));
 
-                     List<BangumiDetails> searchData = searchSnapshot.data!;
-
-                      //debugPrint("search data:${searchData}");
-
-                      
-
+                     List<BangumiDetails> searchData = loadSearchData(searchSnapshot.data!.data);
 
                       for(BangumiDetails currentBangumi in searchData){
-
-                        if(currentBangumi.name!.contains("&amp;")){
-                          currentBangumi.name = currentBangumi.name!.replaceAll("&amp;", "&");
-                          //debugPrint("${currentBangumi.name}");
-                        }
-                        
+                        currentBangumi.name = convertAmpsSymbol(currentBangumi.name);
                       }
 
                       return ListView.separated(
@@ -131,7 +133,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
     debugPrint("search results build");
 
     return FutureBuilder( //requsetAPI
-      future: searchHandler(query),
+      future: sortSearchHandler(keyword:query),
       builder: (_,searchSnapshot){
 
         switch(searchSnapshot.connectionState){
@@ -140,11 +142,11 @@ class CustomSearchDelegate extends SearchDelegate<String>{
 
             if(searchSnapshot.hasData){
 
-              List<BangumiDetails> searchData = searchSnapshot.data!;
+              List<BangumiDetails> searchData = loadSearchData(searchSnapshot.data!.data);
 
               ValueNotifier<bool> isLoading = ValueNotifier<bool>(true);
 
-              debugPrint("data:$searchData");
+              debugPrint("search result data:$searchData");
 
               return EasyRefresh(
                 child: ValueListenableBuilder(
@@ -191,7 +193,6 @@ class CustomSearchDelegate extends SearchDelegate<String>{
                     
                 ),
               );
-
             }
 
             return const Center(child: ScalableText("暂无信息"));

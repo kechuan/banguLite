@@ -7,7 +7,7 @@ import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/star_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
-import 'package:bangu_lite/widgets/general_transition_dialog.dart';
+import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -111,7 +111,7 @@ class BangumiStarPage extends StatelessWidget {
              builder: (_,reversedStatus,__) {
                return IconButton(
                 onPressed: ()=> reversedSortNotifer.value = !reversedSortNotifer.value,
-                icon: reversedStatus ? const Icon(Icons.history_outlined,color: Colors.black) : const Icon(Icons.history_outlined,color: Colors.grey,)
+                icon: reversedStatus ? const Icon(Icons.history_outlined) : const Icon(Icons.history_outlined,color: Colors.grey,)
               );
              }
            ),

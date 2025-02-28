@@ -111,6 +111,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
             
             return Theme(
               data: ThemeData(
+                brightness: Theme.of(context).brightness,
                 colorSchemeSeed: judgeDetailRenderColor(context,widget.bangumiThemeColor),
                 fontFamily: 'MiSansFont',
               ),
@@ -291,14 +292,18 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                     
-                                         IconButton(
-                                            onPressed: () async {
-                                              Navigator.of(context).maybePop();
-                                            },
-                                            icon: const Icon(Icons.arrow_back),
+                                        IconButton(
+                                          onPressed: () => Navigator.of(context).maybePop(),
+                                          icon: const Icon(Icons.arrow_back),
+                                        ),
+
+                                        Expanded(
+                                          child: ScalableText(
+                                            "第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN ?? epModel.epsData[selectedEp]!.name}",
+                                            style: const TextStyle(),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                    
-                                        ScalableText("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}",style: const TextStyle(),),
+                                        ),
                                     
                                         IconButton(
                                           onPressed: () async {

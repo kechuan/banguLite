@@ -54,7 +54,7 @@ Color judgeDetailRenderColor(BuildContext context,Color? imageColor){
 
   Color renderColor;
 
-  if(indexModel.userConfig.isfollowThemeColor == true){
+  if(indexModel.userConfig.isFollowThemeColor == true){
     renderColor = judgeCurrentThemeColor(context);
     
   }

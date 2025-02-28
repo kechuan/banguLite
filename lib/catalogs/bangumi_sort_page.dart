@@ -164,7 +164,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                       loadNewData(currentSearchConfig);
           
                                     },
-                                    labelIcon: Icons.format_list_numbered,
+                                    labelIcon: Icons.leaderboard_outlined,
                                     labelText: "排名",
                                   ),
                                                   
@@ -192,7 +192,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                       loadNewData(currentSearchConfig);
                                       
                                     },
-                                    labelIcon: Icons.arrow_outward_sharp,
+                                    labelIcon: Icons.numbers,
                                     labelText: "分数",
                                   )
                                                   

@@ -23,10 +23,11 @@ class EpCommentTile extends StatelessWidget {
     bool commentBlockStatus = false;
 
     if(
+      epCommentData.state != null &&
       ( epCommentData.state == CommentState.adminCloseTopic.index ||
         epCommentData.state == CommentState.userDelete.index ||
         epCommentData.state == CommentState.adminDelete.index
-      ) && epCommentData.state != null
+      )
     ){
       commentBlockStatus = true;
     }
@@ -43,41 +44,58 @@ class EpCommentTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             
             children: [
-          
-              epCommentData.avatarUrl!=null ? 
-                SizedBox(
-                  height: 50,
-                  width: 50,
-                  child: CachedImageLoader(imageUrl: epCommentData.avatarUrl!)
-                ) : 
-                //Image.asset("assets/icons/icon.png"),
-              const SizedBox.shrink(),
-          
-              ScalableText("${epCommentData.nickName ?? epCommentData.userID ?? ""}",style: const TextStyle(color: Colors.blue)),
-          
+
+              SizedBox(
+                height: 50,
+                width: 50,
+                child: CachedImageLoader(imageUrl: epCommentData.avatarUrl)
+              ),
+
+              //可压缩信息 Expanded
+              Expanded(
+                flex: 2,
+                child: ScalableText(
+                  "${epCommentData.nickName ?? epCommentData.userID ?? "no data"}",
+                    style: const TextStyle(color: Colors.blue),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+              ),
+
               const Spacer(),
-          
+
+              //优先完整实现 size约束盒
               ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 160), 
+                constraints: const BoxConstraints(maxWidth: 160),
+                //constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3),
                 //这个长度一般是 "YEAR-MO-DA HO:MI" 的长度
                 //但如果设备上的字体是不一样的话。。我就不好说了
                 child: Wrap(
-                  //crossAxisAlignment: WrapCrossAlignment.end,
                   spacing: 6,
                   alignment: WrapAlignment.end,
                   children: [
                           
-                    //ScalableText("#${epCommentData.epCommentIndex}"),
                     ScalableText(epCommentData.epCommentIndex== null ? "" : "#${epCommentData.epCommentIndex}"),
                           
                     Builder(
                       builder: (_){
                         DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(epCommentData.commentTimeStamp!*1000);
                         return ScalableText(
-                          "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"
+                          "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)}"
                         );
                       }
                     ),
+
+                    Builder(
+                      builder: (_){
+                        DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(epCommentData.commentTimeStamp!*1000);
+                        return ScalableText(
+                          "${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}",
+                        );
+                      }
+                    ),
+
+
                   ],
                 ),
               )
@@ -101,35 +119,60 @@ class EpCommentTile extends StatelessWidget {
       ),
 
       subtitle: Padding(
-        padding: const EdgeInsets.only(top: 8),
+        padding: EdgeInsets.only(
+          top: epCommentData.sign == null || epCommentData.sign!.isEmpty ? 32 : 6
+        ),
         child: Column(
+          spacing: 12,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             
-            (!commentBlockStatus) ?
-            const SizedBox.shrink() :
+            commentBlockStatus ?
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const ScalableText("发言已隐藏"),
                 ScalableText("原因: ${CommentState.values[epCommentData.state!].reason}")
               ],
-            ),
+            ) :
+            const SizedBox.shrink(),
 
-            commentBlockStatus ? 
-            const SizedBox.shrink() :
+            (!commentBlockStatus) ? 
             BBCodeText(
               data: convertBangumiCommentSticker(epCommentData.comment ?? "comment"),
               stylesheet: BBStylesheet(
                 tags: allEffectTag,
                 selectableText: true,
-                defaultText: TextStyle(fontFamily: 'MiSansFont',fontSize: AppFontSize.s16)
+                defaultText: TextStyle(
+                  fontFamily: 'MiSansFont',
+                  fontSize: AppFontSize.s16,
+                )
               ),
-            ),
+            ) :
+            const SizedBox.shrink(),
 
-            CommentReaction(commentReactions: epCommentData.commentReactions),
+            //因为 CommentReaction 内部是 ListView 本身就是不固定长度
+            //因此决定使用 Flex 来提醒 这是一个特殊方式
+
+            Row(
+              //mainAxisAlignment: MainAxisAlignment.end, 不生效 因为主轴已经被 Expanded 占满
+              children: [
+                Expanded(
+                  //那么只能在内部插入松约束 Align 来调节方位
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: CommentReaction(commentReactions: epCommentData.commentReactions),
+                  ),
+                ),
+              ],
+            ),
         
-            const Padding(padding: PaddingV6),
+            // 楼主: null 
+            // 层主: 3
+            // 回帖: 3-1(详情界面特供)
+            epCommentData.epCommentIndex?.contains("-") ?? false ? 
+            const Divider() :
+            const SizedBox.shrink(),
         
           ],
         ),

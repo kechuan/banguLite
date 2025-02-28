@@ -4,8 +4,8 @@ import 'dart:async';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/widgets/index_landscape.dart';
-import 'package:bangu_lite/widgets/index_portial.dart';
+import 'package:bangu_lite/widgets/views/index_landscape.dart';
+import 'package:bangu_lite/widgets/views/index_portial.dart';
 import 'package:flutter/services.dart';
 
 @FFRoute(name: '/index')

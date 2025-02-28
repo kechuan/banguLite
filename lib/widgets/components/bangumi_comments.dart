@@ -121,6 +121,7 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
 
     return Theme(
       data: ThemeData(
+        brightness: Theme.of(context).brightness,
         colorSchemeSeed: widget.bangumiThemeColor,
         fontFamily: 'MiSansFont',
         scrollbarTheme: const ScrollbarThemeData(

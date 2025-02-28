@@ -141,13 +141,13 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                             
                             itemBuilder: (_,index){
                                   
-                              Color currentEpsColor = Colors.white; //默认白 未放送
+                              Color currentEpsColor = Colors.grey ; //默认灰 未放送
                               int currentEpIndex = (currentSegementRange)+(index)+1;
 
                               EpsInfo? currentInfo = epModel.epsData[currentEpIndex];
 
                               //对于时间跨度很大的番剧。像海贼王这种的 我处理方式就是最简单的 air_date 判断了 
-                              //不可能做到百分百准确 但没办法 没有更好的思路了
+                              //不可能做到百分百准确 但没办法 已经没有更好的思路了
 
                               DateTime? currentEpAirDate = DateTime.tryParse(currentInfo?.airDate ?? "");
 
@@ -169,7 +169,6 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                   border: Border(
                                     bottom: BorderSide(
                                       width: 3, 
-                                      //color: widget.airedEps >= currentEpIndex ? Theme.of(context).scaffoldBackgroundColor.withValues(alpha:0.2) : Colors.grey,
                                       color:  Colors.grey.withValues(alpha:0.2),
                                     ),
                                   ),

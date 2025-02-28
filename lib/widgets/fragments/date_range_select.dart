@@ -1,5 +1,5 @@
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
-import 'package:bangu_lite/widgets/warp_season_dialog.dart';
+import 'package:bangu_lite/widgets/dialogs/warp_season_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bangu_lite/internal/event_bus.dart';

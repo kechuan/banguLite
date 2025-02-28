@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/ep_replied_comment_sheet.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
@@ -42,13 +43,26 @@ class EpRepliedTile extends ListTile {
                     epCommentData: epCommentData,
                     commentIndex: index,
                     child: Row(
+                      spacing: 12,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ScalableText("${epCommentData.repliedComment![index].nickName}:"),
-                  
-                        const Padding(padding: PaddingH6),
-    
-                        Expanded(child: ScalableText("${epCommentData.repliedComment![index].comment}"))
+
+                        Expanded(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxHeight: AppFontSize.s16 * 6, //字符的字高普遍比字宽大1倍
+                              maxWidth: double.infinity
+                               
+                            ),
+                            child: ScalableText(
+                              "${epCommentData.repliedComment![index].comment}",
+                              maxLines: 3,
+                              style: const TextStyle(overflow: TextOverflow.ellipsis,),
+                              
+                            ),
+                          ),
+                        )
 
                       ],
                     ),
@@ -60,8 +74,6 @@ class EpRepliedTile extends ListTile {
             ),
     
             if(epCommentData.repliedComment!.length > 3) 
-
-
               ShowCommentTap(
                 epCommentData: epCommentData,
                 child: ScalableText(
@@ -69,9 +81,7 @@ class EpRepliedTile extends ListTile {
                   style: const TextStyle(color: Colors.blueAccent),
                 )
               ),
-        
-        
-            
+
           ],
         ),
       ),

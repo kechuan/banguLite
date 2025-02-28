@@ -5,7 +5,7 @@ nextTypeId: 6
 types:
   AppConfig:
     typeId: 0
-    nextIndex: 7
+    nextIndex: 8
     fields:
       currentThemeColor:
         index: 0
@@ -17,8 +17,10 @@ types:
         index: 3
       isSelectedCustomColor:
         index: 5
-      isfollowThemeColor:
+      isFollowThemeColor:
         index: 6
+      isManuallyImageLoad:
+        index: 7
   BangumiThemeColor:
     typeId: 1
     nextIndex: 4

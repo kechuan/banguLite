@@ -1,14 +1,12 @@
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/widgets/components/new_update_dialog.dart';
+import 'package:bangu_lite/widgets/dialogs/new_update_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
 import 'package:github/github.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-
-
 
 @FFRoute(name: 'about')
 
