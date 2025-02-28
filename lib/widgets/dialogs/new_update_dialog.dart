@@ -10,6 +10,7 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/update_client.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
+import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ class NewUpdateDialog extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final UpdateClient updateClient = UpdateClient.updateClient;
+    final ValueNotifier<bool> expandedStatusNotifier = ValueNotifier<bool>(false);
 
     return Padding(
       padding: Padding16,
@@ -42,7 +44,7 @@ class NewUpdateDialog extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const ScalableText("New Version"),
-                ScalableText("Tag v${GithubRepository.version} => v${latestRelease.tagName}")
+                ScalableText("Tag v${GithubRepository.version} => v${latestRelease.tagName}"),
               ],
             ),
         
@@ -110,7 +112,18 @@ class NewUpdateDialog extends StatelessWidget {
                 );
               }
             ),
-        
+
+            ExpansionTile(
+              initiallyExpanded: false,
+              tilePadding: const EdgeInsets.all(0),
+              title: const ScalableText("更新说明:"),
+              shape: const Border(),
+              onExpansionChanged:(infoCollapseStatus) => expandedStatusNotifier.value = infoCollapseStatus,
+              children: [
+                ScalableText("${latestRelease.body}")
+              ],
+            ),
+
             Expanded(
               child: ListView.builder(
                 itemCount: latestRelease.assets?.length ?? 0,
