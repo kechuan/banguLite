@@ -10,7 +10,6 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/update_client.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
-import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';

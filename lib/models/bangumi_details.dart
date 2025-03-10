@@ -18,8 +18,6 @@ class BangumiDetails {
 	String? summary;
 	Map<String,dynamic> informationList = {};
 	Map<String,int> tagsList = {};
-	//  Map<String,dynamic> questionList = {};
-
 	Map<String,dynamic> ratingList = {
 		"total": 0,
 		"score": 0.0,
@@ -37,7 +35,6 @@ class BangumiDetails {
       "10": 0
     }
 	};
-
 
 }
 
@@ -246,6 +243,24 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
 
     return bangumiDetails;
   }
+
+BangumiDetails loadRelationsData(Map<String,dynamic> bangumiData){
+  final BangumiDetails bangumiDetails = BangumiDetails();
+
+    bangumiDetails.coverUrl = bangumiData["images"]?["large"];
+    bangumiDetails.name = bangumiData["nameCN"].isNotEmpty ? bangumiData["nameCN"] : bangumiData["name"];
+    bangumiDetails.id = bangumiData["id"];
+    bangumiDetails.type = bangumiData["type"];
+
+    bangumiDetails.ratingList = {
+      "total": bangumiData["rating"]?["total"] ?? 0,
+      "score": bangumiData["rating"]?["score"] ?? 0.0,
+      "rank": bangumiData["rating"]?["rank"] ?? 0, //返回的是一个数值0
+      "count": bangumiData["rating"]?["count"] ?? {}
+    };
+
+  return bangumiDetails;
+}
 
 bool animationFliter(Map currentBangumi){
   //一刀切

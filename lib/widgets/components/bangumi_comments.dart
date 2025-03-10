@@ -114,7 +114,8 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
       Future.wait(
         List.generate(
           min(3,loadPageCount),
-          (index) => commentModel.loadComments(widget.subjectID,pageIndex: index+1),
+          //(index) => commentModel.loadComments(widget.subjectID,pageIndex: index+1),
+          (index) => commentModel.loadComments(pageIndex: index+1),
         )
       )
     );

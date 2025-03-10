@@ -15,7 +15,6 @@ class CachedImageLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -42,17 +41,7 @@ class CachedImageLoader extends StatelessWidget {
                   );
                 },
 
-                errorWidget: (_, url, error) {
-
-                  return DecoratedBox(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
-                      color: Colors.grey.withValues(alpha: 0.5),
-                    ),
-                    child: const Center(child: ScalableText("Image not available")),
-                  );
-
-                },
+                errorWidget: (_, url, error) => ImageNotAvailable(reason: error.toString()),
                 
                 progressIndicatorBuilder: (_, url, progress) {
               
@@ -78,7 +67,7 @@ class CachedImageLoader extends StatelessWidget {
             }
         
             else{
-              return Center(child: Image.asset("assets/icons/icon.png")); //null 
+              return const ImageNotAvailable(reason: "empty Url"); //null 
             }
           }
         )
@@ -95,4 +84,25 @@ class CachedImageLoader extends StatelessWidget {
 }
 
 
-                                                  
+class ImageNotAvailable extends StatelessWidget {
+  const ImageNotAvailable({
+    super.key,
+    this.reason
+  });
+
+  final String? reason;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: Colors.grey.withValues(alpha: 0.5),
+      ),
+      child: Center(
+        child: ScalableText("Image not available \n $reason")
+      ),
+    );
+
+  }
+}

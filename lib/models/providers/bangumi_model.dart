@@ -36,7 +36,6 @@ class BangumiModel extends ChangeNotifier {
     });
   }
 
-
   void getThemeColor(Color imageProviderColor,{bool? darkMode}){
 
     bangumiThemeColor = null;

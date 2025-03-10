@@ -41,7 +41,8 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
       //final indexModel = context.read<IndexModel>();
       final bangumiModel = context.read<BangumiModel>();
 
-      commentFuture ??= context.read<CommentModel>().loadComments(widget.id);
+      //commentFuture ??= context.read<CommentModel>().loadComments(widget.id);
+      commentFuture ??= context.read<CommentModel>().loadComments();
 
         return Padding(
           padding: const EdgeInsets.all(12),
@@ -202,7 +203,8 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                                 
                                 commentModel.currentPageIndex = isOldCommentSort.value ? convertTotalCommentPage(commentModel.commentLength,10) : 1;
                                 
-                                context.read<CommentModel>().loadComments(widget.id,isReverse: isOldCommentSort.value).then((_){
+                                //context.read<CommentModel>().loadComments(widget.id,isReverse: isOldCommentSort.value).then((_){
+                                context.read<CommentModel>().loadComments(isReverse: isOldCommentSort.value).then((_){
                                   commentModel.changePage(commentModel.currentPageIndex);
                                 });
                               }

@@ -45,6 +45,8 @@ class BangumiAPIUrls {
   static String epComment(int epID) => '$newUrl/p1/episodes/$epID/comments';
   static String topics(int subjectID) => '$newUrl/p1/subjects/$subjectID/topics';
   static String topicComment(int topicID) => '$newUrl/p1/subjects/-/topics/$topicID';
+  static String relations(int subjectID) => '$newUrl/p1/subjects/$subjectID/relations';
+
 }
 
 class BangumiWebUrls{
@@ -77,7 +79,8 @@ class BangumiQuerys {
   static Map<String,int>  commentQuery = {"limit":10,"offset":0},
                           sortQuery = {"limit":10,"offset":0},
                           topicsQuery = {"limit":30,"offset":0},
-                          epQuery = {"subject_id":0,"limit":100,"offset":0}
+                          epQuery = {"subject_id":0,"limit":100,"offset":0},
+                          relationsQuery = {"type":2,"limit":20,"offset":0}
   ;
                              
 
@@ -105,7 +108,7 @@ class GithubRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.5.8",
+                      version = "0.6.0",
                       author = "kechuan"
   ;
 }

@@ -10,7 +10,11 @@ import 'package:bangu_lite/models/comment_details.dart';
 
 class CommentModel extends ChangeNotifier {
   
-  CommentModel();
+  CommentModel({
+    required this.subjectID
+  });
+
+  final int subjectID;
 
   ///subject的评论详情, 一页的长度为10个 [CommentDetails]
   ///透过 [loadComments] 函数进行装载, 并在 [dispose] 时移除数据.
@@ -55,7 +59,8 @@ class CommentModel extends ChangeNotifier {
   ///触发 [isReverse] flag与否以进行 最新/最早 评论的切换
   ///
   ///请求到数据后会透过 [notifyListeners] 通知UI组件这个数据已准备好
-  Future<void> loadComments(int subjectID,{int pageIndex = 1,bool isReverse = false, int pageRange = 10}) async {
+  //Future<void> loadComments(int subjectID,{int pageIndex = 1,bool isReverse = false, int pageRange = 10}) async {
+  Future<void> loadComments({int pageIndex = 1,bool isReverse = false, int pageRange = 10}) async {
 
     if(subjectID == 0) return;
 

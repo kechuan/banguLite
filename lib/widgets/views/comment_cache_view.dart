@@ -98,7 +98,8 @@ class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepA
         if(currentPageComments == null){
           //空数据 null 加载 尝试触发notifiedRebuild
           debugPrint("null!: reLoading ${widget.currentPageIndex+1}");
-          commentModel.loadComments(widget.id,pageIndex: widget.currentPageIndex+1);
+          //commentModel.loadComments(widget.id,pageIndex: widget.currentPageIndex+1);
+          commentModel.loadComments(pageIndex: widget.currentPageIndex+1);
 
           //等待notfiyListener通知 再过一遍 commentModel.commentsData[currentPageIndex]!=null 检查
           return WaitingBuilder(currentIndex: widget.currentPageIndex+1, subjectID: widget.id);
@@ -123,7 +124,7 @@ class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepA
 
           WidgetsBinding.instance.addPostFrameCallback((timestamp){
             context.read<CommentModel>().loadComments(
-              widget.id,
+              //widget.id,
               pageIndex: min(
                 widget.currentPageIndex+2,
                 convertTotalCommentPage(commentModel.commentLength,10)
@@ -214,7 +215,7 @@ class WaitingBuilder extends StatelessWidget {
                 commentModel.commentsData.remove(currentIndex);
                 commentModel.changePage(currentIndex);
                 commentModel.loadComments(
-                  subjectID,
+                  //subjectID,
                   pageIndex: currentIndex,
                 );
               },

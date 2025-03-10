@@ -128,11 +128,10 @@ class IntroPortrait extends StatelessWidget {
               bangumiDetails: bangumiDetails
             );
           }
-           
-		),
+        ),
 
 
-        const Padding(padding: PaddingV12),
+        const Padding(padding: PaddingV6),
 
          //Entry for Portial
           
@@ -252,7 +251,8 @@ class IntroPortrait extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: BuildTags(tagsList: bangumiDetails.tagsList)
           )
-)
+        )
+
       ]
     );
       

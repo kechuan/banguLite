@@ -1,3 +1,4 @@
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
@@ -35,101 +36,104 @@ class BangumiSummary extends StatelessWidget {
                             
     }
 
-    return ValueListenableBuilder(
-      valueListenable: expandedSummaryNotifier,
-      builder: (_,expandedStatus,child) {
-        return Stack(
-          children: [
-
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              height: expandedStatus ? 300 : MediaQuery.sizeOf(context).height/4,
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.sizeOf(context).width,
-              ),
-              padding: const EdgeInsets.all(12),
-              child: LayoutBuilder(
-                builder: (_,constraint) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8), //16
-                        child: ScalableText("简介",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)), // 24*(aspectRatio) => 34
-                      ),
-                  
-                      expandedStatus ? 
-                      Expanded(child: child!) : 
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxHeight: constraint.maxHeight - 50, // 16 + 34 => 50
+    return NotificationListener<ScrollNotification>(
+      onNotification: (_) => true,
+      child: ValueListenableBuilder(
+        valueListenable: expandedSummaryNotifier,
+        builder: (_,expandedStatus,child) {
+          return Stack(
+            children: [
+      
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                height: expandedStatus ? 300 : MediaQuery.sizeOf(context).height/4,
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.sizeOf(context).width,
+                ),
+                padding: Padding12,
+                child: LayoutBuilder(
+                  builder: (_,constraint) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8), //16
+                          child: ScalableText("简介",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)), // 24*(aspectRatio) => 34
                         ),
-                        child: child!,
-                      ),
-                  
-                      expandedStatus ?
-                      Align(
-                        alignment: const Alignment(1.0, 0),
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            border: Border.all(width: 1,color: Colors.green),
-                            borderRadius: BorderRadius.circular(24),
-                            
+                    
+                        expandedStatus ? 
+                        Expanded(child: child!) : 
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxHeight: constraint.maxHeight - 50, // 16 + 34 => 50
                           ),
-                          child: TextButton(
-                            onPressed: ()=> expandedSummaryNotifier.value = false, 
-                            child: const ScalableText("收缩")
-                          ),
-                        )) :
-                      const SizedBox.shrink()
-                  
-                    ],
-                  );
-                }
+                          child: child!,
+                        ),
+                    
+                        expandedStatus ?
+                        Align(
+                          alignment: const Alignment(1.0, 0),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              border: Border.all(width: 1,color: Colors.green),
+                              borderRadius: BorderRadius.circular(24),
+                              
+                            ),
+                            child: TextButton(
+                              onPressed: ()=> expandedSummaryNotifier.value = false, 
+                              child: const ScalableText("收缩")
+                            ),
+                          )) :
+                        const SizedBox.shrink()
+                    
+                      ],
+                    );
+                  }
+                ),
               ),
-            ),
-
-            Positioned.fill(
-              child: Offstage(
-                offstage: expandedStatus,
-                child: InkResponse(
-                  onTap: () => expandedSummaryNotifier.value = !expandedSummaryNotifier.value,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: const LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment(0, 0.3),
-                        colors: [
-                          Color.fromRGBO(162, 167, 146, 0.329),Colors.transparent
-                        ]
-                      )
+      
+              Positioned.fill(
+                child: Offstage(
+                  offstage: expandedStatus,
+                  child: InkResponse(
+                    onTap: () => expandedSummaryNotifier.value = !expandedSummaryNotifier.value,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: const LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment(0, 0.3),
+                          colors: [
+                            Color.fromRGBO(162, 167, 146, 0.329),Colors.transparent
+                          ]
+                        )
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
+              )
+            
+            ],
+          );
+        },
+        child: 
+          SizedBox(
+            width: double.infinity,
+            child: ScalableText(
+              selectable: true,
+              summary ?? "no Data",
+              style: const TextStyle(overflow: TextOverflow.ellipsis),          
+            ),
+          )
           
-          ],
-        );
-      },
-      child: 
-        SizedBox(
-          width: double.infinity,
-          child: ScalableText(
-            selectable: true,
-            summary ?? "no Data",
-            style: const TextStyle(overflow: TextOverflow.ellipsis),          
-          ),
-        )
+            
+          //debugPrint("summary constriant:${constriant.maxHeight}, context:${MediaQuery.sizeOf(context).aspectRatio}");
+               
+            
+          
         
-          
-        //debugPrint("summary constriant:${constriant.maxHeight}, context:${MediaQuery.sizeOf(context).aspectRatio}");
-             
-          
-        
-      
+      ),
     );
   }
 }

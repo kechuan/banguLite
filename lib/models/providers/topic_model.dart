@@ -18,7 +18,7 @@ class TopicModel extends ChangeNotifier{
 
   // topicID => topicDetail
   final Map<int,TopicDetails> topicDetailData = {};  
-  int topicsLength = 0;
+
 
   Future<void> loadSubjectTopics({int? offset = 0}) async {
 
@@ -37,12 +37,10 @@ class TopicModel extends ChangeNotifier{
           BangumiQuerys.topicsQuery..["offset"] = offset!
       ).then((response){
         if(response.data != null){
-          topicsLength = response.data["total"] ?? 0;
-
-          if(topicsLength == 0){
+          
+          if((response.data["total"] ?? 0) == 0){
             debugPrint("subject $subjectID has no topics");
             topicInfoData.addAll([TopicInfo()..topicID = 0]);
-            //topicInfoData.addAll({0:TopicInfo()});
           }
 
           else{
