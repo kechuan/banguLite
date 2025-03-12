@@ -7,16 +7,21 @@ class CachedImageLoader extends StatelessWidget {
   const CachedImageLoader({
     super.key,
     this.imageUrl,
-    this.photoViewStatus
+    this.photoViewStatus,
+    this.borderDecoration,
+    this.boxFit
   });
 
   final String? imageUrl;
   final bool? photoViewStatus;
+  final BoxFit? boxFit;
+  final BoxDecoration? borderDecoration;
+
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
+      decoration: borderDecoration ?? BoxDecoration(
         borderRadius: BorderRadius.circular(24),
           border: Border.all(width: 1)
         ),
@@ -36,7 +41,7 @@ class CachedImageLoader extends StatelessWidget {
                         image: imageProvider,
                         fit: BoxFit.cover,
                       ),
-                      borderRadius: BorderRadius.circular(24)
+                      borderRadius: borderDecoration?.borderRadius ?? BorderRadius.circular(24)
                     ),
                   );
                 },
@@ -100,7 +105,10 @@ class ImageNotAvailable extends StatelessWidget {
         color: Colors.grey.withValues(alpha: 0.5),
       ),
       child: Center(
-        child: ScalableText("Image not available \n $reason")
+        child: ScalableText(
+          "Image Not Available \n $reason",
+          textAlign: TextAlign.center,
+        )
       ),
     );
 

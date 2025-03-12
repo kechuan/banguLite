@@ -1,18 +1,26 @@
+import 'package:bangu_lite/models/base_info.dart';
+import 'package:bangu_lite/models/user_details.dart';
 import 'package:dio/dio.dart';
 
-class TopicInfo{
+class TopicInfo extends BaseInfo {
+
+  TopicInfo();
+
 	int? topicID;
   String? topicName;
 
-  int? creatorID;
-  String? creatorNickName;
-  String? creatorSign;
-  String? creatorAvatarUrl;
-  int? createdTime;
+  //user
+  UserDetails? userInformation;
 
+
+  int? createdTime;
   int? repliesCount;
   String? lastRepliedNickName;
   int? lastRepliedTime;
+
+  factory TopicInfo.empty() {
+    return TopicInfo()..topicID = 0;
+  }
 }
 
 List<TopicInfo> loadTopicsInfo(Response bangumiTopicsInfoResponse){
@@ -24,18 +32,15 @@ List<TopicInfo> loadTopicsInfo(Response bangumiTopicsInfoResponse){
 
 	for(Map currentTopicMap in topicListData){
 		TopicInfo currentTopic = TopicInfo();
+    UserDetails currentUserInformation = loadUserDetails( currentTopicMap["creator"] ?? currentTopicMap["user"] );
 
 			currentTopic
         ..topicID = currentTopicMap["id"]
         ..topicName = currentTopicMap["title"]
-        ..creatorID = currentTopicMap["creator"]["id"]
-        ..creatorNickName = currentTopicMap["creator"]["nickname"]
-        ..creatorSign = currentTopicMap["creator"]["sign"]
-        ..creatorAvatarUrl = currentTopicMap["creator"]["avatar"]["large"]
         ..createdTime = currentTopicMap["createdAt"]
         ..repliesCount = currentTopicMap["replyCount"]
-        //..lastRepliedNickName = currentTopicMap[""]
         ..lastRepliedTime = currentTopicMap["updatedAt"]
+        ..userInformation = currentUserInformation
       ;
 
 			topicsList.add(currentTopic);

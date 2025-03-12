@@ -44,7 +44,7 @@
 			"path": "lib/models/providers/ep_model.dart",
 			"bookmarks": [
 				{
-					"line": 29,
+					"line": 30,
 					"column": 54,
 					"label": "获取EPInfo信息"
 				}
@@ -71,16 +71,6 @@
 			]
 		},
 		{
-			"path": "lib/catalogs/bangumi_topic_page.dart",
-			"bookmarks": [
-				{
-					"line": 24,
-					"column": 31,
-					"label": "subjectTopic——番剧单个topic详情"
-				}
-			]
-		},
-		{
 			"path": "lib/catalogs/bangumi_comment_page.dart",
 			"bookmarks": [
 				{
@@ -94,7 +84,7 @@
 			"path": "lib/catalogs/bangumi_detail_page.dart",
 			"bookmarks": [
 				{
-					"line": 29,
+					"line": 30,
 					"column": 32,
 					"label": "subjectDetail——番剧详情"
 				}

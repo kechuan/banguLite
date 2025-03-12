@@ -35,7 +35,6 @@ class ToggleThemeModeButton extends StatelessWidget {
         shouldRebuild: (previous, next) => previous!=next,
         builder: (_, currentTheme, child){
           return Icon(
-            //currentTheme == ThemeMode.dark ? 
             judgeDarknessMode(context) ? 
             Icons.dark_mode_outlined :
             Icons.wb_sunny_outlined

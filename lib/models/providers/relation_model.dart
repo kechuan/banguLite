@@ -1,60 +1,39 @@
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/models/relation_details.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 
-class RelationModel extends ChangeNotifier{
+/// 相关条目 不存在后续的数据
+class RelationModel extends BaseModel<RelationDetails,Null>{
+
   RelationModel({
-    required this.subjectID
+    required super.subjectID
   }){
     loadSubjectRelations();
   }
 
-  final int subjectID;
-  final List<RelationDetails> subjectRelationData = [];
-
-  Future<void> loadSubjectRelations({int? offset = 0}) async {
-
-    if(subjectID == 0) return;
-
-    if(subjectRelationData.isNotEmpty){
-      debugPrint("Relations already loaded");
-      return;
-    }
-
-    try{
-
-      await HttpApiClient.client.get(
-        BangumiAPIUrls.relations(subjectID),
-      ).then((response){
-        if(response.data != null){
-
-          if((response.data["total"] ?? 0) == 0){
-            debugPrint("subject $subjectID has no relations");
-            subjectRelationData.addAll([RelationDetails()..relationID = 0]);
-          }
-
-          else{
-            subjectRelationData.addAll(loadRelationDetails(response.data));
-          }
-
-          notifyListeners();
-
-        }
-
-
-      });
-
-
-    }
-
-    on DioException catch(e){
-      debugPrint("Request Error:${e.toString()}");
-    }
-
+  Future<void> loadSubjectRelations({
+    SubjectType type = SubjectType.anime,
+    int offset = 0
+  }) async {
+    await loadSubjectSubContentList(
+      queryParameters: BangumiQuerys.relationsQuery
+        ..["type"] = type.subjectType
+        ..["offset"] = offset
+    );
   }
-
   
+  @override
+  List<RelationDetails> convertResponseToList(Response subContentListResponseData) => loadRelationDetails(subContentListResponseData.data);
 
+  @override
+  List<RelationDetails> createEmptyInfoList() => [RelationDetails.empty()];
 
+  @override
+  String getContentListUrl(int subjectID) => BangumiAPIUrls.relations(subjectID);
+  
+  @override
+  String getContentDetailUrl(int contentID) => "";
+  
 }

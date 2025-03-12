@@ -4,10 +4,11 @@ import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/ep_details.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/providers/review_model.dart';
+import 'package:bangu_lite/models/review_details.dart';
 
 import 'package:bangu_lite/models/topic_details.dart';
 import 'package:bangu_lite/models/topic_info.dart';
-import 'package:bangu_lite/models/user_details.dart';
 
 import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -20,72 +21,31 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-@FFAutoImport()
-import 'package:bangu_lite/models/providers/topic_model.dart';
 
-@FFRoute(name: '/subjectTopic')
-class BangumiTopicPage extends StatefulWidget {
-  const BangumiTopicPage({
+@FFAutoImport()
+@FFRoute(name: '/Blog')
+class BangumiBlogPage extends StatelessWidget {
+  const BangumiBlogPage({
     super.key,
-    required this.topicModel,
-	  required this.topicInfo
+    required this.reviewModel,
+	  required this.ReviewInfo
   });
 
-  final TopicModel topicModel;
-  final TopicInfo topicInfo;
-
-  @override
-  State<BangumiTopicPage> createState() => _BangumiTopicPageState();
-}
-
-class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
-
-
-  bool isActived = true;
-  Future? topicFuture;
-  final ScrollController scrollController = ScrollController();
   
-  //在极端状况之下 说不定会出现 (BangumiDetailPageA)EpPage => BangumiDetailPageB => EpPageB...
-  //此时 整个路由链存活的 EpPageState 都会触发这个 AppRoute 那就麻烦了, 因此需要加以管控
+  final ReviewModel reviewModel;
+  final ReviewInfo ReviewInfo;
 
-  @override
-  void initState() {
-    bus.on(
-      'AppRoute',
-      (link) {
-        if(!isActived) return;
-        if(!mounted) return;
-        appRouteMethod(context,link);
-      }
-    );
-    
-    super.initState();
-  }
-
-  @override
-  void didPushNext() {
-    isActived = false;
-    super.didPushNext();
-  }
-
-  @override
-  void didPopNext() {
-    isActived = true;
-    super.didPopNext();
-  }
+  final TopicInfo topicInfo;
 
   @override
   Widget build(BuildContext context) {
 
-    final topicModel = widget.topicModel;
-
     return ChangeNotifierProvider.value(
-			value: topicModel,
+			value: reviewModel,
 			builder: (context,child){
 
-        if(widget.topicInfo.topicID == 0) return const SizedBox.shrink();
 
-				topicFuture ??= topicModel.loadTopic(widget.topicInfo.topicID!);
+				topicFuture ??= reviewModel.loadTopic(widget.topicInfo.topicID!);
 
 				return EasyRefresh.builder(
           scrollController: scrollController,
@@ -93,8 +53,8 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
 					
 						return Scaffold(
 
-							body: Selector<TopicModel,TopicDetails>(
-								selector: (_, topicModel) => topicModel.contentDetailData[widget.topicInfo.topicID!] ?? TopicDetails(),
+							body: Selector<reviewModel,TopicDetails>(
+								selector: (_, reviewModel) => reviewModel.contentDetailData[widget.topicInfo.topicID!] ?? TopicDetails(),
 								shouldRebuild: (previous, next) => previous != next,
 								builder: (_,contentDetailData,topicComment) {
 
@@ -152,9 +112,9 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
 									future: topicFuture,
 									builder: (_,snapshot) {
 
-										final TopicDetails? currentTopicDetail = topicModel.contentDetailData[widget.topicInfo.topicID!]; 
+										final TopicDetails? currentTopicDetail = reviewModel.contentDetailData[widget.topicInfo.topicID!]; 
 								
-										bool isCommentLoading = currentTopicDetail == null || currentTopicDetail.topicID == 0;
+										bool isCommentLoading = currentTopicDetail == null ||	currentTopicDetail.topicID == null;
 								
 										int? commentCount;
 								
@@ -177,7 +137,7 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                             }
                       
                             if(topicCommentIndex == 0){
-
+                      
                               return ListView(
                                 physics: const NeverScrollableScrollPhysics(),
                                 
@@ -186,15 +146,9 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
 
                                   EpCommentView(
                                     epCommentData: EpCommentDetails()
-                                      ..userInformation = 
-                                        (
-                                          UserDetails()
-                                            ..userID = widget.topicInfo.userInformation?.userID
-                                            ..avatarUrl = widget.topicInfo.userInformation?.avatarUrl
-                                            ..nickName =  widget.topicInfo.userInformation?.nickName
-                                            ..sign = widget.topicInfo.userInformation?.sign
-                                        )
-                                      
+                                      ..avatarUrl = widget.topicInfo.creatorAvatarUrl
+                                      ..nickName =  widget.topicInfo.creatorNickName
+                                      ..sign = widget.topicInfo.creatorSign
                                       ..comment = currentTopicDetail.content
                                       ..commentTimeStamp = currentTopicDetail.createdTime
                                   ),
@@ -202,11 +156,13 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                                   Padding(
                                     padding: const EdgeInsets.all(16),
                                     child: Row(
-                                      spacing: 12,
                                       children: [
                                         const ScalableText("回复",style: TextStyle(fontSize: 24)),
                                                   
+                                        const Padding(padding: PaddingH6),
+                                                  
                                         ScalableText("$commentCount",style: const TextStyle(color: Colors.grey)),
+                                                  
                                                   
                                       ],
                                     ),
@@ -217,8 +173,8 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
                       
                             }
                       
-                            //TODO 待修改 改为 first 无评论的显示状态
-                            if(currentTopicDetail.topicRepliedComment?.isEmpty == true){
+                            //无评论的显示状态
+                            if(currentTopicDetail.topicRepliedComment!.isEmpty){
                               return const Center(
                                 child: Padding(
                                   padding: EdgeInsets.only(top:64),
@@ -250,3 +206,47 @@ class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
    }
 }
 
+class TopicInfoWidget extends StatelessWidget {
+  
+  const TopicInfoWidget({
+    super.key,
+	required this.topicInfoData
+    
+    
+  });
+
+  final TopicInfo topicInfoData;
+
+  @override
+  Widget build(BuildContext context) {
+
+    if(topicInfoData.topicID == null){
+      return const Skeletonizer(
+        child: SkeletonListTileTemplate()
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        ListTile(
+          title: Row(
+            children: [
+              ScalableText("${topicInfoData.topicName}"),
+              const Padding(padding: PaddingH6),
+            //  ScalableText("${topicInfoData.}",style: const TextStyle(fontSize: 14,color: Colors.grey)),
+            ],
+          ),
+          
+        ),
+
+        //ListTile(
+        //  title:  ScalableText("${topicInfoData.!.description}"),
+        //),
+
+       
+      ],
+    );
+  }
+}

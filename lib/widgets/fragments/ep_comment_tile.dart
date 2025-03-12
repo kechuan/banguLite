@@ -32,6 +32,8 @@ class EpCommentTile extends StatelessWidget {
       commentBlockStatus = true;
     }
 
+    DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch((epCommentData.commentTimeStamp ?? 0)*1000);
+
 
     return ListTile(
       
@@ -48,14 +50,14 @@ class EpCommentTile extends StatelessWidget {
               SizedBox(
                 height: 50,
                 width: 50,
-                child: CachedImageLoader(imageUrl: epCommentData.avatarUrl)
+                child: CachedImageLoader(imageUrl: epCommentData.userInformation?.avatarUrl)
               ),
 
               //可压缩信息 Expanded
               Expanded(
                 flex: 2,
                 child: ScalableText(
-                  "${epCommentData.nickName ?? epCommentData.userID ?? "no data"}",
+                  epCommentData.userInformation?.nickName ?? epCommentData.userInformation?.userName ?? "no data",
                     style: const TextStyle(color: Colors.blue),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -77,24 +79,13 @@ class EpCommentTile extends StatelessWidget {
                           
                     ScalableText(epCommentData.epCommentIndex== null ? "" : "#${epCommentData.epCommentIndex}"),
                           
-                    Builder(
-                      builder: (_){
-                        DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(epCommentData.commentTimeStamp!*1000);
-                        return ScalableText(
-                          "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)}"
-                        );
-                      }
+                    ScalableText(
+                      "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)}"
                     ),
 
-                    Builder(
-                      builder: (_){
-                        DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(epCommentData.commentTimeStamp!*1000);
-                        return ScalableText(
-                          "${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}",
-                        );
-                      }
-                    ),
-
+                    ScalableText(
+                      "${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}",
+                    )
 
                   ],
                 ),
@@ -105,12 +96,12 @@ class EpCommentTile extends StatelessWidget {
           ),
 
           Builder(builder: (_){
-            if(epCommentData.sign == null || epCommentData.sign!.isEmpty){
+            if(epCommentData.userInformation?.sign == null || epCommentData.userInformation!.sign!.isEmpty){
                 return const SizedBox.shrink();
             }
             return Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: ScalableText("(${epCommentData.sign})",style:const TextStyle(color: Colors.grey)),
+              child: ScalableText("(${epCommentData.userInformation?.sign})",style:const TextStyle(color: Colors.grey)),
             );
           }),
 
@@ -120,7 +111,7 @@ class EpCommentTile extends StatelessWidget {
 
       subtitle: Padding(
         padding: EdgeInsets.only(
-          top: epCommentData.sign == null || epCommentData.sign!.isEmpty ? 32 : 6
+          top: epCommentData.userInformation?.sign == null || epCommentData.userInformation!.sign!.isEmpty ? 32 : 6
         ),
         child: Column(
           spacing: 12,

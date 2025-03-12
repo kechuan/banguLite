@@ -1,8 +1,11 @@
 
+import 'package:bangu_lite/models/base_details.dart';
 import 'package:bangu_lite/models/ep_details.dart';
-import 'package:dio/dio.dart';
 
-class TopicDetails {
+class TopicDetails extends BaseDetails {
+
+  TopicDetails();
+
   int? topicID;
   String? title;
   String? content;
@@ -12,23 +15,23 @@ class TopicDetails {
   Map<int,Set<String>>? topicReactions;
   List<EpCommentDetails>? topicRepliedComment;
 
+
+
+  factory TopicDetails.empty() => TopicDetails()..topicID = 0;
+
 }
 
-TopicDetails loadTopicDetails(Response bangumiTopicDetailResponse){
+TopicDetails loadTopicDetails(Map<String,dynamic> topicData){
 
-	Map topicList = bangumiTopicDetailResponse.data;
-	TopicDetails currentTopic = TopicDetails();
-	List topicRepliedListData = bangumiTopicDetailResponse.data["replies"];
+	final currentTopic = TopicDetails();
 
 	currentTopic
-		..topicID = topicList["id"]
-		..title = topicList["title"]
-		..content = topicList["content"]
-		..state = topicList["state"]
-		..createdTime = topicList["createdAt"]
-		..topicRepliedComment = loadEpCommentDetails(topicRepliedListData)
-    
-    //..topicRepliedComment = loadTopicCommentDetails(topicRepliedListData)
+		..topicID = topicData["id"]
+		..title = topicData["title"]
+		..content = topicData["content"]
+		..state = topicData["state"]
+		..createdTime = topicData["createdAt"]
+		..topicRepliedComment = loadEpCommentDetails(topicData["replies"])
 	;
 
 	return currentTopic;

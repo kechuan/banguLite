@@ -46,7 +46,7 @@ class EpRepliedTile extends ListTile {
                       spacing: 12,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ScalableText("${epCommentData.repliedComment![index].nickName}:"),
+                        ScalableText("${epCommentData.repliedComment![index].userInformation?.nickName}:"),
 
                         Expanded(
                           child: ConstrainedBox(

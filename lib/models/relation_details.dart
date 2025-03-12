@@ -1,11 +1,16 @@
 import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/models/base_info.dart';
 
-class RelationDetails{
+class RelationDetails extends BaseInfo{
+  RelationDetails();
+
   BangumiDetails? subjectDetail;
 
   int? relationID;
   String? name;
   String? description;
+
+  factory RelationDetails.empty() => RelationDetails()..relationID = 0;
 
 }
 

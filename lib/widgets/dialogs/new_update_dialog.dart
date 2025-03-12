@@ -119,7 +119,14 @@ class NewUpdateDialog extends StatelessWidget {
               shape: const Border(),
               onExpansionChanged:(infoCollapseStatus) => expandedStatusNotifier.value = infoCollapseStatus,
               children: [
-                ScalableText("${latestRelease.body}")
+                SizedBox(
+                  height: 200,
+                  child: ListView(
+                    children: [
+                      ScalableText("${latestRelease.body}")
+                    ],
+                  ),
+                )
               ],
             ),
 

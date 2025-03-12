@@ -1,100 +1,36 @@
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/models/topic_details.dart';
 import 'package:bangu_lite/models/topic_info.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 
-class TopicModel extends ChangeNotifier{
+class TopicModel extends BaseModel<TopicInfo, TopicDetails> {
   TopicModel({
-    required this.subjectID
+    required super.subjectID
   }){
     loadSubjectTopics();
   }
 
-  final int subjectID;
-
-  final List<TopicInfo> topicInfoData = [];
-  //final Map<int,TopicInfo> topicInfoData = {};
-
-  // topicID => topicDetail
-  final Map<int,TopicDetails> topicDetailData = {};  
-
-
   Future<void> loadSubjectTopics({int? offset = 0}) async {
-
-    if(subjectID == 0) return;
-
-    if(topicInfoData.isNotEmpty){
-      debugPrint("topics already loaded");
-      return;
-    }
-
-    try{
-
-      await HttpApiClient.client.get(
-        BangumiAPIUrls.topics(subjectID),
-        queryParameters: 
-          BangumiQuerys.topicsQuery..["offset"] = offset!
-      ).then((response){
-        if(response.data != null){
-          
-          if((response.data["total"] ?? 0) == 0){
-            debugPrint("subject $subjectID has no topics");
-            topicInfoData.addAll([TopicInfo()..topicID = 0]);
-          }
-
-          else{
-            topicInfoData.addAll(loadTopicsInfo(response));
-          }
-
-          notifyListeners();
-
-        }
-
-
-      });
-
-
-    }
-
-    on DioException catch(e){
-      debugPrint("Request Error:${e.toString()}");
-    }
-
+    await loadSubjectSubContentList(
+      queryParameters: BangumiQuerys.topicsQuery
+        ..["offset"] = offset ?? 0
+    );
   }
 
-  Future<void> loadTopic(int topicID) async {
+  Future<void> loadTopic(int topicID) async => await loadContentDetail(topicID);
 
-    if(topicID == 0) return;
-
-    if(topicDetailData[topicID] != null){
-      debugPrint("topic: $topicID already loaded or in processing");
-      return;
-    }
-
-    //初始化占位
-    topicDetailData.addAll({topicID:TopicDetails()});
-
-    try{
-
-      await HttpApiClient.client.get(
-        BangumiAPIUrls.topicComment(topicID),
-      ).then((response){
-        if(response.data != null){
-          topicDetailData.addAll({topicID:loadTopicDetails(response)});
-
-          debugPrint("$topicID load topic done");
-          
-          notifyListeners();
-        }
-
-      });
-    }
-
-    on DioException catch(e){
-      debugPrint("Request Error:${e.toString()}");
-    }
-  }
-
+  @override
+  List<TopicInfo> createEmptyInfoList() => [TopicInfo.empty()];
+  @override
+  TopicDetails createEmptyDetails() => TopicDetails.empty();
+  @override
+  String getContentListUrl(int subjectID) => BangumiAPIUrls.topics(subjectID);
+  @override
+  String getContentDetailUrl(int contentID) => BangumiAPIUrls.topicComment(contentID);
+  @override
+  List<TopicInfo> convertResponseToList(Response subContentListResponseData) => loadTopicsInfo(subContentListResponseData);
+  @override
+  TopicDetails convertResponseToDetail(Map<String,dynamic> contentResponseData) => loadTopicDetails(contentResponseData);
 
 }

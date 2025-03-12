@@ -8,6 +8,7 @@ class ScalableText extends Text {
     super.maxLines,
     super.overflow,
     super.style,
+    super.textAlign,
     this.selectable = false
   }) : super('');
 
@@ -23,21 +24,25 @@ class ScalableText extends Text {
 
     return selectable ?
     SelectableText(
+      
       text,
       style: currentStyle.copyWith(
         fontSize: originalSize != null ? 
           AppFontSize.getScaledSize(originalSize) : 
           AppFontSize.getScaledSize(AppFontSize.s16)
       ),
+      textAlign:textAlign,
       maxLines: maxLines,
     ) :
     Text(
       text,
+      
       style: currentStyle.copyWith(
         fontSize: originalSize != null ? 
           AppFontSize.getScaledSize(originalSize) : 
           AppFontSize.getScaledSize(AppFontSize.s16)
       ),
+      textAlign:textAlign,
       maxLines: maxLines,
       overflow: overflow,
     );

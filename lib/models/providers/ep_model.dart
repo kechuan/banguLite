@@ -2,6 +2,7 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/ep_details.dart';
 import 'package:bangu_lite/models/eps_info.dart';
+import 'package:bangu_lite/models/user_details.dart';
 import 'package:flutter/material.dart';
 
 class EpModel extends ChangeNotifier{
@@ -135,9 +136,15 @@ class EpModel extends ChangeNotifier{
 
 			epCommentData[selectedEp] = loadEpCommentDetails(response.data);
 
-			//空处理 userID = 0 代表为空
+			//空处理 userName = 0 代表为空
 			if(epCommentData[selectedEp]!.isEmpty){
-				epCommentData[selectedEp] = [EpCommentDetails()..userID = 0];
+				epCommentData[selectedEp] = [
+          EpCommentDetails()
+            ..userInformation = (
+              UserDetails()..userID = 0
+            )
+            
+        ];
 			}
 			
 			debugPrint("$subjectID load Ep.$selectedEp detail done");

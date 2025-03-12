@@ -214,12 +214,12 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                   
                                                   onTap: (){
                                                                     
-                                                    debugPrint("$currentIndex => ${currentIndex % weeklyBangumisRecommend.length} => ${weeklyBangumisRecommend[currentIndex % weeklyBangumisRecommend.length].name} ");
+                                                    debugPrint("$currentIndex => ${weeklyBangumisRecommend[currentIndex].name} ");
                                                       
                                                     Navigator.pushNamed(
                                                       context,
                                                       Routes.subjectDetail,
-                                                      arguments: {"subjectID":weeklyBangumisRecommend[currentIndex % weeklyBangumisRecommend.length].id},
+                                                      arguments: {"subjectID":weeklyBangumisRecommend[currentIndex].id},
                                                     );
                                                             
                                                   },

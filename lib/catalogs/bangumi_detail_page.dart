@@ -1,5 +1,7 @@
 
 import 'package:bangu_lite/models/providers/relation_model.dart';
+import 'package:bangu_lite/models/providers/review_model.dart';
+import 'package:bangu_lite/widgets/components/bangumi_detail_recent_review.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_relations.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -17,7 +19,6 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
-import 'package:bangu_lite/widgets/components/bangumi_detail_recent_review.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_topics.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
@@ -54,9 +55,10 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
       providers: [
         ChangeNotifierProvider(create: (_) => BangumiModel(subjectID: widget.subjectID)),
         ChangeNotifierProvider(create: (_) => EpModel(subjectID: widget.subjectID,selectedEp: 1)),
-        ChangeNotifierProvider(create: (_) => CommentModel(subjectID: widget.subjectID)),
+        ChangeNotifierProvider(create: (_) => RelationModel(subjectID: widget.subjectID)),
+        ChangeNotifierProvider(create: (_) => ReviewModel(subjectID: widget.subjectID)),
         ChangeNotifierProvider(create: (_) => TopicModel(subjectID: widget.subjectID)),
-        ChangeNotifierProvider(create: (_) => RelationModel(subjectID: widget.subjectID))
+        ChangeNotifierProvider(create: (_) => CommentModel(subjectID: widget.subjectID)),
       ],
       child: Selector<BangumiModel,Color?>(
         selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
@@ -208,7 +210,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
 
                                                 BangumiSummary(summary: currentSubjectDetail?.summary),
                                                 
-                                                //BangumiDetailRecentReview(name: bangumiModel.bangumiDetails?.name),
+                                                const BangumiDetailRecentReview(),
 
                                                 const BangumiDetailRelations(),
 

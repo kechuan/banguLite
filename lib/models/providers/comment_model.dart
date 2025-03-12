@@ -73,7 +73,7 @@ class CommentModel extends ChangeNotifier {
         debugPrint("comment subjectID $subjectID: was empty!");
 
         //因为 null/[] 已经被用来占用为 标志位了 无数据返回部分就以这种形式进行处理
-        commentsData.addAll({1:[CommentDetails()..userId = 0]});
+        commentsData.addAll({1:[CommentDetails()..userName = 0]});
 
         notifyListeners();
         return;
@@ -159,7 +159,7 @@ class CommentModel extends ChangeNotifier {
         debugPrint("wrong! server no response");
 
         commentsData.addAll({
-          pageIndex:[CommentDetails()..userId = 0],
+          pageIndex:[CommentDetails()..userName = 0],
         });
 
       }
@@ -167,8 +167,6 @@ class CommentModel extends ChangeNotifier {
       
       debugPrint("comment: subjectID $subjectID: $pageIndex parse done, commentStamp: ${DateTime.now()}");
 
-
-      //if(id!=0) commentID = id;
       notifyListeners();
 
     }

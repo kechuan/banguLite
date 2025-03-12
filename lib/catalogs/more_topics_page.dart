@@ -67,7 +67,7 @@ class MoreTopicsPage extends StatelessWidget {
                     child: Row(
                       children: [
                     
-                        ScalableText("${topicsList[index].creatorNickName}"),
+                        ScalableText("${topicsList[index].userInformation?.nickName}"),
                     
                         const Spacer(),
                     

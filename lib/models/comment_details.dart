@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 
 class CommentDetails {
 
-  int? userId;
+  int? userName;
   String? nickName;
   String? avatarUrl;
   
@@ -35,7 +35,7 @@ List<CommentDetails> loadCommentResponse(Response commentDetailResponse) {
       final CommentDetails commentDetails = CommentDetails();
       
         commentDetails
-          ..userId = currentComment["user"]["id"]
+          ..userName = currentComment["user"]["id"]
           ..nickName = currentComment["user"]["nickname"]
           ..rate = currentComment["rate"]
           ..type = currentComment["type"]

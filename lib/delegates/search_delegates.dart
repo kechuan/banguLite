@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 class CustomSearchDelegate extends SearchDelegate<String>{
 
-  List<BangumiDetails> searchResult = [];
+  ValueNotifier<SubjectType> searchTypesNotifier = ValueNotifier(SubjectType.anime);
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -24,7 +25,68 @@ class CustomSearchDelegate extends SearchDelegate<String>{
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
-      IconButton(onPressed: ()=> query = "", icon: const Icon(Icons.close))
+      Row(
+        spacing: 6,
+        children: [
+
+          ValueListenableBuilder(
+            valueListenable: searchTypesNotifier,
+             builder: (_,currentSortType,child) {
+
+
+               return SizedBox(
+                width: 60,
+                 child: PopupMenuButton<SubjectType>(
+                  tooltip: "搜索类别",
+                  initialValue: currentSortType,
+                  position:PopupMenuPosition.under,
+                  itemBuilder: (_) {
+                    return List.generate(
+                      SubjectType.values.length, 
+                      (index) => PopupMenuItem(
+                        value: SubjectType.values[index],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(SubjectType.values[index].iconData),
+                            Text(SubjectType.values[index].name)
+                          ],),
+                      ),
+                    );
+                  },
+                                    
+                  onSelected: (selectedValue)=> searchTypesNotifier.value = selectedValue,
+                                    
+                  child: SizedBox(
+                    height: 50,
+                    child: Row(
+                      
+                      children: [
+                    
+                        Expanded(
+                          child: Padding(
+                            padding: PaddingH6,
+                            child: Icon(searchTypesNotifier.value.iconData),
+                          ),
+                        ),
+                    
+                        const Icon(Icons.arrow_drop_down)
+                    
+                      ],
+                    ),
+                  ),
+                                    
+                  ),
+               );
+             }
+           ),
+
+
+
+          IconButton(onPressed: ()=> query = "", icon: const Icon(Icons.close)),
+        ],
+      ),
+
     ];
   }
 
@@ -63,9 +125,17 @@ class CustomSearchDelegate extends SearchDelegate<String>{
             debugPrint("suggestion get result done.");
 
             return FutureBuilder( //requsetAPI
-              future: sortSearchHandler(keyword:query).then((result){
+              future: sortSearchHandler(
+                keyword:query,
+                subjectType: 
+                  searchTypesNotifier.value == SubjectType.all ? 
+                  SubjectTypeExtension.subjectTypes :
+                  [searchTypesNotifier.value.subjectType]
+                ,
+                
+
+              ).then((result){
                 debugPrint("done: search query: $query, result: $result");
-                //searchResult = result;
                 return result;
               }),
               builder: (_,searchSnapshot){
@@ -133,7 +203,14 @@ class CustomSearchDelegate extends SearchDelegate<String>{
     debugPrint("search results build");
 
     return FutureBuilder( //requsetAPI
-      future: sortSearchHandler(keyword:query),
+      future: sortSearchHandler(
+        keyword:query,
+        subjectType: 
+          searchTypesNotifier.value == SubjectType.all ? 
+          SubjectTypeExtension.subjectTypes :
+          [searchTypesNotifier.value.subjectType]
+        ,
+      ),
       builder: (_,searchSnapshot){
 
         switch(searchSnapshot.connectionState){

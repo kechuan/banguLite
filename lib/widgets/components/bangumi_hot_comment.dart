@@ -106,7 +106,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                               }
                               
                               //无评论的显示状态
-                              if(commentListData.length == 1 && commentListData[0].userId == 0){
+                              if(commentListData.length == 1 && commentListData[0].userName == 0){
                                 return const Center(
                                   child: ScalableText("该番剧暂无人评论..."),
                                 );
@@ -153,7 +153,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
                                 final commentModel = context.read<CommentModel>();
 
-                                if(commentModel.commentsData.values.first.length == 1 && commentModel.commentsData.values.first[0].userId == 0){
+                                if(commentModel.commentsData.values.first.length == 1 && commentModel.commentsData.values.first[0].userName == 0){
                                   debugPrint("no comment");
                                   return;
                                 }

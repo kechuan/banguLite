@@ -1,20 +1,17 @@
 
 
+import 'package:bangu_lite/models/user_details.dart';
+
 class EpCommentDetails{
-    int? userID;
-    String? epCommentIndex;
 
-    String? nickName; //
-    String? avatarUrl;
-    String? sign;
-    int? state;
     String? comment;
+    String? epCommentIndex;
     int? commentTimeStamp;
-
     Map<int,Set<String>>? commentReactions;
-
+    int? state;
     List<EpCommentDetails>? repliedComment;
-    
+
+    UserDetails? userInformation;
     
 }
 
@@ -30,6 +27,7 @@ List<EpCommentDetails> loadEpCommentDetails(
 
 	for(Map currentEpCommentMap in epCommentListData){
 		EpCommentDetails currentEpComment = EpCommentDetails();
+    UserDetails currentUserInformation = loadUserDetails(currentEpCommentMap["user"] ?? currentEpCommentMap["creator"]);
 
 		currentCommentIndex+=1;
 
@@ -39,12 +37,8 @@ List<EpCommentDetails> loadEpCommentDetails(
         ..commentTimeStamp = currentEpCommentMap["createdAt"]
 
         //user => epComment / creator => topicComment
-        ..userID = currentEpCommentMap["user"]?["id"] ?? currentEpCommentMap["creatorID"]
-        ..avatarUrl = currentEpCommentMap["user"]?["avatar"]["large"] ?? currentEpCommentMap["creator"]?["avatar"]["large"]
-        ..nickName = currentEpCommentMap["user"]?["nickname"] ?? currentEpCommentMap["creator"]?["nickname"]
-        ..sign = currentEpCommentMap["user"]?["sign"] ?? currentEpCommentMap["creator"]?["sign"]
+        ..userInformation = currentUserInformation
 
-        //..epCommentIndex = "$currentCommentIndex"
         ..epCommentIndex = repilyCommentIndex != null ? "$repilyCommentIndex-$currentCommentIndex" : "$currentCommentIndex"
         ..commentReactions = loadReactionDetails(currentEpCommentMap["reactions"])
 			;
@@ -80,7 +74,6 @@ Map<int,Set<String>> loadReactionDetails(List? reactionListData){
     reactionCount.addAll({
       currentReaction["value"] : 
       currentReaction["users"].map<String>(
-        //(currentUser) => currentUser["nickname"]
         (currentUser) => currentUser["nickname"].toString()
       ).toSet()
     });

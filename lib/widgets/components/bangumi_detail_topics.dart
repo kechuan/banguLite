@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
@@ -23,19 +24,18 @@ class BangumiDetailTopics extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-  ValueNotifier<bool> topicCollapseStatusNotifier = ValueNotifier(true);
+  final ValueNotifier<bool> topicCollapseStatusNotifier = ValueNotifier(true);
 
     
 	  final bangumiModel = context.read<BangumiModel>();
     final topicModel = context.read<TopicModel>();
 
     return Padding(
-        padding: const EdgeInsets.all(12.0),
-
-        child:  Selector<TopicModel,List<TopicInfo>>(
+        padding: Padding12,
+        child: Selector<TopicModel,List<TopicInfo>>(
           selector: (_, topicModel){
-             if(topicModel.topicInfoData.isEmpty) return [];
-             return topicModel.topicInfoData;
+             if(topicModel.contentListData.isEmpty) return [];
+             return topicModel.contentListData;
           },
           shouldRebuild: (previous, next) {
             if(previous.isEmpty || next.isEmpty) return true;
@@ -58,7 +58,7 @@ class BangumiDetailTopics extends StatelessWidget {
                         ValueListenableBuilder(
                           valueListenable: topicCollapseStatusNotifier,
                           builder: (_,topicCollapseStatus,child){
-                            return topicCollapseStatus ?  const Icon(Icons.arrow_drop_up_outlined) : const Icon(Icons.arrow_drop_down_outlined);
+                            return topicCollapseStatus ?  const Icon(Icons.arrow_drop_down_outlined) : const Icon(Icons.arrow_drop_up_outlined);
                           }
                         )
                       ],
@@ -71,11 +71,10 @@ class BangumiDetailTopics extends StatelessWidget {
                         padding: const EdgeInsets.only(right: 12),
                         
                         child: TextButton(
-                          
             
                           onPressed: (){
 
-                            if(topicsList[0].topicID == 0) return;
+                            if(topicsList.first.topicID == 0) return;
 
                             Navigator.pushNamed(
                               context,
@@ -89,7 +88,7 @@ class BangumiDetailTopics extends StatelessWidget {
                             );
 
                           },
-                          child: ScalableText("更多讨论 >",style: TextStyle(decoration: TextDecoration.underline,color: topicsList.isEmpty || topicsList[0].topicID == 0 ? Colors.grey : null)),  
+                          child: ScalableText("更多讨论 >",style: TextStyle(decoration: TextDecoration.underline,color: topicsList.isEmpty || topicsList.first.topicID == 0 ? Colors.grey : null)),  
                         )
                       )
             
@@ -101,24 +100,24 @@ class BangumiDetailTopics extends StatelessWidget {
                   child: Builder(
                     builder: (_) {
                       if(topicsList.isEmpty) return const SkeletonListTileTemplate();
-                      if(topicsList[0].topicID == 0) return const Center(child: ScalableText("该番剧暂无讨论版..."));
+                      if(topicsList.first.topicID == 0) return const Center(child: ScalableText("该番剧暂无讨论版..."));
             
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: min(6,topicsList.length),
-                        itemBuilder: (context, index) {
-            
-                          final topicCreateTime = DateTime.fromMillisecondsSinceEpoch(topicsList[index].createdTime!*1000);
-                                      
-                          return Theme(
-                            data: ThemeData(
-                              fontFamily: 'MiSansFont'
-                            ),
-                            child: Card(
+                      return Theme(
+                        data: ThemeData(
+                          fontFamily: 'MiSansFont',
+                          brightness: judgeDarknessMode(context) ? Brightness.dark : null
+                        ),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: min(6,topicsList.length),
+                          itemBuilder: (context, index) {
+                                    
+                            final topicCreateTime = DateTime.fromMillisecondsSinceEpoch(topicsList[index].createdTime!*1000);
+                                        
+                            return Card(
                               color: judgeDetailRenderColor(context,bangumiModel.bangumiThemeColor),
                               child: ListTile(
-                                
                                 title: ScalableText("${topicsList[index].topicName}"),
                                 trailing: ScalableText(convertDateTimeToString(topicCreateTime)),
                                 onTap: () {
@@ -132,11 +131,11 @@ class BangumiDetailTopics extends StatelessWidget {
                                   );
                                 },
                               ),
-                            ),
-                          );
-                                      
-                                      
-                        },
+                            );
+                                        
+                                        
+                          },
+                        ),
                       );
                     }
                   ),

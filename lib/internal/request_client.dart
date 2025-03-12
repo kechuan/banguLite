@@ -41,11 +41,17 @@ class BangumiAPIUrls {
   static String comment(int subjectID) => '$newUrl/p1/subjects/$subjectID/comments';
 
   //25.1.10 更新
-  //static String epComment(int epID) => '$newUrl/p1/subjects/-/episode/$epID/comments';
+
+  //subject
   static String epComment(int epID) => '$newUrl/p1/episodes/$epID/comments';
   static String topics(int subjectID) => '$newUrl/p1/subjects/$subjectID/topics';
   static String topicComment(int topicID) => '$newUrl/p1/subjects/-/topics/$topicID';
   static String relations(int subjectID) => '$newUrl/p1/subjects/$subjectID/relations';
+  static String reviews(int subjectID) => '$newUrl/p1/subjects/$subjectID/reviews';
+
+  //user
+  static String user(String username) => '$newUrl/p1/blogs/$username';
+  static String blog(int blogID) => '$newUrl/p1/blogs/$blogID';
 
 }
 
@@ -58,6 +64,9 @@ class BangumiWebUrls{
   static String subjectTopic(int topicID) => '$baseUrl/subject/topic/$topicID';
 
   static String ep(int epID) => '$baseUrl/ep/$epID';
+  static String user(String username) => '$baseUrl/user/$username';
+  static String blog(int blogID) => '$baseUrl/blog/$blogID';
+  static String blogComment(int blogID) => '${blog(blogID)}/comment';
 
   static String relativeSubject(int subjectID) => '$relativeUrl/subject/$subjectID';
   //static String relativeSubjectComment(int subjectID) => '$relativeUrl/subject/$subjectID/comments';
@@ -80,7 +89,8 @@ class BangumiQuerys {
                           sortQuery = {"limit":10,"offset":0},
                           topicsQuery = {"limit":30,"offset":0},
                           epQuery = {"subject_id":0,"limit":100,"offset":0},
-                          relationsQuery = {"type":2,"limit":20,"offset":0}
+                          relationsQuery = {"type":2,"limit":20,"offset":0},
+                          reviewsQuery = {"limit":5,"offset":0}
   ;
                              
 

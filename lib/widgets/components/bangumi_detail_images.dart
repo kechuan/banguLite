@@ -75,7 +75,7 @@ class BuildDetailImages extends StatelessWidget {
                 borderRadius: BorderRadius.circular(24),
                 color: Colors.grey.withValues(alpha: 0.5),
               ),
-            child: const Center(child: ScalableText("Image not available")),
+            child: const Center(child: ScalableText("Image Not Available")),
           );
         },
         
