@@ -54,10 +54,8 @@ abstract class BaseModel<I extends BaseInfo, D extends BaseDetails?> extends Cha
   }
     
   // 抽象方法：加载特定内容详情
-  Future<void> loadContentDetail(int contentID,{Map<String, dynamic>? queryParameters}) async {
+  Future<dynamic> loadContentDetail(int contentID,{Map<String, dynamic>? queryParameters}) async {
 
-
-    
     if(getContentDetailUrl(contentID) == null) return;
 
     if (contentDetailData[contentID] != null) {
@@ -65,19 +63,16 @@ abstract class BaseModel<I extends BaseInfo, D extends BaseDetails?> extends Cha
       return;
     }
 
-    debugPrint("trigged outside loadContentDetail");
 
     //占位符
     contentDetailData[contentID] = createEmptyDetails() as D;
 
     try {
-      debugPrint("trigged inside loadContentDetail");
       await HttpApiClient.client.get(
         getContentDetailUrl(contentID)!,
         queryParameters: queryParameters
       ).then((response) {
         if (response.data != null) {
-          debugPrint("trigged ininside loadContentDetail");
           contentDetailData[contentID] = convertResponseToDetail(response.data) as D;
           debugPrint("$contentID load content done");
           notifyListeners();

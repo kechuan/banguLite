@@ -44,7 +44,7 @@ class BangumiDetailPage extends StatefulWidget {
 }
 
 
-class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
+class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> with RouteLifecycleMixin  {
 
   ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
 

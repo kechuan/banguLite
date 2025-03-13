@@ -38,42 +38,11 @@ class BangumiTopicPage extends StatefulWidget {
   State<BangumiTopicPage> createState() => _BangumiTopicPageState();
 }
 
-class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> {
+class _BangumiTopicPageState extends LifecycleRouteState<BangumiTopicPage> with RouteLifecycleMixin{
 
-
-  bool isActived = true;
   Future? topicFuture;
   final ScrollController scrollController = ScrollController();
   
-  //在极端状况之下 说不定会出现 (BangumiDetailPageA)EpPage => BangumiDetailPageB => EpPageB...
-  //此时 整个路由链存活的 EpPageState 都会触发这个 AppRoute 那就麻烦了, 因此需要加以管控
-
-  @override
-  void initState() {
-    bus.on(
-      'AppRoute',
-      (link) {
-        if(!isActived) return;
-        if(!mounted) return;
-        appRouteMethod(context,link);
-      }
-    );
-    
-    super.initState();
-  }
-
-  @override
-  void didPushNext() {
-    isActived = false;
-    super.didPushNext();
-  }
-
-  @override
-  void didPopNext() {
-    isActived = true;
-    super.didPopNext();
-  }
-
   @override
   Widget build(BuildContext context) {
 

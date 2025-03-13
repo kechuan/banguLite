@@ -65,36 +65,35 @@ class BangumiDetailRecentReview extends StatelessWidget {
                   const Spacer(),
         
                   Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        
-                        child: TextButton(
-                          
-            
-                          onPressed: (){
+                    padding: const EdgeInsets.only(right: 12),
+                    
+                    child: TextButton(
+                      onPressed: (){
 
-                            if(reviewModel.contentListData.first.reviewID == 0) return;
+                        if(reviewModel.contentListData.first.reviewID == 0) return;
 
-                            Navigator.pushNamed(
-                              context,
-                              Routes.moreTopics,
-                              arguments: {
-                                "reviewModel.contentListData":reviewModel.contentListData,
-                                "title":name,
-                                "reviewModel":reviewModel,
-                                "bangumiThemeColor":bangumiModel.bangumiThemeColor
-                              }
-                            );
 
-                          },
-                          child: ScalableText(
-                            "更多长评 >",
-                            style: TextStyle(
-                              decoration: TextDecoration.underline,
-                              color: isReviewEmpty ? Colors.grey : null
-                            )
-                          ),  
+                        //Navigator.pushNamed(
+                        //  context,
+                        //  Routes.moreReviews,
+                        //  arguments: {
+                        //    "title":name,
+                        //    "reviewsList":reviewModel.contentListData,
+                        //    "reviewModel": reviewModel,
+                        //    "bangumiThemeColor":bangumiModel.bangumiThemeColor
+                        //  }
+                        //);
+
+                      },
+                      child: ScalableText(
+                        "更多长评 >",
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: isReviewEmpty ? Colors.grey : null
                         )
-                      )
+                      ),  
+                    )
+                  )
             
                 ],
               ),
@@ -145,7 +144,7 @@ class BangumiDetailRecentReview extends StatelessWidget {
                                       children: [
                                         ScalableText("${reviewModel.contentListData[index].title}"),
 
-										//summary 被api限制在最大 120 长度之中
+										                    //summary 被api限制在最大 120 长度之中
                                         ScalableText("${reviewModel.contentListData[index].summary}${reviewModel.contentListData[index].summary?.length == 120 ? "..." : null} "),
 
                                         Row(
@@ -158,20 +157,20 @@ class BangumiDetailRecentReview extends StatelessWidget {
                                                 children: [
                                                   const ScalableText("created by"),
                                                   UnVisibleResponse(
-													onTap: () {
-														//Navigator.pushNamed(
-														//	context,
-														//	Routes.subjectTopic,
-														//	arguments: {
-														//		"topicInfo":reviewModel.contentListData[index],
-														//		"topicModel":context.read<TopicModel>()
-														//	}
-														//);
-													},
-													child: ScalableText("${reviewModel.contentListData[index].userInformation?.nickName}",
-													  style: const TextStyle(decoration: TextDecoration.underline),
-													),
-												  ),
+                                                    onTap: () {
+                                                      //Navigator.pushNamed(
+                                                      //  context,
+                                                      //  Routes.blog,
+                                                      //  arguments: {
+                                                      //    "topicInfo":reviewModel.contentListData[index],
+                                                      //    "topicModel":context.read<ReviewModel>()
+                                                      //  }
+                                                      //);
+                                                    },
+                                                    child: ScalableText("${reviewModel.contentListData[index].userInformation?.nickName}",
+                                                      style: const TextStyle(decoration: TextDecoration.underline),
+                                                    ),
+                                                  ),
                                                 ],
                                               )
                                           ],
@@ -185,7 +184,17 @@ class BangumiDetailRecentReview extends StatelessWidget {
                               ),
                               
                               onTap: () {
-                            
+
+                                
+                                Navigator.pushNamed(
+                                  context,
+                                  Routes.blog,
+                                  arguments: {
+                                    "reviewInfo":reviewModel.contentListData[index],
+                                    "reviewModel":context.read<ReviewModel>()
+                                  }
+                                );
+                                  
                                 //Navigator.pushNamed(
                                 //  context,
                                 //  Routes.subjectTopic,

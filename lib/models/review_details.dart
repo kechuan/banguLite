@@ -26,19 +26,19 @@ List<ReviewInfo> loadReviewsDetails(Response bangumiReviewsResponse){
 
   List<dynamic> bangumiRelationsDataList = bangumiReviewsResponse.data["data"];
 
-  for(Map subejctRelationsMap in bangumiRelationsDataList){
+  for(Map subejctReviewsMap in bangumiRelationsDataList){
     ReviewInfo currentReviewDetail = ReviewInfo();
 
 		currentReviewDetail
       
-      ..reviewID = subejctRelationsMap["id"]
-      ..userInformation = loadUserDetails(subejctRelationsMap["user"])
+      ..reviewID = subejctReviewsMap["id"]
+      ..userInformation = loadUserDetails(subejctReviewsMap["user"])
 
-      ..blogID = subejctRelationsMap["entry"]["id"]
-      ..title = subejctRelationsMap["entry"]["title"]
-      ..summary = subejctRelationsMap["entry"]["summary"]
-      ..repliedCount = subejctRelationsMap["entry"]["repies"]
-      ..reviewTimeStamp = subejctRelationsMap["entry"]["updatedAt"]
+      ..blogID = subejctReviewsMap["entry"]["id"]
+      ..title = subejctReviewsMap["entry"]["title"]
+      ..summary = subejctReviewsMap["entry"]["summary"]
+      ..repliedCount = subejctReviewsMap["entry"]["replies"]
+      ..reviewTimeStamp = subejctReviewsMap["entry"]["updatedAt"]
 
     ;
 

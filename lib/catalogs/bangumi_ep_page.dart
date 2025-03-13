@@ -28,7 +28,6 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 
 @FFRoute(name: '/subjectEp')
-
 class BangumiEpPage extends StatefulWidget {
   const BangumiEpPage({
     super.key,
@@ -47,7 +46,7 @@ class BangumiEpPage extends StatefulWidget {
   State<BangumiEpPage> createState() => _BangumiEpPageState();
 }
 
-class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
+class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteLifecycleMixin {
 
   Future<void>? epsInformationFuture;
   //ValueNotifier<double> opacityNotifier = ValueNotifier<double>(0);
@@ -55,46 +54,14 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
 
   final ScrollController scrollViewController = ScrollController();
 
-  bool isActived = true; 
-
   final GlobalKey sliverListKey = GlobalKey();
   final GlobalKey epInfoKey = GlobalKey();
 
   final List<double> itemOffsets = [];
-  
-  //在极端状况之下 说不定会出现 (BangumiDetailPageA)EpPage => BangumiDetailPageB => EpPageB...
-  //此时 整个路由链存活的 EpPageState 都会触发这个 AppRoute 那就麻烦了, 因此需要加以管控
-
-  @override
-  void initState() {
-    bus.on(
-      'AppRoute',
-      (link) {
-        if(!isActived) return;
-        if(!context.mounted) return;
-        appRouteMethod(context,link);
-
-      }
-    );
-    super.initState();
-  }
-
-  @override
-  void didPushNext() {
-    isActived = false;
-    super.didPushNext();
-  }
-
-  @override
-  void didPopNext() {
-    isActived = true;
-    super.didPopNext();
-  }
 
   @override
   Widget build(BuildContext context) {
 
-   
     return ChangeNotifierProvider.value(
       value: widget.epModel,
       builder: (context,child){
@@ -441,34 +408,18 @@ class EpCommentPageDetails extends StatelessWidget {
                     if(epCommentIndex == 0){
                       int commentCount = 0;
 
-                      if(epModel.epCommentData[epModel.selectedEp]![0].userInformation?.userName != 0){
+                      if(epModel.epCommentData[epModel.selectedEp]![0].userInformation?.userID != 0){
                         commentCount = epModel.epCommentData[epModel.selectedEp]!.length;
                       }
 
                       return Padding(
                         padding: const EdgeInsets.all(16),
                         child: Row(
+                          spacing: 12,
                           children: [
                             const ScalableText("吐槽箱",style: TextStyle(fontSize: 24)),
                                       
-                            const Padding(padding: PaddingH6),
-                                      
                             ScalableText("$commentCount",style: const TextStyle(color: Colors.grey)),
-
-                            //BBCode测试
-                            //BBCodeText(
-                            //  //data: "[img=36]这是一个测试[/img] [color=#FF0000]这是另一个测试[/color]", 
-                            //  //data: "[img]https://p.sda1.dev/19/c25b1394330e0a0da6f140ececce3015/1dec650d1b1ee1a139ea09f81246d53d.png[/img]",
-                            //  data: "[img]https://i.yusa.me/RwiYjbYD7yGL.webp[/img]",
-                              
-                            //  stylesheet: BBStylesheet(
-                            //    tags: [
-                            //      SizeTag(),
-                            //      ColorTag(),
-                            //      LateLoadImgTag()
-                            //    ]
-                            //  ),
-                            //)
 
                           ],
                         ),
@@ -476,7 +427,7 @@ class EpCommentPageDetails extends StatelessWidget {
                     }
                   
                     //无评论的显示状态
-                    if(epModel.epCommentData[currentEp]![0].userInformation?.userName == 0){
+                    if(epModel.epCommentData[currentEp]![0].userInformation?.userID == 0){
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.only(top:64),

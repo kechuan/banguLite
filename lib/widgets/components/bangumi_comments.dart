@@ -30,43 +30,18 @@ class CommentView extends StatefulWidget {
   State<CommentView> createState() => _CommentViewState();
 }
 
-class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTickerProviderStateMixin {
+class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTickerProviderStateMixin,  RouteLifecycleMixin  {
 
   late TabController commentTabController;
 
   //bool handleTabChange = false;
-
   //既然我没办法做到pageView预先加载 但预先填充数据这点 我还是能做到的
 
-  bool isActived = true; 
-  
-  //在极端状况之下 说不定会出现 (BangumiDetailPageA)EpPage => BangumiDetailPageB => EpPageB...
-  //此时 整个路由链存活的 EpPageState 都会触发这个 AppRoute 那就麻烦了, 因此需要加以管控
-
-
-  @override
-  void didPushNext() {
-    isActived = false;
-    super.didPushNext();
-  }
-
-  @override
-  void didPopNext() {
-    isActived = true;
-    super.didPopNext();
-  }
 
   @override
   void initState() {
 
-    bus.on(
-      'AppRoute',
-      (link) {
-        if(!isActived) return;
-        if(!context.mounted) return;
-        appRouteMethod(context,link);
-      }
-    );
+    super.initState();
 
     commentTabController = TabController(
       vsync: this,
@@ -89,8 +64,6 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
         );
       });
     
-
-    super.initState();
   }
 
   @override

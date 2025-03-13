@@ -51,6 +51,7 @@ class BangumiRankBox extends StatelessWidget {
                         children: [
                               
                           Row(
+                            spacing: 12,
                             
                             children: [
                           
@@ -66,33 +67,29 @@ class BangumiRankBox extends StatelessWidget {
                                 )
                               ),
                           
-                              const Padding(padding: PaddingH6),
-                          
                               ScalableText(convertScoreRank(bangumiDetails.ratingList["score"]?.toDouble()),style: const TextStyle()),
                           
                           
                             ],
                           ),
                       
-                          //const Padding(padding: PaddingH6),
-                      
-                          Row(
-                            children: [
-                              //ScalableText("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey)),
-                          
-                              const Padding(padding: EdgeInsets.only(left: 6)),
-                          
-                          
-                              ScalableText(bangumiDetails.ratingList["rank"]!=0 ? 'Rank ${convertSubjectType(bangumiDetails.type)} #${bangumiDetails.ratingList["rank"]}' : "Rank ${convertSubjectType(bangumiDetails.type)} #-"),
-                                          
-                            ],
-                          )
-                      
-                              
+
+                          Padding(
+                            padding: const EdgeInsets.only(left: 6),
+                            child: ScalableText(bangumiDetails.ratingList["rank"]!=0 ? 'Rank ${convertSubjectType(bangumiDetails.type)} #${bangumiDetails.ratingList["rank"]}' : "Rank ${convertSubjectType(bangumiDetails.type)} #-"),
+                          ),
+
                         ],
                       ),
 
-                      ScalableText("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ScalableText("标准差 ${convertRankBoxStandardDiffusion(bangumiDetails.ratingList["total"], bangumiDetails.ratingList["count"].values.toList(), bangumiDetails.ratingList["score"])}",),
+
+                          ScalableText("${bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey)),
+                        ],
+                      ),
                     
                     
                     ],

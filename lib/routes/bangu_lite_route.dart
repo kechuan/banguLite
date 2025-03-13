@@ -8,12 +8,15 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables,unused_local_variable,unused_import,unnecessary_import,unused_shown_name,implementation_imports,duplicate_import,library_private_types_in_public_api
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
+import 'package:bangu_lite/models/providers/review_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
+import 'package:bangu_lite/models/review_details.dart';
 import 'package:bangu_lite/models/topic_info.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/widgets.dart';
 
 import '../catalogs/about_page.dart';
+import '../catalogs/bangumi_blog_page.dart';
 import '../catalogs/bangumi_comment_page.dart';
 import '../catalogs/bangumi_detail_page.dart';
 import '../catalogs/bangumi_ep_page.dart';
@@ -32,6 +35,22 @@ FFRouteSettings getRouteSettings({
   final Map<String, dynamic> safeArguments =
       arguments ?? const <String, dynamic>{};
   switch (name) {
+    case '/Blog':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => BangumiBlogPage(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
+          reviewModel: asT<ReviewModel>(
+            safeArguments['reviewModel'],
+          )!,
+          reviewInfo: asT<ReviewInfo>(
+            safeArguments['reviewInfo'],
+          )!,
+        ),
+      );
     case '/index':
       return FFRouteSettings(
         name: name,

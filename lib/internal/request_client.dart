@@ -26,6 +26,7 @@ class HttpApiClient{
 
 class BangumiAPIUrls {
   static const String baseUrl = "https://api.bgm.tv";
+  static const String baseResourceUrl = "https://lain.bgm.tv";
 
   static const String calendar = '$baseUrl/calendar';   
 
@@ -38,11 +39,8 @@ class BangumiAPIUrls {
   //以v1为代表的新api
   static const String newUrl = "https://next.bgm.tv";
 
-  static String comment(int subjectID) => '$newUrl/p1/subjects/$subjectID/comments';
-
-  //25.1.10 更新
-
   //subject
+  static String comment(int subjectID) => '$newUrl/p1/subjects/$subjectID/comments';
   static String epComment(int epID) => '$newUrl/p1/episodes/$epID/comments';
   static String topics(int subjectID) => '$newUrl/p1/subjects/$subjectID/topics';
   static String topicComment(int topicID) => '$newUrl/p1/subjects/-/topics/$topicID';
@@ -52,6 +50,10 @@ class BangumiAPIUrls {
   //user
   static String user(String username) => '$newUrl/p1/blogs/$username';
   static String blog(int blogID) => '$newUrl/p1/blogs/$blogID';
+  static String blogComment(int blogID) => '${blog(blogID)}/comments';
+
+  //other
+  static String imgur(String imageSuffix) => '$baseResourceUrl/pic/photo/l/$imageSuffix';
 
 }
 
@@ -66,7 +68,6 @@ class BangumiWebUrls{
   static String ep(int epID) => '$baseUrl/ep/$epID';
   static String user(String username) => '$baseUrl/user/$username';
   static String blog(int blogID) => '$baseUrl/blog/$blogID';
-  static String blogComment(int blogID) => '${blog(blogID)}/comment';
 
   static String relativeSubject(int subjectID) => '$relativeUrl/subject/$subjectID';
   //static String relativeSubjectComment(int subjectID) => '$relativeUrl/subject/$subjectID/comments';

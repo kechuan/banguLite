@@ -4,7 +4,7 @@
 			"path": "lib/catalogs/bangumi_ep_page.dart",
 			"bookmarks": [
 				{
-					"line": 349,
+					"line": 316,
 					"column": 38,
 					"label": "EPInfo"
 				}
@@ -64,7 +64,7 @@
 			"path": "lib/internal/custom_bbcode_tag.dart",
 			"bookmarks": [
 				{
-					"line": 12,
+					"line": 13,
 					"column": 0,
 					"label": "BBCodeTag"
 				}
