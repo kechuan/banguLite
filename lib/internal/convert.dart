@@ -229,11 +229,11 @@ Future<int> getTotalSizeOfFilesInDir(final FileSystemEntity fileSystemEntity) as
 }
 
 String convertRankBoxStandardDiffusion(int totalVotes, List<dynamic> scoreList,num score){
-  double sd = 0;
+  double standardDiffusion = 0;
 
   for (var (index, item) in scoreList.reversed.indexed) {
-    sd += (10 - index - score) * (10 - index - (score)) * item;
+    standardDiffusion += (10 - index - score) * (10 - index - (score)) * item;
   }
 
-  return sqrt(sd / totalVotes).toStringAsFixed(3);
+  return sqrt(standardDiffusion / totalVotes).toStringAsFixed(3);
 }

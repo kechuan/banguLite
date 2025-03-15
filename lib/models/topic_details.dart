@@ -2,22 +2,24 @@
 import 'package:bangu_lite/models/base_details.dart';
 import 'package:bangu_lite/models/ep_details.dart';
 
-class TopicDetails extends BaseDetails {
+class TopicDetails extends ContentDetails{
 
-  TopicDetails();
+  TopicDetails({
+    super.detailID,
+    super.contentTitle,
+    super.contentRepliedComment,
+  });
 
-  int? topicID;
-  String? title;
-  String? content;
-  int? createdTime;
-  int? state;
+  int? get topicID => detailID;
+  set topicID(int? value) => detailID = value;
 
-  Map<int,Set<String>>? topicReactions;
-  List<EpCommentDetails>? topicRepliedComment;
+  String? get topicTitle => contentTitle;
+  set topicTitle(String? value) => contentTitle = value;
 
+  List<EpCommentDetails>? get topicRepliedComment => contentRepliedComment;
+  set topicRepliedComment(List<EpCommentDetails>? value) => contentRepliedComment = value;
 
-
-  factory TopicDetails.empty() => TopicDetails()..topicID = 0;
+  factory TopicDetails.empty() => TopicDetails()..detailID = 0;
 
 }
 
@@ -27,7 +29,7 @@ TopicDetails loadTopicDetails(Map<String,dynamic> topicData){
 
 	currentTopic
 		..topicID = topicData["id"]
-		..title = topicData["title"]
+		..topicTitle = topicData["title"]
 		..content = topicData["content"]
 		..state = topicData["state"]
 		..createdTime = topicData["createdAt"]

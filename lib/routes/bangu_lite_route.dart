@@ -23,6 +23,7 @@ import '../catalogs/bangumi_ep_page.dart';
 import '../catalogs/bangumi_index_page.dart';
 import '../catalogs/bangumi_picture_view_page.dart';
 import '../catalogs/bangumi_topic_page.dart';
+import '../catalogs/more_reviews_page.dart';
 import '../catalogs/more_topics_page.dart';
 import '../catalogs/settings_page.dart';
 
@@ -61,6 +62,25 @@ FFRouteSettings getRouteSettings({
           ),
         ),
       );
+    case '/moreReviews':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => MoreReviewsPage(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
+          reviewModel: asT<ReviewModel>(
+            safeArguments['reviewModel'],
+          )!,
+          bangumiThemeColor: asT<Color?>(
+            safeArguments['bangumiThemeColor'],
+          ),
+          title: asT<String?>(
+            safeArguments['title'],
+          ),
+        ),
+      );
     case '/moreTopics':
       return FFRouteSettings(
         name: name,
@@ -69,9 +89,6 @@ FFRouteSettings getRouteSettings({
           key: asT<Key?>(
             safeArguments['key'],
           ),
-          topicsList: asT<List<TopicInfo>>(
-            safeArguments['topicsList'],
-          )!,
           topicModel: asT<TopicModel>(
             safeArguments['topicModel'],
           )!,

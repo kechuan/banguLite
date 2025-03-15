@@ -1,3 +1,4 @@
+import 'package:bangu_lite/catalogs/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bus_register_method.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
@@ -38,182 +39,52 @@ class BangumiBlogPage extends StatefulWidget {
   State<BangumiBlogPage> createState() => _BangumiBlogPageState();
 }
 
-class _BangumiBlogPageState extends LifecycleRouteState<BangumiBlogPage> with RouteLifecycleMixin {
-  
-  
-  Future? blogFuture;
-  final ScrollController scrollController = ScrollController();
-  
-  //在极端状况之下 说不定会出现 (BangumiDetailPageA)EpPage => BangumiDetailPageB => EpPageB...
-  //此时 整个路由链存活的 EpPageState 都会触发这个 AppRoute 那就麻烦了, 因此需要加以管控
 
+class _BangumiBlogPageState extends BangumiContentPageState
+<
+	BangumiBlogPage,
+	ReviewModel,
+	ReviewInfo,
+	BlogDetails
+>
+
+{
+  
 
   @override
-  Widget build(BuildContext context) {
+  ReviewInfo getContentInfo() => widget.reviewInfo;
 
-    return ChangeNotifierProvider.value(
-		value: widget.reviewModel,
-		builder: (context,child){
+  @override
+  ReviewModel getContentModel() => widget.reviewModel;
 
-			blogFuture ??= widget.reviewModel.loadBlog(widget.reviewInfo.blogID!);
+  @override 
+  int? getSubContentID() => getContentModel().selectedBlogID;
 
-			return EasyRefresh.builder(
-				scrollController: scrollController,
-				childBuilder: (_,physics) {
-				
-					return Scaffold(
+  @override
+  BlogDetails createEmptyDetailData() => BlogDetails.empty();
 
-						body: Selector<ReviewModel,BlogDetails>(
-							selector: (_, reviewModel) => reviewModel.contentDetailData[widget.reviewInfo.blogID!] ?? BlogDetails(),
-							shouldRebuild: (previous, next) => previous != next,
-							builder: (_,contentDetailData,topicComment) {
+  @override
+  bool isContentLoading(int? blogID){
+	return 
+		getContentModel().contentDetailData[blogID] == null || //没别的意思 只是消除 nullable
+		getContentModel().contentDetailData[blogID]?.blogID == null ||
+		getContentModel().contentDetailData[blogID]?.blogReplies == null
+	;
+  }
 
-								return Scrollbar(
-									thumbVisibility: true,
-									interactive: true,
-									thickness: 6,
-									controller: scrollController,
-									child: CustomScrollView(
-										controller: scrollController,
-										physics:physics,
-										slivers: [
-									
-										MultiSliver(
-											children: [
-																
-											SliverPinnedHeader(
-												child: AppBar(
-												title: ScalableText("${widget.reviewInfo.title}"),
-												
-												backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
-													
-													actions: [
-													
-													IconButton(
-														onPressed: () async {
-														if(await canLaunchUrlString(BangumiWebUrls.blog(widget.reviewInfo.blogID!))){
-															await launchUrlString(BangumiWebUrls.blog(widget.reviewInfo.blogID!));
-														}
-														},
-														icon: Transform.rotate(
-														angle: -45,
-														child: const Icon(Icons.link),
-														)
-													),
-													
-													
-													],
-												)
-											),
-									
-											topicComment!
-									
-											]
-										)
-									
-										],
-										
-									),
-								);
-								
-							},
-								
-							child: FutureBuilder(
-								future: blogFuture,
-								builder: (_,snapshot) {
+  @override
+  int? getCommentCount(BlogDetails? blogDetails, bool isLoading){
 
-									final BlogDetails? currentBlogDetail = widget.reviewModel.contentDetailData[widget.reviewInfo.blogID!]; 
+	if(isLoading) return null;
+	return blogDetails!.blogReplies!.isEmpty ? 0 : blogDetails.blogReplies!.length;
 
-									// 因为 blog 特有的 blog+Comment 同时加载 因此 还需要关注它的列表问题
-									// 然后 widget.reviewInfo.repliedCount 的数据并不准确 因为它计入楼中楼 replied 作为总数目
-									bool isCommentLoading = 
-										currentBlogDetail == null || //没别的意思 只是消除 nullable
-										currentBlogDetail.blogID == null ||
-										currentBlogDetail.blogReplies == null
-									;
-							
-									int? commentCount;
-							
-									if(!isCommentLoading){
-										if(currentBlogDetail.blogID != 0){
-											commentCount = currentBlogDetail.blogReplies!.length;
-										}
-									}
-							
-									return SliverPadding(
-										padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
-										sliver: Skeletonizer.sliver(
-										enabled: isCommentLoading,
-										child: SliverList.separated(
-											itemCount: (commentCount ?? 3)+1,
-											itemBuilder: (_,topicCommentIndex){
-											//Loading...
-											if(isCommentLoading){
-												return const SkeletonListTileTemplate(scaleType: ScaleType.min);
-											}
-										
-											if(topicCommentIndex == 0){
-												return ListView(
-													physics: const NeverScrollableScrollPhysics(),
-													shrinkWrap: true,
-													children: [
-
-														EpCommentView(
-														epCommentData: EpCommentDetails()
-															..userInformation = widget.reviewInfo.userInformation
-															..comment = currentBlogDetail.content
-															..commentTimeStamp = widget.reviewInfo.reviewTimeStamp
-														),
-													
-														Padding(
-														padding: const EdgeInsets.all(16),
-														child: Row(
-															children: [
-															const ScalableText("回复",style: TextStyle(fontSize: 24)),
-																		
-															const Padding(padding: PaddingH6),
-																		
-															ScalableText("$commentCount",style: const TextStyle(color: Colors.grey)),
-																		
-																		
-															],
-														),
-														),
-
-													],
-												);
-											}
-
-										
-											//无评论的显示状态
-											if(widget.reviewInfo.repliedCount == null || widget.reviewInfo.repliedCount == 0){
-												return const Center(
-													child: Padding(
-														padding: EdgeInsets.only(top:64),
-														child: ScalableText("该博客暂无评论..."),
-													),
-												);
-											}
-
-											return EpCommentView(epCommentData: currentBlogDetail.blogReplies![topicCommentIndex-1]);
-											},
-											separatorBuilder: (_,__,) => const Divider(height: 1)
-										),
-										),
-									);
-												
-								}
-							),
-								
-					
-
-						)
-					);
-				}
-
-			);
-		},
-	);
+  }
+	
    
-   }
+  @override
+  String getWebUrl(int? blogID) => BangumiWebUrls.blog(blogID ?? 0);
+
+  @override
+  Future<void> loadContent(int blogID) => getContentModel().loadBlog();
+
 }

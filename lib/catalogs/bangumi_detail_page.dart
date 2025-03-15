@@ -85,7 +85,9 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
               appBar: AppBar(
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha:0.6),
                 
-                title: ValueListenableBuilder(valueListenable: appbarTitleNotifier, builder: (_,appbarTitle,__)=>ScalableText(appbarTitle,style: const TextStyle(color: Colors.black),)),
+                title: ValueListenableBuilder(
+                  valueListenable: appbarTitleNotifier, 
+                  builder: (_,appbarTitle,__)=>ScalableText(appbarTitle,style: const TextStyle(color: Colors.black,fontSize: 20))),
                 leading: IconButton(
                   onPressed: ()=>Navigator.of(context).pop(),
                   icon: const Icon(Icons.arrow_back)
@@ -210,7 +212,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
 
                                                 BangumiSummary(summary: currentSubjectDetail?.summary),
                                                 
-                                                const BangumiDetailRecentReview(),
+                                                BangumiDetailRecentReview(name: bangumiModel.bangumiDetails?.name),
 
                                                 const BangumiDetailRelations(),
 

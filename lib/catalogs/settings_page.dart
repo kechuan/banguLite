@@ -1,6 +1,7 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -10,6 +11,7 @@ import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:provider/provider.dart';
 
 
@@ -28,6 +30,7 @@ class SettingsPage extends StatelessWidget {
       ClearCacheTile(),
       ConfigTile(),
       AboutTile(),
+      //TestTile()
     ];
 
     return Scaffold(
@@ -419,7 +422,6 @@ class ClearCacheTile extends ListTile{
 
 }
 
-
 class ConfigTile extends ListTile{
   const ConfigTile({super.key});
 
@@ -489,4 +491,29 @@ class AboutTile extends ListTile{
 
     }
 
+}
+
+class TestTile extends ListTile{
+  const TestTile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    
+    return SizedBox(
+      height: 80,
+      child: Center(
+        child: BBCodeText(
+          data: 
+          "[color=#ffffff]test[/color] \n" 
+          "[color=ffffff]test[/color] \n" 
+          "[color=33ffffff]test[/color]" //typo
+          "[color=RED]test[/color]", //otherReason
+          stylesheet: BBStylesheet(
+            tags: [PatchColorTag()],
+          )
+        )
+      ),
+    );
+
+    }
 }

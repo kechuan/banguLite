@@ -116,7 +116,6 @@ class BangumiRankBox extends StatelessWidget {
                       currentRankRatio = bangumiDetails.ratingList["count"]["${index+1}"] / bangumiDetails.ratingList["total"];
                     }
                 
-                
                     return Tooltip(
                       verticalOffset: -24,
                       triggerMode: TooltipTriggerMode.tap,
@@ -130,7 +129,7 @@ class BangumiRankBox extends StatelessWidget {
                                     
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 300), 
-                              height: min(100,175*currentRankRatio), //理论上最大值应该是200 毕竟极端值 1:1 但不想顶到上方的Score区域
+                              height: 150*currentRankRatio.clamp(0, 90).toDouble(), //理论上最大值应该是200 毕竟极端值 1:1 但不想顶到上方的Score区域
                               color:Theme.of(context).scaffoldBackgroundColor,
                             ),
                                     

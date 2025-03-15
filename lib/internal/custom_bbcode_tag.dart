@@ -319,13 +319,21 @@ class PatchColorTag extends StyleTag {
   @override
   TextStyle transformStyle(
       TextStyle oldStyle, Map<String, String>? attributes) {
+    RegExp hexColorRegExp = RegExp(r'^#?[0-9a-f]{6}$',caseSensitive : false);
+
+    
     if (attributes?.entries.isEmpty ?? true) {
       return oldStyle;
     }
 
-    String? hexColor = attributes?.entries.first.key;
-    if (hexColor == null) return oldStyle;
-    if (!hexColor.contains("#")) return oldStyle;
-    return oldStyle.copyWith(color: HexColor.fromHex(hexColor));
+    String? hexColor = attributes?.entries.first.key ?? "";
+    
+    if(hexColorRegExp.hasMatch(hexColor)){
+      return oldStyle.copyWith(color: HexColor.fromHex(hexColor));
+    }
+
+    return oldStyle;
   }
+
 }
+

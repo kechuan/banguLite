@@ -24,7 +24,6 @@ class ScalableText extends Text {
 
     return selectable ?
     SelectableText(
-      
       text,
       style: currentStyle.copyWith(
         fontSize: originalSize != null ? 

@@ -10,6 +10,7 @@
 const List<String> routeNames = <String>[
   '/Blog',
   '/index',
+  '/moreReviews',
   '/moreTopics',
   '/photoView',
   '/subjectComment',
@@ -38,13 +39,22 @@ class Routes {
   /// [name] : '/index'
   static const String index = '/index';
 
+  /// '/moreReviews'
+  ///
+  /// [name] : '/moreReviews'
+  ///
+  /// [constructors] :
+  ///
+  /// MoreReviewsPage : [ReviewModel(required) reviewModel, Color? bangumiThemeColor, String? title]
+  static const String moreReviews = '/moreReviews';
+
   /// '/moreTopics'
   ///
   /// [name] : '/moreTopics'
   ///
   /// [constructors] :
   ///
-  /// MoreTopicsPage : [List<TopicInfo>(required) topicsList, TopicModel(required) topicModel, Color? bangumiThemeColor, String? title]
+  /// MoreTopicsPage : [TopicModel(required) topicModel, Color? bangumiThemeColor, String? title]
   static const String moreTopics = '/moreTopics';
 
   /// '/photoView'

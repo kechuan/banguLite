@@ -117,7 +117,7 @@ enum ScoreRank{
   worse("很差",2), // 1~2
   poor("差",2.5), //2~3
   bad("较差",3.5), //3.5~4.5
-  medium("不过不失",4.5), //4.5~5.5
+  just("不过不失",4.5), //4.5~5.5
   pass("还行",5.5), //5.5~6.5
   great("推荐",6.5), //6.5~7.5
   excellent("力荐",7.5), //7.5 ~ 9
@@ -130,6 +130,20 @@ enum ScoreRank{
   const ScoreRank(this.rankText,this.score);
 
 }
+
+//enum scoreDiffusion{
+//getDispute(deviation: number) {
+//  if (deviation === 0) return '-'
+//  if (deviation < 1) return '异口同声'
+//  if (deviation < 1.15) return '基本一致'
+//  if (deviation < 1.3) return '略有分歧'
+//  if (deviation < 1.45) return '莫衷一是'
+//  if (deviation < 1.6) return '各执一词'
+//  if (deviation < 1.75) return '你死我活'
+//  return '厨黑大战'
+//}
+
+//}
 
 
 

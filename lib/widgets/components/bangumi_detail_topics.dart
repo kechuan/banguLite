@@ -39,7 +39,7 @@ class BangumiDetailTopics extends StatelessWidget {
           },
           shouldRebuild: (previous, next) {
             if(previous.isEmpty || next.isEmpty) return true;
-              return previous.last.topicID!=next.last.topicID;
+              return previous.last.id!=next.last.id;
             },
           builder: (_, topicsList, child) {
             return ExpansionTile(
@@ -74,13 +74,12 @@ class BangumiDetailTopics extends StatelessWidget {
             
                           onPressed: (){
 
-                            if(topicsList.first.topicID == 0) return;
+                            if(topicsList.first.id == 0) return;
 
                             Navigator.pushNamed(
                               context,
                               Routes.moreTopics,
                               arguments: {
-                                "topicsList":topicsList,
                                 "title":name,
                                 "topicModel":topicModel,
                                 "bangumiThemeColor":bangumiModel.bangumiThemeColor
@@ -88,7 +87,7 @@ class BangumiDetailTopics extends StatelessWidget {
                             );
 
                           },
-                          child: ScalableText("更多讨论 >",style: TextStyle(decoration: TextDecoration.underline,color: topicsList.isEmpty || topicsList.first.topicID == 0 ? Colors.grey : null)),  
+                          child: ScalableText("更多讨论 >",style: TextStyle(decoration: TextDecoration.underline,color: topicsList.isEmpty || topicsList.first.id == 0 ? Colors.grey : null)),  
                         )
                       )
             
@@ -100,7 +99,7 @@ class BangumiDetailTopics extends StatelessWidget {
                   child: Builder(
                     builder: (_) {
                       if(topicsList.isEmpty) return const SkeletonListTileTemplate();
-                      if(topicsList.first.topicID == 0) return const Center(child: ScalableText("该番剧暂无讨论版..."));
+                      if(topicsList.first.id == 0) return const Center(child: ScalableText("该番剧暂无讨论版..."));
             
                       return Theme(
                         data: ThemeData(
@@ -118,7 +117,7 @@ class BangumiDetailTopics extends StatelessWidget {
                             return Card(
                               color: judgeDetailRenderColor(context,bangumiModel.bangumiThemeColor),
                               child: ListTile(
-                                title: ScalableText("${topicsList[index].topicName}"),
+                                title: ScalableText("${topicsList[index].contentTitle}"),
                                 trailing: ScalableText(convertDateTimeToString(topicCreateTime)),
                                 onTap: () {
                                   Navigator.pushNamed(

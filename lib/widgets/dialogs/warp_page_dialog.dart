@@ -117,7 +117,12 @@ class WarpPageDialog extends StatelessWidget {
                         child: const ScalableText("取消")
                       ),
                       TextButton(
-                        onPressed: onConfirmPressed?.call(),
+                        onPressed: (){
+                          if(onConfirmPressed!=null){
+                              onConfirmPressed!();
+                          }
+                           
+                        },
                         child: const ScalableText("确定")
                       )
                     ]
@@ -155,6 +160,8 @@ void showWrapPageDialog(BuildContext context,PageController commentPageControlle
         jumpPageEditingController: jumpPageEditingController,
         commentTotalPage: convertTotalCommentPage(commentModel.commentLength, 10),
         onConfirmPressed: () {
+          debugPrint("on Confirm Trigged");
+
           Navigator.of(context).pop();
 
           final int newPageIndex = (int.tryParse(jumpPageEditingController.text) ?? pageSelectorController.selectedItem + 1);

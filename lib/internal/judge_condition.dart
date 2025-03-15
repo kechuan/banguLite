@@ -32,10 +32,6 @@ bool judgeTransitionalSeason(){
 
 }
 
-bool judgeDarknessMode(BuildContext context){
-  return Theme.of(context).brightness == Brightness.dark ? true : false;
-}
-
 Color judgeCurrentThemeColor(BuildContext context){
   final IndexModel indexModel = context.read<IndexModel>();
 
@@ -67,26 +63,6 @@ Color judgeDetailRenderColor(BuildContext context,Color? imageColor){
 
 }
 
-//SeasonType judgeCurrentSeasonRange(int currentMonth,{bool? currentTime}){
-
-//  SeasonType currentSeasonType = SeasonType.winter;
-
-//  for(int currentSeasonIndex = 0; currentSeasonIndex<SeasonType.values.length; currentSeasonIndex++){
-//    if(currentMonth > SeasonType.values[currentSeasonIndex].month){
-//      continue;
-//    }
-
-//    else{
-//      if(currentSeasonIndex == 0) return currentSeasonType;
-//      currentSeasonType = SeasonType.values[currentSeasonIndex-1];
-//      break;
-//    }
-//  }
-
-  
-
-//  return currentSeasonType;
-//}
 
 SeasonType judgeSeasonRange(int currentMonth,{bool? currentTime}){
 
@@ -109,3 +85,6 @@ SeasonType judgeSeasonRange(int currentMonth,{bool? currentTime}){
 
   return currentSeasonType;
 }
+
+bool judgeDarknessMode(BuildContext context)=> Theme.of(context).brightness == Brightness.dark ? true : false;
+bool judgeLandscapeMode(BuildContext context) => MediaQuery.orientationOf(context) == Orientation.landscape ? true : false;

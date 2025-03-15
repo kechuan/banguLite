@@ -18,6 +18,9 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
     loadSubjectReviews();
   }
 
+  //给blog访问准备的
+  int selectedBlogID = 0;
+
   Future<void> loadSubjectReviews({int? offset = 0}) async {
     await loadSubjectSubContentList(
       queryParameters: BangumiQuerys.reviewsQuery
@@ -25,58 +28,41 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
     );
   }
 
-  Future<void> loadBlog(int blogID) async {
+  Future<void> loadBlog() async {
 
-	Completer blogFullContentCompleter = Completer();
+    if(selectedBlogID == 0) return;
 
-	//Future<Response> commentFuture = loadBlogComment(blogID);
+    Completer blogFullContentCompleter = Completer();
 
-	await Future.wait(
-		[
-			loadContentDetail(blogID),
-			loadBlogComment(blogID)
-		]
-	).then((responseList){
-		final commentResponse =  responseList[1] as Response;
+    await Future.wait(
+      [
+        loadContentDetail(selectedBlogID),
+        loadBlogComment(selectedBlogID)
+      ]
+    ).then((responseList){
+      final commentResponse = responseList[1] as Response;
 
-		if (commentResponse.data != null) {
-			contentDetailData[blogID]?.blogReplies = loadEpCommentDetails(commentResponse.data);
-			debugPrint("blog: $blogID load blogComment done");
-			blogFullContentCompleter.complete();
-			notifyListeners();
-		}
-		
-	});
+      if (commentResponse.data != null) {
+        contentDetailData[selectedBlogID]?.blogReplies = loadEpCommentDetails(commentResponse.data);
+        debugPrint("blog: $selectedBlogID load blogComment done");
+        blogFullContentCompleter.complete();
+        notifyListeners();
+      }
+      
+    });
 
-
-
-	////因为 一个 loadContentDetail 是void 另一个只能是 loadBlogComment
-	////因此甚至无法直接使用Future.wait..
-	//await loadContentDetail(blogID).then((_) async {
-	//	debugPrint("blog: $blogID load blog done, $blogID:${contentDetailData[blogID]}");
-	//	await loadBlogComment(blogID).then((response){
-	//		if (response.data != null) {
-	//			contentDetailData[blogID]?.blogReplies = loadEpCommentDetails(response.data);
-	//			debugPrint("blog: $blogID load blogComment done");
-	//			notifyListeners();
-	//		}
-	//	});
-	//});
-
-
-	return blogFullContentCompleter.future;
-
-	
+    return blogFullContentCompleter.future;
 
   }
 
   Future<Response> loadBlogComment(int blogID) async {
-	if(blogID == 0) return Response(requestOptions: RequestOptions());
+    if(blogID == 0) return Response(requestOptions: RequestOptions());
 
-	return await HttpApiClient.client.get(
-		BangumiAPIUrls.blogComment(blogID),
-	);
+    return await HttpApiClient.client.get(
+      BangumiAPIUrls.blogComment(blogID),
+    );
   }
+
 
   @override
   List<ReviewInfo> createEmptyInfoList() => [ReviewInfo.empty()];
@@ -85,7 +71,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
   @override
   String getContentListUrl(int subjectID) => BangumiAPIUrls.reviews(subjectID);
   @override
-  String getContentDetailUrl(int contentID) => BangumiAPIUrls.blog(contentID);
+  String getContentDetailUrl(int contentID) => BangumiAPIUrls.blog(selectedBlogID);
   @override
   List<ReviewInfo> convertResponseToList(Response subContentListResponseData) => loadReviewsDetails(subContentListResponseData);
   @override

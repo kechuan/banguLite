@@ -2,29 +2,25 @@ import 'package:bangu_lite/models/base_info.dart';
 import 'package:bangu_lite/models/user_details.dart';
 import 'package:dio/dio.dart';
 
-class TopicInfo extends BaseInfo {
+class TopicInfo extends ContentInfo {
 
-  TopicInfo();
+  TopicInfo({
+    super.id,
+    super.contentTitle
+  });
 
-	int? topicID;
-  String? topicName;
+  int? get topicID => id;
+  set topicID(int? value) => id = value;
 
-  //user
-  UserDetails? userInformation;
-
-
-  int? createdTime;
-  int? repliesCount;
-  String? lastRepliedNickName;
-  int? lastRepliedTime;
+  String? get topicTitle => contentTitle;
+  set topicTitle(String? value) => contentTitle = value;
 
   factory TopicInfo.empty() {
-    return TopicInfo()..topicID = 0;
+    return TopicInfo(id: 0);
   }
 }
 
 List<TopicInfo> loadTopicsInfo(Response bangumiTopicsInfoResponse){
-//Map<int,TopicInfo> loadTopicsInfo(Response bangumiTopicsInfoResponse){
 
 	List topicListData = bangumiTopicsInfoResponse.data["data"];
 
@@ -36,7 +32,7 @@ List<TopicInfo> loadTopicsInfo(Response bangumiTopicsInfoResponse){
 
 			currentTopic
         ..topicID = currentTopicMap["id"]
-        ..topicName = currentTopicMap["title"]
+        ..topicTitle = currentTopicMap["title"]
         ..createdTime = currentTopicMap["createdAt"]
         ..repliesCount = currentTopicMap["replyCount"]
         ..lastRepliedTime = currentTopicMap["updatedAt"]

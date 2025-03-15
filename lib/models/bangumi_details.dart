@@ -5,9 +5,7 @@ import 'dart:math';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 ///打开 subjectID 之后对应的details信息返回
 class BangumiDetails {

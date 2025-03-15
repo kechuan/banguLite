@@ -2,20 +2,23 @@ import 'package:bangu_lite/models/base_info.dart';
 import 'package:bangu_lite/models/user_details.dart';
 import 'package:dio/dio.dart';
 
-class ReviewInfo extends BaseInfo {
+class ReviewInfo extends ContentInfo {
 
-  ReviewInfo();
+  ReviewInfo({
+    super.id,
+    super.contentTitle
+  });
+
+  int? get reviewID => id;
+  set reviewID(int? value) => id = value;
+
+  String? get reviewTitle => contentTitle;
+  set reviewTitle(String? value) => contentTitle = value;
   
-  int? reviewID;
-  //user字段
-  UserDetails? userInformation;
-
-  //entry字段
-  int? blogID;
-  String? title;
+  //独有字段
   String? summary;
-  int? repliedCount;
-  int? reviewTimeStamp;
+  int? blogID;
+
 
   factory ReviewInfo.empty() => ReviewInfo()..reviewID = 0;
 
@@ -35,10 +38,10 @@ List<ReviewInfo> loadReviewsDetails(Response bangumiReviewsResponse){
       ..userInformation = loadUserDetails(subejctReviewsMap["user"])
 
       ..blogID = subejctReviewsMap["entry"]["id"]
-      ..title = subejctReviewsMap["entry"]["title"]
+      ..reviewTitle = subejctReviewsMap["entry"]["title"]
       ..summary = subejctReviewsMap["entry"]["summary"]
-      ..repliedCount = subejctReviewsMap["entry"]["replies"]
-      ..reviewTimeStamp = subejctReviewsMap["entry"]["updatedAt"]
+      ..repliesCount = subejctReviewsMap["entry"]["replies"]
+      ..createdTime = subejctReviewsMap["entry"]["updatedAt"]
 
     ;
 

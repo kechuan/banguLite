@@ -6,34 +6,30 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
-
-@FFAutoImport()
-import 'package:bangu_lite/models/topic_info.dart';
-
-@FFAutoImport()
-import 'package:bangu_lite/models/providers/topic_model.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-@FFRoute(name: '/moreTopics')
-class MoreTopicsPage extends StatelessWidget {
-  const MoreTopicsPage({
+
+@FFAutoImport()
+import 'package:bangu_lite/models/providers/review_model.dart';
+
+
+@FFRoute(name: '/moreReviews')
+class MoreReviewsPage extends StatelessWidget {
+  const MoreReviewsPage({
     super.key,
-    
-    required this.topicModel,
+    required this.reviewModel,
     this.bangumiThemeColor,
     this.title
   });
 
   final String? title;
   final Color? bangumiThemeColor;
-  final TopicModel topicModel;
-  
+  final ReviewModel reviewModel;
 
   @override
   Widget build(BuildContext context) {
 
-    
-    final List<TopicInfo> topicsList = topicModel.contentListData;
+    final reviewsList = reviewModel.contentListData;
 
     return Theme(
       data: ThemeData(
@@ -44,12 +40,12 @@ class MoreTopicsPage extends StatelessWidget {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: ScalableText("讨论板块: $title"),
+          title: ScalableText("长评板块: $title"),
         ),
         body: EasyRefresh(
           child: ListView.builder(
             shrinkWrap: true,
-            itemCount: topicsList.length,
+            itemCount: reviewsList.length,
             itemBuilder: (_,index){
               
               return Card(
@@ -58,17 +54,20 @@ class MoreTopicsPage extends StatelessWidget {
                   onTap: () {
                     Navigator.pushNamed(
                     context,
-                    Routes.subjectTopic,
-                    arguments: {"topicInfo":topicsList[index],"topicModel":topicModel}
+                    Routes.blog,
+                    arguments: {
+                      "reviewInfo":reviewsList[index],
+                      "reviewModel":reviewModel
+                    }
                 );
                   },
-                  title: ScalableText("${topicsList[index].contentTitle}",maxLines: 2,overflow: TextOverflow.ellipsis,),
+                  title: ScalableText("${reviewsList[index].contentTitle}",maxLines: 2,overflow: TextOverflow.ellipsis,),
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Row(
                       children: [
                     
-                        ScalableText("${topicsList[index].userInformation?.nickName}"),
+                        ScalableText("${reviewsList[index].userInformation?.nickName}"),
                     
                         const Spacer(),
                     
@@ -76,13 +75,13 @@ class MoreTopicsPage extends StatelessWidget {
                           spacing: 6,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            ScalableText(convertDateTimeToString(DateTime.fromMillisecondsSinceEpoch(topicsList[index].createdTime!*1000))),
+                            ScalableText(convertDateTimeToString(DateTime.fromMillisecondsSinceEpoch(reviewsList[index].createdTime!*1000))),
                             Wrap(
                               crossAxisAlignment: WrapCrossAlignment.center,
                               spacing: 3,
                               children: [
                                 Icon(MdiIcons.chat,size: 12),
-                                ScalableText("${topicsList[index].repliesCount}"),
+                                ScalableText("${reviewsList[index].repliesCount}"),
                               ],
                             ),
                           ],

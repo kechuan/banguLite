@@ -113,8 +113,6 @@ class CustomSearchDelegate extends SearchDelegate<String>{
       return const Center(child: ScalableText("沉舟侧畔千帆过 病树前头万木春"));
     }
 
-    debugPrint("search query: $query");
-
     return FutureBuilder(
       future: Future.delayed(const Duration(milliseconds: 400)).then((value){debugPrint("input done. searching");}),
       builder: (_,inputSnapshot){

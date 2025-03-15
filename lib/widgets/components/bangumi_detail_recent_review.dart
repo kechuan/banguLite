@@ -29,7 +29,6 @@ class BangumiDetailRecentReview extends StatelessWidget {
 
     final ValueNotifier<bool> reviewCollapseStatusNotifier = ValueNotifier(true);
 
-    final bangumiModel = context.read<BangumiModel>();
 
     return Padding(
       padding: Padding16,
@@ -70,19 +69,20 @@ class BangumiDetailRecentReview extends StatelessWidget {
                     child: TextButton(
                       onPressed: (){
 
+                        final bangumiModel = context.read<BangumiModel>();
+
                         if(reviewModel.contentListData.first.reviewID == 0) return;
 
 
-                        //Navigator.pushNamed(
-                        //  context,
-                        //  Routes.moreReviews,
-                        //  arguments: {
-                        //    "title":name,
-                        //    "reviewsList":reviewModel.contentListData,
-                        //    "reviewModel": reviewModel,
-                        //    "bangumiThemeColor":bangumiModel.bangumiThemeColor
-                        //  }
-                        //);
+                        Navigator.pushNamed(
+                          context,
+                          Routes.moreReviews,
+                          arguments: {
+                            "title":name,
+                            "reviewModel": reviewModel,
+                            "bangumiThemeColor":bangumiModel.bangumiThemeColor
+                          }
+                        );
 
                       },
                       child: ScalableText(
@@ -117,65 +117,39 @@ class BangumiDetailRecentReview extends StatelessWidget {
                           separatorBuilder: (_, __) => const Divider(height: 1,),
                           itemBuilder: (context, index) {
                                     
-                            final reviewTime = DateTime.fromMillisecondsSinceEpoch(reviewModel.contentListData[index].reviewTimeStamp!*1000);
+                            final reviewTime = DateTime.fromMillisecondsSinceEpoch(reviewModel.contentListData[index].createdTime!*1000);
                                         
                             return ListTile(
                               
-                             
                               title: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 spacing: 16,
                                 children: [
 
                                   SizedBox(
-                                    width: 100,
-                                    height: 100,
-                                    child: CachedImageLoader(
-                                      imageUrl: reviewModel.contentListData[index].userInformation?.avatarUrl,
-                                      borderDecoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(0)
-                                      ),
+                                    width: 150,
+                                    child: BuildReviewAvatar(
+                                      avatarUri: reviewModel.contentListData[index].userInformation?.avatarUrl,
+                                      userName: reviewModel.contentListData[index].userInformation?.nickName,
                                     ),
                                   ),
 
 
                                   Expanded(
                                     child: Column(
+                                      spacing: 6,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        ScalableText("${reviewModel.contentListData[index].title}"),
+                                        ScalableText("${reviewModel.contentListData[index].reviewTitle}"),
 
 										                    //summary 被api限制在最大 120 长度之中
                                         ScalableText("${reviewModel.contentListData[index].summary}${reviewModel.contentListData[index].summary?.length == 120 ? "..." : null} "),
 
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                              ScalableText(convertDateTimeToString(reviewTime)),
-                                      
-                                              Row(
-                                                spacing: 6,
-                                                children: [
-                                                  const ScalableText("created by"),
-                                                  UnVisibleResponse(
-                                                    onTap: () {
-                                                      //Navigator.pushNamed(
-                                                      //  context,
-                                                      //  Routes.blog,
-                                                      //  arguments: {
-                                                      //    "topicInfo":reviewModel.contentListData[index],
-                                                      //    "topicModel":context.read<ReviewModel>()
-                                                      //  }
-                                                      //);
-                                                    },
-                                                    child: ScalableText("${reviewModel.contentListData[index].userInformation?.nickName}",
-                                                      style: const TextStyle(decoration: TextDecoration.underline),
-                                                    ),
-                                                  ),
-                                                ],
-                                              )
-                                          ],
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: ScalableText(convertDateTimeToString(reviewTime))
                                         ),
-                                                                
+                      
                                                                 
                                       ],
                                     ),
@@ -185,25 +159,17 @@ class BangumiDetailRecentReview extends StatelessWidget {
                               
                               onTap: () {
 
-                                
+                                reviewModel.selectedBlogID = reviewModel.contentListData[index].blogID ?? 0;
+
                                 Navigator.pushNamed(
                                   context,
                                   Routes.blog,
                                   arguments: {
                                     "reviewInfo":reviewModel.contentListData[index],
-                                    "reviewModel":context.read<ReviewModel>()
+                                    "reviewModel":reviewModel
                                   }
                                 );
-                                  
-                                //Navigator.pushNamed(
-                                //  context,
-                                //  Routes.subjectTopic,
-                                //  arguments: {
-                                //    "topicInfo":reviewModel.contentListData[index],
-                                //    "topicModel":context.read<TopicModel>()
-                                //  }
-                                //);
-                            
+ 
                               },
                             );
                                         
@@ -224,3 +190,50 @@ class BangumiDetailRecentReview extends StatelessWidget {
     );
   }
 }
+
+class BuildReviewAvatar extends StatelessWidget {
+  const BuildReviewAvatar({
+    super.key,
+    this.avatarUri,
+    this.userName
+  });
+
+  final String? avatarUri;
+  final String? userName;
+
+  @override
+  Widget build(BuildContext context) {
+    
+  return UnVisibleResponse(
+    onTap: () {
+      //用户界面...
+    },
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      spacing: 24,
+      children: [
+    
+        SizedBox(
+          width: 100,
+          height: 100,
+          child: CachedImageLoader(
+            imageUrl: avatarUri,
+            borderDecoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(0)
+            ),
+          ),
+        ),
+    
+        ScalableText(
+          "$userName",
+          style:const TextStyle(decoration: TextDecoration.underline),
+          textAlign: TextAlign.center,
+        )
+    
+      ],
+    ),
+  );
+
+  }
+}
+
