@@ -1,9 +1,10 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
-import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -11,9 +12,9 @@ import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:provider/provider.dart';
-
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 @FFRoute(name: 'settings')
 class SettingsPage extends StatelessWidget {
@@ -30,7 +31,7 @@ class SettingsPage extends StatelessWidget {
       ClearCacheTile(),
       ConfigTile(),
       AboutTile(),
-      //TestTile()
+      TestTile()
     ];
 
     return Scaffold(
@@ -496,24 +497,39 @@ class AboutTile extends ListTile{
 class TestTile extends ListTile{
   const TestTile({super.key});
 
-  @override
+   @override
   Widget build(BuildContext context) {
+
+    final indexModel = context.read<IndexModel>();
+    final accountModel = context.read<AccountModel>();
     
     return SizedBox(
       height: 80,
       child: Center(
-        child: BBCodeText(
-          data: 
-          "[color=#ffffff]test[/color] \n" 
-          "[color=ffffff]test[/color] \n" 
-          "[color=33ffffff]test[/color]" //typo
-          "[color=RED]test[/color]", //otherReason
-          stylesheet: BBStylesheet(
-            tags: [PatchColorTag()],
-          )
-        )
+        child: ListTile(
+          trailing: IconButton(
+            onPressed: (){
+
+            }, 
+            icon: const Icon(Icons.cookie)
+          ),
+          onTap: () async {
+
+            final entries =  BangumiQuerys.authorizationQuery().entries;
+
+            final authParams = 
+              entries.map((entry) =>'${entry.key}=${entry.value}')
+              .toList()
+              .join('&');
+
+            launchUrlString('${BangumiWebUrls.oAuth}?$authParams');
+
+          },
+          title: ScalableText("登入",style: TextStyle(fontSize: AppFontSize.s16))
+        ),
       ),
     );
 
     }
+
 }

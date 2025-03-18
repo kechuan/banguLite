@@ -23,6 +23,7 @@ import '../catalogs/bangumi_ep_page.dart';
 import '../catalogs/bangumi_index_page.dart';
 import '../catalogs/bangumi_picture_view_page.dart';
 import '../catalogs/bangumi_topic_page.dart';
+import '../catalogs/bangumi_webview_page.dart';
 import '../catalogs/more_reviews_page.dart';
 import '../catalogs/more_topics_page.dart';
 import '../catalogs/settings_page.dart';
@@ -181,6 +182,28 @@ FFRouteSettings getRouteSettings({
           topicInfo: asT<TopicInfo>(
             safeArguments['topicInfo'],
           )!,
+        ),
+      );
+    case '/webview':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => BangumiWebviewPage(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
+          url: asT<String>(
+            safeArguments['url'],
+          )!,
+          title: asT<String?>(
+            safeArguments['title'],
+          ),
+          targetUrl: asT<String?>(
+            safeArguments['targetUrl'],
+          ),
+          onTargetUrlReached: asT<Function(String?)?>(
+            safeArguments['onTargetUrlReached'],
+          ),
         ),
       );
     case 'about':

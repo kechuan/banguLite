@@ -1,6 +1,10 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/user_details.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 void appRouteMethod(BuildContext context,String link){
@@ -39,4 +43,56 @@ void appRouteMethod(BuildContext context,String link){
   }
 
         
+}
+
+void apploginMethod(BuildContext context,String link){
+
+  debugPrint("detected BangumiLogin: $link");
+
+  if(
+    link.startsWith(APPInformationRepository.bangumiAuthCallbackUri.scheme)
+  ){
+
+    final accountModel = context.read<AccountModel>();
+    final code = link.split("code=").last;
+
+    try{
+        HttpApiClient.client.post(
+          BangumiWebUrls.oAuthToken,
+          data: BangumiQuerys.getAccessTokenQuery(code),
+        ).then((response) async {
+          if(response.statusCode == 200){
+
+            if(response.data != null){
+
+              debugPrint("response:$response");
+
+              await accountModel.verifySessionValidity(response.data["access_token"])
+                .then((isValid){
+                  if(isValid){
+                    accountModel.updateLoginInformation(
+                      LoginedUserDetails()
+                        ..accessToken = response.data["access_token"]
+                        ..expiredTime = DateTime.now().millisecondsSinceEpoch~/1000 + (response.data["expires_in"] as int)
+                        ..refreshToken = response.data["refresh_token"]
+                    );
+                  }
+                });
+
+            }
+
+          }
+
+        });
+
+    }
+
+    on DioException catch(e){
+      debugPrint("[Login error] ${e.response?.statusCode}:${e.message}");
+    }
+
+
+
+
+  }
 }

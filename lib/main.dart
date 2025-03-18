@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/internal/platforms/register_windows_applink.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/webview_model.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +24,7 @@ void main() async {
   // path_provider 初始化需要
   WidgetsFlutterBinding.ensureInitialized();
 
+  listenAPPLink();
   HttpApiClient.init();
   await MyHive.init();
 
@@ -47,8 +51,13 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return ChangeNotifierProvider(
-      create: (_) => IndexModel(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<IndexModel>(create: (_) => IndexModel()),
+        ChangeNotifierProvider<AccountModel>(create: (_) => AccountModel()),
+        ChangeNotifierProvider<WebViewModel>(create: (_) => WebViewModel()),
+      ],
+     
       child: Builder(
         builder: (context) {
           return Selector<IndexModel,Color>(

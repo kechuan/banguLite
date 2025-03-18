@@ -44,7 +44,7 @@ Future<String> getApkContentProviderUri(File apkFile) async {
 
   if (Platform.isAndroid) {
     
-      const authority = '${GithubRepository.packageName}.fileprovider';
+      const authority = '${APPInformationRepository.packageName}.fileprovider';
       final filePath = apkFile.absolute.path;
 
       return 'content://$authority/external_files/downloads/${filePath.split('/downloads/').last}';

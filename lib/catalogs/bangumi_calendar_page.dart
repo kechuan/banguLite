@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:bangu_lite/internal/bus_register_method.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
 import 'package:bangu_lite/widgets/dialogs/warp_season_dialog.dart';
+import 'package:dio/dio.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +29,7 @@ class BangumiCalendarPage extends StatefulWidget {
   State<BangumiCalendarPage> createState() => _BangumiCalendarPageState();
 }
 
-class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
+class _BangumiCalendarPageState extends LifecycleRouteState<BangumiCalendarPage> {
 
   Future? calendarLoadFuture;
   Timer? carouselTimer;
@@ -54,12 +57,30 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
     });
   }
 
+  void carouselSpinTimer(){
+    if(carouselTimer!=null){ carouselTimer?.cancel(); }
+    carouselTimer = generateScrollList();
+  }
+
+  @override
+  void initState(){
+    carouselSpinTimer();
+    calendarLoadFuture = context.read<IndexModel>().loadCalendar();
+
+    bus.on('LoginRoute', (link) {
+      apploginMethod(context, link);
+    });
+    
+    super.initState();
+  }
+
   @override
   void onPause() {
     debugPrint("caleandar pause");
     if(carouselTimer!=null){
       carouselTimer?.cancel();
     }
+    FocusScope.of(context).unfocus();
     super.onPause();
   }
 
@@ -70,26 +91,9 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
     super.onResume();
   }
 
-  @override
-  void didPushNext() {
-    //WeekDaySelectOverlay.weekDaySelectOverlay?.closeWeekDaySelectFieldOverlay();
-    FocusScope.of(context).unfocus();
-    super.didPushNext();
-  }
+  
 
-  void carouselSpinTimer(){
-    if(carouselTimer!=null){
-      carouselTimer?.cancel();
-    }
-    carouselTimer = generateScrollList();
-  }
-
-  @override
-  void initState() {
-    carouselSpinTimer();
-    calendarLoadFuture = context.read<IndexModel>().loadCalendar();
-    super.initState();
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -408,7 +412,6 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                 ),
                                                 onEnd: (){
                                                   if(!animatedStatus) weekdaySelectOffstageNotifier.value = true;
-                                                  debugPrint("end: ${weekdaySelectOffstageNotifier.value}");
                                                 },
                                                 
                                                 builder: (_,animationProgress,child){

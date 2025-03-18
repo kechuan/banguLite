@@ -181,12 +181,12 @@ mixin RouteLifecycleMixin<T extends StatefulWidget> on LifecycleRouteState<T> {
 
   @override
   void initState() {
-    super.initState();
     bus.on('AppRoute', (link) {
       if (!isActived) return;
       if (!mounted) return;
       appRouteMethod(context, link);
     });
+    super.initState();
   }
 
   @override

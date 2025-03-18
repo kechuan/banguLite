@@ -10,6 +10,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(AppConfigAdapter());
     registerAdapter(BangumiThemeColorAdapter());
     registerAdapter(ColorAdapter());
+    registerAdapter(LoginedUserDetailsAdapter());
     registerAdapter(ScaleTypeAdapter());
     registerAdapter(StarBangumiDetailsAdapter());
     registerAdapter(ThemeModeAdapter());

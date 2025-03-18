@@ -6,35 +6,31 @@ import 'package:bangu_lite/models/user_details.dart';
 // 因为实际上大部分数据 都依靠 review 提供
 // 剩下的数据源还要依靠 blog/comments
 class BlogDetails extends ContentDetails{
+
   BlogDetails({
     super.detailID,
     super.contentRepliedComment,
     super.content
   });
 
-  UserDetails? userInfo;
-
   int? get blogID => detailID;
-  set blogID(int? value) => detailID = value;
-
   String? get blogContent => content;
-  set blogContent(String? value) => content = value;
+  
+  UserDetails? userInfo;
 
   List<EpCommentDetails>? get blogReplies => contentRepliedComment;
   set blogReplies(List<EpCommentDetails>? value) => contentRepliedComment = value;
 
 
-  factory BlogDetails.empty() => BlogDetails()..blogID = 0;
+  factory BlogDetails.empty() => BlogDetails(detailID: 0);
 }
 
 BlogDetails loadBlogDetails(Map<String,dynamic> blogData){
 
-  final currentBlog = BlogDetails();
-
-	currentBlog
-		..blogID = blogData["id"]
-		..blogContent = blogData["content"]
-	;
+  final currentBlog = BlogDetails(
+    detailID: blogData["id"],
+    content: blogData["content"]
+  );
 
   return currentBlog;
 }

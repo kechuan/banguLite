@@ -22,13 +22,11 @@ abstract class BangumiContentPageState<
 > extends LifecycleRouteState<T> with RouteLifecycleMixin {
 
   //widget.*信息获取
+  @protected
   M getContentModel();
   I getContentInfo();
 
   D createEmptyDetailData();
-
-
-
   String getWebUrl(int? contentID);
 
   Future<void> loadContent(int contentID);
@@ -59,7 +57,6 @@ abstract class BangumiContentPageState<
       builder: (context, child) {
 
         contentFuture ??= loadContent(getSubContentID() ?? contentInfo.id ?? 0);
-        //contentFuture ??= loadContent(getContentModel().contentDetailData[contentInfo.id]?.detailID ?? 0);
         
         return EasyRefresh.builder(
           scrollController: scrollController,
@@ -109,7 +106,7 @@ abstract class BangumiContentPageState<
                 child: FutureBuilder(
                   future: contentFuture,
                   builder: (_, snapshot) {
-                    //final contentDetail = getContentDetailFromModel(); 
+                    
                     final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id);
                     final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
                     final int? commentCount = getCommentCount(contentDetail, isCommentLoading);
@@ -117,56 +114,54 @@ abstract class BangumiContentPageState<
                     return SliverPadding(
                       padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
                       sliver: Skeletonizer.sliver(
-                      enabled: isCommentLoading,
-                      child: SliverList.separated(
-                        itemCount: (isCommentLoading ? 3 : commentCount!)+2,
+						enabled: isCommentLoading,
+						child: SliverList.separated(
+                        itemCount: (isCommentLoading ? 3 : (commentCount ?? 0))+1,
                         itemBuilder: (_,contentCommentIndex){
                         //Loading...
-                        if(isCommentLoading){
-                          return const SkeletonListTileTemplate(scaleType: ScaleType.min);
-                        }
+                          if(isCommentLoading){
+                            return const SkeletonListTileTemplate(scaleType: ScaleType.min);
+                          }
 
+                          if(contentCommentIndex == 0){
+                            return ListView(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              children: [
 
-                        if(contentCommentIndex == 0){
-                          return ListView(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            children: [
-
-                              EpCommentView(
-                                epCommentData: EpCommentDetails()
-                                  ..userInformation = contentInfo.userInformation
-                                  ..comment = contentDetail?.content
-                                  ..commentTimeStamp = contentInfo.createdTime
-                              ),
-                            
-                              Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Row(
-                                  spacing: 12,
-                                  children: [
-                                    const ScalableText("回复",style: TextStyle(fontSize: 24)),
-
-                                    ScalableText("$commentCount",style: const TextStyle(color: Colors.grey)),
-                                  ],
+                                EpCommentView(
+                                  epCommentData: EpCommentDetails()
+                                    ..userInformation = contentInfo.userInformation
+                                    ..comment = contentDetail?.content
+                                    ..commentTimeStamp = contentInfo.createdTime
                                 ),
-                              ),
+                              
+                                Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    spacing: 12,
+                                    children: [
+                                      const ScalableText("回复",style: TextStyle(fontSize: 24)),
 
-                            ],
-                          );
-                        }
+                                      ScalableText("$commentCount",style: const TextStyle(color: Colors.grey)),
+                                    ],
+                                  ),
+                                ),
 
-                        //无评论的显示状态
-                        if(commentCount == null || commentCount == 0){
-                          return const Center(
-                            child: Padding(
-                              padding: EdgeInsets.only(top:64),
-                              child: ScalableText("暂无评论..."),
-                            ),
-                          );
-                        }
+                                //无评论的显示状态
+                                if(commentCount == null || commentCount == 0)
+                                const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(top:64),
+                                    child: ScalableText("暂无评论..."),
+                                  ),
+                                )
 
-                        return EpCommentView(epCommentData: contentDetail!.contentRepliedComment![contentCommentIndex-2]);
+                              ],
+                            );
+                          }
+
+                          return EpCommentView(epCommentData: contentDetail!.contentRepliedComment![contentCommentIndex-1]);
 
                         },
                         separatorBuilder: (_,__) => const Divider(height: 1)

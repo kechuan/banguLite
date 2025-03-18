@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:bangu_lite/internal/bus_register_method.dart';
 import 'package:bangu_lite/internal/convert.dart';
-import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';

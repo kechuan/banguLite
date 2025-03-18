@@ -285,3 +285,66 @@ class StarBangumiDetailsAdapter extends TypeAdapter<StarBangumiDetails> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class LoginedUserDetailsAdapter extends TypeAdapter<LoginedUserDetails> {
+  @override
+  final int typeId = 7;
+
+  @override
+  LoginedUserDetails read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return LoginedUserDetails()
+      ..accessToken = fields[0] as String?
+      ..userID = (fields[1] as num?)?.toInt()
+      ..userName = fields[2] as String?
+      ..nickName = fields[3] as String?
+      ..avatarUrl = fields[4] as String?
+      ..sign = fields[5] as String?
+      ..joinedAtTimeStamp = (fields[6] as num?)?.toInt()
+      ..group = (fields[7] as num?)?.toInt()
+      ..blogs = (fields[8] as List?)?.cast<BlogDetails>()
+      ..expiredTime = (fields[9] as num?)?.toInt()
+      ..refreshToken = fields[10] as String?;
+  }
+
+  @override
+  void write(BinaryWriter writer, LoginedUserDetails obj) {
+    writer
+      ..writeByte(11)
+      ..writeByte(0)
+      ..write(obj.accessToken)
+      ..writeByte(1)
+      ..write(obj.userID)
+      ..writeByte(2)
+      ..write(obj.userName)
+      ..writeByte(3)
+      ..write(obj.nickName)
+      ..writeByte(4)
+      ..write(obj.avatarUrl)
+      ..writeByte(5)
+      ..write(obj.sign)
+      ..writeByte(6)
+      ..write(obj.joinedAtTimeStamp)
+      ..writeByte(7)
+      ..write(obj.group)
+      ..writeByte(8)
+      ..write(obj.blogs)
+      ..writeByte(9)
+      ..write(obj.expiredTime)
+      ..writeByte(10)
+      ..write(obj.refreshToken);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LoginedUserDetailsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

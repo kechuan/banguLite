@@ -4,7 +4,7 @@
 			"path": "lib/catalogs/bangumi_ep_page.dart",
 			"bookmarks": [
 				{
-					"line": 316,
+					"line": 314,
 					"column": 38,
 					"label": "EPInfo"
 				}
@@ -24,7 +24,7 @@
 			"path": "lib/catalogs/bangumi_calendar_page.dart",
 			"bookmarks": [
 				{
-					"line": 122,
+					"line": 126,
 					"column": 35,
 					"label": "calendarPage——资讯页面"
 				}
@@ -34,7 +34,7 @@
 			"path": "lib/main.dart",
 			"bookmarks": [
 				{
-					"line": 26,
+					"line": 30,
 					"column": 25,
 					"label": "Android——SystemChromeSetting"
 				}
@@ -64,7 +64,7 @@
 			"path": "lib/internal/custom_bbcode_tag.dart",
 			"bookmarks": [
 				{
-					"line": 13,
+					"line": 12,
 					"column": 0,
 					"label": "BBCodeTag"
 				}
@@ -94,9 +94,9 @@
 			"path": "lib/catalogs/settings_page.dart",
 			"bookmarks": [
 				{
-					"line": 21,
-					"column": 1,
-					"label": ""
+					"line": 18,
+					"column": 26,
+					"label": "设置页 —— SettingPage "
 				}
 			]
 		}

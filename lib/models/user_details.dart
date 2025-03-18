@@ -16,9 +16,20 @@ class UserDetails {
   
 }
 
+class LoginedUserDetails extends UserDetails{
+  LoginedUserDetails();
+
+  String? accessToken;
+  int? expiredTime;
+  String? refreshToken;
+
+}
+
+LoginedUserDetails getDefaultLoginedUserDetails() => LoginedUserDetails();
+
+
 UserDetails loadUserDetails(Map<String,dynamic> bangumiUserData){
   final userDetails = UserDetails();
-
 
   userDetails
     ..userID = bangumiUserData["id"]

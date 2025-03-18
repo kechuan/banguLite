@@ -17,6 +17,7 @@ const List<String> routeNames = <String>[
   '/subjectDetail',
   '/subjectEp',
   '/subjectTopic',
+  '/webview',
   'about',
   'settings',
 ];
@@ -101,6 +102,15 @@ class Routes {
   ///
   /// BangumiTopicPage : [TopicModel(required) topicModel, TopicInfo(required) topicInfo]
   static const String subjectTopic = '/subjectTopic';
+
+  /// '/webview'
+  ///
+  /// [name] : '/webview'
+  ///
+  /// [constructors] :
+  ///
+  /// BangumiWebviewPage : [String(required) url, String? title, String? targetUrl,  Function(String?)? onTargetUrlReached]
+  static const String webview = '/webview';
 
   /// 'about'
   ///
