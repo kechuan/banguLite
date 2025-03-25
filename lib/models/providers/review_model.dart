@@ -71,7 +71,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
   @override
   String getContentListUrl(int subjectID) => BangumiAPIUrls.reviews(subjectID);
   @override
-  String getContentDetailUrl(int contentID) => BangumiAPIUrls.blog(selectedBlogID);
+  String getContentDetailUrl(int contentID) => BangumiAPIUrls.userBlog(selectedBlogID);
   @override
   List<ReviewInfo> convertResponseToList(Response subContentListResponseData) => loadReviewsDetails(subContentListResponseData);
   @override

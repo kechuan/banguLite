@@ -89,11 +89,11 @@ class IntroPortrait extends StatelessWidget {
                             onTap: () {
                               Clipboard.setData(ClipboardData(text: '${bangumiDetails.name}'));
                               //showToast("标题已复制,长按复制alias",context:context);
-                              fadeToaster(context: context,message: "标题已复制,长按复制alias");
+                              fadeToaster(context: context,message: "标题已复制,长按复制别称");
                             },
                             onLongPress: () {
                               Clipboard.setData(ClipboardData(text: '${bangumiDetails.informationList["alias"] ?? ""}'));
-                              fadeToaster(context:context,message:"alias已复制");
+                              fadeToaster(context:context,message:"别称已复制");
                             },
                             title: ScalableText("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
                             subtitle: ScalableText(bangumiDetails.informationList["alias"] ?? "")

@@ -1,7 +1,9 @@
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/comment_details.dart';
@@ -33,17 +35,33 @@ class BangumiCommentTile extends StatelessWidget {
           children: [
             
             Builder(builder: (_){
-              if(commentData.avatarUrl==null) return Image.asset("assets/icons/icon.png",height: 50,width: 50,);
+              if(commentData.userInformations?.avatarUrl==null) return Image.asset("assets/icons/icon.png",height: 50,width: 50,);
 
-              return SizedBox(
-                height: 50,
-                width: 50,
-                child: CachedImageLoader(imageUrl: commentData.avatarUrl!,photoViewStatus: true,)
+              return UnVisibleResponse(
+                onTap: () {
+                  showUserInfomationDialog(context, commentData.userInformations);
+                },
+                child: SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: CachedImageLoader(imageUrl: commentData.userInformations?.avatarUrl!,photoViewStatus: true,)
+                ),
               );
 
             }),
 
-            ScalableText(commentData.nickName ?? "nameID",style: TextStyle(color: themeColor)),
+            
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.sizeOf(context).width - 320,
+              ),
+                child: ScalableText(
+                  commentData.userInformations?.nickName ?? "nameID",
+                  style: TextStyle(color: themeColor),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis
+                ),
+              ),
 
             const Spacer(),
 

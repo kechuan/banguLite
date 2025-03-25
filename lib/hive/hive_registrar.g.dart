@@ -10,9 +10,11 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(AppConfigAdapter());
     registerAdapter(BangumiThemeColorAdapter());
     registerAdapter(ColorAdapter());
-    registerAdapter(LoginedUserDetailsAdapter());
+    registerAdapter(LoginedUserInformationsAdapter());
     registerAdapter(ScaleTypeAdapter());
     registerAdapter(StarBangumiDetailsAdapter());
     registerAdapter(ThemeModeAdapter());
+    registerAdapter(TimelineDetailsAdapter());
+    registerAdapter(UserInformationsAdapter());
   }
 }

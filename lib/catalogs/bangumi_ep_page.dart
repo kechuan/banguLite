@@ -47,7 +47,6 @@ class BangumiEpPage extends StatefulWidget {
 class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteLifecycleMixin {
 
   Future<void>? epsInformationFuture;
-  //ValueNotifier<double> opacityNotifier = ValueNotifier<double>(0);
   ValueNotifier<double> offsetNotifier = ValueNotifier<double>(0);
 
   final ScrollController scrollViewController = ScrollController();
@@ -97,7 +96,6 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                         double commentProgress = 0.0;
                   
                         return Padding(
-                          //padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
                           padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
                           child: Stack(
                             alignment: Alignment.bottomCenter,
@@ -236,55 +234,52 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                   ],	
                                 ),
                               ),
+              
+                              ValueListenableBuilder(
+                                valueListenable: offsetNotifier,
+                                builder: (_,offset,appbar) {
+                                  return AnimatedPositioned(
+                                    duration: const Duration(milliseconds: 300),
+                                    bottom: offset <= sliverViewStartOffset ? -60 : 0,
+                                    height: 60,
+                                    width: MediaQuery.sizeOf(context).width,
+                                    child: appbar!
+                                  );
+                                },
+                                child: ColoredBox(
+                                  color: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                  
+                                      IconButton(
+                                        onPressed: () => Navigator.of(context).maybePop(),
+                                        icon: const Icon(Icons.arrow_back),
+                                      ),
                             
-              
-                              Positioned(
-                                bottom: 0,
-                                height: 60,
-                                width: MediaQuery.sizeOf(context).width,
-                                child: ValueListenableBuilder(
-                                  valueListenable: offsetNotifier,
-                                  builder: (_,offset,appbar) {
-                                    return Offstage(
-                                      offstage: offset <= sliverViewStartOffset,
-                                      child: appbar!
-                                    );
-                                  },
-              
-                                  child: ColoredBox(
-                                    color: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                    
-                                        IconButton(
-                                          onPressed: () => Navigator.of(context).maybePop(),
-                                          icon: const Icon(Icons.arrow_back),
+                                      Expanded(
+                                        child: ScalableText(
+                                          "第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN ?? epModel.epsData[selectedEp]!.name}",
+                                          style: const TextStyle(),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-
-                                        Expanded(
-                                          child: ScalableText(
-                                            "第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN ?? epModel.epsData[selectedEp]!.name}",
-                                            style: const TextStyle(),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                    
-                                        IconButton(
-                                          onPressed: () async {
-                                            if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
-                                              await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
-                                            }
-                                          },
-                                          icon: Transform.rotate(
-                                            angle: -45,
-                                            child: const Icon(Icons.link),
-                                          )
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                  
+                                      IconButton(
+                                        onPressed: () async {
+                                          if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
+                                            await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
+                                          }
+                                        },
+                                        icon: Transform.rotate(
+                                          angle: -45,
+                                          child: const Icon(Icons.link),
+                                        )
+                                      ),
+                                    ],
                                   ),
                                 ),
+                                    
                               ),
               
               
@@ -380,7 +375,7 @@ class EpCommentPageDetails extends StatelessWidget {
 			builder: (_,currentEpCommentData,child){
 				
 				return FutureBuilder(
-					future: context.read<EpModel>().loadEp(),
+					future: context.read<EpModel>().loadEpComment(),
 					builder: (_,snapshot) {
 
 						final epModel = context.read<EpModel>();

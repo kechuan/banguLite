@@ -1,12 +1,15 @@
 
 import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/user_details.dart';
 import 'package:dio/dio.dart';
 
 class CommentDetails {
 
-  int? userName;
-  String? nickName;
-  String? avatarUrl;
+  UserInformations? userInformations;
+
+  //int? userName;
+  //String? nickName;
+  //String? avatarUrl;
   
   String? comment;
   int? commentTimeStamp;
@@ -35,11 +38,12 @@ List<CommentDetails> loadCommentResponse(Response commentDetailResponse) {
       final CommentDetails commentDetails = CommentDetails();
       
         commentDetails
-          ..userName = currentComment["user"]["id"]
-          ..nickName = currentComment["user"]["nickname"]
+          ..userInformations = loadUserInformations(currentComment["user"])
+          
+
           ..rate = currentComment["rate"]
           ..type = currentComment["type"]
-          ..avatarUrl = currentComment["user"]["avatar"]["medium"]
+          
           
           ..comment = currentComment["comment"]
           ..commentTimeStamp = currentComment["updatedAt"]

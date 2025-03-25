@@ -16,7 +16,7 @@ class BlogDetails extends ContentDetails{
   int? get blogID => detailID;
   String? get blogContent => content;
   
-  UserDetails? userInfo;
+  UserInformations? userInfo;
 
   List<EpCommentDetails>? get blogReplies => contentRepliedComment;
   set blogReplies(List<EpCommentDetails>? value) => contentRepliedComment = value;

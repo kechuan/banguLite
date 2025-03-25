@@ -6,6 +6,7 @@ class UnVisibleResponse extends InkResponse {
     super.containedInkWell,
     super.hoverDuration,
     super.onTap,
+    super.onLongPress,
     super.onHover,
     super.child,
     

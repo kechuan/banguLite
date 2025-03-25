@@ -4,7 +4,7 @@
 			"path": "lib/catalogs/bangumi_ep_page.dart",
 			"bookmarks": [
 				{
-					"line": 314,
+					"line": 309,
 					"column": 38,
 					"label": "EPInfo"
 				}
@@ -24,7 +24,7 @@
 			"path": "lib/catalogs/bangumi_calendar_page.dart",
 			"bookmarks": [
 				{
-					"line": 126,
+					"line": 127,
 					"column": 35,
 					"label": "calendarPage——资讯页面"
 				}
@@ -34,7 +34,7 @@
 			"path": "lib/main.dart",
 			"bookmarks": [
 				{
-					"line": 30,
+					"line": 34,
 					"column": 25,
 					"label": "Android——SystemChromeSetting"
 				}
@@ -44,7 +44,7 @@
 			"path": "lib/models/providers/ep_model.dart",
 			"bookmarks": [
 				{
-					"line": 30,
+					"line": 33,
 					"column": 54,
 					"label": "获取EPInfo信息"
 				}
@@ -84,7 +84,7 @@
 			"path": "lib/catalogs/bangumi_detail_page.dart",
 			"bookmarks": [
 				{
-					"line": 30,
+					"line": 31,
 					"column": 32,
 					"label": "subjectDetail——番剧详情"
 				}
@@ -97,6 +97,36 @@
 					"line": 18,
 					"column": 26,
 					"label": "设置页 —— SettingPage "
+				}
+			]
+		},
+		{
+			"path": "lib/catalogs/bangumi_blog_page.dart",
+			"bookmarks": [
+				{
+					"line": 14,
+					"column": 46,
+					"label": "BlogPage —— 日志"
+				}
+			]
+		},
+		{
+			"path": "lib/widgets/fragments/ep_comment_tile.dart",
+			"bookmarks": [
+				{
+					"line": 13,
+					"column": 0,
+					"label": "EPComment —— 当前EP评论"
+				}
+			]
+		},
+		{
+			"path": "lib/models/providers/account_model.dart",
+			"bookmarks": [
+				{
+					"line": 13,
+					"column": 43,
+					"label": "AccountModel —— 账号系统"
 				}
 			]
 		}

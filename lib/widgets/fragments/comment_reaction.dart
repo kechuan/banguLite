@@ -1,4 +1,5 @@
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
@@ -24,9 +25,10 @@ class CommentReaction extends StatelessWidget {
         physics: const ClampingScrollPhysics(),
         itemCount: commentReactions?.length ?? 0,
         itemBuilder: (_, index) {
+          
           int dataLikeIndex = commentReactions!.keys.elementAt(index);
-      
-          int stickerIndex = dataLikeIndex - 39 + 23;
+          int stickerIndex = convertStickerDatalike(dataLikeIndex);
+          
       
           //我也不知道为什么别人前端的里 大部分 data-like-value 的差异都是39 就只有 0 指向的是 44
           //data-like-value = 0 => "/img/smiles/tv/44.gif"
@@ -34,9 +36,7 @@ class CommentReaction extends StatelessWidget {
           
           //但唯有 0 dataLikeIndex 是需求增加 
           //而其他的 dataLikeIndex 都是 减少偏移数值
-          if(dataLikeIndex == 0){
-            stickerIndex = dataLikeIndex + 44 + 23; 
-          }
+         
       
           return SizedBox(
             width: 70,
@@ -60,7 +60,7 @@ class CommentReaction extends StatelessWidget {
                   
                     Image.asset(
                       "assets/bangumiSticker/bgm$stickerIndex.gif",
-                      scale: stickerIndex == 124 || stickerIndex == 125 ? 1.6 : 0.8,
+                      scale: 0.8,
                     ),
                   
                     ScalableText("${commentReactions?[dataLikeIndex]?.length}"),

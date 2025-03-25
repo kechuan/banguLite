@@ -2,13 +2,17 @@ import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
+import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
 import 'package:bangu_lite/catalogs/bangumi_sort_page.dart';
 import 'package:bangu_lite/delegates/search_delegates.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
 class IndexLandscape extends StatelessWidget {
@@ -23,10 +27,13 @@ class IndexLandscape extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final indexModel = context.read<IndexModel>();
+    final accountModel = context.read<AccountModel>();
     
     return ValueListenableBuilder(
       valueListenable: selectedPageIndexNotifier,
       builder: (_,currentPageIndex,railLeading) {
+
+
         return LayoutBuilder(
           builder: (_,constraint) {
             
@@ -46,11 +53,37 @@ class IndexLandscape extends StatelessWidget {
                         spacing: 32,
                         children: [
 
-                      
                           Padding(
-                            padding: EdgeInsets.only(top: max(0,constraint.maxHeight-548)),
-                            child: const ToggleThemeModeButton(),
+                            padding: EdgeInsets.only(top: max(0,constraint.maxHeight-658))
                           ),
+
+                          UnVisibleResponse(
+                            onTap: () {
+                              //if(accountModel.loginedUserInformations.userInformations?.userID != null){
+                              //  Navigator.pushNamed(context,Routes.userPage,arguments: accountModel.loginedUserInformations.userInformations?.userID);
+                              //}
+
+                              //else{
+                              //  Navigator.pushNamed(context,Routes.login,arguments: accountModel.loginedUserInformations.userInformations?.userID);
+                              //}
+                            },
+                            child: SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: Builder(
+                                builder: (_){
+                                  if(accountModel.loginedUserInformations.userInformations?.avatarUrl != null){
+                                    return CachedImageLoader(imageUrl: accountModel.loginedUserInformations.userInformations?.avatarUrl);
+                                  }
+                                  else{
+                                    return Icon(MdiIcons.accountCircleOutline,size: 30);
+                                  }
+                                } 
+                              )
+                            ),
+                          ),
+
+                          const ToggleThemeModeButton(),
                       
                           InkResponse(
                             onTap: () {
@@ -71,7 +104,7 @@ class IndexLandscape extends StatelessWidget {
                     NavigationRailDestination(
                       icon: Icon(Icons.local_fire_department_outlined),
                       selectedIcon: Icon(Icons.local_fire_department_rounded),
-                      label: ScalableText('资讯')
+                      label: ScalableText('番剧')
                     ),
                         
                     NavigationRailDestination(

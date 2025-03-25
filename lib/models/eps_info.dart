@@ -15,6 +15,10 @@ class EpsInfo {
 
   int? type;
 
+  //上下ID的链表 kana?
+  int? nextEpID;
+  int? prevEpID;
+
 }
 
 List<EpsInfo> loadEpsData(Response bangumiEpsInfoResponse){

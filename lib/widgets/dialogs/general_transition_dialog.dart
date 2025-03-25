@@ -7,7 +7,9 @@ void showTransitionAlertDialog(
     String? title,
     String? content,
     Function()? cancelAction,
-    Function()? confirmAction
+    Function()? confirmAction,
+    String? cancelText,
+    String? confirmText,
   }
 ){
     showGeneralDialog(
@@ -24,7 +26,7 @@ void showTransitionAlertDialog(
                 if(cancelAction!=null) cancelAction();
                 
                 Navigator.of(context).pop();
-              }, child: const ScalableText("取消")
+              }, child: ScalableText(cancelText ?? "取消")
             ),
             TextButton(
               onPressed: () async {
@@ -37,7 +39,7 @@ void showTransitionAlertDialog(
                 }
 
               }, 
-              child: const ScalableText("确认")
+              child: ScalableText(confirmText ?? "确认")
             )
           ]
         );

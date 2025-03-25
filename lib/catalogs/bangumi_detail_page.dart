@@ -1,4 +1,5 @@
 
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/models/providers/relation_model.dart';
 import 'package:bangu_lite/models/providers/review_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_recent_review.dart';
@@ -94,15 +95,22 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                 ),
                 actions: [
 
+                  IconButton(
+                    onPressed: (){
+                      Navigator.pushNamed(context, Routes.testPage);
+                    },
+                    icon: const Icon(Icons.edit_document)
+                  ),
+
+                  const Padding(padding: PaddingH6),
+
                   ToggleThemeModeButton(
                     onThen: (){
-
                       bangumiModel.getThemeColor(
                         judgeDetailRenderColor(context,bangumiModel.imageColor),
                         darkMode: !judgeDarknessMode(context) 
                         //这里是为了 切换。是 target! 而不是状态 因此得取反向的值。
                       );
-                      
                     }
                   ),
 

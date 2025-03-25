@@ -28,7 +28,7 @@ List<TopicInfo> loadTopicsInfo(Response bangumiTopicsInfoResponse){
 
 	for(Map currentTopicMap in topicListData){
 		TopicInfo currentTopic = TopicInfo();
-    UserDetails currentUserInformation = loadUserDetails( currentTopicMap["creator"] ?? currentTopicMap["user"] );
+    UserInformations currentUserInformation = loadUserInformations( currentTopicMap["creator"] ?? currentTopicMap["user"] );
 
 			currentTopic
         ..topicID = currentTopicMap["id"]

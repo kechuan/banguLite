@@ -8,11 +8,14 @@ import 'package:flutter/material.dart';
 class EpModel extends ChangeNotifier{
   
   EpModel({
-    required this.subjectID,
-    required this.selectedEp,
+    this.subjectID = 0,
+    this.selectedEp = 0,
+    this.episodesID,
   }){
     getEpsInformation();
   }
+
+  final int? episodesID; //一旦提供 则只能是固定数据
 
   int subjectID;
   int selectedEp;
@@ -26,10 +29,15 @@ class EpModel extends ChangeNotifier{
     selectedEp = newEp;
     notifyListeners();
 
-	  if(epCommentData[selectedEp] == null) loadEp();
+	  if(epCommentData[selectedEp] == null) loadEpComment();
   }
 
 	Future<void> getEpsInformation({int? offset}) async {
+
+    //导入新方法
+    if(subjectID == 0 && episodesID != null){
+
+    }
 
     int requestOffset = (offset ?? 0)*100;
     int requestLimit = 100;
@@ -98,39 +106,41 @@ class EpModel extends ChangeNotifier{
 
 	}
 
-	Future<void> loadEp() async{
+	Future<void> loadEpComment() async{
 
-		if(epsData.isEmpty){
-			await getEpsInformation();
-			if(epsData.isEmpty) return;
-		}
+    int requestID = episodesID ?? epsData[selectedEp]!.epID ?? 0;
+    if(requestID == 0) return;
 
-    else{
-      if(epsData[selectedEp] == null){
-        await getEpsInformation(offset: convertSegement(selectedEp,100));
+    if(episodesID == null){
+      if(epsData.isEmpty){
+        await getEpsInformation();
         if(epsData.isEmpty) return;
       }
+
+      else{
+        if(epsData[selectedEp] == null){
+          await getEpsInformation(offset: convertSegement(selectedEp,100));
+          if(epsData.isEmpty) return;
+        }
+      }
+
+      if(epCommentData[selectedEp] != null){
+
+        if(epCommentData[selectedEp]!.isEmpty){
+          debugPrint("$selectedEp in Progress");
+        }
+
+        debugPrint("$selectedEp already loaded");
+        
+        return;
+      }
     }
-
-    
-
-		if(epCommentData[selectedEp] != null){
-
-			if(epCommentData[selectedEp]!.isEmpty){
-				debugPrint("$selectedEp in Progress");
-				return;
-			}
-
-			debugPrint("$selectedEp already loaded");
-			
-			return;
-		}
 
 		//初始化占位
 		epCommentData[selectedEp] = [];
 		
 		await HttpApiClient.client.get(
-			BangumiAPIUrls.epComment(epsData[selectedEp]!.epID!),
+			BangumiAPIUrls.epComment(requestID),
 		).then((response){
 			if(response.data != null){
 
@@ -141,7 +151,7 @@ class EpModel extends ChangeNotifier{
 				epCommentData[selectedEp] = [
           EpCommentDetails()
             ..userInformation = (
-              UserDetails()..userID = 0
+              UserInformations()..userID = 0
             )
             
         ];

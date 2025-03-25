@@ -76,7 +76,7 @@ class IndexPortial extends StatelessWidget {
               NavigationDestination(
                 icon: Icon(Icons.local_fire_department_outlined),
                 selectedIcon: Icon(Icons.local_fire_department_rounded),
-                label: '资讯',
+                label: '番剧',
               ),
       
               NavigationDestination(

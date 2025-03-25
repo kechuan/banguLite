@@ -1,6 +1,5 @@
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
-import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/webview_model.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/foundation.dart';
@@ -10,7 +9,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
+//预计用途: 查看外部图片之类的
 @FFRoute(name: '/webview')
 class BangumiWebviewPage extends StatefulWidget {
   const BangumiWebviewPage({
@@ -31,8 +30,6 @@ class BangumiWebviewPage extends StatefulWidget {
 }
 
 class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage> with RouteLifecycleMixin {
-
-  
   
   PullToRefreshController? pullToRefreshController;
   

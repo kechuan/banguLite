@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/models/user_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -73,7 +74,15 @@ class CommentModel extends ChangeNotifier {
         debugPrint("comment subjectID $subjectID: was empty!");
 
         //因为 null/[] 已经被用来占用为 标志位了 无数据返回部分就以这种形式进行处理
-        commentsData.addAll({1:[CommentDetails()..userName = 0]});
+        commentsData.addAll(
+          {
+            1:
+            [
+              CommentDetails()
+                ..userInformations = (UserInformations()..userID = 0)
+            ]
+          }
+        );
 
         notifyListeners();
         return;
@@ -159,9 +168,13 @@ class CommentModel extends ChangeNotifier {
         debugPrint("wrong! server no response");
 
         commentsData.addAll({
-          pageIndex:[CommentDetails()..userName = 0],
+  
+            pageIndex:
+            [
+              CommentDetails()
+                ..userInformations = (UserInformations()..userID = 0)
+            ]
         });
-
       }
 
       

@@ -3,9 +3,11 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/models/ep_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
@@ -47,10 +49,15 @@ class EpCommentTile extends StatelessWidget {
             
             children: [
 
-              SizedBox(
-                height: 50,
-                width: 50,
-                child: CachedImageLoader(imageUrl: epCommentData.userInformation?.avatarUrl)
+              UnVisibleResponse(
+                onTap: () {
+                  showUserInfomationDialog(context,epCommentData.userInformation);
+                },
+                child: SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: CachedImageLoader(imageUrl: epCommentData.userInformation?.avatarUrl)
+                ),
               ),
 
               //可压缩信息 Expanded
@@ -110,41 +117,42 @@ class EpCommentTile extends StatelessWidget {
       ),
 
       subtitle: Padding(
-        padding: EdgeInsets.only(
-          top: epCommentData.userInformation?.sign == null || epCommentData.userInformation!.sign!.isEmpty ? 32 : 6
+        padding: const EdgeInsets.only(
+          top: 16
         ),
         child: Column(
           spacing: 12,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+            ...?commentBlockStatus ?
+            [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const ScalableText("发言已隐藏"),
+                  ScalableText("原因: ${CommentState.values[epCommentData.state!].reason}")
+                ],
+              )
+            ] : null,
+
+
+            ...?(!commentBlockStatus && epCommentData.comment?.isNotEmpty == true) ? 
+            [
+               BBCodeText(
+                data: convertBangumiCommentSticker(epCommentData.comment ?? ""),
+                stylesheet: BBStylesheet(
+                  tags: allEffectTag,
+                  selectableText: true,
+                  defaultText: TextStyle(
+                    fontFamily: 'MiSansFont',
+                    fontSize: AppFontSize.s16,
+                  )
+                ),
+              ) 
             
-            commentBlockStatus ?
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const ScalableText("发言已隐藏"),
-                ScalableText("原因: ${CommentState.values[epCommentData.state!].reason}")
-              ],
-            ) :
-            const SizedBox.shrink(),
-
-            (!commentBlockStatus) ? 
-            BBCodeText(
-              data: convertBangumiCommentSticker(epCommentData.comment ?? "comment"),
-              stylesheet: BBStylesheet(
-                tags: allEffectTag,
-                selectableText: true,
-                defaultText: TextStyle(
-                  fontFamily: 'MiSansFont',
-                  fontSize: AppFontSize.s16,
-                )
-              ),
-            ) :
-            const SizedBox.shrink(),
-
-            //因为 CommentReaction 内部是 ListView 本身就是不固定长度
-            //因此决定使用 Flex 来提醒 这是一个特殊方式
-
+            ] : null,
+            
             Row(
               //mainAxisAlignment: MainAxisAlignment.end, 不生效 因为主轴已经被 Expanded 占满
               children: [
@@ -161,9 +169,10 @@ class EpCommentTile extends StatelessWidget {
             // 楼主: null 
             // 层主: 3
             // 回帖: 3-1(详情界面特供)
-            epCommentData.epCommentIndex?.contains("-") ?? false ? 
-            const Divider() :
-            const SizedBox.shrink(),
+
+            ...?epCommentData.epCommentIndex?.contains("-") ?? false ? 
+            [const Divider()] :
+            null,
         
           ],
         ),

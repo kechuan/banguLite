@@ -70,7 +70,7 @@ class CachedImageLoader extends StatelessWidget {
                 },
               );
             }
-        
+
             else{
               return const ImageNotAvailable(reason: "empty Url"); //null 
             }
@@ -99,6 +99,7 @@ class ImageNotAvailable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),

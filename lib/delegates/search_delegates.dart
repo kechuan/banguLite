@@ -49,7 +49,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Icon(SubjectType.values[index].iconData),
-                            Text(SubjectType.values[index].name)
+                            Text(SubjectType.values[index].subjectName)
                           ],),
                       ),
                     );

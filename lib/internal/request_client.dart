@@ -41,6 +41,7 @@ class BangumiAPIUrls {
 
   //subject
   static String comment(int subjectID) => '$newUrl/p1/subjects/$subjectID/comments';
+  static String ep(int epID) => '$newUrl/p1/episodes/$epID';
   static String epComment(int epID) => '$newUrl/p1/episodes/$epID/comments';
   static String topics(int subjectID) => '$newUrl/p1/subjects/$subjectID/topics';
   static String topicComment(int topicID) => '$newUrl/p1/subjects/-/topics/$topicID';
@@ -49,13 +50,29 @@ class BangumiAPIUrls {
 
   //user
   static String me = '$newUrl/p1/me';
-  static String user(String username) => '$newUrl/p1/blogs/$username';
-  static String blog(int blogID) => '$newUrl/p1/blogs/$blogID';
-  static String blogComment(int blogID) => '${blog(blogID)}/comments';
+
+  static String user(String username) => '$newUrl/p1/users/$username';
+  static String userBlog(int blogID) => '$newUrl/p1/blogs/$blogID';
+  static String userTimeline(String username) => '${user(username)}/timeline';
+  
+  static String blogComment(int blogID) => '${userBlog(blogID)}/comments';
+
+  //user-relation
+  static String addBlockList(String username) => '$newUrl/p1/blocklist/$username';
+  static String removeBlockList(String username) => '$newUrl/p1/blocklist/$username';
+  static String addFriend(String username) => '$newUrl/p1/friends/$username';
+  static String removeFriend(String username) => '$newUrl/p1/friends/$username';
+
 
   //other
   static String imgur(String imageSuffix) => '$baseResourceUrl/pic/photo/l/$imageSuffix';
-
+  static String imgurThumbnail(
+    String imagePath,
+    {
+      int width = 0,
+      int height = 0,
+    }
+  ) => '$baseResourceUrl/r/${width}x${height}/$imagePath';
 
 }
 
@@ -71,12 +88,24 @@ class BangumiWebUrls{
 
   static String ep(int epID) => '$baseUrl/ep/$epID';
   static String user(String username) => '$baseUrl/user/$username';
-  static String blog(int blogID) => '$baseUrl/blog/$blogID';
+  static String userBlog(int blogID) => '$baseUrl/blog/$blogID';
 
   static String relativeSubject(int subjectID) => '$relativeUrl/subject/$subjectID';
-  //static String relativeSubjectComment(int subjectID) => '$relativeUrl/subject/$subjectID/comments';
-  //static String relativeSubjectTopic(int topicID) => '$relativeUrl/subject/topic/$topicID';
-  //static String relativeEp(int epID) => '$relativeUrl/ep/$epID';
+  static String relativeSubjectComment(int subjectID) => '$relativeUrl/subject/$subjectID/comments';
+  static String relativeSubjectTopic(int topicID) => '$relativeUrl/subject/topic/$topicID';
+  static String relativeEp(int epID) => '$relativeUrl/ep/$epID';
+
+  static String webAuthPage(){
+    final entries =  BangumiQuerys.authorizationQuery().entries;
+        
+    final authParams = 
+      entries.map((entry) =>'${entry.key}=${entry.value}')
+      .toList()
+      .join('&');
+
+    return '${BangumiWebUrls.oAuth}?$authParams';
+  }
+
 
   static const String oAuth = '$relativeUrl/oauth/authorize';
   static const String oAuthToken = '$relativeUrl/oauth/access_token';
@@ -113,7 +142,7 @@ class BangumiQuerys {
 		"client_id":APPInformationRepository.bangumiAPPID,
 		"client_secret":APPInformationRepository.bangumiAPPSecret,
 		"refresh_token":refreshToken,
-		"redirect_uri":APPInformationRepository.bangumiAuthCallbackUri.toString(),
+		"redirect_uri":'banguLite://oauth/bgm_login?client_id=bgm369067d8f39dea8d4',
 		"accept": "application/json",
 	};
 
@@ -130,7 +159,8 @@ class BangumiQuerys {
                           topicsQuery = {"limit":30,"offset":0},
                           epQuery = {"subject_id":0,"limit":100,"offset":0},
                           relationsQuery = {"type":2,"limit":20,"offset":0},
-                          reviewsQuery = {"limit":20,"offset":0}
+                          reviewsQuery = {"limit":20,"offset":0},
+                          timelineQuery = {"limit":3}
   ;
                              
 
@@ -158,7 +188,7 @@ class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.6.0",
+                      version = "0.6.1",
                       author = "kechuan"
   ;
   
@@ -190,7 +220,6 @@ Future<Release?> pullLatestRelease() async {
   return latestRelease; 
 
 }
-
 
 void downloadSticker() async {  
   await Future.wait(

@@ -17,17 +17,25 @@ final allEffectTag = [
 	UnderlineTag(),
 	StrikeThroughTag(),
 	//ColorTag(),
-  PatchColorTag(),
+  	PatchColorTag(),
 	SizeTag(),
 	//ImgTag(),
+  	CodeTag(),
 	LateLoadImgTag(),
-  LateLoadImgTag(tagName: "photo"),
+  	LateLoadImgTag(tagName: "photo"),
 	UrlTag(
     onTap: (link) async => 
-      await canLaunchUrlString(link).then((launchable)=>bus.emit('AppRoute', link))
+      await canLaunchUrlString(link).then(
+		(launchable){
+			if(launchable){
+				bus.emit('AppRoute', link);	
+			}
+			
+		}
+	)
   ),
 	//QuoteTag(),
-  AdapterQuoteTag(),
+  	AdapterQuoteTag(),
 	LeftAlignTag(),
 	CenterAlignTag(),
 	RightAlignTag(),
@@ -182,6 +190,41 @@ class AdapterQuoteDisplay extends StatelessWidget{
 
 }
 
+class CodeTag extends AdvancedTag{
+
+  CodeTag() : super("code");
+
+  @override
+  List<InlineSpan> parse(FlutterRenderer renderer, bbob.Element element) {
+
+    if (element.children.isEmpty) {
+      return [TextSpan(text: "[$tag]")];
+    }
+
+    String codeText = element.children.first.textContent;
+
+    return [
+      WidgetSpan(
+        child: Padding(
+          padding: Padding16,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius:BorderRadius.circular(6),
+              color: Colors.white,
+            ),
+            
+            child: ScalableText(
+              codeText,
+              
+            ),
+          ),
+        ),
+      )
+    ];
+  }
+
+}
+
 class MaskTag extends WrappedStyleTag {
   MaskTag() : super("mask");
 
@@ -224,7 +267,7 @@ class BangumiStickerTag extends AdvancedTag{
 
     final image = Image.asset(
       imageUrl,
-      scale: imageUrl.contains(RegExp(r'(124)|(125)')) ? 1.6 : 0.8,
+      scale: 0.8,
       errorBuilder: (context, error, stack) => ScalableText("[$tag]")
 	  );
 

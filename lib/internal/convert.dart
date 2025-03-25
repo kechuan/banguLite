@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/models/bangumi_details.dart';
 import 'package:bangu_lite/models/eps_info.dart';
 import 'package:flutter/material.dart';
 
@@ -36,6 +35,25 @@ String convertDigitNumString(int originalNumber, {int numberBits = 2}){
     return '$fillingContent$originalNumber';
   }
 
+}
+
+int convertStickerDatalike(int dataLikeIndex){
+
+  //我也不知道为什么别人前端的里 大部分 data-like-value 的差异都是39 就只有 0 指向的是 44
+  //data-like-value = 0 => "/img/smiles/tv/44.gif"
+  //至于为什么是+23 那就是因为 bgm 与 tv 包的差异了 bgm包刚好是23个表情 因此偏移23
+  
+  //但唯有 0 dataLikeIndex 是需求增加 
+  //而其他的 dataLikeIndex 都是 减少偏移数值
+
+  int stickerIndex = dataLikeIndex - 39 + 23;
+      
+          
+  if(dataLikeIndex == 0){
+    stickerIndex = dataLikeIndex + 44 + 23; 
+  }
+
+  return stickerIndex;
 }
 
 String convertBangumiCommentSticker(String originalComment){
@@ -236,4 +254,43 @@ String convertRankBoxStandardDiffusion(int totalVotes, List<dynamic> scoreList,n
   }
 
   return sqrt(standardDiffusion / totalVotes).toStringAsFixed(3);
+}
+
+String covertPastDifferentTime(int? timeStamp){
+
+  
+  String resultText = "";
+
+  if(timeStamp == null) return resultText;
+
+  final currentTime = DateTime.now();
+
+  final int = currentTime.difference(DateTime.fromMillisecondsSinceEpoch(timeStamp*1000)).inMinutes;
+
+  if(int < 60){
+    resultText = "$int分钟前";
+  }
+  
+  else if(int < 60 * 24){
+    resultText = "${int~/60}小时前";
+  }
+  
+  else if(int < 60 * 24 * 7){
+    resultText = "${int~/(60 * 24)}天前";
+  }
+  
+  else if(int < 60 * 24 * 30){
+    resultText = "${int~/(60 * 24 * 7)}周前";
+  }
+
+  else if(int < 60 * 24 * 30 * 12){
+    resultText = "${int~/(60 * 24 * 30)}月前";
+  }
+
+  else if(int < 60 * 24 * 30 * 12 * 10){
+    resultText = "${int~/(60 * 24 * 30 * 12)}年前";
+  }
+
+
+  return resultText;
 }

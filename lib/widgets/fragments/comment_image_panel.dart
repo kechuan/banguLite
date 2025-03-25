@@ -64,12 +64,21 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                   child: UnVisibleResponse(
                     onTap: (){
                       if(!isValid){
-                        canLaunchUrlString(widget.imageUrl).then((result){
-                          result ? launchUrlString(widget.imageUrl): null;
-                          return;
-                        });
+                        Navigator.pushNamed(
+                          context,
+                          Routes.webview,
+                          arguments: {"url":widget.imageUrl},
+                        );
+                        //canLaunchUrlString(widget.imageUrl).then((result){
+                        //  result ? launchUrlString(widget.imageUrl): null;
+                        //  return;
+                        //});
                       }
-                      imageLoadNotifier.value = true;
+
+                      else{
+                        imageLoadNotifier.value = true;
+                      }
+                      
                     },
                     child: ValueListenableBuilder(
                       valueListenable: imageLoadNotifier,

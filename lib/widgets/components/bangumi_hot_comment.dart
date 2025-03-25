@@ -40,9 +40,10 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
       //final indexModel = context.read<IndexModel>();
       final bangumiModel = context.read<BangumiModel>();
+      final commentModel = context.read<CommentModel>();
 
-      //commentFuture ??= context.read<CommentModel>().loadComments(widget.id);
-      commentFuture ??= context.read<CommentModel>().loadComments();
+      //commentFuture ??= commentModel.loadComments(widget.id);
+      commentFuture ??= commentModel.loadComments();
 
         return Padding(
           padding: const EdgeInsets.all(12),
@@ -106,7 +107,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                               }
                               
                               //无评论的显示状态
-                              if(commentListData.length == 1 && commentListData[0].userName == 0){
+                              if(commentListData.length == 1 && commentListData[0].userInformations?.userID == 0){
                                 return const Center(
                                   child: ScalableText("该番剧暂无人评论..."),
                                 );
@@ -151,9 +152,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
                               onPressed: (){
 
-                                final commentModel = context.read<CommentModel>();
-
-                                if(commentModel.commentsData.values.first.length == 1 && commentModel.commentsData.values.first[0].userName == 0){
+                                if(commentModel.commentsData.values.first.length == 1 && commentModel.commentsData.values.first[0].userInformations?.userID == 0){
                                   debugPrint("no comment");
                                   return;
                                 }
@@ -162,7 +161,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                                   context,
                                   Routes.subjectComment,
                                   arguments: {
-                                    "commentModel":context.read<CommentModel>(),
+                                    "commentModel":commentModel,
                                     "subjectID":widget.id,
                                     "name":widget.name,
                                     "bangumiThemeColor":bangumiModel.bangumiThemeColor
@@ -184,27 +183,25 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                             hoverColor: Colors.transparent,
                             onTap: (){
                               debugPrint("change timeSort way");                              
-                                  
-                              final commentModel = context.read<CommentModel>();
                           
                               isOldCommentSort.value = !isOldCommentSort.value;
                           
                               if(
                                 commentModel.commentsData.keys.contains(
                                   convertTotalCommentPage(
-                                    context.read<CommentModel>().commentLength, 
+                                    commentModel.commentLength, 
                                     10
                                 ))
                               ){
-                                context.read<CommentModel>().notifyListeners();
+                                commentModel.notifyListeners();
                               }
                                   
                               else{
                                 
                                 commentModel.currentPageIndex = isOldCommentSort.value ? convertTotalCommentPage(commentModel.commentLength,10) : 1;
                                 
-                                //context.read<CommentModel>().loadComments(widget.id,isReverse: isOldCommentSort.value).then((_){
-                                context.read<CommentModel>().loadComments(isReverse: isOldCommentSort.value).then((_){
+                                //commentModel.loadComments(widget.id,isReverse: isOldCommentSort.value).then((_){
+                                commentModel.loadComments(isReverse: isOldCommentSort.value).then((_){
                                   commentModel.changePage(commentModel.currentPageIndex);
                                 });
                               }

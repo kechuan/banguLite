@@ -312,24 +312,3 @@ Future<List<Map<String,num>>> loadStarsDetail(List<int> starsIDList) async {
   return starUpdateCompleter.future;
 
 }
-
-enum SubjectType {
-  book(1,Icons.book_outlined), // 书籍
-  anime(2,Icons.live_tv_rounded), // 动画
-  music(3,Icons.music_note), // 音乐
-  game(4,Icons.games_outlined), // 游戏
-  real(6,Icons.movie), // 电视剧/电影
-  all(7,Icons.select_all)
-  ;
-
-  final int subjectType;
-  final IconData iconData;
-
-  const SubjectType(this.subjectType,this.iconData);
-}
-
-extension SubjectTypeExtension on SubjectType {
-  static List<int> get subjectTypes {
-    return SubjectType.values.map((e) => e.subjectType).toList();
-  }
-}

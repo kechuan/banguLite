@@ -1,8 +1,10 @@
-import 'package:bangu_lite/models/blog_details.dart';
+import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/models/social_details.dart';
+import 'package:bangu_lite/models/timeline_details.dart';
 
-class UserDetails {
+class UserInformations {
 
-  UserDetails();
+  UserInformations();
 
   int? userID;
   String? userName;
@@ -12,12 +14,31 @@ class UserDetails {
 
   int? joinedAtTimeStamp;
   int? group;
-  List<BlogDetails>? blogs;
-  
+
 }
 
-class LoginedUserDetails extends UserDetails{
-  LoginedUserDetails();
+class UserDetails{
+
+	UserInformations? userInfomation;
+
+	String? introduction;
+
+	//site 字段 也会算在 这里面 计入为 home
+
+	//UserInfo
+	//Map? subjectStat;
+	Map? subjectStat;
+	List<SocialDetails>? socialAccounts;
+	//Timeline
+	List<TimelineDetails>? timelineActions;
+
+	
+}
+
+
+class LoginedUserInformations{
+
+  UserInformations? userInformations;
 
   String? accessToken;
   int? expiredTime;
@@ -25,13 +46,20 @@ class LoginedUserDetails extends UserDetails{
 
 }
 
-LoginedUserDetails getDefaultLoginedUserDetails() => LoginedUserDetails();
 
 
-UserDetails loadUserDetails(Map<String,dynamic> bangumiUserData){
-  final userDetails = UserDetails();
+UserInformations getDefaultUserInformations()=> UserInformations();
+LoginedUserInformations getDefaultLoginedUserInformations() => LoginedUserInformations();
 
-  userDetails
+
+UserInformations loadUserInformations(
+  Map<String,dynamic> bangumiUserData,
+  
+){
+
+  final userInformations = UserInformations();
+
+  userInformations
     ..userID = bangumiUserData["id"]
     ..userName = bangumiUserData["username"]
     ..nickName = bangumiUserData["nickname"].isEmpty ? bangumiUserData["username"] : bangumiUserData["nickname"]
@@ -40,6 +68,37 @@ UserDetails loadUserDetails(Map<String,dynamic> bangumiUserData){
     ..joinedAtTimeStamp = bangumiUserData["joinedAt"]
     ..group = bangumiUserData["group"]
   ;
+  
+  return userInformations;
+}
 
-  return userDetails;
+
+UserDetails loadUserDetails(
+	Map<String,dynamic> bangumiUserDetailsData,
+	{UserInformations? currentUserInformation}
+){
+	UserDetails userDetails = UserDetails();
+
+	userDetails
+		..userInfomation = currentUserInformation ?? loadUserInformations(bangumiUserDetailsData)
+		..introduction = bangumiUserDetailsData["bio"]
+		..socialAccounts = loadSocialDetails(bangumiUserDetailsData["networkServices"])
+		..subjectStat = bangumiUserDetailsData["stats"]["subject"]
+	;
+
+	return userDetails;
+
+
+}
+
+List<dynamic> convertSubjectStat(
+  Map? statData,
+  {
+    SubjectType subjectType = SubjectType.anime
+  }
+){
+
+  if(statData == null) return List.filled(5, 0);
+
+  return statData['${subjectType.subjectType}']?.values.toList()  ?? List.filled(5, 0);
 }

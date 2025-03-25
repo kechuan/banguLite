@@ -286,56 +286,36 @@ class StarBangumiDetailsAdapter extends TypeAdapter<StarBangumiDetails> {
           typeId == other.typeId;
 }
 
-class LoginedUserDetailsAdapter extends TypeAdapter<LoginedUserDetails> {
+class LoginedUserInformationsAdapter
+    extends TypeAdapter<LoginedUserInformations> {
   @override
   final int typeId = 7;
 
   @override
-  LoginedUserDetails read(BinaryReader reader) {
+  LoginedUserInformations read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return LoginedUserDetails()
+    return LoginedUserInformations()
       ..accessToken = fields[0] as String?
-      ..userID = (fields[1] as num?)?.toInt()
-      ..userName = fields[2] as String?
-      ..nickName = fields[3] as String?
-      ..avatarUrl = fields[4] as String?
-      ..sign = fields[5] as String?
-      ..joinedAtTimeStamp = (fields[6] as num?)?.toInt()
-      ..group = (fields[7] as num?)?.toInt()
-      ..blogs = (fields[8] as List?)?.cast<BlogDetails>()
       ..expiredTime = (fields[9] as num?)?.toInt()
-      ..refreshToken = fields[10] as String?;
+      ..refreshToken = fields[10] as String?
+      ..userInformations = fields[12] as UserInformations?;
   }
 
   @override
-  void write(BinaryWriter writer, LoginedUserDetails obj) {
+  void write(BinaryWriter writer, LoginedUserInformations obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.accessToken)
-      ..writeByte(1)
-      ..write(obj.userID)
-      ..writeByte(2)
-      ..write(obj.userName)
-      ..writeByte(3)
-      ..write(obj.nickName)
-      ..writeByte(4)
-      ..write(obj.avatarUrl)
-      ..writeByte(5)
-      ..write(obj.sign)
-      ..writeByte(6)
-      ..write(obj.joinedAtTimeStamp)
-      ..writeByte(7)
-      ..write(obj.group)
-      ..writeByte(8)
-      ..write(obj.blogs)
       ..writeByte(9)
       ..write(obj.expiredTime)
       ..writeByte(10)
-      ..write(obj.refreshToken);
+      ..write(obj.refreshToken)
+      ..writeByte(12)
+      ..write(obj.userInformations);
   }
 
   @override
@@ -344,7 +324,119 @@ class LoginedUserDetailsAdapter extends TypeAdapter<LoginedUserDetails> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is LoginedUserDetailsAdapter &&
+      other is LoginedUserInformationsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class UserInformationsAdapter extends TypeAdapter<UserInformations> {
+  @override
+  final int typeId = 8;
+
+  @override
+  UserInformations read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return UserInformations()
+      ..userID = (fields[0] as num?)?.toInt()
+      ..userName = fields[1] as String?
+      ..nickName = fields[2] as String?
+      ..avatarUrl = fields[3] as String?
+      ..sign = fields[4] as String?
+      ..joinedAtTimeStamp = (fields[5] as num?)?.toInt()
+      ..group = (fields[6] as num?)?.toInt();
+  }
+
+  @override
+  void write(BinaryWriter writer, UserInformations obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.userID)
+      ..writeByte(1)
+      ..write(obj.userName)
+      ..writeByte(2)
+      ..write(obj.nickName)
+      ..writeByte(3)
+      ..write(obj.avatarUrl)
+      ..writeByte(4)
+      ..write(obj.sign)
+      ..writeByte(5)
+      ..write(obj.joinedAtTimeStamp)
+      ..writeByte(6)
+      ..write(obj.group);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserInformationsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class TimelineDetailsAdapter extends TypeAdapter<TimelineDetails> {
+  @override
+  final int typeId = 9;
+
+  @override
+  TimelineDetails read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return TimelineDetails(
+      detailID: (fields[9] as num?)?.toInt(),
+    )
+      ..actionUserUID = (fields[0] as num?)?.toInt()
+      ..catType = (fields[1] as num?)?.toInt()
+      ..catAction = (fields[2] as num?)?.toInt()
+      ..timelineCreatedAt = (fields[3] as num?)?.toInt()
+      ..objectIDSet = (fields[4] as Set?)?.cast<int>()
+      ..objectNameSet = (fields[5] as Set?)?.cast<String>()
+      ..subObjectID = (fields[6] as num?)?.toInt()
+      ..comment = fields[7] as String?
+      ..epsUpdate = (fields[8] as num?)?.toInt();
+  }
+
+  @override
+  void write(BinaryWriter writer, TimelineDetails obj) {
+    writer
+      ..writeByte(10)
+      ..writeByte(0)
+      ..write(obj.actionUserUID)
+      ..writeByte(1)
+      ..write(obj.catType)
+      ..writeByte(2)
+      ..write(obj.catAction)
+      ..writeByte(3)
+      ..write(obj.timelineCreatedAt)
+      ..writeByte(4)
+      ..write(obj.objectIDSet)
+      ..writeByte(5)
+      ..write(obj.objectNameSet)
+      ..writeByte(6)
+      ..write(obj.subObjectID)
+      ..writeByte(7)
+      ..write(obj.comment)
+      ..writeByte(8)
+      ..write(obj.epsUpdate)
+      ..writeByte(9)
+      ..write(obj.detailID);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TimelineDetailsAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

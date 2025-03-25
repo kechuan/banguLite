@@ -177,29 +177,19 @@ mixin RouteLifecycleMixin<T extends StatefulWidget> on LifecycleRouteState<T> {
   // 而且需要多个State 都能被统一封装
   // 那就只能是 mixin 引入了
 
-  bool isActived = true;
+  //bool isActived = true;
 
-  @override
-  void initState() {
-    bus.on('AppRoute', (link) {
-      if (!isActived) return;
-      if (!mounted) return;
-      appRouteMethod(context, link);
-    });
-    super.initState();
-  }
+  //@override
+  //void initState() {
+  //  bus.on('AppRoute', (link) {
+  //    if (!isActived) return;
+  //    if (!mounted) return;
+  //    appRouteMethodListener(context, link);
+  //  });
+  //  super.initState();
+  //}
 
-  @override
-  void onPause() {
-    isActived = false;
-    super.onPause();
-  }
-
-  @override
-  void onResume() {
-    isActived = true;
-    super.onResume();
-  }
+ 
 
 }
 

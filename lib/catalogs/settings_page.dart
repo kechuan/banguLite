@@ -1,6 +1,7 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -13,7 +14,6 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 @FFRoute(name: 'settings')
@@ -23,10 +23,13 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    const List<Widget> configWidgetList = [
+    const List<Widget> appearanceConfigList = [
       FontSizeTile(),
       ColorThemeTile(),
       ThemeModeTile(),
+    ];
+
+    const List<Widget> behaviourConfigList = [
       CommentImageLoadModeTile(),
       ClearCacheTile(),
       ConfigTile(),
@@ -34,20 +37,108 @@ class SettingsPage extends StatelessWidget {
       TestTile()
     ];
 
+
     return Scaffold(
       appBar: AppBar(title: const ScalableText("设置")),
 
       body: EasyRefresh(
-        child: ListView.separated(
-        shrinkWrap: true,
-        itemCount: configWidgetList.length,
-        itemBuilder: (context, index) {
-          return configWidgetList[index];
-        },
-        separatorBuilder: (context, index) => const Divider(height: 1),
-          
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+
+
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              scrollbarTheme : const ScrollbarThemeData(
+                thickness: WidgetStatePropertyAll(0.0)
+              ),
+            ),
+            child: ListView(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    color: judgeCurrentThemeColor(context).withValues(alpha: 0.2)
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    
+                    children: [
+                  
+                      Padding(
+                        padding: PaddingH16V12,
+                        child: ScalableText("外观",style:TextStyle(color:Colors.grey.withValues(alpha: 0.8))),
+                      ),
+                  
+                      ListView.separated(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: appearanceConfigList.length,
+                        itemBuilder: (context, index) {
+                          return appearanceConfigList[index];
+                        },
+                        separatorBuilder: (context, index) => const Divider(height: 1),
+                        
+                      ),
+                    
+                    
+                    
+                    ],
+                  ),
+                ),
+            
+                const Padding(padding: PaddingV16),
+            
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    color: judgeCurrentThemeColor(context).withValues(alpha: 0.2)
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    
+                    children: [
+                  
+                      Padding(
+                        padding: PaddingH16V12,
+                        child: ScalableText("设置",style:TextStyle(color:Colors.grey.withValues(alpha: 0.8))),
+                      ),
+                  
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: behaviourConfigList.length,
+                        itemBuilder: (context, index) {
+                          return behaviourConfigList[index];
+                        },
+                        separatorBuilder: (context, index) => const Divider(height: 1),
+                        
+                      ),
+                    
+                    
+                    
+                    ],
+                  ),
+                ),
+              
+              ],
+            ),
+          ),
         ),
       ),
+
+      //body: EasyRefresh(
+      //  child: ListView.separated(
+      //  shrinkWrap: true,
+      //  itemCount: configWidgetList.length,
+      //  itemBuilder: (context, index) {
+      //    return configWidgetList[index];
+      //  },
+      //  separatorBuilder: (context, index) => const Divider(height: 1),
+          
+      //  ),
+      //),
+
+
     );
   }
 }
@@ -94,13 +185,7 @@ class FontSizeTile extends ListTile {
                       },
                       dividerColor: Colors.transparent,
                       indicatorSize: TabBarIndicatorSize.label,
-                      tabs: const [
-                        Center(child: Text("小")),
-                        Center(child: Text("偏小")),
-                        Center(child: Text("中")),
-                        Center(child: Text("偏大")),
-                        Center(child: Text("大")),
-                      ]
+                      tabs: List.generate(5, (index) => Center(child: Text(ScaleType.values[index].sacleName)))
                     ),
                   ),
                 ),
@@ -160,12 +245,11 @@ class ColorThemeTile extends ListTile{
                             else{
                               //show 调色板
                               showModalBottomSheet(
-                          
                                 isScrollControlled: true,
                                 backgroundColor: Colors.transparent,
                                 constraints: BoxConstraints(
                                   maxWidth: MediaQuery.sizeOf(context).width*5/6,
-                                  maxHeight: MediaQuery.sizeOf(context).height*2/3+MediaQuery.paddingOf(context).bottom+20
+                                  maxHeight: 400
                                 ),
                                 context: context,
                                 builder: (_){
@@ -497,11 +581,8 @@ class AboutTile extends ListTile{
 class TestTile extends ListTile{
   const TestTile({super.key});
 
-   @override
+  @override
   Widget build(BuildContext context) {
-
-    final indexModel = context.read<IndexModel>();
-    final accountModel = context.read<AccountModel>();
     
     return SizedBox(
       height: 80,
@@ -509,22 +590,11 @@ class TestTile extends ListTile{
         child: ListTile(
           trailing: IconButton(
             onPressed: (){
-
+              
             }, 
             icon: const Icon(Icons.cookie)
           ),
-          onTap: () async {
-
-            final entries =  BangumiQuerys.authorizationQuery().entries;
-
-            final authParams = 
-              entries.map((entry) =>'${entry.key}=${entry.value}')
-              .toList()
-              .join('&');
-
-            launchUrlString('${BangumiWebUrls.oAuth}?$authParams');
-
-          },
+          onTap: ()=> launchUrlString(BangumiWebUrls.webAuthPage()),
           title: ScalableText("登入",style: TextStyle(fontSize: AppFontSize.s16))
         ),
       ),

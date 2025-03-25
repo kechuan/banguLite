@@ -22,7 +22,6 @@ abstract class BangumiContentPageState<
 > extends LifecycleRouteState<T> with RouteLifecycleMixin {
 
   //widget.*信息获取
-  @protected
   M getContentModel();
   I getContentInfo();
 
@@ -114,8 +113,8 @@ abstract class BangumiContentPageState<
                     return SliverPadding(
                       padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
                       sliver: Skeletonizer.sliver(
-						enabled: isCommentLoading,
-						child: SliverList.separated(
+                        enabled: isCommentLoading,
+                        child: SliverList.separated(
                         itemCount: (isCommentLoading ? 3 : (commentCount ?? 0))+1,
                         itemBuilder: (_,contentCommentIndex){
                         //Loading...
@@ -134,6 +133,7 @@ abstract class BangumiContentPageState<
                                     ..userInformation = contentInfo.userInformation
                                     ..comment = contentDetail?.content
                                     ..commentTimeStamp = contentInfo.createdTime
+                                    ..commentReactions = contentDetail?.contentReactions
                                 ),
                               
                                 Padding(
@@ -150,9 +150,9 @@ abstract class BangumiContentPageState<
 
                                 //无评论的显示状态
                                 if(commentCount == null || commentCount == 0)
-                                const Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.only(top:64),
+                                const SizedBox(
+                                  height: 64,
+                                  child: Center(
                                     child: ScalableText("暂无评论..."),
                                   ),
                                 )

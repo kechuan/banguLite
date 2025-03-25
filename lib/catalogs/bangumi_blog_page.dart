@@ -34,11 +34,8 @@ class _BangumiBlogPageState extends BangumiContentPageState
 	ReviewModel,
 	ReviewInfo,
 	BlogDetails
->
-
-{
+>{
   
-
   @override
   ReviewInfo getContentInfo() => widget.reviewInfo;
 
@@ -64,13 +61,12 @@ class _BangumiBlogPageState extends BangumiContentPageState
   int? getCommentCount(BlogDetails? blogDetails, bool isLoading){
 
 	if(isLoading) return null;
-	return blogDetails!.blogReplies!.isEmpty ? 0 : blogDetails.blogReplies!.length;
-
+	  return blogDetails!.blogReplies!.isEmpty ? 0 : blogDetails.blogReplies!.length;
   }
 	
    
   @override
-  String getWebUrl(int? blogID) => BangumiWebUrls.blog(blogID ?? 0);
+  String getWebUrl(int? blogID) => BangumiWebUrls.userBlog(blogID ?? 0);
 
   @override
   Future<void> loadContent(int blogID) => getContentModel().loadBlog();

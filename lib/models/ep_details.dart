@@ -11,7 +11,7 @@ class EpCommentDetails{
     int? state;
     List<EpCommentDetails>? repliedComment;
 
-    UserDetails? userInformation;
+    UserInformations? userInformation;
     
 }
 
@@ -27,7 +27,7 @@ List<EpCommentDetails> loadEpCommentDetails(
 
 	for(Map currentEpCommentMap in epCommentListData){
 		EpCommentDetails currentEpComment = EpCommentDetails();
-    UserDetails currentUserInformation = loadUserDetails(currentEpCommentMap["user"] ?? currentEpCommentMap["creator"]);
+    UserInformations currentUserInformation = loadUserInformations(currentEpCommentMap["user"] ?? currentEpCommentMap["creator"]);
 
 		currentCommentIndex+=1;
 

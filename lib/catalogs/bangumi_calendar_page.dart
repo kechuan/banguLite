@@ -10,7 +10,6 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
 import 'package:bangu_lite/widgets/dialogs/warp_season_dialog.dart';
-import 'package:dio/dio.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +28,7 @@ class BangumiCalendarPage extends StatefulWidget {
   State<BangumiCalendarPage> createState() => _BangumiCalendarPageState();
 }
 
-class _BangumiCalendarPageState extends LifecycleRouteState<BangumiCalendarPage> {
+class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
 
   Future? calendarLoadFuture;
   Timer? carouselTimer;
@@ -67,8 +66,13 @@ class _BangumiCalendarPageState extends LifecycleRouteState<BangumiCalendarPage>
     carouselSpinTimer();
     calendarLoadFuture = context.read<IndexModel>().loadCalendar();
 
+    bus.on('AppRoute', (link) {
+      if (!mounted) return;
+      appRouteMethodListener(context, link);
+    });
+
     bus.on('LoginRoute', (link) {
-      apploginMethod(context, link);
+      appLoginMethodListener(context, link);
     });
     
     super.initState();
@@ -91,9 +95,6 @@ class _BangumiCalendarPageState extends LifecycleRouteState<BangumiCalendarPage>
     super.onResume();
   }
 
-  
-
-  
 
   @override
   Widget build(BuildContext context) {
