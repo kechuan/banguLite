@@ -2,6 +2,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/max_number_input_formatter.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
@@ -15,19 +16,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
-@FFRoute(name: '/TestPage')
+@FFRoute(name: '/sendComment')
 class SendCommentPage extends StatefulWidget {
   const SendCommentPage({
     super.key,
-    this.isReply = false,
-    this.replyTitle,
-    this.referenceObject = 'sth wrong!',
+	this.title,
+    required this.isReply,
+    this.referenceObject,
     this.preservationContent,
   });
 
   final bool isReply;
-  final String? replyTitle;
-  final String? referenceObject; //quote 标签 之类的东西
+  final String? title;
+
+  //有可能是创建 但也有可能是编辑回复
+
+  //quote 标签 之类的东西
+  final String? referenceObject; 
+
+  //草稿箱/编辑回复 依赖字段
   final String? preservationContent;
 
   @override
@@ -35,7 +42,7 @@ class SendCommentPage extends StatefulWidget {
 }
 
 class _SendCommentPageState extends State<SendCommentPage> {
-  final ValueNotifier<bool> expandedToolKitNotifier = ValueNotifier(true);
+  final ValueNotifier<bool> expandedToolKitNotifier = ValueNotifier(false);
 
   final TextEditingController titleEditingController = TextEditingController();
   final TextEditingController contentEditingController = TextEditingController();
@@ -48,10 +55,18 @@ class _SendCommentPageState extends State<SendCommentPage> {
   final PageController stickerPageController = PageController();
 
   @override
+  void initState() {
+    textEditingFocus.requestFocus();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
-    if(widget.referenceObject!=null){
-      contentEditingController.text = '[quote]${widget.referenceObject}[/quote]\n';
+	debugPrint("widget.referenceObject:${widget.referenceObject}, ${widget.isReply}");
+
+    if(widget.preservationContent!=null){
+      contentEditingController.text = widget.referenceObject ?? '';
     }
 
     return Scaffold(
@@ -60,30 +75,37 @@ class _SendCommentPageState extends State<SendCommentPage> {
         leading: IconButton(
           onPressed: () {
 
-            showTransitionAlertDialog(
-              context,
-              title: "退出确认",
-              content: "需要保留草稿纸吗? 内容会存留至退出详情页面之前",
-              cancelText: "放弃修改",
-              confirmText: "保留修改",
-              cancelAction: () {
-                //额外需要多 pop 一层
-                Navigator.of(context).pop();
-              },
-              confirmAction: () {
-                
-              },
-            );
+			if(contentEditingController.text.isEmpty){
+				 Navigator.of(context).pop();
+			}
 
-            //Navigator.of(context).pop();
+			else{
+				showTransitionAlertDialog(
+					context,
+					title: "退出确认",
+					content: "需要保留草稿纸吗? 编辑内容会存留至退出详情页面之前",
+					cancelText: "放弃修改",
+					confirmText: "保留修改",
+					cancelAction: () {
+						//额外需要多 pop 一层
+						Navigator.of(context).pop();
+					},
+					confirmAction: () {
+						Navigator.of(context).pop();
+					},
+				);
+
+			}
+
 
           },
           icon: const Icon(Icons.arrow_back),
         ),
         backgroundColor: judgeCurrentThemeColor(context).withValues(alpha: 0.8),
         title: widget.isReply ? 
-          ScalableText('吐槽 ${widget.referenceObject}',style: const TextStyle(fontSize: 18)) : 
-          ScalableText('回复 ${widget.referenceObject}',style: const TextStyle(fontSize: 18)) ,
+          ScalableText('吐槽 ${widget.title}',style: const TextStyle(fontSize: 18)) : 
+		  ScalableText('回复 ${widget.title}',style: const TextStyle(fontSize: 18))
+		,
         actions: [
 
           IconButton(
@@ -100,193 +122,241 @@ class _SendCommentPageState extends State<SendCommentPage> {
 
 
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+				if(contentEditingController.text.isEmpty){
+					//后续估计会专门出一个switch判断。。
+					fadeToaster(context: context, message: '不可发送空白内容');
+					return;
+				}
+			},
             icon: const Icon(Icons.send),
           ),
 
         ],
       ),
-      body: Stack(
-        children: [
-            Padding(
-              padding: Padding12,
-              child: Column(
-                spacing: 16,
-                children: [
-                        
-                  if (widget.isReply) ...[
-                    TextField(
-                      decoration: const InputDecoration(
-                        labelText: '这里填可以引喷的标题',
-                        
-                      ),
-                      controller: titleEditingController,
-                      maxLines: null,
-                    ),
-                  ],
-                  
-                  Expanded(
-                    child: TextField(
-						focusNode:textEditingFocus,
-						maxLength: 2000,
-						controller: contentEditingController,
-						onTapOutside: (event) {
-						  if(toolKitFocus.hasFocus){
-							textEditingFocus.requestFocus();
-						  }
-						  else{
-							textEditingFocus.unfocus();
-						  }
-						},
-						textAlignVertical: TextAlignVertical.top,
-						buildCounter: (context, {required currentLength, required isFocused, required maxLength}) {
-							return Text("$currentLength/$maxLength");
-						},
-						decoration:  InputDecoration(
-							hintText: '这里填可以引喷的内容',
-							hintStyle: TextStyle(color: judgeDarknessMode(context) ? Colors.white : Colors.black,),
-							border: const OutlineInputBorder(),
-						),
-						expands : true,
-						maxLines: null,
+      body: ValueListenableBuilder(
+		valueListenable: expandedToolKitNotifier,
+        builder: (_,expandedToolKitStatus,toolKit) {
+          	return Padding(
+          		padding: EdgeInsets.only(
+          			bottom: !expandedToolKitNotifier.value ? MediaQuery.paddingOf(context).bottom : 0,
+          		),
+				child: toolKit!
+			);
+        },
+		child: Column(
+		  children: [
+
+			widget.referenceObject != null ?
+
+			Padding(
+				padding: Padding16,
+				child: Center(
+				child: BBCodeText(
+					data: widget.referenceObject ?? "",
+					stylesheet: BBStylesheet(
+						tags: allEffectTag,
+						selectableText: true,
+						defaultText: const TextStyle(fontFamily: "MiSansFont")
 					),
-                  ),
+				),
+				),
+			): const SizedBox.shrink(),
 
-                  //countText 预留位置
-                  const Padding(padding: PaddingV24)
-                    
-                ],
-              ),
-            ),
 
-            //工具栏
-            ValueListenableBuilder(
-              valueListenable: expandedToolKitNotifier,
-              builder: (_,expandedStatus,toolKitWidget) {
-                return AnimatedPositioned(
-                  height: 350,
-                  width: MediaQuery.sizeOf(context).width,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.ease,
-                  bottom: expandedStatus ? 0 : -290,
-                  child: toolKitWidget!
-                );
-              },
-              child: Focus(
-				focusNode: toolKitFocus,
-				
-				child: Listener(
-					onPointerDown: (event) {
-
-						toolKitFocus.requestFocus();
-
-						WidgetsBinding.instance.addPostFrameCallback((_) {
-							if(!textEditingFocus.hasFocus){
-								textEditingFocus.requestFocus();
-							}
-							
-							debugPrint("trigged onPointerDown: ${textEditingFocus.hasFocus} / ${toolKitFocus.hasFocus}");
-						});
-						
-						
-
-						
-
-						//toolKitFocus.requestFocus();
-						
-					},
-					child: DecoratedBox(
-							decoration: BoxDecoration(
-								color: judgeCurrentThemeColor(context).withValues(alpha: 0.6),
-								borderRadius: const BorderRadius.vertical(top: Radius.circular(16))
-							),
-							child: Column(
-								children: [
-									SizedBox(
-										height: kToolbarHeight,
-										child: Row(
-											mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-											crossAxisAlignment: CrossAxisAlignment.center,
-											children: [
-										
-												IconButton(
-													icon: const Row(
-																	spacing: 6,
-													children: [
-														Icon(Icons.emoji_emotions),
-																	ScalableText("贴纸表情")
-													],
-													),
-													onPressed: () {
-																	expandedToolKitNotifier.value = true;
-																	toolkitPageController.animateToPage(
-																		0, 
-																		duration: const Duration(milliseconds: 300),
-																		curve: Curves.easeIn
-																	);
-													},
-												),
-												
-												IconButton(
-													icon: const Row(
-																	spacing: 6,
-													children: [
-														Icon(Icons.format_color_text),
-																	ScalableText("文字样式")
-													],
-													),
-													onPressed: () {
-																	expandedToolKitNotifier.value = true;
-																	toolkitPageController.animateToPage(
-																		1, 
-																		duration: const Duration(milliseconds: 300),
-																		curve: Curves.easeIn
-																	);
-													},
-												),
-												
-												
-												IconButton(
-													icon: const Icon(Icons.keyboard),
-													onPressed: () {
-													expandedToolKitNotifier.value = !expandedToolKitNotifier.value;
-													},
-												),
-												
+		    Expanded(
+				child: Stack(
+							children: [
+						  
+								Padding(
+								padding: Padding12,
+								child: Column(
+									spacing: 16,
+									children: [
 											
-											],
+									if (!widget.isReply) ...[
+										TextField(
+										decoration: const InputDecoration(
+											labelText: '这里填可以引喷的标题',
+											
+											
 										),
-									),
-									
-									Divider(color: judgeDarknessMode(context) ? Colors.white : Colors.black,height: 1),
+										controller: titleEditingController,
+										maxLines: null,
+										),
+									],
 									
 									Expanded(
-										child: Builder(
-											builder: (_) {
+										child: TextField(		
+																			focusNode:textEditingFocus,
+																			maxLength: 2000,
+																			controller: contentEditingController,
+																			onTap: () async {
+																				expandedToolKitNotifier.value = false;
+																				
+																			},
+																			keyboardType: TextInputType.text,
+																			
+																			textAlignVertical: TextAlignVertical.top,
+																			buildCounter: (context, {required currentLength, required isFocused, required maxLength}) {
+																				return Text("$currentLength/$maxLength");
+																			},
+																			decoration:  InputDecoration(
+																				hintText: '这里填可以引喷的内容',
+																				hintStyle: TextStyle(color: judgeDarknessMode(context) ? Colors.white : Colors.black,),
+																				border: const OutlineInputBorder(),
+																			),
+																			expands : true,
+																			maxLines: null,
+																		),
+									),
+						  
+									//countText 预留位置
+									const Padding(padding: PaddingV24)
 										
-											return PageView(
-												controller: toolkitPageController,
+									],
+								),
+								),
+						  
+								//工具栏
+								ValueListenableBuilder(
+								valueListenable: expandedToolKitNotifier,
+								builder: (_,expandedStatus,toolKitWidget) {
+									return AnimatedPositioned(
+									height: 400,
+									width: MediaQuery.sizeOf(context).width,
+									duration: const Duration(milliseconds: 300),
+									curve: Curves.ease,
+									bottom: expandedStatus ? MediaQuery.systemGestureInsetsOf(context).bottom : -350,
+									child: toolKitWidget!,
+									);
+								},
+								child: Focus(
+										focusNode: toolKitFocus,
 										
-												children: [
-										
-																StickerSelectView(contentEditingController: contentEditingController),
-										
-																TextStyleSelectView(contentEditingController: contentEditingController),
+										child: Listener(
+											
+											onPointerDown: (event) {
+						  
+												//expandedToolKitNotifier.value = true;
+						  
+												//toolKitFocus.requestFocus();
+						  
+												//有时会出现 输入法弹出 后，点击工具栏，工具栏会弹出，但是输入法不会收起 因为输入法的焦点没有发生变化
+												//只能手动管理它了
+												if(!expandedToolKitNotifier.value){
+													//expandedToolKitNotifier.value = true;
+													SystemChannels.textInput.invokeMethod('TextInput.hide');
+												}
+						  
+						  
+												WidgetsBinding.instance.addPostFrameCallback((_) {
+													if(!textEditingFocus.hasFocus){
+														textEditingFocus.requestFocus();
+														SystemChannels.textInput.invokeMethod('TextInput.hide');
+													}
+													
+													debugPrint("trigged onPointerDown: ${textEditingFocus.hasFocus} / ${toolKitFocus.hasFocus}");
+												});
+												
+												
+											},
+											child: DecoratedBox(
+													decoration: BoxDecoration(
+														color: judgeCurrentThemeColor(context).withValues(alpha: 0.6),
+														borderRadius: const BorderRadius.vertical(top: Radius.circular(16))
+													),
+													child: Column(
+														children: [
+															SizedBox(
+																height: kToolbarHeight,
+																child: Row(
+																	mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+																	crossAxisAlignment: CrossAxisAlignment.center,
+																	children: [
 																
-										
-												],
-											);
-											}
-										),
-									)
-								],
-							),
-						),
-					),
+																		IconButton(
+																			icon: const Row(
+																							spacing: 6,
+																			children: [
+																				Icon(Icons.emoji_emotions),
+																				ScalableText("贴纸表情")
+																			],
+																			),
+																			onPressed: () {
+																				expandedToolKitNotifier.value = true;
+																				toolkitPageController.animateToPage(
+																					0, 
+																					duration: const Duration(milliseconds: 300),
+																					curve: Curves.easeIn
+																				);
+																			},
+																		),
+																		
+																		IconButton(
+																			icon: const Row(
+																							spacing: 6,
+																			children: [
+																				Icon(Icons.format_color_text),
+																							ScalableText("文字样式")
+																			],
+																			),
+																			onPressed: () {
+																							expandedToolKitNotifier.value = true;
+																							toolkitPageController.animateToPage(
+																								1, 
+																								duration: const Duration(milliseconds: 300),
+																								curve: Curves.easeIn
+																							);
+																			},
+																		),
+																		
+																		
+																		IconButton(
+																			icon: const Icon(Icons.keyboard),
+																			onPressed: () {
+																				
+																				expandedToolKitNotifier.value = !expandedToolKitNotifier.value;
+																				
+							
+																		
+																			},
+																		),
+																		
+																	
+																	],
+																),
+															),
+															
+															Divider(color: judgeDarknessMode(context) ? Colors.white : Colors.black,height: 1),
+															
+															Expanded(
+																child: PageView(
+																	controller: toolkitPageController,
+																										
+																	children: [
+																										
+																		StickerSelectView(contentEditingController: contentEditingController),
+																							
+																		TextStyleSelectView(contentEditingController: contentEditingController),
+																		
+																										
+																	],
+																),
+															)
+														],
+													),
+												),
+											),
+									),
+									
+								)
+							]
+						  ),
 			),
-                
-            )
-        ]
+		  ],
+		),
+		
       ),
     );
   }
@@ -308,54 +378,69 @@ class StickerSelectView extends StatelessWidget {
 
 			Expanded(
 				child: EasyRefresh(
-					child: PageView(
-					controller: stickerPageController,
-					children: [
-						GridView(
-							gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-								crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 16 : 8
-							),
-							children: List.generate(
-							23,
-							((index){
-								return UnVisibleResponse(
-								onTap: () {
-									contentEditingController.text += '(bgm${convertDigitNumString(index+1)})';
-									
-						
-								},
-								child: Image.asset(
-									'./assets/bangumiSticker/bgm${convertDigitNumString(index+1)}.gif',
-									scale: 0.8,
-								)
+					child: Builder(
+					  builder: (_) {
+
+						insertBgmSticker(int index){
+							int currentPostion = contentEditingController.selection.start;
+					    
+							contentEditingController.text = 
+								convertInsertContent(
+									originalText: contentEditingController.text,
+									insertText: '(bgm${convertDigitNumString(index+1)})',
+									insertOffset:currentPostion
 								);
-							})
-							),
-						),
-					
-						GridView(
-					
-						gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-							crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 16 : 8
-						),
-						children: List.generate(
-							102,
-							((index){
-							return UnVisibleResponse(
-							onTap: () {
-								contentEditingController.text += '(bgm${convertDigitNumString(index+24)})';
-							},
-							child: Image.asset(
-								'./assets/bangumiSticker/bgm${convertDigitNumString(index+24)}.gif',
-								scale: 0.8,
-							)
+							
+							//(bgm01)=>(bgm1xx)
+							contentEditingController.selection = TextSelection.fromPosition(
+								TextPosition(offset: currentPostion + '(bgm)'.length + (index >= 100 ? 3 : 2) )
 							);
-						})
-						),
-					),
-					
-					],
-					
+						}
+
+					    return PageView(
+					    controller: stickerPageController,
+					    children: [
+					    	GridView(
+					    		gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+					    			crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 16 : 8
+					    		),
+					    		children: List.generate(
+					    		23,
+					    		((index){
+					    			return UnVisibleResponse(
+					    			onTap: () => insertBgmSticker(index),
+					    			child: Image.asset(
+					    				'./assets/bangumiSticker/bgm${convertDigitNumString(index+1)}.gif',
+					    				scale: 0.8,
+					    			)
+					    			);
+					    		})
+					    		),
+					    	),
+					    
+					    	GridView(
+					    
+					    		gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+					    			crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 16 : 8
+					    		),
+					    		children: List.generate(
+					    			102,
+					    			((index){
+					    			return UnVisibleResponse(
+					    				onTap: () => insertBgmSticker(index),
+					    				child: Image.asset(
+					    					'./assets/bangumiSticker/bgm${convertDigitNumString(index+24)}.gif',
+					    					scale: 0.8,
+					    				)
+					    		);
+					    	})
+					    	),
+					    ),
+					    
+					    ],
+					    
+					    );
+					  }
 					),
 				),
 			),
@@ -407,115 +492,145 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
 
 					Expanded(
 						flex: 2,
-						child: Padding(
-							padding: PaddingH12,
-							child: GridView(
-								shrinkWrap: true,
-								gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-									crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 8 : 5
-								),
-								children: [
-								//简单的包裹
-									...List.generate(
-									BBCodeTag.values.length,
-									(index){
-										return UnVisibleResponse(
-											onTap: () {
-												widget.contentEditingController.text += '[${BBCodeTag.values[index].name}][/${BBCodeTag.values[index].name}]';
-												widget.contentEditingController.selection = TextSelection.fromPosition(
-													TextPosition(offset: widget.contentEditingController.text.length - 3 - BBCodeTag.values[index].name.length)
-												);
-											},
-												child: GridTile(
-												footer: Center(
-													child: ScalableText(
-														'[${BBCodeTag.values[index].name}]',
-													),
-												),
-												child: Center(
-													child: BBCodeText(
-														data: '[${BBCodeTag.values[index].name}]${BBCodeTag.values[index].tagName}[/${BBCodeTag.values[index].name}]',
-														
-														stylesheet: BBStylesheet(
-															tags: allEffectTag,
-															defaultText: TextStyle(
-																fontFamily: 'MiSansFont',
-																color: judgeDarknessMode(context) ? Colors.white : Colors.black,
-															)
+						child: ColoredBox(
+							color: judgeCurrentThemeColor(context).withValues(alpha: 0.33),
+								child: Padding(
+								padding: PaddingH12,
+								child: GridView(
+									shrinkWrap: true,
+									gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+										crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 8 : 4
+									),
+									children: [
+									//简单的包裹
+										...List.generate(
+										BBCodeTag.values.length,
+										(index){
+											return UnVisibleResponse(
+												onTap: () {
+
+													int currentPostion = widget.contentEditingController.selection.start;
+
+													widget.contentEditingController.text = 
+														convertInsertContent(
+															originalText: widget.contentEditingController.text,
+															insertText: '[${BBCodeTag.values[index].name}][/${BBCodeTag.values[index].name}]',
+															insertOffset:currentPostion
+														);
+								
+												
+													widget.contentEditingController.selection = TextSelection.fromPosition(
+														TextPosition(offset: currentPostion + 2 + BBCodeTag.values[index].name.length)
+													);
+
+												},
+													child: GridTile(
+													footer: Center(
+														child: ScalableText(
+															'[${BBCodeTag.values[index].name}]',
 														),
 													),
-												)
-												),
+													child: Center(
+														child: BBCodeText(
+															data: '[${BBCodeTag.values[index].name}]${BBCodeTag.values[index].tagName}[/${BBCodeTag.values[index].name}]',
+															
+															stylesheet: BBStylesheet(
+																tags: allEffectTag,
+																defaultText: TextStyle(
+																	fontFamily: 'MiSansFont',
+																	color: judgeDarknessMode(context) ? Colors.white : Colors.black,
+																)
+															),
+														),
+													)
+													),
+												);
+										}
+								
+									),
+								
+									//需携带参数的包裹
+									//[url=test]链接描述[/url]
+									UnVisibleResponse(
+										onTap: (){
+											int currentPostion = widget.contentEditingController.selection.start;
+
+											widget.contentEditingController.text = 
+												convertInsertContent(
+													originalText: widget.contentEditingController.text,
+													insertText: "[url='hyperLink']链接名称[/url]",
+													insertOffset:currentPostion
+												);
+						
+
+											widget.contentEditingController.selection = TextSelection(
+												baseOffset: currentPostion + "[url='hyperLink']".length + '链接名称'.length,
+												extentOffset: currentPostion +"[url='hyperLink']".length
 											);
-									}
-							
-								),
-
-								//需携带参数的包裹
-								//[url=test]链接描述[/url]
-								UnVisibleResponse(
-								    onTap: (){
-										widget.contentEditingController.text += "[url='hyperLink']链接名称[/url]";
-										widget.contentEditingController.selection = TextSelection(
-											baseOffset: widget.contentEditingController.text.length - 3 - 'url'.length - '链接名称'.length,
-  											extentOffset: widget.contentEditingController.text.length - 3 - 'url'.length
 											
-										);
-										
-										TextSelection.fromPosition(
-											TextPosition(offset: widget.contentEditingController.text.length - 3 - 'url'.length)
-										);
-									},
-								  	child: GridTile(
-								    footer: const Center(
-								  		child: ScalableText(
-								  			"[url='link']",
-								  		),
-								  	),
-								    child:Center(
-										child: AbsorbPointer(
-											child: BBCodeText(
-											data: '[url=]超链接[/url]',
-											stylesheet: BBStylesheet(
-												tags: allEffectTag,
-												defaultText: const TextStyle(fontFamily: 'MiSansFont')
-											),
+										},
+										child: GridTile(
+										footer: const Center(
+											child: ScalableText(
+												"[url='link']",
 											),
 										),
-									),
-								  ),
-								),
-
-								UnVisibleResponse(
-								    onTap: (){
-										widget.contentEditingController.text += "[img][/img]";
-										widget.contentEditingController.selection = TextSelection.fromPosition(
-											TextPosition(offset: widget.contentEditingController.text.length - 3 - 'img'.length)
-										);
-									},
-								  	child: const GridTile(
-								    footer:  Center(
-								  		child: ScalableText("[img]"),
-								  	),
-								    child:Center(
-										child: AbsorbPointer(
-											child: ScalableText('图片'),
+										child:Center(
+											child: AbsorbPointer(
+												child: BBCodeText(
+												data: '[url=]超链接[/url]',
+												stylesheet: BBStylesheet(
+													tags: allEffectTag,
+													defaultText: const TextStyle(fontFamily: 'MiSansFont')
+												),
+												),
+											),
+										),
 										),
 									),
-								  ),
-								),
+								
+									UnVisibleResponse(
+										onTap: (){
 
-								UnVisibleResponse(
-								    onTap: ()=> widget.contentEditingController.text += "\n",
-									child: const GridTile(
-										footer: Center(child: ScalableText("enter")),
-										child:Center(child: ScalableText('回车')),
+											int currentPostion = widget.contentEditingController.selection.start;
+
+											widget.contentEditingController.text = 
+												convertInsertContent(
+													originalText: widget.contentEditingController.text,
+													insertText: "[img][/img]",
+													insertOffset:currentPostion
+												);
+						
+
+											widget.contentEditingController.selection = TextSelection.fromPosition(
+												TextPosition(offset:currentPostion + "[img]".length)
+											);
+
+										},
+										child: const GridTile(
+										footer:  Center(
+											child: ScalableText("[img]"),
+										),
+										child:Center(
+											child: AbsorbPointer(
+												child: ScalableText('图片'),
+											),
+										),
+										),
 									),
+								
+									UnVisibleResponse(
+										onTap: ()=> widget.contentEditingController.text += "\n",
+										child: const GridTile(
+											footer: Center(child: ScalableText("enter")),
+											child:Center(child: ScalableText('回车')),
+										),
+									),
+								
+								]
 								),
-
-							]
+								),
 							),
-						),
 					),
 
 					Divider(color: judgeDarknessMode(context) ? Colors.white : Colors.black,height: 1),
@@ -547,11 +662,13 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
 										SizedBox(
 											width: 50,
 											child: TextField(
+												
 												controller: fontSizeEditingController,
 												textAlign: TextAlign.center,
 												decoration: const InputDecoration(
 													isDense: true, //相当于shrinkWrap
 												),
+												
 												inputFormatters: [
 													FilteringTextInputFormatter.digitsOnly,
 						

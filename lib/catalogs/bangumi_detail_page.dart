@@ -65,7 +65,8 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
         selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
         shouldRebuild: (previous, next) => previous!=next,
         
-        builder: (_,linearColor,detailScaffold) {
+        builder: (_,linearColor,detailScaffold) {          
+
           debugPrint("linear color:$linearColor");
           return Theme(
             data: ThemeData(
@@ -97,7 +98,15 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
 
                   IconButton(
                     onPressed: (){
-                      Navigator.pushNamed(context, Routes.testPage);
+                      Navigator.pushNamed(
+                        context, 
+                        Routes.sendComment,
+                        arguments: {
+                          'isReply':true,
+                          'title':bangumiModel.bangumiDetails?.name ?? '',
+                          'preservationContent': bangumiModel.draftContent,
+                        }
+                      );
                     },
                     icon: const Icon(Icons.edit_document)
                   ),

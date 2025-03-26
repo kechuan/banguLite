@@ -38,11 +38,9 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
       if(widget.id == 0) return const SizedBox.shrink();
 
-      //final indexModel = context.read<IndexModel>();
       final bangumiModel = context.read<BangumiModel>();
       final commentModel = context.read<CommentModel>();
 
-      //commentFuture ??= commentModel.loadComments(widget.id);
       commentFuture ??= commentModel.loadComments();
 
         return Padding(
@@ -69,20 +67,10 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
         
               return FutureBuilder(
                 future: commentFuture,
-
-                  //以后学聪明点 要不就直接写进initState 然后刷新携带flag 
-                  //要不然就是返回Completer 然后从Models里导入数据 
-                  //真的该好好想想 就为了节省这Model里多存放一份的数据有必要像这次这样
-                  //写一大堆反rebuild的措施吗？ 这从头到尾起码也有三四天的时间去折腾这里了
-
                 builder: (_,__){
-        
-                  //Selector虽然不rebuild 但不代表不会真不需要layout. 
-                  //所以如果size改变的时候 这里的builder流程还是会触发. 但如果你使用的是selector提供的值 这里的值会尽量保持的像静态child!处理的一样
-        
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    
                     children: [
                       
                       child!,

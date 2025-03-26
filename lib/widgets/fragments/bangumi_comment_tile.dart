@@ -1,4 +1,7 @@
+import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
@@ -9,6 +12,7 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
+import 'package:provider/provider.dart';
 
 class BangumiCommentTile extends StatelessWidget {
   const BangumiCommentTile({
@@ -22,6 +26,8 @@ class BangumiCommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final accountModel = context.read<AccountModel>();
 
     int ratingScore = commentData.rate ?? 0;
 
@@ -127,7 +133,77 @@ class BangumiCommentTile extends StatelessWidget {
             ],
           ),
 
-          ScalableText("${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}")
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ScalableText("${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"),
+
+              PopupMenuButton<CommentActionType>(
+                onSelected: (commentAction){
+                  switch(commentAction){
+
+                    case CommentActionType.reply:{
+                      Navigator.pushNamed(
+                        context,
+                        Routes.sendComment,
+                        arguments: {
+                          'isReply': true,
+                          'title': commentData.userInformations?.nickName ?? commentData.userInformations?.userName,
+                          'referenceObject': commentData.comment,
+
+                        }
+                      );
+                    }
+                     
+                     
+                    case CommentActionType.sticker:{}
+                     
+                     
+                    case CommentActionType.report:{}
+                     
+                     
+                    case CommentActionType.edit:{}
+
+                    case CommentActionType.delete:{
+
+                    }
+                     
+                     
+                  }
+                },
+                itemBuilder: (_){
+                  return List.generate(
+                    CommentActionType.values.length, (index){
+
+                      bool isActionAvaliable = 
+                        accountModel.isLogined() ? 
+                        (
+                          index >= CommentActionType.delete.index ? 
+                          accountModel.loginedUserInformations.userInformations?.userID == commentData.userInformations?.userID : 
+                          true
+                        ) 
+                        : false
+                      ;
+
+                      return PopupMenuItem(
+                          height: 50,
+                          enabled: isActionAvaliable,
+                          value: CommentActionType.values[index],
+                          child: ScalableText(CommentActionType.values[index].actionTypeString),
+                        );
+                    }
+                  );
+                }
+              )
+
+             
+
+              //IconButton(
+              //  onPressed: onPressed,
+              //  icon: const Icon(Icons.more_vert)
+              //)
+            ],
+          )
 
         ],
       ),

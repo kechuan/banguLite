@@ -200,6 +200,22 @@ enum StarType{
 
 }
 
+enum CommentActionType{
+  //登录可操作
+  reply("回复"),
+  sticker("贴条"),
+  report("检举"),
+  //自身评论可操作
+  delete("删除"),
+  edit("编辑"),
+  ;
+
+  final String actionTypeString;
+  
+
+  const CommentActionType(this.actionTypeString);
+}
+
 enum UserRelationsActionType{
     add("发送好友请求"),
     remove("删除好友"),

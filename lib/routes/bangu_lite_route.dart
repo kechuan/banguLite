@@ -56,30 +56,6 @@ FFRouteSettings getRouteSettings({
           )!,
         ),
       );
-    case '/TestPage':
-      return FFRouteSettings(
-        name: name,
-        arguments: arguments,
-        builder: () => SendCommentPage(
-          key: asT<Key?>(
-            safeArguments['key'],
-          ),
-          isReply: asT<bool>(
-            safeArguments['isReply'],
-            false,
-          )!,
-          replyTitle: asT<String?>(
-            safeArguments['replyTitle'],
-          ),
-          referenceObject: asT<String?>(
-            safeArguments['referenceObject'],
-            'sth wrong!',
-          ),
-          preservationContent: asT<String?>(
-            safeArguments['preservationContent'],
-          ),
-        ),
-      );
     case '/commentPreview':
       return FFRouteSettings(
         name: name,
@@ -152,6 +128,29 @@ FFRouteSettings getRouteSettings({
           imageProvider: asT<ImageProvider>(
             safeArguments['imageProvider'],
           )!,
+        ),
+      );
+    case '/sendComment':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => SendCommentPage(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
+          title: asT<String?>(
+            safeArguments['title'],
+          ),
+          isReply: asT<bool>(
+            safeArguments['isReply'],
+          )!,
+          referenceObject: asT<String?>(
+            safeArguments['referenceObject'],
+            "test what",
+          ),
+          preservationContent: asT<String?>(
+            safeArguments['preservationContent'],
+          ),
         ),
       );
     case '/subjectComment':

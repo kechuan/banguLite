@@ -31,6 +31,8 @@ class AccountModel extends ChangeNotifier {
     });
   }
 
+  bool isLogined() => loginedUserInformations.accessToken!=null;
+
   void loadUserDetail(){
     loginedUserInformations = MyHive.loginUserDataBase.get('loginUserInformations') ?? getDefaultLoginedUserInformations();
   }

@@ -294,3 +294,13 @@ String covertPastDifferentTime(int? timeStamp){
 
   return resultText;
 }
+
+String convertInsertContent({String originalText = '',String insertText = '',int insertOffset = 0}){
+  StringBuffer buffer = StringBuffer();
+  buffer.write(originalText.substring(0, insertOffset)); // 写入前半部分
+  buffer.write(insertText); // 插入内容
+  buffer.write(originalText.substring(insertOffset)); // 写入后半部分
+
+  return buffer.toString();
+}
+
