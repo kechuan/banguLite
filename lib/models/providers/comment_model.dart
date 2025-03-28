@@ -79,7 +79,7 @@ class CommentModel extends ChangeNotifier {
             1:
             [
               CommentDetails()
-                ..userInformations = (UserInformations()..userID = 0)
+                ..userInformation = (UserInformation()..userID = 0)
             ]
           }
         );
@@ -172,7 +172,7 @@ class CommentModel extends ChangeNotifier {
             pageIndex:
             [
               CommentDetails()
-                ..userInformations = (UserInformations()..userID = 0)
+                ..userInformation = (UserInformation()..userID = 0)
             ]
         });
       }

@@ -24,7 +24,7 @@ abstract class ContentInfo extends BaseInfo {
   int? lastRepliedTime;
 
   //user
-  UserInformations? userInformation;
+  UserInformation? userInformation;
 
 
   // 工厂方法，创建空对象

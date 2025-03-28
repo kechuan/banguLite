@@ -1,5 +1,5 @@
 import 'package:bangu_lite/models/base_details.dart';
-import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/user_details.dart';
 
 // 严格意义来说 整个 Blog数据源 唯一有用的数据 只有。。content
@@ -16,7 +16,7 @@ class BlogDetails extends ContentDetails{
   int? get blogID => detailID;
   String? get blogContent => content;
   
-  UserInformations? userInfo;
+  UserInformation? userInfo;
 
   List<EpCommentDetails>? get blogReplies => contentRepliedComment;
   set blogReplies(List<EpCommentDetails>? value) => contentRepliedComment = value;

@@ -4,6 +4,7 @@ import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
+import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -12,7 +13,6 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
-import 'package:provider/provider.dart';
 
 class BangumiCommentTile extends StatelessWidget {
   const BangumiCommentTile({
@@ -27,10 +27,9 @@ class BangumiCommentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final accountModel = context.read<AccountModel>();
+    final stickerButtonLink = LayerLink();
 
-    int ratingScore = commentData.rate ?? 0;
-
+    final int ratingScore = commentData.rate ?? 0;
     DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(commentData.commentTimeStamp!*1000);
 
     return ListTile(
@@ -41,35 +40,30 @@ class BangumiCommentTile extends StatelessWidget {
           children: [
             
             Builder(builder: (_){
-              if(commentData.userInformations?.avatarUrl==null) return Image.asset("assets/icons/icon.png",height: 50,width: 50,);
+              if(commentData.userInformation?.avatarUrl==null) return Image.asset("assets/icons/icon.png",height: 50,width: 50,);
 
               return UnVisibleResponse(
                 onTap: () {
-                  showUserInfomationDialog(context, commentData.userInformations);
+                  showUserInfomationDialog(context, commentData.userInformation);
                 },
                 child: SizedBox(
                   height: 50,
                   width: 50,
-                  child: CachedImageLoader(imageUrl: commentData.userInformations?.avatarUrl!,photoViewStatus: true,)
+                  child: CachedImageLoader(imageUrl: commentData.userInformation?.avatarUrl!,photoViewStatus: true,)
                 ),
               );
 
             }),
 
-            
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.sizeOf(context).width - 320,
-              ),
-                child: ScalableText(
-                  commentData.userInformations?.nickName ?? "nameID",
+
+            Expanded(
+              child: ScalableText(
+                  commentData.userInformation?.nickName ?? "nameID",
                   style: TextStyle(color: themeColor),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis
                 ),
-              ),
-
-            const Spacer(),
+            ),
 
             //因为tile的title给的交叉轴也是unbounded的 所以需要约束
             SizedBox(
@@ -127,7 +121,9 @@ class BangumiCommentTile extends StatelessWidget {
                 //那么只能在内部插入松约束 Align 来调节方位
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: CommentReaction(commentReactions: commentData.commentReactions),
+                  child: CommentReaction(
+                    commentReactions: commentData.commentReactions
+                  ),
                 ),
               ),
             ],
@@ -138,70 +134,11 @@ class BangumiCommentTile extends StatelessWidget {
             children: [
               ScalableText("${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"),
 
-              PopupMenuButton<CommentActionType>(
-                onSelected: (commentAction){
-                  switch(commentAction){
-
-                    case CommentActionType.reply:{
-                      Navigator.pushNamed(
-                        context,
-                        Routes.sendComment,
-                        arguments: {
-                          'isReply': true,
-                          'title': commentData.userInformations?.nickName ?? commentData.userInformations?.userName,
-                          'referenceObject': commentData.comment,
-
-                        }
-                      );
-                    }
-                     
-                     
-                    case CommentActionType.sticker:{}
-                     
-                     
-                    case CommentActionType.report:{}
-                     
-                     
-                    case CommentActionType.edit:{}
-
-                    case CommentActionType.delete:{
-
-                    }
-                     
-                     
-                  }
-                },
-                itemBuilder: (_){
-                  return List.generate(
-                    CommentActionType.values.length, (index){
-
-                      bool isActionAvaliable = 
-                        accountModel.isLogined() ? 
-                        (
-                          index >= CommentActionType.delete.index ? 
-                          accountModel.loginedUserInformations.userInformations?.userID == commentData.userInformations?.userID : 
-                          true
-                        ) 
-                        : false
-                      ;
-
-                      return PopupMenuItem(
-                          height: 50,
-                          enabled: isActionAvaliable,
-                          value: CommentActionType.values[index],
-                          child: ScalableText(CommentActionType.values[index].actionTypeString),
-                        );
-                    }
-                  );
-                }
+              BangumiCommentActionButton(
+                commentData: commentData,
+                isSubjectComment: true,
               )
 
-             
-
-              //IconButton(
-              //  onPressed: onPressed,
-              //  icon: const Icon(Icons.more_vert)
-              //)
             ],
           )
 

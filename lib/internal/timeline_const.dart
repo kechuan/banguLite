@@ -10,6 +10,9 @@ const List<dynamic> timelineEnums = [
   //TimelineCatSubjectBatch.values, ???
   
   TimelineCatStatus.values,
+  //对应 6/7 的空置
+  [],
+  [],
   TimelineCatMono.values,
   TimelineCatDoujin.values,
 ];

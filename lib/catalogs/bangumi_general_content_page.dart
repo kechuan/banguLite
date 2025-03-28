@@ -2,7 +2,7 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/base_details.dart';
 import 'package:bangu_lite/models/base_info.dart';
-import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';

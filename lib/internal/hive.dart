@@ -24,7 +24,7 @@ class MyHive {
 
   //计划: 存储账号相关的内容 大抵有 我的xxx内容 topic/Star/Comment 以及各种 status 数据之类的东西
   //老实说 我并不清楚这些内容应该怎么表述。。 难道就是 UserDetail 这样吗?
-  //那我就 UserInformations? 就先这样吧
+  //那我就 UserInformation? 就先这样吧
   //如果我是断网条件 进入时 我不应该处理它的逻辑 而是。。。statusCode 
   //wrongCaptcha 这种错误再处理
 

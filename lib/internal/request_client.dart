@@ -39,7 +39,7 @@ class BangumiAPIUrls {
   //以v1为代表的新api
   static const String newUrl = "https://next.bgm.tv";
 
-  //subject
+  //subject : GET/POST 通用 只要是只需求 subjectID 而非 需求具体的 sub-contentID 都能使用
   static String comment(int subjectID) => '$newUrl/p1/subjects/$subjectID/comments';
   static String ep(int epID) => '$newUrl/p1/episodes/$epID';
   static String epComment(int epID) => '$newUrl/p1/episodes/$epID/comments';
@@ -62,6 +62,21 @@ class BangumiAPIUrls {
   static String removeBlockList(String username) => '$newUrl/p1/blocklist/$username';
   static String addFriend(String username) => '$newUrl/p1/friends/$username';
   static String removeFriend(String username) => '$newUrl/p1/friends/$username';
+
+  //comment-action put/delete 目前发评论 仅支持EP/topic内容
+  
+
+  //static String actionSubjectComment(int commentID) => '$newUrl/p1/comments/$commentID/actions';
+
+  static String actionEpComment(int commentID) => '$newUrl/p1/episodes/-/comments/$commentID';
+  static String actionEpCommentLike(int commentID) => '${actionEpComment(commentID)}/like';
+
+  static String postTopicRepliy(int topicID) => '$newUrl/p1/subject/-/$topicID/replies';
+  
+  
+  
+
+  
 
 
   //other

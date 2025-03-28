@@ -22,10 +22,10 @@ import 'package:provider/provider.dart';
 class UserInformationDialog extends StatelessWidget {
   const UserInformationDialog({
     super.key,
-    this.userInformations
+    this.userInformation
   });
 
-  final UserInformations? userInformations;
+  final UserInformation? userInformation;
 
   @override
   Widget build(BuildContext context) {
@@ -59,18 +59,18 @@ class UserInformationDialog extends StatelessWidget {
     					  SizedBox(
     						height: 50,
     						width: 50,
-    						child: CachedImageLoader(imageUrl: userInformations?.avatarUrl)
+    						child: CachedImageLoader(imageUrl: userInformation?.avatarUrl)
     					  ),
     						  
     					  //可压缩信息 Expanded
     					  Expanded(
     						child: UnVisibleResponse(
     						  onTap: () {
-    							Clipboard.setData(ClipboardData(text: '${userInformations?.userName}'));
+    							Clipboard.setData(ClipboardData(text: '${userInformation?.userName}'));
     							fadeToaster(context: context,message: "已复制用户ID");
     						  },
     						  child: ScalableText(
-    							userInformations?.nickName ?? userInformations?.userName ?? "no data",
+    							userInformation?.nickName ?? userInformation?.userName ?? "no data",
     							  style: const TextStyle(color: Colors.blue),
     							  maxLines: 2,
     							  overflow: TextOverflow.ellipsis,
@@ -112,17 +112,20 @@ class UserInformationDialog extends StatelessWidget {
     									showTransitionAlertDialog(
     									  context,
     									  title: "发送好友请求",
-    									  content: "确定对用户 ${userInformations?.nickName ?? userInformations?.userName} 发送好友请求吗?",
+    									  content: "确定对用户 ${userInformation?.nickName ?? userInformation?.userName} 发送好友请求吗?",
     									  confirmAction: () async {
     				  
-    										asyncToaster(String message)=> fadeToaster(context: context, message: message);
+                          asyncToaster(String message) => fadeToaster(context: context, message: message);
 
-											accountModel.userAction(
-												userInformations?.userName,
-												fallbackAction: (errorMessage) => asyncToaster(errorMessage),
-											).then((_){
-												asyncToaster("发送请求成功");
-											});
+                          accountModel.userAction(
+                            userInformation?.userName,
+                            fallbackAction: (errorMessage) => asyncToaster(errorMessage),
+                          ).then((status){
+                            if(status){
+                              asyncToaster("发送请求成功");
+                            }
+                            
+                          });
     				  
     									  },
     				  
@@ -141,13 +144,13 @@ class UserInformationDialog extends StatelessWidget {
     									showTransitionAlertDialog(
     									  context,
     									  title: "拉黑用户",
-    									  content: "确定拉入用户 ${userInformations?.nickName ?? userInformations?.userName} 进黑名单吗?",
+    									  content: "确定拉入用户 ${userInformation?.nickName ?? userInformation?.userName} 进黑名单吗?",
     									  confirmAction: () async {
     				  
     										asyncToaster(String message)=> fadeToaster(context: context, message: message);
 
 											accountModel.userAction(
-												userInformations?.userName,
+												userInformation?.userName,
 												relationType: UserRelationsActionType.block,
 												fallbackAction: (errorMessage) => asyncToaster(errorMessage),
 											).then((_){
@@ -179,10 +182,10 @@ class UserInformationDialog extends StatelessWidget {
     			  Expanded(
     				  child: EasyRefresh(
     					child: FutureBuilder(
-    					  future: userModel.loadUserInfomation(userInformations?.userName, userInformations),
+    					  future: userModel.loadUserInfomation(userInformation?.userName, userInformation),
     					  builder: (_,snapshot) {
     					
-    						final timelineActions = userModel.userData[userInformations?.userName]?.timelineActions;
+    						final timelineActions = userModel.userData[userInformation?.userName]?.timelineActions;
     					
     						switch(snapshot.connectionState){
     						  case ConnectionState.done:{
@@ -204,7 +207,7 @@ class UserInformationDialog extends StatelessWidget {
     											Builder(
     												builder: (_) {
     														
-														DateTime joinTime = DateTime.fromMillisecondsSinceEpoch((userInformations?.joinedAtTimeStamp ?? 0)*1000);
+														DateTime joinTime = DateTime.fromMillisecondsSinceEpoch((userInformation?.joinedAtTimeStamp ?? 0)*1000);
 																
 														return ScalableText(
 															"加入时间: ${joinTime.year}-${convertDigitNumString(joinTime.month)}-${convertDigitNumString(joinTime.day)}",
@@ -220,7 +223,7 @@ class UserInformationDialog extends StatelessWidget {
 											// 收藏数据
     										Builder(
     										  builder: (_) {
-												final statListData = convertSubjectStat(userModel.userData[userInformations?.userName]?.subjectStat);
+												final statListData = convertSubjectStat(userModel.userData[userInformation?.userName]?.subjectStat);
     										    return Wrap(
 													spacing: 6,
 													runSpacing: 12,
@@ -317,7 +320,7 @@ class UserInformationDialog extends StatelessWidget {
   }
 }
 
-void showUserInfomationDialog(BuildContext context,UserInformations? userInformations){
+void showUserInfomationDialog(BuildContext context,UserInformation? userInformation){
   showGeneralDialog(
     barrierDismissible: true,
     barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
@@ -326,7 +329,7 @@ void showUserInfomationDialog(BuildContext context,UserInformations? userInforma
     transitionDuration: const Duration(milliseconds: 300),
     pageBuilder: (_,inAnimation,outAnimation){
 
-      return UserInformationDialog(userInformations: userInformations);
+      return UserInformationDialog(userInformation: userInformation);
       
     }
   );

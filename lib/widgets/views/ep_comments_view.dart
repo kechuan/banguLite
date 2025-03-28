@@ -1,4 +1,4 @@
-import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comment_tile.dart';
 import 'package:bangu_lite/widgets/fragments/ep_replied_tile.dart';
 import 'package:flutter/material.dart';

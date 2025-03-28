@@ -59,12 +59,12 @@ class IndexLandscape extends StatelessWidget {
 
                           UnVisibleResponse(
                             onTap: () {
-                              //if(accountModel.loginedUserInformations.userInformations?.userID != null){
-                              //  Navigator.pushNamed(context,Routes.userPage,arguments: accountModel.loginedUserInformations.userInformations?.userID);
+                              //if(accountModel.loginedUserInformations.userInformation?.userID != null){
+                              //  Navigator.pushNamed(context,Routes.userPage,arguments: accountModel.loginedUserInformations.userInformation?.userID);
                               //}
 
                               //else{
-                              //  Navigator.pushNamed(context,Routes.login,arguments: accountModel.loginedUserInformations.userInformations?.userID);
+                              //  Navigator.pushNamed(context,Routes.login,arguments: accountModel.loginedUserInformations.userInformation?.userID);
                               //}
                             },
                             child: SizedBox(
@@ -72,8 +72,8 @@ class IndexLandscape extends StatelessWidget {
                               width: 30,
                               child: Builder(
                                 builder: (_){
-                                  if(accountModel.loginedUserInformations.userInformations?.avatarUrl != null){
-                                    return CachedImageLoader(imageUrl: accountModel.loginedUserInformations.userInformations?.avatarUrl);
+                                  if(accountModel.loginedUserInformations.userInformation?.avatarUrl != null){
+                                    return CachedImageLoader(imageUrl: accountModel.loginedUserInformations.userInformation?.avatarUrl);
                                   }
                                   else{
                                     return Icon(MdiIcons.accountCircleOutline,size: 30);

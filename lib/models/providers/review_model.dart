@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/blog_details.dart';
-import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/models/review_details.dart';
 import 'package:dio/dio.dart';

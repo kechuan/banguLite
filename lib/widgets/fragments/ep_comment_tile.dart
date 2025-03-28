@@ -1,9 +1,10 @@
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
-import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
+import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -42,7 +43,6 @@ class EpCommentTile extends StatelessWidget {
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-
           Row(
             spacing: 12,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -71,11 +71,11 @@ class EpCommentTile extends StatelessWidget {
                   ),
               ),
 
-              const Spacer(),
+              
 
               //优先完整实现 size约束盒
               ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 160),
+                constraints: const BoxConstraints(maxWidth: 140),
                 //constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3),
                 //这个长度一般是 "YEAR-MO-DA HO:MI" 的长度
                 //但如果设备上的字体是不一样的话。。我就不好说了
@@ -96,8 +96,12 @@ class EpCommentTile extends StatelessWidget {
 
                   ],
                 ),
-              )
-          
+              ),
+
+              BangumiCommentActionButton(
+                commentData: epCommentData,
+                isSubjectComment: false,
+              ),
               
             ],
           ),
@@ -117,9 +121,7 @@ class EpCommentTile extends StatelessWidget {
       ),
 
       subtitle: Padding(
-        padding: const EdgeInsets.only(
-          top: 16
-        ),
+        padding: const EdgeInsets.only(top: 16),
         child: Column(
           spacing: 12,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,23 +155,41 @@ class EpCommentTile extends StatelessWidget {
             
             ] : null,
             
+            //commentReaction Area
             Row(
               //mainAxisAlignment: MainAxisAlignment.end, 不生效 因为主轴已经被 Expanded 占满
               children: [
                 Expanded(
                   //那么只能在内部插入松约束 Align 来调节方位
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: CommentReaction(commentReactions: epCommentData.commentReactions),
+                  child: Builder(
+                    builder: (_) {
+
+                      int? commentIndex = int.tryParse(epCommentData.epCommentIndex!.split('-').first);
+                      int? replyIndex = int.tryParse(epCommentData.epCommentIndex!.split('-').length == 1 ? '' : epCommentData.epCommentIndex!.split('-').last);
+
+
+
+                      return Align(
+                        alignment: Alignment.centerRight,
+                        child: CommentReaction(
+                          commentID: epCommentData.commentID,
+                          commentIndex: commentIndex,
+                          replyIndex: replyIndex,
+                          commentReactions: epCommentData.commentReactions
+                        ),
+                      );
+                    }
                   ),
                 ),
               ],
             ),
         
+            //commentAction Area
+
+
             // 楼主: null 
             // 层主: 3
             // 回帖: 3-1(详情界面特供)
-
             ...?epCommentData.epCommentIndex?.contains("-") ?? false ? 
             [const Divider()] :
             null,

@@ -62,7 +62,7 @@ class AccountModel extends ChangeNotifier {
         ).then((response) {
           if(response.statusCode == 200){
             debugPrint("accessToken: Valid, ${DateTime.now().millisecondsSinceEpoch~/1000} / ${loginedUserInformations.expiredTime}");
-            loginedUserInformations.userInformations = loadUserInformations(response.data);
+            loginedUserInformations.userInformation = loadUserInformations(response.data);
             verifyCompleter.complete(true);
           }
         });
@@ -144,7 +144,7 @@ class AccountModel extends ChangeNotifier {
     }
   }
 
-  //账户相关操作
+  //账户相关操作.. 实在是有点太多了 要不。。聚合一下?
   Future<bool> userAction(
     String? username,
     {
@@ -181,10 +181,84 @@ class AccountModel extends ChangeNotifier {
 
   }
 
-    
+  
+  Future<bool> postComment() async {
+    return true;
+  }
+
+  Future<bool> postTopic() async {
+    return true;
+  }
+
+  Future<bool> postReply() async {
+    return true;
+  }
+
+  Future<bool> deleteComment() async {
+    return true;
+  }
+
+  Future<bool> deleteTopic() async {
+    return true;
+  }
+
+  Future<bool> deleteReply() async {
+    return true;
+  }
+
+  Future<bool> actionEpCommentLike(
+    int commentID,
+    int stickerLikeIndex,
+    {UserContentActionType actionType = UserContentActionType.post}
+  ) async {
+    Completer<bool> likeCompleter = Completer();
+
+    if(loginedUserInformations.accessToken==null){
+      debugPrint("账号未登录");
+      likeCompleter.complete(false);
+    }
+
+    late Future<Response<dynamic>> Function(int? stickerLikeIndex) actionLikeFuture;
+
+    switch(actionType){
+      case UserContentActionType.post:{
+        actionLikeFuture = (data) => HttpApiClient.client.put(
+          BangumiAPIUrls.actionEpCommentLike(commentID),
+          options: Options(
+            headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!),
+          ),
+          data: {"value": stickerLikeIndex}
+        );
+      }
+       
+      case UserContentActionType.delete:{
+        actionLikeFuture = (data) => HttpApiClient.client.delete(
+          BangumiAPIUrls.actionEpCommentLike(commentID),
+          options: Options(
+            headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!),
+          ),
+        );
+      }
+        
+      default: {}
+    }
+
+    await actionLikeFuture(stickerLikeIndex).then((response){
+      if(response.statusCode == 200){
+        likeCompleter.complete(true);
+      }
+
+      else{
+        likeCompleter.complete(false);
+      }
+      
+    });
+
+    return likeCompleter.future;
+  }
+
   
 
-  Future<void> postComment() async {}
-  Future<void> postTopic() async {}
 
 }
+

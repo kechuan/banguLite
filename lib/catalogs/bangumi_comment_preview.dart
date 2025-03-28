@@ -17,6 +17,7 @@ class BangumiCommentPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(title: const Text('预览')),
       body: Padding(
@@ -32,6 +33,8 @@ class BangumiCommentPreview extends StatelessWidget {
           ),
         ),
       ),
+
+
     );
   }
 }

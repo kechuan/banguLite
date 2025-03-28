@@ -97,9 +97,9 @@ types:
         index: 9
       refreshToken:
         index: 10
-      userInformations:
+      userInformation:
         index: 12
-  UserInformations:
+  UserInformation:
     typeId: 8
     nextIndex: 7
     fields:

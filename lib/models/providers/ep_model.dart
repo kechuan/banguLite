@@ -1,9 +1,12 @@
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/eps_info.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/user_details.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class EpModel extends ChangeNotifier{
   
@@ -23,6 +26,9 @@ class EpModel extends ChangeNotifier{
   final Map<int,EpsInfo> epsData = {};
   final Map<int,List<EpCommentDetails>> epCommentData = {}; 
 
+  //double => 浮点 #3 / #3-1 etc
+  final Map<int,Map<double,int>> userCommentLikeData = {}; 
+
   void updateSelectedEp(int newEp){
     if(newEp == selectedEp) return;
 
@@ -30,6 +36,113 @@ class EpModel extends ChangeNotifier{
     notifyListeners();
 
 	  if(epCommentData[selectedEp] == null) loadEpComment();
+  }
+
+  bool? updateUserEpCommentDataLike(
+    int commentID,
+    int dataLikeIndex,
+    {
+      int? commentIndex,
+      int? replyCommentIndex,
+    }){
+
+      if(epCommentData[selectedEp] == null || commentIndex == null) return null;
+
+      bool isExist = true;
+
+        if(userCommentLikeData[selectedEp] == null){
+
+          userCommentLikeData[selectedEp] = {
+            double.parse('$commentIndex.${replyCommentIndex ?? 0}') : dataLikeIndex
+          };
+
+        }
+
+        else{
+
+          if(userCommentLikeData[selectedEp]![double.parse('$commentIndex.${replyCommentIndex ?? 0}')] == dataLikeIndex){
+            userCommentLikeData[selectedEp]![double.parse('$commentIndex.${replyCommentIndex ?? 0}')] = -1;
+			isExist = false;
+          }
+
+          else{
+            userCommentLikeData[selectedEp]![double.parse('$commentIndex.${replyCommentIndex ?? 0}')] = dataLikeIndex;
+          }
+
+
+        }
+
+		WidgetsBinding.instance.addPostFrameCallback((_) {
+          notifyListeners();
+        });
+
+		return isExist;
+
+
+  }
+
+  void updateEpCommentDataLike(
+    BuildContext context,
+    int dataLikeIndex,
+    {
+      int? commentIndex,
+      int? replyCommentIndex,
+    }
+  ){
+
+    if(epCommentData[selectedEp] == null || commentIndex == null) return;
+
+    final accountModel = context.read<AccountModel>();
+
+    epCommentData.update(
+      selectedEp, 
+      (epCommentDetailsList){
+
+        if(replyCommentIndex != null){
+          epCommentDetailsList[commentIndex-1].repliedComment![replyCommentIndex-1].commentReactions!.update(
+            dataLikeIndex, 
+            (commentReactionData){
+              commentReactionData.add(
+                accountModel.loginedUserInformations.userInformation!.getName()
+              );
+              return commentReactionData;
+            }, 
+            ifAbsent: (){
+              return { 
+                accountModel.loginedUserInformations.userInformation!.getName()
+              };
+            }
+          );
+
+
+        }
+
+        else{
+
+          epCommentDetailsList[commentIndex-1].commentReactions!.update(
+            dataLikeIndex, 
+            (commentReactionData){
+              commentReactionData.add(
+                accountModel.loginedUserInformations.userInformation!.getName()
+              );
+              return commentReactionData;
+            }, 
+            ifAbsent: (){
+              return { 
+                accountModel.loginedUserInformations.userInformation!.getName()
+              };
+            }
+          );
+
+
+        }
+
+        return epCommentDetailsList;
+
+      }
+    );
+
+    notifyListeners();
   }
 
 	Future<void> getEpsInformation({int? offset}) async {
@@ -151,7 +264,7 @@ class EpModel extends ChangeNotifier{
 				epCommentData[selectedEp] = [
           EpCommentDetails()
             ..userInformation = (
-              UserInformations()..userID = 0
+              UserInformation()..userID = 0
             )
             
         ];

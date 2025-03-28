@@ -4,6 +4,7 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/max_number_input_formatter.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
@@ -41,7 +42,7 @@ class SendCommentPage extends StatefulWidget {
   State<SendCommentPage> createState() => _SendCommentPageState();
 }
 
-class _SendCommentPageState extends State<SendCommentPage> {
+class _SendCommentPageState extends LifecycleState<SendCommentPage> {
   final ValueNotifier<bool> expandedToolKitNotifier = ValueNotifier(false);
 
   final TextEditingController titleEditingController = TextEditingController();
@@ -49,10 +50,15 @@ class _SendCommentPageState extends State<SendCommentPage> {
   final TextEditingController hexColorEditingController = TextEditingController();
 
   final FocusNode textEditingFocus = FocusNode();
-  final FocusNode toolKitFocus = FocusNode();
 
   final PageController toolkitPageController = PageController();
   final PageController stickerPageController = PageController();
+
+  @override 
+  void onResume() {
+    expandedToolKitNotifier.value = false;
+    super.onResume();
+  }
 
   @override
   void initState() {
@@ -62,8 +68,6 @@ class _SendCommentPageState extends State<SendCommentPage> {
 
   @override
   Widget build(BuildContext context) {
-
-	debugPrint("widget.referenceObject:${widget.referenceObject}, ${widget.isReply}");
 
     if(widget.preservationContent!=null){
       contentEditingController.text = widget.referenceObject ?? '';
@@ -153,7 +157,7 @@ class _SendCommentPageState extends State<SendCommentPage> {
 				padding: Padding16,
 				child: Center(
 				child: BBCodeText(
-					data: widget.referenceObject ?? "",
+					data: '[quote]${widget.referenceObject}[/quote]',
 					stylesheet: BBStylesheet(
 						tags: allEffectTag,
 						selectableText: true,
@@ -188,27 +192,25 @@ class _SendCommentPageState extends State<SendCommentPage> {
 									
 									Expanded(
 										child: TextField(		
-																			focusNode:textEditingFocus,
-																			maxLength: 2000,
-																			controller: contentEditingController,
-																			onTap: () async {
-																				expandedToolKitNotifier.value = false;
-																				
-																			},
-																			keyboardType: TextInputType.text,
-																			
-																			textAlignVertical: TextAlignVertical.top,
-																			buildCounter: (context, {required currentLength, required isFocused, required maxLength}) {
-																				return Text("$currentLength/$maxLength");
-																			},
-																			decoration:  InputDecoration(
-																				hintText: '这里填可以引喷的内容',
-																				hintStyle: TextStyle(color: judgeDarknessMode(context) ? Colors.white : Colors.black,),
-																				border: const OutlineInputBorder(),
-																			),
-																			expands : true,
-																			maxLines: null,
-																		),
+											focusNode:textEditingFocus,
+											maxLength: 2000,
+											controller: contentEditingController,
+											onTap: () async {
+												expandedToolKitNotifier.value = false;
+											},
+											
+											textAlignVertical: TextAlignVertical.top,
+											buildCounter: (context, {required currentLength, required isFocused, required maxLength}) {
+												return Text("$currentLength/$maxLength");
+											},
+											decoration:  InputDecoration(
+												hintText: '这里填可以引喷的内容',
+												hintStyle: TextStyle(color: judgeDarknessMode(context) ? Colors.white : Colors.black,),
+												border: const OutlineInputBorder(),
+											),
+											expands : true,
+											maxLines: null,
+										),
 									),
 						  
 									//countText 预留位置
@@ -231,123 +233,111 @@ class _SendCommentPageState extends State<SendCommentPage> {
 									child: toolKitWidget!,
 									);
 								},
-								child: Focus(
-										focusNode: toolKitFocus,
+								child: Listener(
+									
+									onPointerDown: (event) {
+
+                    if(!expandedToolKitNotifier.value){
+                      SystemChannels.textInput.invokeMethod('TextInput.hide');
+                    }
+		  
+										WidgetsBinding.instance.addPostFrameCallback((_) {
+											if(!textEditingFocus.hasFocus){
+												textEditingFocus.requestFocus();
+												SystemChannels.textInput.invokeMethod('TextInput.hide');
+											}
+										});
+
+                    
 										
-										child: Listener(
-											
-											onPointerDown: (event) {
-						  
-												//expandedToolKitNotifier.value = true;
-						  
-												//toolKitFocus.requestFocus();
-						  
-												//有时会出现 输入法弹出 后，点击工具栏，工具栏会弹出，但是输入法不会收起 因为输入法的焦点没有发生变化
-												//只能手动管理它了
-												if(!expandedToolKitNotifier.value){
-													//expandedToolKitNotifier.value = true;
-													SystemChannels.textInput.invokeMethod('TextInput.hide');
-												}
-						  
-						  
-												WidgetsBinding.instance.addPostFrameCallback((_) {
-													if(!textEditingFocus.hasFocus){
-														textEditingFocus.requestFocus();
-														SystemChannels.textInput.invokeMethod('TextInput.hide');
-													}
-													
-													debugPrint("trigged onPointerDown: ${textEditingFocus.hasFocus} / ${toolKitFocus.hasFocus}");
-												});
-												
-												
-											},
-											child: DecoratedBox(
-													decoration: BoxDecoration(
-														color: judgeCurrentThemeColor(context).withValues(alpha: 0.6),
-														borderRadius: const BorderRadius.vertical(top: Radius.circular(16))
-													),
-													child: Column(
-														children: [
-															SizedBox(
-																height: kToolbarHeight,
-																child: Row(
-																	mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-																	crossAxisAlignment: CrossAxisAlignment.center,
-																	children: [
-																
-																		IconButton(
-																			icon: const Row(
-																							spacing: 6,
-																			children: [
-																				Icon(Icons.emoji_emotions),
-																				ScalableText("贴纸表情")
-																			],
-																			),
-																			onPressed: () {
-																				expandedToolKitNotifier.value = true;
-																				toolkitPageController.animateToPage(
-																					0, 
-																					duration: const Duration(milliseconds: 300),
-																					curve: Curves.easeIn
-																				);
-																			},
-																		),
-																		
-																		IconButton(
-																			icon: const Row(
-																							spacing: 6,
-																			children: [
-																				Icon(Icons.format_color_text),
-																							ScalableText("文字样式")
-																			],
-																			),
-																			onPressed: () {
-																							expandedToolKitNotifier.value = true;
-																							toolkitPageController.animateToPage(
-																								1, 
-																								duration: const Duration(milliseconds: 300),
-																								curve: Curves.easeIn
-																							);
-																			},
-																		),
-																		
-																		
-																		IconButton(
-																			icon: const Icon(Icons.keyboard),
-																			onPressed: () {
-																				
-																				expandedToolKitNotifier.value = !expandedToolKitNotifier.value;
-																				
-							
-																		
-																			},
-																		),
-																		
-																	
-																	],
-																),
-															),
-															
-															Divider(color: judgeDarknessMode(context) ? Colors.white : Colors.black,height: 1),
-															
-															Expanded(
-																child: PageView(
-																	controller: toolkitPageController,
-																										
-																	children: [
-																										
-																		StickerSelectView(contentEditingController: contentEditingController),
-																							
-																		TextStyleSelectView(contentEditingController: contentEditingController),
-																		
-																										
-																	],
-																),
-															)
-														],
-													),
-												),
+										
+									},
+									child: DecoratedBox(
+											decoration: BoxDecoration(
+												color: judgeCurrentThemeColor(context).withValues(alpha: 0.6),
+												borderRadius: const BorderRadius.vertical(top: Radius.circular(16))
 											),
+											child: Column(
+												children: [
+													SizedBox(
+														height: kToolbarHeight,
+														child: Row(
+															mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+															crossAxisAlignment: CrossAxisAlignment.center,
+															children: [
+														
+																IconButton(
+																	icon: const Row(
+																					spacing: 6,
+																	children: [
+																		Icon(Icons.emoji_emotions),
+																		ScalableText("贴纸表情")
+																	],
+																	),
+																	onPressed: () {
+																		expandedToolKitNotifier.value = true;
+																		toolkitPageController.animateToPage(
+																			0, 
+																			duration: const Duration(milliseconds: 300),
+																			curve: Curves.easeIn
+																		);
+																	},
+																),
+																
+																IconButton(
+																	icon: const Row(
+																					spacing: 6,
+																	children: [
+																		Icon(Icons.format_color_text),
+																					ScalableText("文字样式")
+																	],
+																	),
+																	onPressed: () {
+																					expandedToolKitNotifier.value = true;
+																					toolkitPageController.animateToPage(
+																						1, 
+																						duration: const Duration(milliseconds: 300),
+																						curve: Curves.easeIn
+																					);
+																	},
+																),
+																
+																
+																IconButton(
+																	icon: const Icon(Icons.keyboard),
+																	onPressed: () {
+																		
+																		expandedToolKitNotifier.value = !expandedToolKitNotifier.value;
+																		
+															
+																
+																	},
+																),
+																
+															
+															],
+														),
+													),
+													
+													Divider(color: judgeDarknessMode(context) ? Colors.white : Colors.black,height: 1),
+													
+													Expanded(
+														child: PageView(
+															controller: toolkitPageController,
+																								
+															children: [
+																								
+																StickerSelectView(contentEditingController: contentEditingController),
+																					
+																TextStyleSelectView(contentEditingController: contentEditingController),
+																
+																								
+															],
+														),
+													)
+												],
+											),
+										),
 									),
 									
 								)

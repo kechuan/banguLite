@@ -8,10 +8,10 @@ import 'package:flutter/widgets.dart';
 //唉 真的不想写这玩意
 class UserModel extends ChangeNotifier{
 
-  //userID: UserInformations
+  //userID: UserInformation
   Map<String,UserDetails> userData = {};
 
-  Future<void> loadUserInfomation(String? userName,UserInformations? currentUserInformation) async {
+  Future<void> loadUserInfomation(String? userName,UserInformation? currentUserInformation) async {
 
     Completer userInfomationCompleter = Completer();
 

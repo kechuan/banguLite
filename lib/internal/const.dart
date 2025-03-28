@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 
+const stickerDataLike = [0,79,54,140,62,122,104,80,141,88,85,90];
+
 enum WeekDay{
 
   mon("一",1),
@@ -214,6 +216,17 @@ enum CommentActionType{
   
 
   const CommentActionType(this.actionTypeString);
+}
+
+enum UserContentActionType{
+  post("发表"),
+  delete("删除"),
+  edit("编辑"),
+  ;
+
+  final String actionTypeString;
+
+  const UserContentActionType(this.actionTypeString);
 }
 
 enum UserRelationsActionType{

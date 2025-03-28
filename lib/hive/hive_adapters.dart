@@ -17,7 +17,7 @@ part 'hive_adapters.g.dart';
     AdapterSpec<ScaleType>(),
     AdapterSpec<Color>(),
     AdapterSpec<StarBangumiDetails>(),
-    AdapterSpec<UserInformations>(),
+    AdapterSpec<UserInformation>(),
     AdapterSpec<LoginedUserInformations>(),
     AdapterSpec<TimelineDetails>()
   ]    

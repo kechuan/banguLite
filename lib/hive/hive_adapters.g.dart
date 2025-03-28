@@ -301,7 +301,7 @@ class LoginedUserInformationsAdapter
       ..accessToken = fields[0] as String?
       ..expiredTime = (fields[9] as num?)?.toInt()
       ..refreshToken = fields[10] as String?
-      ..userInformations = fields[12] as UserInformations?;
+      ..userInformation = fields[12] as UserInformation?;
   }
 
   @override
@@ -315,7 +315,7 @@ class LoginedUserInformationsAdapter
       ..writeByte(10)
       ..write(obj.refreshToken)
       ..writeByte(12)
-      ..write(obj.userInformations);
+      ..write(obj.userInformation);
   }
 
   @override
@@ -329,17 +329,17 @@ class LoginedUserInformationsAdapter
           typeId == other.typeId;
 }
 
-class UserInformationsAdapter extends TypeAdapter<UserInformations> {
+class UserInformationsAdapter extends TypeAdapter<UserInformation> {
   @override
   final int typeId = 8;
 
   @override
-  UserInformations read(BinaryReader reader) {
+  UserInformation read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return UserInformations()
+    return UserInformation()
       ..userID = (fields[0] as num?)?.toInt()
       ..userName = fields[1] as String?
       ..nickName = fields[2] as String?
@@ -350,7 +350,7 @@ class UserInformationsAdapter extends TypeAdapter<UserInformations> {
   }
 
   @override
-  void write(BinaryWriter writer, UserInformations obj) {
+  void write(BinaryWriter writer, UserInformation obj) {
     writer
       ..writeByte(7)
       ..writeByte(0)

@@ -2,9 +2,9 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/models/social_details.dart';
 import 'package:bangu_lite/models/timeline_details.dart';
 
-class UserInformations {
+class UserInformation {
 
-  UserInformations();
+  UserInformation();
 
   int? userID;
   String? userName;
@@ -15,11 +15,13 @@ class UserInformations {
   int? joinedAtTimeStamp;
   int? group;
 
+  String getName() => nickName ?? userName ?? '';
+
 }
 
 class UserDetails{
 
-	UserInformations? userInfomation;
+	UserInformation? userInfomation;
 
 	String? introduction;
 
@@ -38,7 +40,7 @@ class UserDetails{
 
 class LoginedUserInformations{
 
-  UserInformations? userInformations;
+  UserInformation? userInformation;
 
   String? accessToken;
   int? expiredTime;
@@ -48,18 +50,18 @@ class LoginedUserInformations{
 
 
 
-UserInformations getDefaultUserInformations()=> UserInformations();
+UserInformation getDefaultUserInformations()=> UserInformation();
 LoginedUserInformations getDefaultLoginedUserInformations() => LoginedUserInformations();
 
 
-UserInformations loadUserInformations(
+UserInformation loadUserInformations(
   Map<String,dynamic> bangumiUserData,
   
 ){
 
-  final userInformations = UserInformations();
+  final userInformation = UserInformation();
 
-  userInformations
+  userInformation
     ..userID = bangumiUserData["id"]
     ..userName = bangumiUserData["username"]
     ..nickName = bangumiUserData["nickname"].isEmpty ? bangumiUserData["username"] : bangumiUserData["nickname"]
@@ -69,13 +71,13 @@ UserInformations loadUserInformations(
     ..group = bangumiUserData["group"]
   ;
   
-  return userInformations;
+  return userInformation;
 }
 
 
 UserDetails loadUserDetails(
 	Map<String,dynamic> bangumiUserDetailsData,
-	{UserInformations? currentUserInformation}
+	{UserInformation? currentUserInformation}
 ){
 	UserDetails userDetails = UserDetails();
 

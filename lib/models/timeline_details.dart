@@ -125,11 +125,6 @@ String convertTimelineDescription(TimelineDetails currentTimeline, {bool? author
     case 6:case 7: { actionText+="添加了 "; break;}
 
     default: { 
-      if(currentTimeline.catType == 9){
-        actionText += '${timelineEnums.last[currentTimeline.catAction].actionName} ';
-      }
-
-      else{
 
         List currentType = timelineEnums.elementAt(currentTimeline.catType!-1);
 
@@ -139,8 +134,6 @@ String convertTimelineDescription(TimelineDetails currentTimeline, {bool? author
             break;
           }
         }
-
-      }
 
     }
 
@@ -253,9 +246,7 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
 }
 
 
-
-
-
+//TODO Mono尚未完成 / 完成动作尚未完成
 String convertSubjectTimeline(
 
   Set<int>? objectIDSet,
@@ -276,11 +267,11 @@ String convertSubjectTimeline(
 
   if(cat == 4 && action == 2){
      subjectTimelineText += '[url=${BangumiWebUrls.subject(objectIDSet.last)}]${objectNameSet.last}[/url] ';
-     subjectTimelineText += "([url=${BangumiWebUrls.ep(objectIDSet.first)}]Ep.$ep ${objectNameSet.first}[/url] )";
+     subjectTimelineText += "( [url=${BangumiWebUrls.ep(objectIDSet.first)}]Ep.$ep ${objectNameSet.first}[/url] )";
   } 
 
   else if(cat == 4 && action == 0){
-    subjectTimelineText += "([url=${BangumiWebUrls.subject(objectIDSet.first)}]${objectNameSet.first}[/url]  Ep.$ep )";
+    subjectTimelineText += "( [url=${BangumiWebUrls.subject(objectIDSet.first)}]${objectNameSet.first}[/url]  Ep.$ep )";
   }
 
   else{

@@ -1,4 +1,4 @@
-import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 
 abstract class BaseDetails {
 
