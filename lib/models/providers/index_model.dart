@@ -19,7 +19,7 @@ class IndexModel extends ChangeNotifier {
   DateTime dataTime = DateTime.now();
   int selectedYear = DateTime.now().year;
   int selectedWeekDay = DateTime.now().weekday;
-  SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month,currentTime: true);
+  SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month);
 
   static Completer? loadFuture; //适用作用目标只有一个的对象里
   
@@ -41,6 +41,15 @@ class IndexModel extends ChangeNotifier {
   int cachedImageSize = 0;
 
   List<Map<String,num>> starsUpdateRating = [];
+
+  //int 此处为 ID 为了方便 不再设立 各种的 topic/episode 这种的ID
+  //毕竟 bgm也有作防冲突处理
+
+  // 草稿箱 [标题:内容]
+  // 当然标题不一定存在 如果不存在直接置为空就好
+  final Map<int,Map<String,String>> draftContent = {};
+
+
 
   void initModel() async {
     loadConfigData();

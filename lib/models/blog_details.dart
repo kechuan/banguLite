@@ -15,8 +15,12 @@ class BlogDetails extends ContentDetails{
 
   int? get blogID => detailID;
   String? get blogContent => content;
+
   
   UserInformation? userInfo;
+
+  //尾部图片
+  String? bannerUri; 
 
   List<EpCommentDetails>? get blogReplies => contentRepliedComment;
   set blogReplies(List<EpCommentDetails>? value) => contentRepliedComment = value;
@@ -29,8 +33,8 @@ BlogDetails loadBlogDetails(Map<String,dynamic> blogData){
 
   final currentBlog = BlogDetails(
     detailID: blogData["id"],
-    content: blogData["content"]
+    content: blogData["content"],
   );
 
-  return currentBlog;
+  return currentBlog..bannerUri = blogData["icon"];
 }

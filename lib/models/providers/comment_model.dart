@@ -48,8 +48,8 @@ class CommentModel extends ChangeNotifier {
 
   Future<void> getCommentLength(int subjectID) async {
     await HttpApiClient.client.get(
-      BangumiAPIUrls.comment(subjectID),
-      queryParameters: BangumiQuerys.commentQuery..["limit"] = 1
+      BangumiAPIUrls.subjectComment(subjectID),
+      queryParameters: BangumiQuerys.commentAccessQuery..["limit"] = 1
     ).then((response){
       if(response.data != null && response.data["total"] != null){
         commentLength = response.data["total"];
@@ -139,8 +139,8 @@ class CommentModel extends ChangeNotifier {
       int currentRequestRange = (pageRange)*(pageIndex - 1).abs();
 
       final detailInformation = await HttpApiClient.client.get(
-      BangumiAPIUrls.comment(subjectID),
-      queryParameters: BangumiQuerys.commentQuery
+      BangumiAPIUrls.subjectComment(subjectID),
+      queryParameters: BangumiQuerys.commentAccessQuery
 
       // 末数 比如 55-(10*(6-1)) => 5 这样就不会请求一整页的数据 而是请求残余页的条目数
       ..["limit"] = min(pageRange , (commentLength - currentRequestRange)) 

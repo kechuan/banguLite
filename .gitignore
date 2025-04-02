@@ -1,9 +1,12 @@
+directoryTree.md
+
 # Miscellaneous
 *.class
 *.log
 *.pyc
 *.swp
 *.cmd
+*.log
 .DS_Store
 .atom/
 .buildlog/

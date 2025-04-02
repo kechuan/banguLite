@@ -37,46 +37,65 @@ class BangumiAPIUrls {
   static const String bangumiSubjectSort = '$baseUrl/v0/search/subjects';
 
   //以v1为代表的新api
-  static const String newUrl = "https://next.bgm.tv";
+  static const String newUrl = "https://next.bgm.tv/p1";
 
   //subject : GET/POST 通用 只要是只需求 subjectID 而非 需求具体的 sub-contentID 都能使用
-  static String comment(int subjectID) => '$newUrl/p1/subjects/$subjectID/comments';
-  static String ep(int epID) => '$newUrl/p1/episodes/$epID';
-  static String epComment(int epID) => '$newUrl/p1/episodes/$epID/comments';
-  static String topics(int subjectID) => '$newUrl/p1/subjects/$subjectID/topics';
-  static String topicComment(int topicID) => '$newUrl/p1/subjects/-/topics/$topicID';
-  static String relations(int subjectID) => '$newUrl/p1/subjects/$subjectID/relations';
-  static String reviews(int subjectID) => '$newUrl/p1/subjects/$subjectID/reviews';
+  /// EP,Subject 划分 内容/评论 因此划分 comments 与 空
+  /// Topic 则是单个一体 因此才会有 topics 这个字段
+
+  //static String subject(int subjectID) => '$newUrl/subjects/$subjectID';
+
+
+  static String subjectComment(int subjectID) => '$newUrl/subjects/$subjectID/comments';
+  static String ep(int epID) => '$newUrl/episodes/$epID';
+  static String epComment(int epID) => '$newUrl/episodes/$epID/comments';
+  static String topics(int subjectID) => '$newUrl/subjects/$subjectID/topics';
+  static String topicComment(int topicID) => '$newUrl/subjects/-/topics/$topicID';
+  static String relations(int subjectID) => '$newUrl/subjects/$subjectID/relations';
+  static String reviews(int subjectID) => '$newUrl/subjects/$subjectID/reviews';
 
   //user
-  static String me = '$newUrl/p1/me';
+  static String me = '$newUrl/me';
 
-  static String user(String username) => '$newUrl/p1/users/$username';
-  static String userBlog(int blogID) => '$newUrl/p1/blogs/$blogID';
+  static String user(String username) => '$newUrl/users/$username';
+  static String userBlog(int blogID) => '$newUrl/blogs/$blogID';
+  static String userBlogPicture(int blogID) => '${userBlog(blogID)}/photos';
+
   static String userTimeline(String username) => '${user(username)}/timeline';
   
   static String blogComment(int blogID) => '${userBlog(blogID)}/comments';
 
   //user-relation
-  static String addBlockList(String username) => '$newUrl/p1/blocklist/$username';
-  static String removeBlockList(String username) => '$newUrl/p1/blocklist/$username';
-  static String addFriend(String username) => '$newUrl/p1/friends/$username';
-  static String removeFriend(String username) => '$newUrl/p1/friends/$username';
+  static String addBlockList(String username) => '$newUrl/blocklist/$username';
+  static String removeBlockList(String username) => '$newUrl/blocklist/$username';
+  static String addFriend(String username) => '$newUrl/friends/$username';
+  static String removeFriend(String username) => '$newUrl/friends/$username';
 
   //comment-action put/delete 目前发评论 仅支持EP/topic内容
   
-
-  //static String actionSubjectComment(int commentID) => '$newUrl/p1/comments/$commentID/actions';
-
-  static String actionEpComment(int commentID) => '$newUrl/p1/episodes/-/comments/$commentID';
-  static String actionEpCommentLike(int commentID) => '${actionEpComment(commentID)}/like';
-
-  static String postTopicRepliy(int topicID) => '$newUrl/p1/subject/-/$topicID/replies';
+  /// 行为允许 POST
   
-  
-  
+  /// ContentArea
+  static String postTopic(int subjectID) => topics(subjectID);
+  //似乎还不支持postBlog
+  //static String postBlog() => '';
 
   
+  /// CommentArea
+  static String postEPComment(int epID) => epComment(epID);
+  static String postTopicComment(int topicID) => '${topicComment(topicID)}/replies';
+  static String postBlogComment(int subjectID) => '${userBlog(subjectID)}/comments';
+
+  
+  /// 行为允许 GET/PUT/DELETE
+  static String actionTopic(int commentID) => '$newUrl/subjects/-/posts/$commentID';
+  static String actionEpComment(int commentID) => '$newUrl/episodes/-/comments/$commentID';
+  ///这个不允许GET
+  static String actionBlogComment(int commentID) => '$newUrl/blogs/-/comments/$commentID';
+
+  /// 行为允许 PUT/DELETE
+  static String toggleEPCommentLike(int commentID) => '${actionEpComment(commentID)}/like';
+  static String toggleTopicLike(int commentID) => '${actionTopic(commentID)}/like';
 
 
   //other
@@ -132,7 +151,7 @@ class BangumiQuerys {
 	static Map<String,String> authorizationQuery() => {
 		"client_id":APPInformationRepository.bangumiAPPID,
 		"response_type":"code",
-		"chii_referer":APPInformationRepository.bangumiAuthCallbackUri.toString(),
+		"chii_referer":APPInformationRepository.bangumiOAuthCallbackUri.toString(),
 		"client_secret":APPInformationRepository.bangumiAPPSecret,
 	};
 
@@ -168,8 +187,15 @@ class BangumiQuerys {
 		"max_results":10
 	};
 
+  static Map<String,dynamic> replyQuery = {
+    "content": "",
+    //replyComment/replyContent 的区分
+    "replyTo": 0, 
+    "turnstileToken": ""
+  };
 
-  static Map<String,int>  commentQuery = {"limit":10,"offset":0},
+
+  static Map<String,int>  commentAccessQuery = {"limit":10,"offset":0},
                           sortQuery = {"limit":10,"offset":0},
                           topicsQuery = {"limit":30,"offset":0},
                           epQuery = {"subject_id":0,"limit":100,"offset":0},
@@ -211,7 +237,9 @@ class APPInformationRepository{
   static const String bangumiAPPID = 'bgm369067d8f39dea8d4';
   static const String bangumiAPPSecret = 'e34be838faee529cb7df1bad76a66db3';
 
-  static final Uri bangumiAuthCallbackUri = Uri.parse('bangulite://oauth/bgm_login?client_id=$bangumiAPPID');
+  static final Uri bangumiOAuthCallbackUri = Uri.parse('bangulite://oauth/bgm_login?client_id=$bangumiAPPID');
+  static final Uri bangumiTurnstileCallbackUri = Uri.parse('bangulite://turnstile/callback');
+
 }
 
 Future<Release?> pullLatestRelease() async {

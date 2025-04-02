@@ -59,7 +59,10 @@ class MoreTopicsPage extends StatelessWidget {
                     Navigator.pushNamed(
                     context,
                     Routes.subjectTopic,
-                    arguments: {"topicInfo":topicsList[index],"topicModel":topicModel}
+                    arguments: {
+                      "topicInfo":topicsList[index],
+                      "topicModel":topicModel,
+                    }
                 );
                   },
                   title: ScalableText("${topicsList[index].contentTitle}",maxLines: 2,overflow: TextOverflow.ellipsis,),

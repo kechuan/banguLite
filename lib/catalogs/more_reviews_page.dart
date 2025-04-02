@@ -56,8 +56,9 @@ class MoreReviewsPage extends StatelessWidget {
                     context,
                     Routes.blog,
                     arguments: {
-                      "reviewInfo":reviewsList[index],
-                      "reviewModel":reviewModel
+                      "reviewModel":reviewModel,
+                      "selectedBlogIndex": index,
+                      "themeColor": judgeDetailRenderColor(context,bangumiThemeColor),
                     }
                 );
                   },

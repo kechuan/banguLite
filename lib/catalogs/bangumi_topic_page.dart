@@ -1,4 +1,5 @@
 import 'package:bangu_lite/catalogs/bangumi_general_content_page.dart';
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/topic_details.dart';
 import 'package:bangu_lite/models/topic_info.dart';
@@ -13,11 +14,13 @@ class BangumiTopicPage extends StatefulWidget {
   const BangumiTopicPage({
     super.key,
     required this.topicModel,
-	  required this.topicInfo
+	  required this.topicInfo,
+    this.themeColor
   });
 
   final TopicModel topicModel;
   final TopicInfo topicInfo;
+  final Color? themeColor;
 
   @override
   State<BangumiTopicPage> createState() => _BangumiTopicPageState();
@@ -38,7 +41,14 @@ class _BangumiTopicPageState extends BangumiContentPageState
   TopicModel getContentModel() => widget.topicModel;
 
   @override
+  Color? getcurrentSubjectThemeColor() => widget.themeColor;
+
+  @override
   TopicDetails createEmptyDetailData() => TopicDetails.empty();
+
+
+  @override
+  PostCommentType? getPostCommentType() => PostCommentType.replyTopic;
 
   @override
   int? getCommentCount(TopicDetails? contentDetail, bool isLoading){

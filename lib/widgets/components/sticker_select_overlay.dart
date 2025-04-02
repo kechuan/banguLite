@@ -16,17 +16,19 @@ class StickerSelectOverlay{
   StickerSelectOverlay(
     {
       required this.context,
-      required this.buttonLayerLink,
+      this.buttonLayerLink,
+      this.postCommentType
     }
   );
 
 
   final BuildContext context;
   final LayerLink? buttonLayerLink;
+  final PostCommentType? postCommentType;
+
   final opacityListenable = ValueNotifier<double>(0.0);
 
   OverlayEntry? currentEntry;
-  
 
   bool isOverlayActived = false;
 
@@ -40,7 +42,7 @@ class StickerSelectOverlay{
 
     else{
       OverlayState overlayState = Overlay.of(context); //refresh OverlayState?
-      OverlayEntry stickerSelectOverlay = createOverlay(context,commentID);
+      OverlayEntry stickerSelectOverlay = createOverlay(context,commentID,postCommentType);
       overlayState.insert(stickerSelectOverlay);
       isOverlayActived = true;
     }
@@ -57,7 +59,11 @@ class StickerSelectOverlay{
 
   }
 
-  OverlayEntry createOverlay(BuildContext context,int commentID){
+  OverlayEntry createOverlay(
+    BuildContext context,
+    int commentID,
+    PostCommentType? postCommentType
+  ){
     return currentEntry = OverlayEntry(
       
       builder: (_){
@@ -136,11 +142,15 @@ class StickerSelectOverlay{
                                   return GridTile(
                                     child: InkResponse(
                                       onTap: () {
-                                        //final accountModel = context.read<AccountModel>();
+                                        final accountModel = context.read<AccountModel>();
+
+                                        debugPrint("postCommentType:$postCommentType");
           
-                                        //accountModel.actionEpCommentLike(
-                                        //  commentID, stickerDataLike[index]
-                                        //);
+                                        accountModel.toggleCommentLike(
+                                          commentID, 
+                                          stickerDataLike[index],
+                                          postCommentType,
+                                        );
 
                                         opacityListenable.value = 0.0;
 

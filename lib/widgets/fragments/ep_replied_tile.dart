@@ -11,10 +11,14 @@ class EpRepliedTile extends ListTile {
   const EpRepliedTile({
     super.key,
     required this.epCommentData,
+    this.postCommentType,
+    this.themeColor,
 
   });
 
   final EpCommentDetails epCommentData;
+  final PostCommentType? postCommentType;
+  final Color? themeColor;
 
   @override
   Widget build(BuildContext context) {
@@ -25,64 +29,81 @@ class EpRepliedTile extends ListTile {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      decoration: BoxDecoration(border: Border.all()),
-      child: ListTile(
-        tileColor: Theme.of(context).brightness == Brightness.light ? const Color.fromARGB(225, 212, 232, 215) : const Color.fromARGB(255, 118, 121, 119),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-        
-            ...List.generate(
-              min(3,epCommentData.repliedComment!.length), 
-              (index){
-      
-                return Padding(
-                  padding: PaddingV6,
-                  child: ShowCommentTap(
-                    epCommentData: epCommentData,
-                    commentIndex: index,
-                    child: Row(
-                      spacing: 12,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ScalableText("${epCommentData.repliedComment![index].userInformation?.nickName}:"),
-
-                        Expanded(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxHeight: AppFontSize.s16 * 6, //字符的字高普遍比字宽大1倍
-                              maxWidth: double.infinity
-                               
-                            ),
-                            child: ScalableText(
-                              "${epCommentData.repliedComment![index].comment}",
-                              maxLines: 3,
-                              style: const TextStyle(overflow: TextOverflow.ellipsis,),
-                              
-                            ),
-                          ),
-                        )
-
-                      ],
-                    ),
+    return Padding(
+      padding: Padding16,
+      child: Container(
+        decoration: BoxDecoration(border: Border.all()),
+        child: ListTile(
+          tileColor: Theme.of(context).brightness == Brightness.light ? const Color.fromARGB(225, 212, 232, 215) : const Color.fromARGB(255, 118, 121, 119),
+          title: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+            
+                ...List.generate(
+                  min(3,epCommentData.repliedComment!.length), 
+                  (index){
                     
-                  ),
-                );
-      
-              }
-            ),
-    
-            if(epCommentData.repliedComment!.length > 3) 
-              ShowCommentTap(
-                epCommentData: epCommentData,
-                child: ScalableText(
-                  "> 点击查看 ${epCommentData.repliedComment!.length} 条评论",
-                  style: const TextStyle(color: Colors.blueAccent),
-                )
-              ),
+                    return Padding(
+                      padding: PaddingV6,
+                      child: ShowCommentTap(
+                        postCommentType:postCommentType,
+                        epCommentData: epCommentData,
+                        commentIndex: index,
+                        child: Row(
+                          spacing: 12,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ScalableText("${epCommentData.repliedComment![index].userInformation?.nickName}:"),
+                  
+                            Expanded(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight: AppFontSize.s16 * 6, //字符的字高普遍比字宽大1倍
+                                  maxWidth: double.infinity
+                                   
+                                ),
+                                child: Builder(
+                                  builder: (_) {
 
-          ],
+                                    if(epCommentData.repliedComment?[index].comment?.isEmpty ?? false){
+                                      return const ScalableText("发言已隐藏",style: TextStyle(fontStyle: FontStyle.italic));
+                                    }
+
+                                    return ScalableText(
+                                      "${epCommentData.repliedComment![index].comment}",
+                                      maxLines: 3,
+                                      style: const TextStyle(overflow: TextOverflow.ellipsis,),
+                                      
+                                    );
+                                  }
+                                ),
+                              ),
+                            )
+                  
+                          ],
+                        ),
+                        
+                      ),
+                    );
+                    
+                  }
+                ),
+                  
+                if(epCommentData.repliedComment!.length > 3) 
+                  ShowCommentTap(
+                    themeColor: themeColor,
+                    postCommentType: postCommentType,
+                    epCommentData: epCommentData,
+                    child: ScalableText(
+                      "> 点击查看 ${epCommentData.repliedComment!.length} 条评论",
+                      style: const TextStyle(color: Colors.blueAccent),
+                    )
+                  ),
+                  
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -97,11 +118,17 @@ class ShowCommentTap extends InkResponse {
     super.key,
     super.child,
     required this.epCommentData,
-    this.commentIndex
+    this.commentIndex,
+    this.postCommentType,
+    this.themeColor,
+
   });
 
   final EpCommentDetails epCommentData;
   final int? commentIndex;
+  final PostCommentType? postCommentType;
+
+  final Color? themeColor;
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +141,15 @@ class ShowCommentTap extends InkResponse {
           isScrollControlled: true,
           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width,maxHeight:MediaQuery.sizeOf(context).height*3/4),
           context: context,
-          builder: (_)=> EpRepliedCommentDialog(currentComment: epCommentData,commentIndex: commentIndex)
+          builder: (_){
+            return EpRepliedCommentDialog(
+              currentComment: epCommentData,
+              commentIndex: commentIndex,
+              postCommentType: postCommentType,
+              themeColor: themeColor,
+            );
+            
+          }
         );
       },
       child: child,

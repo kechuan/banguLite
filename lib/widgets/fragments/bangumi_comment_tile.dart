@@ -18,16 +18,15 @@ class BangumiCommentTile extends StatelessWidget {
   const BangumiCommentTile({
     super.key,
     required this.commentData,
-    this.themeColor
+    this.themeColor,
   });
 
   final CommentDetails commentData;
   final Color? themeColor;
 
+
   @override
   Widget build(BuildContext context) {
-
-    final stickerButtonLink = LayerLink();
 
     final int ratingScore = commentData.rate ?? 0;
     DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(commentData.commentTimeStamp!*1000);
@@ -122,7 +121,8 @@ class BangumiCommentTile extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: CommentReaction(
-                    commentReactions: commentData.commentReactions
+                    commentReactions: commentData.commentReactions,
+                    themeColor: themeColor,
                   ),
                 ),
               ),
@@ -135,8 +135,8 @@ class BangumiCommentTile extends StatelessWidget {
               ScalableText("${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"),
 
               BangumiCommentActionButton(
+                postCommentType: PostCommentType.comment,
                 commentData: commentData,
-                isSubjectComment: true,
               )
 
             ],

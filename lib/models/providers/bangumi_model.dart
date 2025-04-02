@@ -19,8 +19,6 @@ class BangumiModel extends ChangeNotifier {
   Color? bangumiThemeColor;
   Color? imageColor;
 
-  String? draftContent;
-
   Future<void> loadDetails({bool? refresh}) async {
 
     if(subjectID==0) return;

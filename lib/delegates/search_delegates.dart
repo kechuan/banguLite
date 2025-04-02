@@ -18,7 +18,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
   @override
   ThemeData appBarTheme(BuildContext context) {
     return super.appBarTheme(context).copyWith(
-      inputDecorationTheme: const InputDecorationTheme(),
+      inputDecorationTheme: const InputDecorationTheme()
     );
   }
 
@@ -32,7 +32,6 @@ class CustomSearchDelegate extends SearchDelegate<String>{
           ValueListenableBuilder(
             valueListenable: searchTypesNotifier,
              builder: (_,currentSortType,child) {
-
 
                return SizedBox(
                 width: 60,

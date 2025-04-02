@@ -117,7 +117,7 @@ class UserInformationDialog extends StatelessWidget {
     				  
                           asyncToaster(String message) => fadeToaster(context: context, message: message);
 
-                          accountModel.userAction(
+                          accountModel.userRelationAction(
                             userInformation?.userName,
                             fallbackAction: (errorMessage) => asyncToaster(errorMessage),
                           ).then((status){
@@ -149,7 +149,7 @@ class UserInformationDialog extends StatelessWidget {
     				  
     										asyncToaster(String message)=> fadeToaster(context: context, message: message);
 
-											accountModel.userAction(
+											accountModel.userRelationAction(
 												userInformation?.userName,
 												relationType: UserRelationsActionType.block,
 												fallbackAction: (errorMessage) => asyncToaster(errorMessage),

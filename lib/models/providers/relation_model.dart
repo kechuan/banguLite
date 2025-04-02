@@ -1,6 +1,5 @@
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/bangumi_details.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/models/relation_details.dart';
 import 'package:dio/dio.dart';

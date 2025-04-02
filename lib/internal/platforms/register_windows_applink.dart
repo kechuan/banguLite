@@ -62,8 +62,8 @@ bool handleLink(Uri uri) {
   debugPrint("listenAPPLink: $uri");
 
   if (
-    uri.host == APPInformationRepository.bangumiAuthCallbackUri.host && 
-    uri.path == APPInformationRepository.bangumiAuthCallbackUri.path
+    uri.host == APPInformationRepository.bangumiOAuthCallbackUri.host && 
+    uri.path == APPInformationRepository.bangumiOAuthCallbackUri.path
   ) {
 
     if(uri.queryParameters["client_id"] == APPInformationRepository.bangumiAPPID){

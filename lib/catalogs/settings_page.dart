@@ -156,36 +156,41 @@ class FontSizeTile extends ListTile {
       builder: (_,fontScale,child){
         return ListTile(
           title: Row(
+            spacing: 12,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ScalableText("文字大小",style: TextStyle(fontSize: AppFontSize.s16)),
     
-              SizedBox(
-                height: 60,
-                width: 50*(ScaleType.values.length.toDouble()),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: Colors.grey.withValues(alpha: 0.2)
+              Flexible(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth:  50*(ScaleType.values.length).toDouble(),
+                    maxHeight: 60,
                   ),
-                  child: DefaultTabController(
-                    initialIndex: fontScale.index,
-                    length: ScaleType.values.length,
-                    child: TabBar(
-                      labelPadding: const EdgeInsets.all(0),
-                      onTap: (value) {
-                        switch(value){
-                          case 0: indexModel.updateFontSize(ScaleType.min); break;
-                          case 1: indexModel.updateFontSize(ScaleType.less); break;
-                          case 2: indexModel.updateFontSize(ScaleType.medium); break;
-                          case 3: indexModel.updateFontSize(ScaleType.more); break;
-                          case 4: indexModel.updateFontSize(ScaleType.max); break;
-                        }
-                        
-                      },
-                      dividerColor: Colors.transparent,
-                      indicatorSize: TabBarIndicatorSize.label,
-                      tabs: List.generate(5, (index) => Center(child: Text(ScaleType.values[index].sacleName)))
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: Colors.grey.withValues(alpha: 0.2)
+                    ),
+                    child: DefaultTabController(
+                      initialIndex: fontScale.index,
+                      length: ScaleType.values.length,
+                      child: TabBar(
+                        labelPadding: const EdgeInsets.all(0),
+                        onTap: (value) {
+                          switch(value){
+                            case 0: indexModel.updateFontSize(ScaleType.min); break;
+                            case 1: indexModel.updateFontSize(ScaleType.less); break;
+                            case 2: indexModel.updateFontSize(ScaleType.medium); break;
+                            case 3: indexModel.updateFontSize(ScaleType.more); break;
+                            case 4: indexModel.updateFontSize(ScaleType.max); break;
+                          }
+                          
+                        },
+                        dividerColor: Colors.transparent,
+                        indicatorSize: TabBarIndicatorSize.label,
+                        tabs: List.generate(5, (index) => Center(child: Text(ScaleType.values[index].sacleName)))
+                      ),
                     ),
                   ),
                 ),
@@ -217,14 +222,15 @@ class ColorThemeTile extends ListTile{
             shouldRebuild: (previous, next) => previous!=next,
             builder: (_,currentColor,child) => ScalableText("主题色设置",style: TextStyle(color: judgeCurrentThemeColor(context).withValues(alpha: 0.8)))
           ),
-    
-          SizedBox(
+
+          Flexible(
+            child: SizedBox(
             width: 50*(BangumiThemeColor.values.length+1),
             height: 50,
             child: ListView.builder(
+              physics: const ClampingScrollPhysics(),
               scrollDirection: Axis.horizontal,
               itemCount: BangumiThemeColor.values.length+1,
-              
               itemExtent: 50,
               itemBuilder: (_, index) {
     
@@ -320,7 +326,12 @@ class ColorThemeTile extends ListTile{
               },
             ),
           )
-        ],
+        
+          )
+
+
+    
+          ],
       ),
       subtitle: Selector<IndexModel,bool?>(
         selector: (_, indexModel) => indexModel.userConfig.isFollowThemeColor,
@@ -358,38 +369,43 @@ class ThemeModeTile extends ListTile{
 
     return ListTile(
       title: Row(
+        spacing: 12,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          ScalableText("黑暗模式",style: TextStyle(fontSize: AppFontSize.s16)),
+          ScalableText("明亮模式",style: TextStyle(fontSize: AppFontSize.s16)),
         
-          SizedBox(
-            height: 60,
-            width: (50*ScaleType.values.length).toDouble(),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: Colors.grey.withValues(alpha: 0.2)
+          Flexible(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: 100*(ThemeMode.values.length).toDouble(),
+                maxHeight: 60,
               ),
-              child: DefaultTabController(
-                initialIndex: indexModel.userConfig.themeMode!.index,
-                length: ThemeMode.values.length,
-                child: TabBar(
-                  labelPadding: const EdgeInsets.all(0),
-                  onTap: (value) {
-                    switch(value){
-                      case 0: indexModel.updateThemeMode(ThemeMode.system,config:true); break;
-                      case 1: indexModel.updateThemeMode(ThemeMode.light,config:true); break;
-                      case 2: indexModel.updateThemeMode(ThemeMode.dark,config:true); break;
-                    }
-                    
-                  },
-                  dividerColor: Colors.transparent,
-                  indicatorSize: TabBarIndicatorSize.label,
-                  tabs: const [
-                    Center(child: Text("系统")),
-                    Center(child: Text("明亮")),
-                    Center(child: Text("黑暗")),
-                  ]
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.grey.withValues(alpha: 0.2)
+                ),
+                child: DefaultTabController(
+                  initialIndex: indexModel.userConfig.themeMode!.index,
+                  length: ThemeMode.values.length,
+                  child: TabBar(
+                    labelPadding: const EdgeInsets.all(0),
+                    onTap: (value) {
+                      switch(value){
+                        case 0: indexModel.updateThemeMode(ThemeMode.system,config:true); break;
+                        case 1: indexModel.updateThemeMode(ThemeMode.light,config:true); break;
+                        case 2: indexModel.updateThemeMode(ThemeMode.dark,config:true); break;
+                      }
+                      
+                    },
+                    dividerColor: Colors.transparent,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    tabs: const [
+                      Center(child: Text("系统")),
+                      Center(child: Text("明亮")),
+                      Center(child: Text("黑暗")),
+                    ]
+                  ),
                 ),
               ),
             ),

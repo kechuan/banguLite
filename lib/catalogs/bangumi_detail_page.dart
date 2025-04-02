@@ -1,5 +1,6 @@
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/models/providers/relation_model.dart';
 import 'package:bangu_lite/models/providers/review_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_recent_review.dart';
@@ -98,15 +99,19 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
 
                   IconButton(
                     onPressed: (){
-                      Navigator.pushNamed(
-                        context, 
-                        Routes.sendComment,
-                        arguments: {
-                          'isReply':true,
-                          'title':bangumiModel.bangumiDetails?.name ?? '',
-                          'preservationContent': bangumiModel.draftContent,
-                        }
-                      );
+
+                      fadeToaster(context: context, message: 'bangumi 暂未开放 番剧吐槽 API');
+
+                      //Navigator.pushNamed(
+                      //  context, 
+                      //  Routes.sendComment,
+                      //  arguments: {
+                      //    'postCommentType':PostCommentType.comment,
+                      //    'title':bangumiModel.bangumiDetails?.name ?? '',
+                      //    'preservationContent': bangumiModel.draftContent,
+                      //  }
+                      //);
+
                     },
                     icon: const Icon(Icons.edit_document)
                   ),

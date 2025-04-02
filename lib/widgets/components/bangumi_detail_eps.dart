@@ -11,11 +11,15 @@ class BuildEps extends StatelessWidget {
     required this.subjectID,
     required this.informationList,
 	  this.portialMode,
+
+    this.subjectName,
   });
 
   final int subjectID;
   final Map<String, dynamic> informationList;
   final bool? portialMode;
+
+  final String? subjectName;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +57,7 @@ class BuildEps extends StatelessWidget {
       EpSelect(
         totalEps: totalEps,
         airedEps: airedEps,
-        name: informationList["alias"],
+        name: informationList["alias"].isEmpty ? subjectName : informationList["alias"],
         portialMode: portialMode,
         bangumiThemeColor: bangumiModel.bangumiThemeColor
         

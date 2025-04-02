@@ -1,3 +1,4 @@
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comment_tile.dart';
 import 'package:flutter/material.dart';
@@ -5,12 +6,18 @@ import 'package:flutter/material.dart';
 class EpRepliedCommentDialog extends StatelessWidget {
   const EpRepliedCommentDialog({
     super.key,
+    
     required this.currentComment,
     this.commentIndex,
-  });
+    this.postCommentType,
+    this.themeColor,
 
+  });
+  
   final EpCommentDetails currentComment;
   final int? commentIndex;
+  final PostCommentType? postCommentType;
+  final Color? themeColor;
   
   @override
   Widget build(BuildContext context) {
@@ -27,14 +34,21 @@ class EpRepliedCommentDialog extends StatelessWidget {
         if(index == 0){
             return Column(  
               children: [
-                EpCommentTile(epCommentData: currentComment),
+                EpCommentTile(
+                  epCommentData: currentComment,
+                  themeColor:themeColor
+                ),
                 const Divider(height: 1),
               ],
             );
          }
 
         if(currentComment.repliedComment!.isNotEmpty){
-          return EpCommentTile(epCommentData: currentComment.repliedComment![index-1]);
+          return EpCommentTile(
+            postCommentType: postCommentType,
+            epCommentData: currentComment.repliedComment![index-1],
+            themeColor: themeColor
+          );
         }
 
         else{

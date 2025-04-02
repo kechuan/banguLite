@@ -4,7 +4,7 @@
 			"path": "lib/catalogs/bangumi_ep_page.dart",
 			"bookmarks": [
 				{
-					"line": 309,
+					"line": 268,
 					"column": 38,
 					"label": "EPInfo"
 				}
@@ -44,7 +44,7 @@
 			"path": "lib/models/providers/ep_model.dart",
 			"bookmarks": [
 				{
-					"line": 145,
+					"line": 144,
 					"column": 54,
 					"label": "获取EPInfo信息"
 				}
@@ -84,7 +84,7 @@
 			"path": "lib/catalogs/bangumi_detail_page.dart",
 			"bookmarks": [
 				{
-					"line": 31,
+					"line": 32,
 					"column": 32,
 					"label": "subjectDetail——番剧详情"
 				}
@@ -104,7 +104,7 @@
 			"path": "lib/catalogs/bangumi_blog_page.dart",
 			"bookmarks": [
 				{
-					"line": 14,
+					"line": 15,
 					"column": 46,
 					"label": "BlogPage —— 日志"
 				}
@@ -127,6 +127,26 @@
 					"line": 13,
 					"column": 43,
 					"label": "AccountModel —— 账号系统"
+				}
+			]
+		},
+		{
+			"path": "lib/catalogs/bangumi_topic_page.dart",
+			"bookmarks": [
+				{
+					"line": 12,
+					"column": 0,
+					"label": "TopicPage —— 讨论页"
+				}
+			]
+		},
+		{
+			"path": "lib/models/providers/bangumi_model.dart",
+			"bookmarks": [
+				{
+					"line": 9,
+					"column": 43,
+					"label": "BangumiModel —— 番剧Model"
 				}
 			]
 		}

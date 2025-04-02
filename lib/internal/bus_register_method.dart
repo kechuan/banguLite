@@ -84,7 +84,7 @@ void appLoginMethodListener(BuildContext context,String link){
   
   debugPrint("detected BangumiLogin: $link");
 
-  if(link.startsWith(APPInformationRepository.bangumiAuthCallbackUri.scheme)){
+  if(link.startsWith(APPInformationRepository.bangumiOAuthCallbackUri.scheme)){
     final code = link.split("code=").last;
     accountModel.getAccessToken(code);
   }

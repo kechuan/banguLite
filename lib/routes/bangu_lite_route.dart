@@ -6,6 +6,7 @@
 // version: 10.1.0
 // **************************************************************************
 // ignore_for_file: prefer_const_literals_to_create_immutables,unused_local_variable,unused_import,unnecessary_import,unused_shown_name,implementation_imports,duplicate_import,library_private_types_in_public_api
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/review_model.dart';
@@ -51,9 +52,12 @@ FFRouteSettings getRouteSettings({
           reviewModel: asT<ReviewModel>(
             safeArguments['reviewModel'],
           )!,
-          reviewInfo: asT<ReviewInfo>(
-            safeArguments['reviewInfo'],
+          selectedBlogIndex: asT<int>(
+            safeArguments['selectedBlogIndex'],
           )!,
+          themeColor: asT<Color?>(
+            safeArguments['themeColor'],
+          ),
         ),
       );
     case '/commentPreview':
@@ -138,15 +142,17 @@ FFRouteSettings getRouteSettings({
           key: asT<Key?>(
             safeArguments['key'],
           ),
+          contentID: asT<int?>(
+            safeArguments['contentID'],
+          ),
           title: asT<String?>(
             safeArguments['title'],
           ),
-          isReply: asT<bool>(
-            safeArguments['isReply'],
-          )!,
+          postCommentType: asT<PostCommentType?>(
+            safeArguments['postCommentType'],
+          ),
           referenceObject: asT<String?>(
             safeArguments['referenceObject'],
-            "test what",
           ),
           preservationContent: asT<String?>(
             safeArguments['preservationContent'],
@@ -221,6 +227,9 @@ FFRouteSettings getRouteSettings({
           topicInfo: asT<TopicInfo>(
             safeArguments['topicInfo'],
           )!,
+          themeColor: asT<Color?>(
+            safeArguments['themeColor'],
+          ),
         ),
       );
     case '/webview':

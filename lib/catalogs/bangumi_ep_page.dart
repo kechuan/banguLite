@@ -9,6 +9,7 @@ import 'package:bangu_lite/models/eps_info.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 
 import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comments_progress_slider.dart';
@@ -112,29 +113,13 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                       children: [
                                   
                                         SliverPinnedHeader(
-                                          child: AppBar(
-                                            //title: ScalableText("第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN}"),
-                                            
-                                            title: ScalableText(convertCollectionName(epModel.epsData[selectedEp],selectedEp)),
-                                            backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
-                                  
-                                            actions: [
-                                
-                                              IconButton(
-                                                onPressed: () async {
-                                                  if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
-                                                    await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
-                                                  }
-                                                },
-                                                icon: Transform.rotate(
-                                                  angle: -45,
-                                                  child: const Icon(Icons.link),
-                                                )
-                                              ),
-                                  
-                                            ],
-                                          )
-                                  
+                                          child: BangumiContentAppbar(
+                                            contentID: epModel.epsData[selectedEp]?.epID,
+                                            titleText: "第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN ?? epModel.epsData[selectedEp]!.name}",
+                                            webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!),
+                                            postCommentType: PostCommentType.postEpComment,
+                                            surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
+                                          ),
                                         ),
                                         
                                   
@@ -246,40 +231,14 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                     child: appbar!
                                   );
                                 },
-                                child: ColoredBox(
-                                  color: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                  
-                                      IconButton(
-                                        onPressed: () => Navigator.of(context).maybePop(),
-                                        icon: const Icon(Icons.arrow_back),
-                                      ),
-                            
-                                      Expanded(
-                                        child: ScalableText(
-                                          "第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN ?? epModel.epsData[selectedEp]!.name}",
-                                          style: const TextStyle(),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                  
-                                      IconButton(
-                                        onPressed: () async {
-                                          if(await canLaunchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!))){
-                                            await launchUrlString(BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!));
-                                          }
-                                        },
-                                        icon: Transform.rotate(
-                                          angle: -45,
-                                          child: const Icon(Icons.link),
-                                        )
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                    
+                                child:BangumiContentAppbar(
+                                  contentID: epModel.epsData[selectedEp]?.epID,
+                                  titleText: "第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN ?? epModel.epsData[selectedEp]!.name}",
+                                  webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!),
+                                  postCommentType: PostCommentType.postEpComment,
+                                  surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
+                                )
+                                
                               ),
               
               
@@ -289,7 +248,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                         
                       },
               
-                      child: EpCommentPageDetails(sliverKey: sliverListKey)
+                      child: EpCommentPageDetails(sliverListKey: sliverListKey)
                 
                     )
               
@@ -334,10 +293,10 @@ class EpInfo extends StatelessWidget {
       children: [
     
         ListTile(
-          title: Row(
+          title: Wrap(
+            spacing: 12,
             children: [
               ScalableText("${epsInfo[selectedEp]!.nameCN ?? epsInfo[selectedEp]!.name}"),
-              const Padding(padding: PaddingH6),
               ScalableText("${epsInfo[selectedEp]!.airDate}",style: const TextStyle(fontSize: 14,color: Colors.grey)),
             ],
           ),
@@ -357,16 +316,14 @@ class EpInfo extends StatelessWidget {
 class EpCommentPageDetails extends StatelessWidget {
 	const EpCommentPageDetails({
 		super.key,
-    this.sliverKey,
+    this.sliverListKey,
     
 	});
 
-  final GlobalKey? sliverKey;
+  final GlobalKey? sliverListKey;
 
 	@override
 	Widget build(BuildContext context) {
-
-    final GlobalKey? sliverListKey = sliverKey;
 
 		return Selector<EpModel,List?>(
 			selector: (_, epModel) => epModel.epCommentData[epModel.selectedEp],
@@ -430,6 +387,7 @@ class EpCommentPageDetails extends StatelessWidget {
                     }
 
                     return EpCommentView(
+                      postCommentType: PostCommentType.replyEpComment,
                       epCommentData: epModel.epCommentData[currentEp]![epCommentIndex-1]
                     );
                   },

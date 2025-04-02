@@ -35,7 +35,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiBlogPage : [ReviewModel(required) reviewModel, ReviewInfo(required) reviewInfo]
+  /// BangumiBlogPage : [ReviewModel(required) reviewModel, int(required) selectedBlogIndex, Color? themeColor]
   static const String blog = '/Blog';
 
   /// '/commentPreview'
@@ -85,7 +85,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// SendCommentPage : [String? title, bool(required) isReply, String? referenceObject, String? preservationContent]
+  /// SendCommentPage : [int? contentID, String? title, PostCommentType? postCommentType, String? referenceObject, String? preservationContent]
   static const String sendComment = '/sendComment';
 
   /// '/subjectComment'
@@ -121,7 +121,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiTopicPage : [TopicModel(required) topicModel, TopicInfo(required) topicInfo]
+  /// BangumiTopicPage : [TopicModel(required) topicModel, TopicInfo(required) topicInfo, Color? themeColor]
   static const String subjectTopic = '/subjectTopic';
 
   /// '/webview'

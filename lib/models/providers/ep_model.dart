@@ -1,4 +1,3 @@
-import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/comment_details.dart';
@@ -48,33 +47,32 @@ class EpModel extends ChangeNotifier{
 
       if(epCommentData[selectedEp] == null || commentIndex == null) return null;
 
-      bool isExist = true;
+      	bool isExist = true;
 
-        if(userCommentLikeData[selectedEp] == null){
+		if(userCommentLikeData[selectedEp] == null){
 
-          userCommentLikeData[selectedEp] = {
-            double.parse('$commentIndex.${replyCommentIndex ?? 0}') : dataLikeIndex
-          };
+			userCommentLikeData[selectedEp] = {
+			double.parse('$commentIndex.${replyCommentIndex ?? 0}') : dataLikeIndex
+			};
+		}
 
-        }
+		else{
 
-        else{
+			if(userCommentLikeData[selectedEp]![double.parse('$commentIndex.${replyCommentIndex ?? 0}')] == dataLikeIndex){
+				userCommentLikeData[selectedEp]![double.parse('$commentIndex.${replyCommentIndex ?? 0}')] = -1;
+				isExist = false;
+			}
 
-          if(userCommentLikeData[selectedEp]![double.parse('$commentIndex.${replyCommentIndex ?? 0}')] == dataLikeIndex){
-            userCommentLikeData[selectedEp]![double.parse('$commentIndex.${replyCommentIndex ?? 0}')] = -1;
-			isExist = false;
-          }
-
-          else{
-            userCommentLikeData[selectedEp]![double.parse('$commentIndex.${replyCommentIndex ?? 0}')] = dataLikeIndex;
-          }
+			else{
+				userCommentLikeData[selectedEp]![double.parse('$commentIndex.${replyCommentIndex ?? 0}')] = dataLikeIndex;
+			}
 
 
-        }
+		}
 
 		WidgetsBinding.instance.addPostFrameCallback((_) {
-          notifyListeners();
-        });
+			notifyListeners();
+		});
 
 		return isExist;
 

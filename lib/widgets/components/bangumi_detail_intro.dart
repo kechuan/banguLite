@@ -159,6 +159,7 @@ class IntroPortrait extends StatelessWidget {
                               padding: const EdgeInsets.all(12),
                               child: BuildEps(
                                 subjectID: bangumiDetails.id!, 
+                                subjectName: bangumiDetails.name,
                                 informationList: bangumiDetails.informationList,
                                 portialMode: true,
                               )
@@ -323,6 +324,7 @@ class IntroLandscape extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   child: BuildEps(
                     subjectID: bangumiDetails.id ?? 0,
+                    subjectName: bangumiDetails.name,
                     informationList: bangumiDetails.informationList
                   )
                 ),

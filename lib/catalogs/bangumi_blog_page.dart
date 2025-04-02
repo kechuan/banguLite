@@ -1,4 +1,5 @@
 import 'package:bangu_lite/catalogs/bangumi_general_content_page.dart';
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/models/blog_details.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 
@@ -16,12 +17,15 @@ class BangumiBlogPage extends StatefulWidget {
   const BangumiBlogPage({
     super.key,
     required this.reviewModel,
-	required this.reviewInfo
+    required this.selectedBlogIndex,
+    this.themeColor,
   });
 
   
   final ReviewModel reviewModel;
-  final ReviewInfo reviewInfo;
+  final int selectedBlogIndex;
+
+  final Color? themeColor;
 
   @override
   State<BangumiBlogPage> createState() => _BangumiBlogPageState();
@@ -35,18 +39,26 @@ class _BangumiBlogPageState extends BangumiContentPageState
 	ReviewInfo,
 	BlogDetails
 >{
-  
-  @override
-  ReviewInfo getContentInfo() => widget.reviewInfo;
 
   @override
   ReviewModel getContentModel() => widget.reviewModel;
 
+  @override
+  ReviewInfo getContentInfo() => widget.reviewModel.contentListData[widget.selectedBlogIndex];
+
   @override 
-  int? getSubContentID() => getContentModel().selectedBlogID;
+  int? getSubContentID() => widget.reviewModel.contentListData[widget.selectedBlogIndex].blogID;
+
+  @override
+  String? getContentBannerUri() => widget.reviewModel.contentDetailData[widget.selectedBlogIndex]?.bannerUri;
 
   @override
   BlogDetails createEmptyDetailData() => BlogDetails.empty();
+
+  @override
+  Color? getcurrentSubjectThemeColor() => widget.themeColor;
+
+
 
   @override
   bool isContentLoading(int? blogID){
@@ -64,11 +76,14 @@ class _BangumiBlogPageState extends BangumiContentPageState
 	  return blogDetails!.blogReplies!.isEmpty ? 0 : blogDetails.blogReplies!.length;
   }
 	
-   
   @override
-  String getWebUrl(int? blogID) => BangumiWebUrls.userBlog(blogID ?? 0);
+  PostCommentType? getPostCommentType() => PostCommentType.replyBlog;
+  
+  @override
+  //String getWebUrl(int? blogID) => BangumiWebUrls.userBlog(widget.selectedBlogID ?? blogID ?? 0);
+  String getWebUrl(int? blogID)=> BangumiWebUrls.userBlog(blogID ?? 0);
 
   @override
-  Future<void> loadContent(int blogID) => getContentModel().loadBlog();
+  Future<void> loadContent(int blogID) => getContentModel().loadBlog(blogID);
 
 }

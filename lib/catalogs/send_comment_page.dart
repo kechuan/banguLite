@@ -1,11 +1,12 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/const.dart';
+
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/max_number_input_formatter.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -17,26 +18,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
+@FFAutoImport()
+import 'package:bangu_lite/internal/const.dart';
+import 'package:provider/provider.dart';
+
+
 @FFRoute(name: '/sendComment')
 class SendCommentPage extends StatefulWidget {
   const SendCommentPage({
     super.key,
-	this.title,
-    required this.isReply,
+    this.contentID,
+    this.title,
+    this.postCommentType,
     this.referenceObject,
     this.preservationContent,
+
   });
 
-  final bool isReply;
+  //timeline无需 id
+  final int? contentID;
+
+  final PostCommentType? postCommentType;
   final String? title;
 
   //有可能是创建 但也有可能是编辑回复
-
   //quote 标签 之类的东西
   final String? referenceObject; 
 
   //草稿箱/编辑回复 依赖字段
   final String? preservationContent;
+
 
   @override
   State<SendCommentPage> createState() => _SendCommentPageState();
@@ -69,8 +80,10 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
   @override
   Widget build(BuildContext context) {
 
-    if(widget.preservationContent!=null){
-      contentEditingController.text = widget.referenceObject ?? '';
+    final indexModel = context.read<IndexModel>();
+
+    if(widget.preservationContent!=null && contentEditingController.text.isEmpty){
+      contentEditingController.text = widget.preservationContent ?? '';
     }
 
     return Scaffold(
@@ -87,14 +100,25 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 				showTransitionAlertDialog(
 					context,
 					title: "退出确认",
-					content: "需要保留草稿纸吗? 编辑内容会存留至退出详情页面之前",
+					content: "需要保留草稿纸吗? 编辑内容将会存留至退出APP之前",
 					cancelText: "放弃修改",
 					confirmText: "保留修改",
 					cancelAction: () {
 						//额外需要多 pop 一层
+            indexModel.draftContent.addAll({
+              widget.contentID ?? 0:{"":""}
+            });
+
 						Navigator.of(context).pop();
 					},
 					confirmAction: () {
+            
+            indexModel.draftContent.addAll({
+              widget.contentID ?? 0:{
+                titleEditingController.text.isEmpty ? "" : titleEditingController.text : contentEditingController.text
+              }
+            });
+
 						Navigator.of(context).pop();
 					},
 				);
@@ -106,19 +130,19 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
           icon: const Icon(Icons.arrow_back),
         ),
         backgroundColor: judgeCurrentThemeColor(context).withValues(alpha: 0.8),
-        title: widget.isReply ? 
+        title: widget.postCommentType == PostCommentType.comment ? 
           ScalableText('吐槽 ${widget.title}',style: const TextStyle(fontSize: 18)) : 
-		  ScalableText('回复 ${widget.title}',style: const TextStyle(fontSize: 18))
-		,
+		      ScalableText('回复 ${widget.title}',style: const TextStyle(fontSize: 18))
+		    ,
         actions: [
 
           IconButton(
             onPressed: () {
-				Navigator.of(context).pushNamed(
-					Routes.commentPreview,
-					arguments: {'renderText': contentEditingController.text}
-				);
-			},
+              Navigator.of(context).pushNamed(
+                Routes.commentPreview,
+                arguments: {'renderText': contentEditingController.text}
+              );
+            },
             icon: const Icon(Icons.remove_red_eye),
           ),
 
@@ -127,12 +151,32 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
           IconButton(
             onPressed: () {
-				if(contentEditingController.text.isEmpty){
-					//后续估计会专门出一个switch判断。。
-					fadeToaster(context: context, message: '不可发送空白内容');
-					return;
-				}
-			},
+              if(contentEditingController.text.isEmpty){
+                //后续估计会专门出一个switch判断。。
+                fadeToaster(context: context, message: '不可发送空白内容');
+                return;
+              }
+
+              else{
+
+                debugPrint("id:${widget.contentID} ${widget.postCommentType}");
+
+                switch(widget.postCommentType){
+
+                  default:{
+                    
+                  }
+
+                  
+                }
+
+                //..Future<bool> 
+
+                Navigator.of(context).pop(contentEditingController.text);
+
+
+              }
+            },
             icon: const Icon(Icons.send),
           ),
 
@@ -156,14 +200,19 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 			Padding(
 				padding: Padding16,
 				child: Center(
-				child: BBCodeText(
-					data: '[quote]${widget.referenceObject}[/quote]',
-					stylesheet: BBStylesheet(
-						tags: allEffectTag,
-						selectableText: true,
-						defaultText: const TextStyle(fontFamily: "MiSansFont")
-					),
-				),
+				child: EasyRefresh(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 200),
+            child: BBCodeText(
+              data: '[quote]${widget.referenceObject}[/quote]',
+              stylesheet: BBStylesheet(
+                tags: [AdapterQuoteTag()],
+                selectableText: true,
+                defaultText: const TextStyle(fontFamily: "MiSansFont")
+              ),
+            ),
+          ),
+        ),
 				),
 			): const SizedBox.shrink(),
 
@@ -178,12 +227,13 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 									spacing: 16,
 									children: [
 											
-									if (!widget.isReply) ...[
+									if (
+                    widget.postCommentType == PostCommentType.postBlog ||
+                    widget.postCommentType == PostCommentType.postTopic
+                  ) ...[
 										TextField(
 										decoration: const InputDecoration(
 											labelText: '这里填可以引喷的标题',
-											
-											
 										),
 										controller: titleEditingController,
 										maxLines: null,

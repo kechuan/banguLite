@@ -15,10 +15,15 @@ import 'package:flutter_bbcode/flutter_bbcode.dart';
 class EpCommentTile extends StatelessWidget {
   const EpCommentTile({
     super.key,
-    required this.epCommentData
+    required this.epCommentData,
+	  this.postCommentType,
+    this.themeColor
+
   });
   
   final EpCommentDetails epCommentData;
+  final PostCommentType? postCommentType;
+  final Color? themeColor;
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +105,7 @@ class EpCommentTile extends StatelessWidget {
 
               BangumiCommentActionButton(
                 commentData: epCommentData,
-                isSubjectComment: false,
+                postCommentType: postCommentType,
               ),
               
             ],
@@ -164,14 +169,16 @@ class EpCommentTile extends StatelessWidget {
                   child: Builder(
                     builder: (_) {
 
-                      int? commentIndex = int.tryParse(epCommentData.epCommentIndex!.split('-').first);
-                      int? replyIndex = int.tryParse(epCommentData.epCommentIndex!.split('-').length == 1 ? '' : epCommentData.epCommentIndex!.split('-').last);
+                      int? commentIndex = int.tryParse(epCommentData.epCommentIndex?.split('-').first ?? '');
+                      int? replyIndex = int.tryParse(epCommentData.epCommentIndex?.split('-').length == 1 ? '' : epCommentData.epCommentIndex?.split('-').last ?? '');
 
 
 
                       return Align(
                         alignment: Alignment.centerRight,
                         child: CommentReaction(
+                          themeColor: themeColor,
+                          postCommentType: postCommentType,
                           commentID: epCommentData.commentID,
                           commentIndex: commentIndex,
                           replyIndex: replyIndex,

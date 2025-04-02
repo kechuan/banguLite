@@ -5,6 +5,8 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
+
 import 'package:bangu_lite/widgets/components/sticker_select_overlay.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +16,13 @@ class BangumiCommentActionButton extends StatefulWidget {
   const BangumiCommentActionButton({
     super.key,
     required this.commentData,
-    required this.isSubjectComment
+    this.postCommentType,
     
   });
   
   final BaseComment commentData;
-  final bool isSubjectComment;
+  final PostCommentType? postCommentType;
+  
   
 
   @override
@@ -36,6 +39,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
     stickerSelectOverlay = StickerSelectOverlay(
       context: context,
       buttonLayerLink: stickerLayerLink,
+      postCommentType: widget.postCommentType,
     );
     super.initState();
   }
@@ -50,6 +54,8 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
   Widget build(BuildContext context) {
 
     final accountModel = context.read<AccountModel>();
+    final indexModel = context.read<IndexModel>();
+    
 
     return CompositedTransformTarget(
       link: stickerLayerLink,
@@ -62,16 +68,18 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                 context,
                 Routes.sendComment,
                 arguments: {
-                  'isReply': true,
+                  'contentID':widget.commentData.commentID,
+                  'postCommentType':widget.postCommentType,
                   'title': widget.commentData.userInformation?.nickName ?? widget.commentData.userInformation?.userName,
                   'referenceObject': widget.commentData.comment,
+                  'preservationContent': indexModel.draftContent[widget.commentData.commentID]?.values.first
                 }
               );
             }
               
               
             case CommentActionType.sticker:{
-              if(!widget.isSubjectComment){
+              if(widget.postCommentType != PostCommentType.comment){
                 stickerSelectOverlay.showStickerSelectOverlay(widget.commentData.commentID);
               }
 
@@ -92,9 +100,9 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                 context,
                 Routes.sendComment,
                 arguments: {
-                  'isReply': false,
+                  'contentID':widget.commentData.commentID,
                   'title': '修改你的评论',
-                  'referenceObject': widget.commentData.comment,
+                  'preservationContent': widget.commentData.comment
                 }
               );
             }
@@ -109,16 +117,41 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
         itemBuilder: (_){
           return List.generate(
             CommentActionType.values.length, (index){
+
+              bool isActionAvaliable = true;
+
+              if( accountModel.isLogined()){
+
+            
+        
+
+                 if(index == CommentActionType.reply.index){
+                    if(widget.postCommentType == PostCommentType.comment){
+                      isActionAvaliable = false;
+                    }
+                 }
+
+                 if(index == CommentActionType.sticker.index){
+                    if(
+                      widget.postCommentType == PostCommentType.postBlog || 
+                      widget.postCommentType == PostCommentType.replyBlog
+                    ){
+                      isActionAvaliable = false;
+                    }
+                 }
+
+                 if(index == CommentActionType.edit.index || index == CommentActionType.delete.index){
+                    if(widget.commentData.userInformation?.userName != accountModel.loginedUserInformations.userInformation?.getName()){
+                      isActionAvaliable = false;
+                    }
+                 }
+              }
+
+              else{
+                isActionAvaliable = false;
+              }
       
-              bool isActionAvaliable = 
-                accountModel.isLogined() ? 
-                (
-                  index >= CommentActionType.delete.index ? 
-                  accountModel.loginedUserInformations.userInformation?.userID == widget.commentData.userInformation?.userID : 
-                  true
-                ) 
-                : false
-              ;
+             
       
               return PopupMenuItem(
                 

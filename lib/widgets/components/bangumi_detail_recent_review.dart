@@ -156,14 +156,17 @@ class BangumiDetailRecentReview extends StatelessWidget {
                               
                               onTap: () {
 
-                                reviewModel.selectedBlogID = reviewModel.contentListData[index].blogID ?? 0;
+
+
+                                //reviewModel.selectedBlogID = reviewModel.contentListData[index].blogID ?? 0;
 
                                 Navigator.pushNamed(
                                   context,
                                   Routes.blog,
-                                  arguments: {
-                                    "reviewInfo":reviewModel.contentListData[index],
-                                    "reviewModel":reviewModel
+                                   arguments: {
+                                    "reviewModel":reviewModel,
+                                    "selectedBlogIndex": index,
+                                    //"themeColor": judgeDetailRenderColor(context,bangumiThemeColor),
                                   }
                                 );
  

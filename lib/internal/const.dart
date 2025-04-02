@@ -133,20 +133,19 @@ extension SubjectTypeExtension on SubjectType {
 }
 
 enum SortType{
-  rank("rank","番剧排名"),
-  heat("heat","番剧热度"),
-  score("score","番剧评分"),
-  joinTime("joinTime","收藏时间"),
-  updateTime("updateTime","更新日期"),
-  airDate("airDate","放送日期")
+  rank("番剧排名"),
+  heat("番剧热度"),
+  score("番剧评分"),
+  joinTime("收藏时间"),
+  updateTime("更新日期"),
+  airDate("放送日期")
   
   ;
 
-  final String searchSortType;
+  
   final String label;
 
   const SortType(
-    this.searchSortType,
     this.label,
   );
 }
@@ -202,6 +201,31 @@ enum StarType{
 
 }
 
+enum PostCommentType{
+  //comment无法reply 只能发布/修改 而且还会伴随着评分
+  comment("番剧吐槽"),
+
+  postEpComment("单集吐槽"),
+  replyEpComment("回复单集吐槽"),
+  commentEpCommentReply("回复层主单集吐槽"),
+
+  postTopic("发布帖子"),
+  replyTopic("回复帖子"),
+  commentTopicReply("回复层主帖子"),
+
+  postBlog("发布博客"),
+  replyBlog("回复博客"),
+  commentBlogReply("回复层主博客"),
+  ;
+
+  final String commentTypeString;
+  
+
+  const PostCommentType(this.commentTypeString);
+
+
+}
+
 enum CommentActionType{
   //登录可操作
   reply("回复"),
@@ -217,6 +241,8 @@ enum CommentActionType{
 
   const CommentActionType(this.actionTypeString);
 }
+
+
 
 enum UserContentActionType{
   post("发表"),

@@ -1,10 +1,8 @@
-import 'dart:ffi';
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
-import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +16,9 @@ class CommentReaction extends StatelessWidget {
     this.commentReactions,
     this.commentIndex,
     this.replyIndex,
+    this.postCommentType,
+
+    this.themeColor
   });
 
   final int? commentID;
@@ -27,10 +28,15 @@ class CommentReaction extends StatelessWidget {
   final int? commentIndex;
   final int? replyIndex;
 
+  final PostCommentType? postCommentType;
+
+  final Color? themeColor;
+
   @override
   Widget build(BuildContext context) {
 
-    //ValueNotifier<int> reactDataLikeNotifier = ValueNotifier(-1);
+    ValueNotifier<int> reactDataLikeNotifier = ValueNotifier(-1);
+
     final accountModel = context.read<AccountModel>();
     bool isReactAble = accountModel.isLogined() && commentID != null;
 
@@ -38,110 +44,94 @@ class CommentReaction extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    bool isServerDataContain = commentReactions!.entries.any((userList){
+      if(userList.value.contains(accountModel.loginedUserInformations.userInformation!.getName())){
+        reactDataLikeNotifier.value = userList.key;
+        return true;
+      }
+
+      return false;
+    });
+
+
+
     return SizedBox(
-      height: 60,
-      child: Consumer<EpModel>(
-        builder: (_,epModel,child){
-
-          debugPrint("rebuild epModel");
-
-          int? selectedDataLikeIndex;
-
-          bool isServerDataContain = false;
-
-          
-          if(replyIndex == null){
-            selectedDataLikeIndex = epModel.userCommentLikeData[epModel.selectedEp]?[double.parse('$commentIndex')];
-          }
-
-          else{
-            selectedDataLikeIndex = epModel.userCommentLikeData[epModel.selectedEp]?[double.parse('$commentIndex.$replyIndex')];
-          }
-
-          commentReactions!.entries.any((userList){
-
-            if(userList.value.contains(accountModel.loginedUserInformations.userInformation!.getName())){
-              isServerDataContain = true;
-
-              if(selectedDataLikeIndex == null){
-                  epModel.updateUserEpCommentDataLike(
-                  commentID!,
-                  userList.key,
-                  commentIndex:commentIndex,
-                  replyCommentIndex:replyIndex,
-                );
-
-                selectedDataLikeIndex = userList.key;
-              }
-
-              return true;
-            }
-
-            return false;
-          });
-
-          
-          
-
+      height: 40,
+      child: ValueListenableBuilder(
+        valueListenable: reactDataLikeNotifier,
+        builder: (_,reactDataLike,child){
           return ListView.separated(
             shrinkWrap: true,
             scrollDirection: Axis.horizontal,
             physics: const ClampingScrollPhysics(),
             itemCount: commentReactions!.length,
             itemBuilder: (_, index) {
-
+          
               //恐怕 需要变成 reactDataLikeNotifier 驱动了
               
               int dataLikeIndex = commentReactions!.keys.elementAt(index);
               int stickerIndex = convertStickerDatalike(dataLikeIndex);
+
+              Color? buttonColor = 
+                isReactAble ? 
+                (reactDataLike == dataLikeIndex ? themeColor?.withValues(alpha: 0.8) : themeColor?.withValues(alpha: 0.3)) : 
+                Colors.grey.withValues(alpha: 0.8)
+              ;
+
+              //reactDataLike == dataLikeIndex ? 
+              //  themeColor?.withValues(
+              //    alpha: 0.8,
+              //    red: ((themeColor?.r ?? 0.5) + 0.1),
+              //    green: ((themeColor?.g ?? 0.5) + 0.1),
+              //    blue: ((themeColor?.b ?? 0.5) + 0.1),
+              //  ) :
+              //  themeColor?.withValues(alpha: 0.8)
+              //;
           
               return SizedBox(
-                width: 70,
-                height: 50,
-                child: InkResponse(
-                  enableFeedback: isReactAble ? true : false,
-                  onLongPress: () {
-                    if(!isReactAble) return;
+                width: 80,
+                child: SizedBox(
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(buttonColor),
 
-                    final epModel = context.read<EpModel>();
-          
-                    bool? isExist = epModel.updateUserEpCommentDataLike(
-                      commentID!,
-                      dataLikeIndex,
-                      commentIndex:commentIndex,
-                      replyCommentIndex:replyIndex,
-                    );
-
-                    if(isExist != null && commentID != null){
-
-                      //这里是 目标行为 而非当前状态
-                      if(!isExist){
-                        accountModel.actionEpCommentLike(
-                          commentID!,
-                          dataLikeIndex,
-                          actionType: UserContentActionType.delete
-                        );
-                      }
-
-                      else{
-                        accountModel.actionEpCommentLike(
-                          commentID!,
-                          dataLikeIndex
-                        );
-                      }
-                    }
-
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                      borderRadius: BorderRadius.circular(16),
-                      color: 
-                        isReactAble ? 
-                        (selectedDataLikeIndex == dataLikeIndex ? const Color.fromARGB(255, 169, 186, 216) : null) : 
-                        Colors.grey.withValues(alpha: 0.4)
+                      padding: const WidgetStatePropertyAll(PaddingH6),
                     ),
+                    onPressed:  () {
+                      if(!isReactAble) return;
+                                
+                      if(reactDataLike == dataLikeIndex){
+                                
+                        accountModel.toggleCommentLike(
+                          commentID,
+                          dataLikeIndex,
+                          postCommentType,
+                          actionType: UserContentActionType.delete
+                        ).then((result){
+                          if(result){
+                            reactDataLikeNotifier.value = -1;
+                          } 
+                        });
+                                
+                      }
+                                
+                      else{
+                                
+                        accountModel.toggleCommentLike(
+                          commentID,
+                          dataLikeIndex,
+                          postCommentType,
+                        ).then((result){
+                          if(result){
+                            reactDataLikeNotifier.value = dataLikeIndex;
+                          } 
+                        });
+                                
+                      }
+                                
+                      debugPrint("postCommentType:$postCommentType, id: $commentID");
+                                
+                    },
                     child: Tooltip(
                       triggerMode: TooltipTriggerMode.tap,
                       message: 
@@ -158,24 +148,22 @@ class CommentReaction extends StatelessWidget {
                             "assets/bangumiSticker/bgm$stickerIndex.gif",
                             scale: 0.8,
                           ),
-                        
-                          
                           
                           ScalableText("${(commentReactions![dataLikeIndex]?.length ?? 0) + (
-                              selectedDataLikeIndex == dataLikeIndex ? 
+                              reactDataLike == dataLikeIndex ? 
                                 (
                                   isServerDataContain ? 
-                                  selectedDataLikeIndex != dataLikeIndex ? -1 : 0 :
-                                  selectedDataLikeIndex == dataLikeIndex ? 1 : 0
+                                  reactDataLike != dataLikeIndex ? -1 : 0 :
+                                  reactDataLike == dataLikeIndex ? 1 : 0
                                 ) :
-                              selectedDataLikeIndex == dataLikeIndex ? 1 : 0
+                              reactDataLike == dataLikeIndex ? 1 : 0
                             )
                           }"),
                         ],
                       ),
                     ),
+                      
                   ),
-                    
                 ),
               );
           
@@ -183,10 +171,7 @@ class CommentReaction extends StatelessWidget {
           
             separatorBuilder: (_, index) => const Padding(padding: PaddingH6)
           );
-         
-        }
-
-          
+        },
         
       ),
     );

@@ -17,9 +17,13 @@ abstract class BaseComment {
   int? commentTimeStamp;
   Map<int,Set<String>>? commentReactions;
 
+  
+
 }
 
 class CommentDetails extends BaseComment{
+
+  //普通 comment 没有回复 也没有index
   int? rate;
   int? type;
 }

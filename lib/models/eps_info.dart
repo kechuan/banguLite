@@ -32,8 +32,8 @@ List<EpsInfo> loadEpsData(Response bangumiEpsInfoResponse){
 
     currentEpInfo
       ..airDate = currentEpInfoMap["airdate"]
-      ..name = currentEpInfoMap["name"]
-      ..nameCN = currentEpInfoMap["name_cn"]
+      ..name = convertAmpsSymbol(currentEpInfoMap["name"])
+      ..nameCN = convertAmpsSymbol(currentEpInfoMap["name_cn"])
       ..epID = currentEpInfoMap["id"]
       ..epIndex = currentEpInfoMap["ep"]
       ..sort = currentEpInfoMap["sort"]

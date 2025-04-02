@@ -18,9 +18,6 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
     loadSubjectReviews();
   }
 
-  //给blog访问准备的
-  int selectedBlogID = 0;
-
   Future<void> loadSubjectReviews({int? offset = 0}) async {
     await loadSubjectSubContentList(
       queryParameters: BangumiQuerys.reviewsQuery
@@ -28,7 +25,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
     );
   }
 
-  Future<void> loadBlog() async {
+  Future<void> loadBlog(int selectedBlogID) async {
 
     if(selectedBlogID == 0) return;
 
@@ -71,7 +68,8 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
   @override
   String getContentListUrl(int subjectID) => BangumiAPIUrls.reviews(subjectID);
   @override
-  String getContentDetailUrl(int contentID) => BangumiAPIUrls.userBlog(selectedBlogID);
+  //String getContentDetailUrl(int contentID) => BangumiAPIUrls.userBlog(selectedBlogID);
+  String getContentDetailUrl(int contentID) => BangumiAPIUrls.userBlog(contentID);
   @override
   List<ReviewInfo> convertResponseToList(Response subContentListResponseData) => loadReviewsDetails(subContentListResponseData);
   @override

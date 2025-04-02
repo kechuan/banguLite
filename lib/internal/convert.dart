@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/eps_info.dart';
 import 'package:flutter/material.dart';
 
@@ -140,21 +141,17 @@ int convertAiredEps(String? bangumiDate){
 }
 
 int convertPassedSeason(int year,int month){
-  int passedSeason = 1;
   DateTime currentTime = DateTime.now();
 
-  if(year < currentTime.year) return 4;
+  if(year < currentTime.year) {return 4;} 
+  
+  else if(year > currentTime.year) {return 0;}
 
-  SeasonType.values.any((currentSeasonType){
-    if(currentSeasonType.month > month){
-      debugPrint("what:${currentSeasonType.month} / $month ");
-      passedSeason+=1;
-      return false;
-    }
-    return true;
-  });
+  else{
+    return judgeSeasonRange(month).index;
+  }
 
-  return passedSeason;
+
 
 }
 
