@@ -1,11 +1,9 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
-import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -119,7 +117,9 @@ class SettingsPage extends StatelessWidget {
                     ],
                   ),
                 ),
-              
+
+                const Padding(padding: PaddingV16),
+
               ],
             ),
           ),
@@ -606,7 +606,14 @@ class TestTile extends ListTile{
         child: ListTile(
           trailing: IconButton(
             onPressed: (){
+
+              Navigator.pushNamed(
+                context,
+                Routes.webview,
+                arguments: {"url":BangumiWebUrls.trunstileAuth()},
+              );
               
+
             }, 
             icon: const Icon(Icons.cookie)
           ),

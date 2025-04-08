@@ -61,7 +61,14 @@ class CommentModel extends ChangeNotifier {
   ///
   ///请求到数据后会透过 [notifyListeners] 通知UI组件这个数据已准备好
   //Future<void> loadComments(int subjectID,{int pageIndex = 1,bool isReverse = false, int pageRange = 10}) async {
-  Future<void> loadComments({int pageIndex = 1,bool isReverse = false, int pageRange = 10}) async {
+  Future<void> loadComments(
+    {
+      int pageIndex = 1,
+      bool isReverse = false,
+      int pageRange = 10,
+      bool isReloaded = false
+    }
+  ) async {
 
     if(subjectID == 0) return;
 
@@ -102,6 +109,11 @@ class CommentModel extends ChangeNotifier {
     if((currentPageIndex).abs() - pageIndex.abs() >= 3 || (currentPageIndex).abs() - pageIndex.abs() <= -3 ){
       debugPrint("prevent rebuild conflict:${commentsData.keys}");
       return;
+    }
+
+    if(isReloaded){
+      debugPrint("$pageIndex: reloaded");
+      commentsData.remove(pageIndex);
     }
 
 

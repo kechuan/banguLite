@@ -1,5 +1,5 @@
 import 'package:bangu_lite/catalogs/bangumi_general_content_page.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/topic_details.dart';
 import 'package:bangu_lite/models/topic_info.dart';

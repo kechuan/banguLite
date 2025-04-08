@@ -6,6 +6,7 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/widgets/components/bangumi_tab_content_select.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
@@ -352,6 +353,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                           return previous!=next;
                         },
                         builder: (_, weekday, selectChild) {
+                          
                           final selectedDay = indexModel.selectedWeekDay;
             
                           return MultiSliver(
@@ -395,62 +397,17 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                         ),
                                       ),
 
-                                      ValueListenableBuilder(
-                                        valueListenable: weekdaySelectOffstageNotifier,
-                                        builder: (_, weekDayOffstage, tabRow) {
-                                          return Offstage(
-                                            offstage: weekDayOffstage,
-                                            child: SizedBox(
-                                              height: 60,
-                                              child: ValueListenableBuilder(
-                                                valueListenable: weekdaySelectOffstageAnimatedNotifier,
-                                                builder: (_, animatedStatus, animated) {
-                                              return TweenAnimationBuilder<double>(
-                                                duration: const Duration(milliseconds: 200),
-                                                tween: Tween(
-                                                  begin: 0,
-                                                  end: animatedStatus ? 0 : 1.0 ,
-                                                ),
-                                                onEnd: (){
-                                                  if(!animatedStatus) weekdaySelectOffstageNotifier.value = true;
-                                                },
-                                                
-                                                builder: (_,animationProgress,child){
-                                                  return Opacity(
-                                                    opacity: 1.0-animationProgress,
-                                                    child: Transform.translate(
-                                                      offset: Offset(0, -animationProgress*60),
-                                                      child: tabRow!,
-                                                    ),
-                                                  );
-                                                }
-                                              );
-                                              }
-                                              ),
-                                            )
-                                          );
+                                      BangumiTabContentSelect(
+                                        selectOffstageNotifier: weekdaySelectOffstageNotifier,
+                                        selectOffstageAnimatedNotifier: weekdaySelectOffstageAnimatedNotifier,
+                                        selectedList: WeekDay.values,
+                                        initalIndex: indexModel.selectedWeekDay - 1,
+                                        onTap:  (selectedIndex) {
+                                          indexModel.updateSelectedWeekDay(selectedIndex+1);
                                         },
-                                        child: ColoredBox(
-                                          color: judgeCurrentThemeColor(context).withValues(alpha: 0.8),
-                                          child: DefaultTabController(
-                                            initialIndex: selectedDay - 1,
-                                            length: WeekDay.values.length,
-                                            child: TabBar(
-                                              labelPadding: const EdgeInsets.all(0),
-                                              onTap: (selectedIndex) {
-                                                debugPrint("Index:$selectedIndex");
-                                                indexModel.updateSelectedWeekDay(selectedIndex+1);
-                                              },
-                                              dividerColor: Colors.transparent,
-                                              indicatorSize: TabBarIndicatorSize.label,
-                                              tabs: List.generate(
-                                                WeekDay.values.length, (currentDay)=> Center(child: ScalableText(WeekDay.values[currentDay].dayText)),
-                                              )
-                                            ),
-                                          ),
-                                        ),
-                                                            
+                                        
                                       )
+
                                     
                                     ],
                                   ),
@@ -461,38 +418,38 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                               ),
                         
                               SliverToBoxAdapter(
-									child: BanguTileGridView(
-										bangumiLists: calendarBangumis.isEmpty ? [] : calendarBangumis.values.elementAt(selectedDay-1),
-									),
-								)
+                                child: BanguTileGridView(
+                                  bangumiLists: calendarBangumis.isEmpty ? [] : calendarBangumis.values.elementAt(selectedDay-1),
+                                ),
+                              )
             
                             ]
                               
                           );
                         },
                         child: InkResponse(
-							borderRadius: BorderRadius.circular(24),
-							containedInkWell: true,
-							hoverColor: Colors.transparent,
-							focusColor: Colors.transparent,
-							highlightColor: Colors.transparent,
-							onTap: (){
-								debugPrint("show seasons Select");
+                          borderRadius: BorderRadius.circular(24),
+                          containedInkWell: true,
+                          hoverColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: (){
+                            debugPrint("show seasons Select");
 
-								if(weekdaySelectOffstageNotifier.value){
-									weekdaySelectOffstageNotifier.value = false;
-								}
+                            if(weekdaySelectOffstageNotifier.value){
+                              weekdaySelectOffstageNotifier.value = false;
+                            }
 
-								if(weekdaySelectOffstageAnimatedNotifier.value){
-									weekdaySelectOffstageAnimatedNotifier.value = false;
-								}
+                            if(weekdaySelectOffstageAnimatedNotifier.value){
+                              weekdaySelectOffstageAnimatedNotifier.value = false;
+                            }
 
-								else{
-									weekdaySelectOffstageAnimatedNotifier.value = true;
-								}
+                            else{
+                              weekdaySelectOffstageAnimatedNotifier.value = true;
+                            }
 
-							},
-							child: const Icon(Icons.arrow_drop_down,size: 32),
+                          },
+							            child: const Icon(Icons.arrow_drop_down,size: 32),
                         ),
                         
                       ),

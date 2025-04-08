@@ -1,5 +1,4 @@
-import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 

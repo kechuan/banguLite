@@ -1,4 +1,4 @@
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comment_tile.dart';
 import 'package:flutter/material.dart';

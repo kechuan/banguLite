@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:github/github.dart';
 
 
+
 class HttpApiClient{
   static final client = Dio();
   static BaseOptions clientOption = Dio().options;
@@ -76,26 +77,33 @@ class BangumiAPIUrls {
   /// 行为允许 POST
   
   /// ContentArea
+  /// /p1/subjects/-/topics/{topicID}
   static String postTopic(int subjectID) => topics(subjectID);
-  //似乎还不支持postBlog
-  //static String postBlog() => '';
 
   
-  /// CommentArea
-  static String postEPComment(int epID) => epComment(epID);
+  /// CommentArea 行为允许 POST
+  
+  
+  /// /p1/episodes/{episodeID}/comments
+  static String postEpComment(int epID) => epComment(epID);
+  /// /p1/subjects/-/topics/{topicID}/replies
   static String postTopicComment(int topicID) => '${topicComment(topicID)}/replies';
   static String postBlogComment(int subjectID) => '${userBlog(subjectID)}/comments';
 
-  
-  /// 行为允许 GET/PUT/DELETE
-  static String actionTopic(int commentID) => '$newUrl/subjects/-/posts/$commentID';
+/// 行为允许 GET/PUT/DELETE
+  static String actionTopicComment(int topicID) => '$newUrl/subjects/-/posts/$topicID';
+
   static String actionEpComment(int commentID) => '$newUrl/episodes/-/comments/$commentID';
   ///这个不允许GET
   static String actionBlogComment(int commentID) => '$newUrl/blogs/-/comments/$commentID';
 
+  
+  
+  
+
   /// 行为允许 PUT/DELETE
   static String toggleEPCommentLike(int commentID) => '${actionEpComment(commentID)}/like';
-  static String toggleTopicLike(int commentID) => '${actionTopic(commentID)}/like';
+  static String toggleTopicLike(int commentID) => '${actionTopicComment(commentID)}/like';
 
 
   //other
@@ -106,13 +114,15 @@ class BangumiAPIUrls {
       int width = 0,
       int height = 0,
     }
-  ) => '$baseResourceUrl/r/${width}x${height}/$imagePath';
+  ) => '$baseResourceUrl/r/${width}x$height/$imagePath';
 
 }
 
 class BangumiWebUrls{
   static const String baseUrl = "https://bangumi.tv";
   static const String relativeUrl = "https://bgm.tv";
+
+  static const String nextUrl = "https://next.bgm.tv";
 
   static String login() => '$baseUrl/login';
 
@@ -129,6 +139,12 @@ class BangumiWebUrls{
   static String relativeSubjectTopic(int topicID) => '$relativeUrl/subject/topic/$topicID';
   static String relativeEp(int epID) => '$relativeUrl/ep/$epID';
 
+  static String person(int personID) => '$baseUrl/person/$personID';
+  static String character(int characterID) => '$baseUrl/character/$characterID';
+  
+
+  //Auth Area
+
   static String webAuthPage(){
     final entries =  BangumiQuerys.authorizationQuery().entries;
         
@@ -143,6 +159,8 @@ class BangumiWebUrls{
 
   static const String oAuth = '$relativeUrl/oauth/authorize';
   static const String oAuthToken = '$relativeUrl/oauth/access_token';
+
+  static String trunstileAuth() => '$nextUrl/p1/turnstile?redirect_uri=${APPInformationRepository.bangumiTurnstileCallbackUri.toString()}';
 
 }
 
@@ -177,6 +195,8 @@ class BangumiQuerys {
 		"client_secret":APPInformationRepository.bangumiAPPSecret,
 		"refresh_token":refreshToken,
 		"redirect_uri":'banguLite://oauth/bgm_login?client_id=bgm369067d8f39dea8d4',
+		
+		
 		"accept": "application/json",
 	};
 
@@ -187,12 +207,25 @@ class BangumiQuerys {
 		"max_results":10
 	};
 
-  static Map<String,dynamic> replyQuery = {
-    "content": "",
-    //replyComment/replyContent 的区分
-    "replyTo": 0, 
-    "turnstileToken": ""
-  };
+	static Map<String,dynamic> postQuery({
+		String? content,
+		String? title,
+		String? turnstileToken
+	}) => {
+		"content": content,
+		"title": title,
+		"turnstileToken": turnstileToken
+	};
+
+	static Map<String,dynamic> replyQuery({
+		String? content,
+		int? replyTo,
+		String? turnstileToken,
+	}) => {
+		"content": content,
+		"replyTo": replyTo,
+		"turnstileToken": turnstileToken
+	};
 
 
   static Map<String,int>  commentAccessQuery = {"limit":10,"offset":0},
@@ -201,7 +234,7 @@ class BangumiQuerys {
                           epQuery = {"subject_id":0,"limit":100,"offset":0},
                           relationsQuery = {"type":2,"limit":20,"offset":0},
                           reviewsQuery = {"limit":20,"offset":0},
-                          timelineQuery = {"limit":3}
+                          timelineQuery = {"limit":10}
   ;
                              
 
@@ -232,6 +265,8 @@ class APPInformationRepository{
                       version = "0.6.1",
                       author = "kechuan"
   ;
+
+  // only Debug : ac2BRVCwpDMtOGDPfcZlgZXTuoyzxe5RuoIVbIEe
   
   
   static const String bangumiAPPID = 'bgm369067d8f39dea8d4';

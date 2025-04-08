@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:bangu_lite/internal/bus_register_method.dart';
-import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

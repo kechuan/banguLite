@@ -1,12 +1,13 @@
 // 定义排序策略抽象类
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/star_details.dart';
 
 abstract class SortStrategy {
-  int getSort(StarBangumiDetails details);
-  String generateHeaderText(int counter);
+  num getSort(StarBangumiDetails details);
+  String generateHeaderText(num counter);
   SortType currentSort = SortType.airDate;
 }
 
@@ -17,9 +18,9 @@ class AirDateSortStrategy implements SortStrategy {
       convertDateTime(details.airDate).millisecondsSinceEpoch;
 
   @override
-  String generateHeaderText(int airTimestamp) {
+  String generateHeaderText(num airTimestamp) {
 
-	final DateTime convertTime = DateTime.fromMillisecondsSinceEpoch(airTimestamp);
+	final DateTime convertTime = DateTime.fromMillisecondsSinceEpoch(airTimestamp.toInt());
 
     final season = judgeSeasonRange(convertTime.month);
     return '${convertTime.year}年 ${season.seasonText}';
@@ -57,7 +58,7 @@ class UpdateTimeSortStrategy implements SortStrategy {
   }
 
   @override
-  String generateHeaderText(int weekday) {
+  String generateHeaderText(num weekday) {
     
     String resultText = "";
 
@@ -86,9 +87,9 @@ class JoinTimeSortStrategy implements SortStrategy {
 		convertDateTime(details.joinDate).millisecondsSinceEpoch;
 
 	@override
-	String generateHeaderText(int joinms) {
+	String generateHeaderText(num joinms) {
 
-		final DateTime convertTime = DateTime.fromMillisecondsSinceEpoch(joinms);
+		final DateTime convertTime = DateTime.fromMillisecondsSinceEpoch(joinms.toInt());
 
 		final season = judgeSeasonRange(convertTime.month);
 		return '${convertTime.year}年 ${season.seasonText}';
@@ -101,13 +102,13 @@ class JoinTimeSortStrategy implements SortStrategy {
 //评分信息排序 
 class ScoreSortStrategy implements SortStrategy {
   @override
-  int getSort(StarBangumiDetails details){
-    return (details.score!*10).toInt(); //*10化整
+  num getSort(StarBangumiDetails details){
+    return details.score!;
   }
 
   @override
-  String generateHeaderText(int intScore) {
-	double resultScore = intScore/10;
+  String generateHeaderText(num score) {
+	double resultScore = score.toDouble();
 	String resultRankText = convertScoreRank(resultScore);
 
 	ScoreRank.values.any((currentRank){
@@ -134,7 +135,7 @@ class RankSortStrategy implements SortStrategy {
   int getSort(StarBangumiDetails details) => details.rank!;
 
   @override
-  String generateHeaderText(int rank){
+  String generateHeaderText(num rank){
 	if(rank <= 500) return "Rank 500 -";
 	return "Rank ${rank~/500*500} +";
   }

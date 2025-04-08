@@ -17,9 +17,17 @@ abstract class BaseModel<I extends BaseInfo, D extends BaseDetails?> extends Cha
   final List<I> contentListData = [];
   final Map<int, D> contentDetailData = {};
 
-  Future<void> loadSubjectSubContentList({Map<String, dynamic>? queryParameters}) async {
+  Future<void> loadSubjectSubContentList({
+    Map<String, dynamic>? queryParameters,
+    bool isReloaded = false
+  }) async {
 
     if (subjectID == 0) return;
+
+    if (isReloaded) {
+      contentListData.clear();
+      contentDetailData.clear();
+    }
 
     if (contentListData.isNotEmpty) {
       debugPrint("topics already loaded");

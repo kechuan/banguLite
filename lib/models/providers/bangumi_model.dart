@@ -14,16 +14,18 @@ class BangumiModel extends ChangeNotifier {
 
   int subjectID = 0;
 
+  String? turnsTileToken;
+
   BangumiDetails? bangumiDetails;
 
   Color? bangumiThemeColor;
   Color? imageColor;
 
-  Future<void> loadDetails({bool? refresh}) async {
+  Future<void> loadDetails({bool? isRefresh}) async {
 
     if(subjectID==0) return;
 
-    if(bangumiDetails != null && refresh != true) return;
+    if(bangumiDetails != null && isRefresh != true) return;
 
     final detailInformation = await HttpApiClient.client.get("${BangumiAPIUrls.subject}/$subjectID");
 

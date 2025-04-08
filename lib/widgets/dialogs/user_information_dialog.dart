@@ -1,3 +1,4 @@
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
@@ -265,11 +266,6 @@ class UserInformationDialog extends StatelessWidget {
 																covertPastDifferentTime(timelineActions![index].timelineCreatedAt),
 																style: const TextStyle(color: Colors.blueGrey,fontSize: 14),
 															),
-
-															//ScalableText(
-															//	convertTimelineDescription(timelineActions[index]),
-															//	selectable: true,
-															//)
 
 															BBCodeText(
 																data: convertTimelineDescription(timelineActions[index]),

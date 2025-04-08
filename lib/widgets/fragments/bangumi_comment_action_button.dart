@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -17,13 +17,22 @@ class BangumiCommentActionButton extends StatefulWidget {
     super.key,
     required this.commentData,
     this.postCommentType,
+
+    this.onReplyComment,
+    this.onDeleteComment,
+    this.onEditComment,
+    this.onSticker,
+
     
   });
   
   final BaseComment commentData;
   final PostCommentType? postCommentType;
-  
-  
+
+  final Function()? onReplyComment;
+  final Function()? onDeleteComment;
+  final Function()? onEditComment;
+  final Function()? onSticker;
 
   @override
   State<BangumiCommentActionButton> createState() => _BangumiCommentActionButtonState();
@@ -74,13 +83,18 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                   'referenceObject': widget.commentData.comment,
                   'preservationContent': indexModel.draftContent[widget.commentData.commentID]?.values.first
                 }
-              );
+              ).then((_){
+                widget.onReplyComment!();
+              });
+                
+              
             }
               
-              
             case CommentActionType.sticker:{
-              if(widget.postCommentType != PostCommentType.comment){
-                stickerSelectOverlay.showStickerSelectOverlay(widget.commentData.commentID);
+              if(widget.postCommentType != PostCommentType.subjectComment){
+                stickerSelectOverlay.showStickerSelectOverlay(
+                  widget.commentData.commentID
+                );
               }
 
               else{
@@ -89,26 +103,59 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
               
             }
               
-              
             case CommentActionType.report:{
               //Dialog reportReason 暂且不做
+              debugPrint("report");
             }
               
               
             case CommentActionType.edit:{
+              debugPrint("edit");
+
               Navigator.pushNamed(
                 context,
                 Routes.sendComment,
                 arguments: {
                   'contentID':widget.commentData.commentID,
-                  'title': '修改你的评论',
-                  'preservationContent': widget.commentData.comment
+                  'postCommentType':widget.postCommentType,
+                  'title': widget.commentData.userInformation?.nickName ?? widget.commentData.userInformation?.userName,
+                  'referenceObject': widget.commentData.comment,
+                  'preservationContent': indexModel.draftContent[widget.commentData.commentID]?.values.first
                 }
-              );
+              ).then((_){
+                if(widget.onEditComment!=null){
+                  widget.onEditComment!();
+                }
+              });
+
+              
+
+              //更改的话。。 恐怕需要透过 userCommentList ?? 那可不行。。
+              // button 的位置所处的 能被太多地方所访问。。
+              // 恐怕。。需要搞一大堆的 onEdit / onDelete / onSticker 的回调。。
+              
+
+
+              //Navigator.pushNamed(
+              //  context,
+              //  Routes.sendComment,
+              //  arguments: {
+              //    'contentID':widget.commentData.commentID,
+              //    'title': '修改你的评论',
+              //    'preservationContent': widget.commentData.comment
+              //  }
+              //);
             }
       
             case CommentActionType.delete:{
+
+              if(widget.onDeleteComment!=null){
+                widget.onDeleteComment!();
+              }
+
+           
               //accountModel.
+              //animatedSliverListKey.currentState?.removeItem(index, builder);
             }
               
               
@@ -120,13 +167,10 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
 
               bool isActionAvaliable = true;
 
-              if( accountModel.isLogined()){
-
-            
-        
+              if(accountModel.isLogined()){
 
                  if(index == CommentActionType.reply.index){
-                    if(widget.postCommentType == PostCommentType.comment){
+                    if(widget.postCommentType == PostCommentType.subjectComment){
                       isActionAvaliable = false;
                     }
                  }
@@ -141,7 +185,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                  }
 
                  if(index == CommentActionType.edit.index || index == CommentActionType.delete.index){
-                    if(widget.commentData.userInformation?.userName != accountModel.loginedUserInformations.userInformation?.getName()){
+                    if(widget.commentData.userInformation?.userID != accountModel.loginedUserInformations.userInformation?.userID){
                       isActionAvaliable = false;
                     }
                  }

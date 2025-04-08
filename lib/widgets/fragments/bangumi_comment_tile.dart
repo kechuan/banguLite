@@ -1,7 +1,5 @@
-import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
-import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
@@ -135,7 +133,7 @@ class BangumiCommentTile extends StatelessWidget {
               ScalableText("${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"),
 
               BangumiCommentActionButton(
-                postCommentType: PostCommentType.comment,
+                postCommentType: PostCommentType.subjectComment,
                 commentData: commentData,
               )
 

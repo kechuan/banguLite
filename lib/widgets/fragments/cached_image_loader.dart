@@ -55,7 +55,6 @@ class CachedImageLoader extends StatelessWidget {
                   if(DateTime.now().millisecondsSinceEpoch - loadStartTime.millisecondsSinceEpoch > 5000){
                      showProgressIndicator = true;
                   }
-                  //debugPrint("url: $url , progress:${progress}");
               
                   return DecoratedBox(                              
                     decoration: BoxDecoration(
@@ -67,6 +66,7 @@ class CachedImageLoader extends StatelessWidget {
                       child: ScalableText("loading... ${showProgressIndicator ? "${((progress.progress ?? 0.0)*100).toStringAsFixed(2)}%" : ""}"), //loading
                     ),
                   );
+                  
                 },
               );
             }

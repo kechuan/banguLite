@@ -4,7 +4,7 @@
 			"path": "lib/catalogs/bangumi_ep_page.dart",
 			"bookmarks": [
 				{
-					"line": 268,
+					"line": 270,
 					"column": 38,
 					"label": "EPInfo"
 				}
@@ -24,7 +24,7 @@
 			"path": "lib/catalogs/bangumi_calendar_page.dart",
 			"bookmarks": [
 				{
-					"line": 127,
+					"line": 128,
 					"column": 35,
 					"label": "calendarPage——资讯页面"
 				}
@@ -84,7 +84,7 @@
 			"path": "lib/catalogs/bangumi_detail_page.dart",
 			"bookmarks": [
 				{
-					"line": 32,
+					"line": 36,
 					"column": 32,
 					"label": "subjectDetail——番剧详情"
 				}
@@ -104,7 +104,7 @@
 			"path": "lib/catalogs/bangumi_blog_page.dart",
 			"bookmarks": [
 				{
-					"line": 15,
+					"line": 17,
 					"column": 46,
 					"label": "BlogPage —— 日志"
 				}
@@ -114,7 +114,7 @@
 			"path": "lib/widgets/fragments/ep_comment_tile.dart",
 			"bookmarks": [
 				{
-					"line": 14,
+					"line": 16,
 					"column": 0,
 					"label": "EPComment —— 当前EP评论"
 				}
@@ -124,7 +124,7 @@
 			"path": "lib/models/providers/account_model.dart",
 			"bookmarks": [
 				{
-					"line": 13,
+					"line": 17,
 					"column": 43,
 					"label": "AccountModel —— 账号系统"
 				}
@@ -134,7 +134,7 @@
 			"path": "lib/catalogs/bangumi_topic_page.dart",
 			"bookmarks": [
 				{
-					"line": 12,
+					"line": 14,
 					"column": 0,
 					"label": "TopicPage —— 讨论页"
 				}
@@ -147,6 +147,26 @@
 					"line": 9,
 					"column": 43,
 					"label": "BangumiModel —— 番剧Model"
+				}
+			]
+		},
+		{
+			"path": "lib/delegates/search_delegates.dart",
+			"bookmarks": [
+				{
+					"line": 14,
+					"column": 58,
+					"label": "searchDeleGates —— 搜索页委托"
+				}
+			]
+		},
+		{
+			"path": "lib/catalogs/send_comment_page.dart",
+			"bookmarks": [
+				{
+					"line": 28,
+					"column": 46,
+					"label": "sendMessage —— 发送评论的页面"
 				}
 			]
 		}

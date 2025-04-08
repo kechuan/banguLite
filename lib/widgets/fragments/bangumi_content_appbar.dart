@@ -1,5 +1,5 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';

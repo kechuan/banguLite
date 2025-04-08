@@ -46,6 +46,7 @@ class IntroPortrait extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Column(
+      spacing: 12,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -56,17 +57,11 @@ class IntroPortrait extends StatelessWidget {
             //Pic
             Expanded(
               flex: 2,
-              child: Column(
-                children: [
-                  FittedBox(
-                    child: BuildDetailImages(
-                      detailImageUrl: bangumiDetails.coverUrl,
-                      imageID: bangumiDetails.id
-                    )
-                  ),
-              
-                  const Padding(padding: PaddingV6)
-                ]
+              child: FittedBox(
+                child: BuildDetailImages(
+                  detailImageUrl: bangumiDetails.coverUrl,
+                  imageID: bangumiDetails.id
+                )
               )
             ),
     
@@ -93,14 +88,21 @@ class IntroPortrait extends StatelessWidget {
                             },
                             onLongPress: () {
                               Clipboard.setData(ClipboardData(text: '${bangumiDetails.informationList["alias"] ?? ""}'));
-                              fadeToaster(context:context,message:"别称已复制");
+                              fadeToaster(context:context,message: "别称已复制");
                             },
-                            title: ScalableText("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
-                            subtitle: ScalableText(bangumiDetails.informationList["alias"] ?? "")
+                            title: ScalableText(
+                              "${bangumiDetails.name}",
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                            subtitle: ScalableText(
+                              bangumiDetails.informationList["alias"] ?? "",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            )
                           )
                         ),
 
-                        StarButton(bangumiDetails: bangumiDetails)
+                        
                         
 
                       ]
@@ -109,7 +111,6 @@ class IntroPortrait extends StatelessWidget {
                     BuildInfoBox(informationList: bangumiDetails.informationList,type: bangumiDetails.type)
                 
 
-					
 
 
                   ]
@@ -121,6 +122,8 @@ class IntroPortrait extends StatelessWidget {
           ]
         ),
 
+        StarButton(bangumiDetails: bangumiDetails),
+
         LayoutBuilder(
           builder: (_,constraint){
             return BangumiRankBox(
@@ -130,11 +133,7 @@ class IntroPortrait extends StatelessWidget {
           }
         ),
 
-
-        const Padding(padding: PaddingV6),
-
-         //Entry for Portial
-          
+        //Entry for Portial          
         InkResponse(
           onTap: () {
 
@@ -147,30 +146,27 @@ class IntroPortrait extends StatelessWidget {
                 //因为showDialog/showModalBottomSheet 使用的context是独立在整个体系之外的
                 //在 layout inspector 里能看到 此时它的层级关系是和 其他的Page一样直接属于materialApp的分支之下
                 //因此只能直接这样处理了
-                return ChangeNotifierProvider.value(
-                  value: context.watch<BangumiModel>(),
-                  builder: (_,__) {
-                    return ChangeNotifierProvider.value(
-                      value: context.watch<EpModel>(),
-                      builder: (_,__) {
-                        return EasyRefresh(
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: BuildEps(
-                                subjectID: bangumiDetails.id!, 
-                                subjectName: bangumiDetails.name,
-                                informationList: bangumiDetails.informationList,
-                                portialMode: true,
-                              )
-                            )
-                          )
-                      
-                        );
-                      }
-                    );
-                  }
+                return MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider.value(value: context.read<BangumiModel>()),
+                    ChangeNotifierProvider.value(value: context.read<EpModel>())
+                  ],
+                  child: EasyRefresh(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: BuildEps(
+                          subjectID: bangumiDetails.id!, 
+                          subjectName: bangumiDetails.name,
+                          informationList: bangumiDetails.informationList,
+                          portialMode: true,
+                        )
+                      )
+                    )
+                
+                  ),
                 );
+
               }
             );
           },
@@ -245,7 +241,6 @@ class IntroPortrait extends StatelessWidget {
           )
         ),
           
-
         ConstrainedBox(
           constraints: const BoxConstraints.tightFor(width: double.infinity),
           child: Padding(
@@ -303,7 +298,10 @@ class IntroLandscape extends StatelessWidget {
                       },
                       title: ScalableText("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
                       subtitle: ScalableText(bangumiDetails.informationList["alias"] ?? ""),
-                      trailing: StarButton(bangumiDetails: bangumiDetails)
+                      trailing: SizedBox(
+                        width: 120,
+                        child: StarButton(bangumiDetails: bangumiDetails)
+                      )
                     )
                 ),
 

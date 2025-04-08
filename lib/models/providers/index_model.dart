@@ -49,8 +49,6 @@ class IndexModel extends ChangeNotifier {
   // 当然标题不一定存在 如果不存在直接置为空就好
   final Map<int,Map<String,String>> draftContent = {};
 
-
-
   void initModel() async {
     loadConfigData();
     await updateStarDetail();

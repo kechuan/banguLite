@@ -5,7 +5,6 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
-import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
 import 'package:bangu_lite/models/topic_info.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';

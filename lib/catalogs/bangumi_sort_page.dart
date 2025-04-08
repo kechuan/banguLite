@@ -2,6 +2,7 @@
 
 import 'dart:math';
 
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/widgets/fragments/animated_wave_footer.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -263,16 +264,15 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                   return FadeTransition(
                                     opacity: animation,
                                     child: BangumiListTile(
-                                      bangumiTitle: messageList[index].name,
-                                      imageUrl: messageList[index].coverUrl,
-                                      imageSize: const Size(100,150),
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          Routes.subjectDetail,
-                                          arguments: {"subjectID":messageList[index].id}
-                                        );
-                                      },
+										bangumiDetails: messageList[index],
+                                      	imageSize: const Size(100,150),
+										onTap: () {
+											Navigator.pushNamed(
+											context,
+											Routes.subjectDetail,
+											arguments: {"subjectID":messageList[index].id}
+											);
+										},
                               
                               
                                     )

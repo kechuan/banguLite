@@ -1,5 +1,6 @@
 
 import 'dart:math';
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
@@ -23,7 +24,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 
 @FFRoute(name: '/subjectEp')
@@ -115,9 +115,9 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                         SliverPinnedHeader(
                                           child: BangumiContentAppbar(
                                             contentID: epModel.epsData[selectedEp]?.epID,
-                                            titleText: "第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN ?? epModel.epsData[selectedEp]!.name}",
+                                            titleText: "第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN!.isEmpty ? epModel.epsData[selectedEp]!.name : ""}",
                                             webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!),
-                                            postCommentType: PostCommentType.postEpComment,
+                                            postCommentType: PostCommentType.replyEpComment,
                                             surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
                                           ),
                                         ),
@@ -233,9 +233,9 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                 },
                                 child:BangumiContentAppbar(
                                   contentID: epModel.epsData[selectedEp]?.epID,
-                                  titleText: "第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN ?? epModel.epsData[selectedEp]!.name}",
+                                  titleText: "第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN!.isEmpty ? epModel.epsData[selectedEp]!.name : ""}",
                                   webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!),
-                                  postCommentType: PostCommentType.postEpComment,
+                                  postCommentType: PostCommentType.replyEpComment,
                                   surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
                                 )
                                 

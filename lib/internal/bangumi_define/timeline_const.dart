@@ -2,13 +2,31 @@
 
 // Blog/Index 没有子级目录
 
+import 'package:bangu_lite/internal/request_client.dart';
+
+const detectIDList = [
+  'id',
+  'subjectID',
+];
+
+const detectNameList = [
+  'name',
+  'nameCN',
+  'title',
+  'nickname'
+];
+
+const detectPropList = [
+  'epsUpdate',
+  'sort',
+  'reactions'
+];
+
 const List<dynamic> timelineEnums = [
   TimelineCatDaily.values,
   TimelineCatWiki.values,
   TimelineCatSubjectSingle.values,
   TimelineCatProgress.values,
-  //TimelineCatSubjectBatch.values, ???
-  
   TimelineCatStatus.values,
   //对应 6/7 的空置
   [],
@@ -49,6 +67,7 @@ enum TimelineCatDaily {
   final String actionName;
   const TimelineCatDaily(this.value, this.actionName);
 }
+
 enum TimelineCatWiki {
 
   AddBook(1, "添加了新书"),
@@ -62,6 +81,7 @@ enum TimelineCatWiki {
   final String actionName;
   const TimelineCatWiki(this.value, this.actionName);
 }
+
 enum TimelineCatSubjectSingle {
   
   WantToRead(1, "想读"),
@@ -86,7 +106,6 @@ enum TimelineCatSubjectSingle {
   
 }
 
-
 enum TimelineCatProgress {
 
   Completed(0, "完成"),
@@ -98,6 +117,7 @@ enum TimelineCatProgress {
   final String actionName;
   const TimelineCatProgress(this.value, this.actionName);
 }
+
 enum TimelineCatStatus {
 
   UpdateSignature(0, "更新签名"),
@@ -108,15 +128,17 @@ enum TimelineCatStatus {
   final String actionName;
   const TimelineCatStatus(this.value, this.actionName);
 }
+
 enum TimelineCatMono {
 
-  Character(1, "收藏角色"),
-  Person(2, "收藏人物");
+  Created(0, "创建收藏"),
+  Collected(1, "增加收藏");
 
   final int value;
   final String actionName;
   const TimelineCatMono(this.value, this.actionName);
 }
+
 enum TimelineCatDoujin {
 
   AddWork(0, "添加作品"),

@@ -9,7 +9,6 @@ import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class CommentImagePanel extends StatefulWidget {
   const CommentImagePanel({
@@ -29,9 +28,6 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
   RequestByteInformation pictureRequestInformation = RequestByteInformation();
   ValueNotifier<bool> imageLoadNotifier = ValueNotifier(false);
 
-  
-
-  //final int size;
   @override
   Widget build(BuildContext context) {
 
@@ -69,10 +65,6 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                           Routes.webview,
                           arguments: {"url":widget.imageUrl},
                         );
-                        //canLaunchUrlString(widget.imageUrl).then((result){
-                        //  result ? launchUrlString(widget.imageUrl): null;
-                        //  return;
-                        //});
                       }
 
                       else{
@@ -134,7 +126,13 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
 
                         return CachedNetworkImage(
                           imageUrl: widget.imageUrl,
-                          progressIndicatorBuilder: (context, url, progress) => const LoadingCard(),
+                          progressIndicatorBuilder: (context, url, progress){ 
+              
+                            return LoadingCard(
+                              progress: "${((progress.progress ?? 0.0)*100).toStringAsFixed(2)}%",
+                            );
+
+                          },
                           imageBuilder: (_, imageProvider) {
                             return UnVisibleResponse(
                               onTap: (){
@@ -168,14 +166,30 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
 }
 
 class LoadingCard extends StatelessWidget {
-  const LoadingCard({super.key});
+  const LoadingCard({
+    super.key,
+    this.progress
+  });
+
+  final String? progress;
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
+    return  SizedBox(
       height: 200,
       width: 200,
-      child: Center(child: CircularProgressIndicator()),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+
+            const CircularProgressIndicator(),
+
+            ScalableText(progress ?? ""),
+
+          ],
+        ),
+      ),
     );
   }
 }

@@ -1,8 +1,10 @@
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/delegates/star_sort_strategy.dart';
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/models/bangumi_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/star_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
@@ -208,7 +210,7 @@ List<Widget> seasonTypeSort({
 		sortType == SortType.score
 	){
 		dataSource = List.generate(
-			indexModel.starsUpdateRating.length,
+			dataSource.length,
 			(index){
 				//indexModel.starsUpdateRating[startIndex + index]["rank"]!.toInt()
 
@@ -342,45 +344,47 @@ Widget buildSectionList(
         
         return BangumiListTile(
           imageSize: const Size(100, 150),
-          bangumiTitle: starBangumiDetail.name,
-          imageUrl: starBangumiDetail.coverUrl,
-          trailing: SizedBox(
-            width: 160,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              spacing: 12,
-              children: [
-                    
-                Builder(
-                  builder: (_) {
+          bangumiDetails: loadStarDetailsData(starBangumiDetail),
 
-                    String resultText = getUpdateText(
-                      starsUpdateRating:indexModel.starsUpdateRating,
-                      item:starBangumiDetail,
-                      sortType:sortType,
-                      resultIndex:startIndex + index
-                    );
-
-                    return ScalableText(
-                      resultText,
-                      style: TextStyle(fontSize: resultText.length > 8 ? 14 : null),
-                      maxLines: 2,
-                    );
+          trailing: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            spacing: 12,
+            children: [
+                  
+              Builder(
+                builder: (_) {
+          
+                  String resultText = getUpdateText(
+                    starsUpdateRating:indexModel.starsUpdateRating,
+                    item:starBangumiDetail,
+                    sortType:sortType,
+                    resultIndex:startIndex + index
+                  );
+          
+                  if(resultText.isEmpty){
+                    return const SizedBox();
                   }
-                ),
-
-
-                IconButton(
-                  icon: const Icon(Icons.star),
-                  onPressed: () {
-                    MyHive.starBangumisDataBase.delete(starBangumiDetail.bangumiID);
-                    indexModel.updateStar();
-                  },
-                ),
-
-            
-              ],
-            ),
+                    
+        
+                  return ScalableText(
+                    resultText,
+                    style: TextStyle(fontSize: resultText.length > 8 ? 14 : null),
+                    maxLines: 2,
+                  );
+                }
+              ),
+          
+          
+              IconButton(
+                icon: const Icon(Icons.star),
+                onPressed: () {
+                  MyHive.starBangumisDataBase.delete(starBangumiDetail.bangumiID);
+                  indexModel.updateStar();
+                },
+              ),
+          
+          
+            ],
           ),
           onTap: () => Navigator.pushNamed(
             context,
@@ -407,6 +411,8 @@ String getUpdateText(
   switch(sortType){
                     
     case SortType.rank:{
+
+      debugPrint("resultIndex:$resultIndex item: ${item.name}/${item.rank}/${item.score} => ${starsUpdateRating[resultIndex]} ");
 
       int starRank = MyHive.starBangumisDataBase.values.elementAt(resultIndex).rank!;
 

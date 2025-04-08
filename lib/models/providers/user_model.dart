@@ -5,7 +5,6 @@ import 'package:bangu_lite/models/timeline_details.dart';
 import 'package:bangu_lite/models/user_details.dart';
 import 'package:flutter/widgets.dart';
 
-//唉 真的不想写这玩意
 class UserModel extends ChangeNotifier{
 
   //userID: UserInformation

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 
@@ -7,6 +8,7 @@ import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/base_details.dart';
 import 'package:bangu_lite/models/base_info.dart';
 import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -56,7 +58,10 @@ abstract class BangumiContentPageState<
 
   final GlobalKey<SliverAnimatedListState> animatedSliverListKey = GlobalKey();
 
+
   final List<String> userCommentList = [];
+  // index:comment record or just add?
+  //final Map<int,String> userCommentMap = {};
 
   @override
   Widget build(BuildContext context) {
@@ -105,18 +110,16 @@ abstract class BangumiContentPageState<
                                   postCommentType: getPostCommentType(),
                                   surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
                                   onSendMessage: (content) {
-                                    //还是不跳了 重新计算会卡死自己。除非我愿意做分页 
-                                    //但是做分页的话 实际上也不能解决评论位置的出现问题。。那就这样了吧 顶多发一个toaster提示是了
-
-                                    //至于显示位置:
-                                    //1.学bangumi那样 单独做一个自己回复的 view 出来展示
-                                    //2.直接展示在列表顶部 重新访问就保持原来的位置上
-                                    //那实际上还是 1 的做法高明
-
                                     debugPrint("it will insert comment at here: $content");
                                     fadeToaster(context: context, message: "回帖成功");
                                     userCommentList.add(content);
-                                    animatedSliverListKey.currentState?.insertItem(0, duration: const Duration(milliseconds: 300));
+									
+
+                                    WidgetsBinding.instance.addPostFrameCallback((_){
+                                      animatedSliverListKey.currentState?.insertItem(0);
+                                    });
+
+                                    
                                   },
                                 )
                               ),
@@ -166,7 +169,7 @@ abstract class BangumiContentPageState<
                           key: animatedSliverListKey,
                           //rebuild不会影响内部 initialItemCount 只能分离逻辑了
                           initialItemCount: resultCommentCount,
-                          itemBuilder: (_,contentCommentIndex,animation){
+                          itemBuilder: (animatedContext,contentCommentIndex,animation){
                         
                             debugPrint("$contentCommentIndex/$resultCommentCount");
                         
@@ -221,56 +224,93 @@ abstract class BangumiContentPageState<
                             }
                         
                             if(contentCommentIndex >= commentListCount){
-                        
-                              if(userCommentList.length <= contentCommentIndex - resultCommentCount){
+
+                              // 一般而言 出现这种情况 只会是 调用了insert
+                              // 但实际上是 有时候会出现 相等甚至是超越 initialItemCount 的 index(明明没insert)
+                              // 非常的奇怪 可能是因为 animatedList 的 特质
+                              if(contentCommentIndex < resultCommentCount){
                                 return const SizedBox.shrink();
                               }
+
+                              final currentEpCommentDetails =  EpCommentDetails()
+                                //..userInformation = context.read<AccountModel>().loginedUserInformations.userInformation
+                                ..userInformation = 
+                                  (									
+                                    context.read<AccountModel>()
+                                      .loginedUserInformations.userInformation
+                                        ?..userName = "818458"
+                                  )
+                                ..commentID = getSubContentID() ?? contentInfo.id
+                                ..comment = userCommentList[contentCommentIndex - resultCommentCount]
+                                ..epCommentIndex = "${contentCommentIndex+1}"
+                                ..commentTimeStamp = DateTime.now().millisecondsSinceEpoch~/1000
+                              ;
                         
-                              return RepaintBoundary(
-                                child: FadeTransition(
-                                  opacity: animation,
-                                  child: Column(
-                                    children: [
-                                      EpCommentView(
-                                        postCommentType: PostCommentType.values[getPostCommentType()!.index + 1],
-                                        epCommentData: EpCommentDetails()
-                                          ..userInformation = contentInfo.userInformation
-                                          ..commentID = getSubContentID() ?? contentInfo.id
-                                          ..comment = userCommentList[contentCommentIndex - resultCommentCount]
-                                          ..commentTimeStamp = contentInfo.createdTime
-                                          ..commentReactions = contentDetail?.contentReactions
-                                      ),
+                              return FadeTransition(
+                                opacity: animation,
+                                child: Column(
+                                  children: [
+                                    if(contentCommentIndex - resultCommentCount == 0)
+                                      const Divider(),
                                 
+                                      EpCommentView(
+                                        postCommentType: getPostCommentType(),
+                                        onDeleteComment: () {
+                                  
+                                          userCommentList.removeAt(contentCommentIndex - resultCommentCount);
+
+                                          //因为永远都不可能会移除首项 所以动画项目永远会是+1
+                                          int removeAnimatedIndex = contentCommentIndex - resultCommentCount + 1;
+
+                                          if(getPostCommentType() == PostCommentType.replyBlog){
+                                            removeAnimatedIndex += 1;
+                                          }
+
+                                          SliverAnimatedList.of(animatedContext).removeItem(
+                                            removeAnimatedIndex,
+                                            duration: const Duration(milliseconds: 300),
+                                            (_,animation){
+
+                                              return FadeTransition(
+                                                opacity: animation,
+                                                child: SizeTransition(
+                                                  sizeFactor: animation,
+                                                  axis: Axis.vertical,
+                                                  child: EpCommentView(
+                                                    epCommentData: currentEpCommentDetails
+                                                  ),
+                                                ),
+                                              );
+                                        
+                                            });
+                                  
+                                        },
+                                        epCommentData: currentEpCommentDetails
+                                      ),
+                                                                
                                       const Divider()
-                                    ],
-                                  ),
+                                  ],
                                 ),
                               );
                         
-                        
-                              
                             } 
                         
-                        
-                            
-                        
-                            
-                        
+
                             return FadeTransition(
                               opacity: animation,
                               child: Column(
                                 children: [
                         
-                                  if(getPostCommentType() == PostCommentType.replyTopic)
                                     EpCommentView(
-                                      postCommentType: PostCommentType.commentTopicReply,
+                                      postCommentType: getPostCommentType(),
+                                      onDeleteComment: () {
+                                        animatedSliverListKey.currentState!.removeItem(contentCommentIndex, (_,animation) => FadeTransition(
+                                          opacity: animation,
+                                          child: const SizedBox.shrink(),
+                                        ));
+                                        
+                                      },
                                       epCommentData: contentDetail!.contentRepliedComment![contentCommentIndex]
-                                    ),
-                        
-                                  if(getPostCommentType() != PostCommentType.replyTopic)
-                                    EpCommentView(
-                                      postCommentType: PostCommentType.values[getPostCommentType()!.index + 1],
-                                      epCommentData: contentDetail!.contentRepliedComment![contentCommentIndex-1]
                                     ),
                         
                                   if(contentCommentIndex < commentListCount - 1)
@@ -282,7 +322,7 @@ abstract class BangumiContentPageState<
                               
                         },
                         
-                                                ),
+                          ),
                       );
                             
                                 

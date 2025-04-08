@@ -104,8 +104,8 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
           
           			//TabView
           			SizedBox(
-                  height: widget.portialMode == true ? constraint.maxHeight -60 : 250,
-                  //height: 250,
+                  height: widget.portialMode == true ? constraint.maxHeight - 80 : 250,
+                  
                   child: ValueListenableBuilder(
                   valueListenable: epSegementsIndexNotifier,
                   builder: (_,currentSegment,child) {
@@ -143,24 +143,24 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                   
                               Color currentEpsColor = Colors.grey ; //默认灰 未放送
                               int currentEpIndex = (currentSegementRange)+(index)+1;
-
+                          
                               EpsInfo? currentInfo = epModel.epsData[currentEpIndex];
-
+                          
                               //对于时间跨度很大的番剧。像海贼王这种的 我处理方式就是最简单的 air_date 判断了 
                               //不可能做到百分百准确 但没办法 已经没有更好的思路了
-
+                          
                               DateTime? currentEpAirDate = DateTime.tryParse(currentInfo?.airDate ?? "");
-
+                          
                               if(currentEpAirDate!=null){
                                 currentTime.difference(currentEpAirDate) > const Duration(hours: 1) ?
                                 currentEpsColor = Theme.of(context).scaffoldBackgroundColor: //已放送
                                 null ;
                               }
-
+                          
                               if(widget.airedEps < widget.totalEps){ //如果还有未放送的
                                 if(widget.airedEps == currentEpIndex) currentEpsColor = BangumiThemeColor.macha.color; //标注当前放送中最新的一集
                               }
-
+                          
                               return SizedBox(
                                 height: 60,
                                 child: Container(

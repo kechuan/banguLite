@@ -1,4 +1,5 @@
 
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -7,8 +8,6 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-//这个变更数据。。恐怕得靠 subjectModel 存储了 因为 commentReactions 的数据是固定的
-//除非 我直接去修改 commentReactions 的数据 然后只要包含我的 id 就直接标特殊就行
 class CommentReaction extends StatelessWidget {
   const CommentReaction({
     super.key,
@@ -78,16 +77,6 @@ class CommentReaction extends StatelessWidget {
                 Colors.grey.withValues(alpha: 0.8)
               ;
 
-              //reactDataLike == dataLikeIndex ? 
-              //  themeColor?.withValues(
-              //    alpha: 0.8,
-              //    red: ((themeColor?.r ?? 0.5) + 0.1),
-              //    green: ((themeColor?.g ?? 0.5) + 0.1),
-              //    blue: ((themeColor?.b ?? 0.5) + 0.1),
-              //  ) :
-              //  themeColor?.withValues(alpha: 0.8)
-              //;
-          
               return SizedBox(
                 width: 80,
                 child: SizedBox(

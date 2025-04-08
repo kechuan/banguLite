@@ -2,10 +2,11 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/eps_info.dart';
-import 'package:flutter/material.dart';
+
 
 
 String? convertAmpsSymbol(String? originalString){
@@ -34,6 +35,24 @@ String convertDigitNumString(int originalNumber, {int numberBits = 2}){
     }
 
     return '$fillingContent$originalNumber';
+  }
+
+}
+
+String convertDecimalDigitNumString(num originalNumber, {int numberBits = 2}){
+
+  String fillingContent = '.';
+
+  if(originalNumber.toString().length > (numberBits-1)){
+    return '$originalNumber';
+  }
+
+  else{
+    for(numberBits; numberBits>1; numberBits--){
+      fillingContent+='0';
+    }
+
+    return '$originalNumber$fillingContent';
   }
 
 }

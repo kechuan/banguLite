@@ -2,9 +2,8 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/internal/timeline_const.dart';
+import 'package:bangu_lite/internal/bangumi_define/timeline_const.dart';
 import 'package:bangu_lite/models/base_details.dart';
-
 
 // 广场timeline 与 用户timeline需求数据
 
@@ -81,112 +80,8 @@ class TimelineDetails extends BaseDetails {
   }
 }
 
-
-List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData){
-
-  List<TimelineDetails> timelineDetailsList = [];
-
-  for(var bangumiTimelineData in bangumiTimelineListData){
-    final resultFields = extractBaseFields(bangumiTimelineData['memo']);
-
-    TimelineDetails timelineDetails = TimelineDetails(
-      detailID: bangumiTimelineData['id'],
-    );
-
-    timelineDetails
-      ..actionUserUID = bangumiTimelineData['uid']
-      ..catType = bangumiTimelineData['cat']
-      ..catAction = bangumiTimelineData['type']
-      ..timelineCreatedAt = bangumiTimelineData['createdAt']
-      ..objectIDSet = resultFields['objectIDSet']
-      ..objectNameSet = resultFields['objectNameSet']
-      ..epsUpdate = resultFields['epsUpdate'] ?? resultFields['sort']
-      //..subObjectID = resultFields['subContentID']
-      //..commentReactions = loadReactionDetails(reactionListData)
-    ;
-
-    timelineDetailsList.add(timelineDetails);
-  }
-
-  return timelineDetailsList;
-}
-
-String convertTimelineDescription(TimelineDetails currentTimeline, {bool? authorDeclared}){
-  String resultText = "TA ";
-
-  String actionText = "";
-  String contentText = "";
-  String suffixText = "";
-	
-  /// 那么首先 划定 action 字段 行为
-  switch(currentTimeline.catType){
-   
-    //人物/日志/目录
-    case 6:case 7: { actionText+="添加了 "; break;}
-
-    default: { 
-
-        List currentType = timelineEnums.elementAt(currentTimeline.catType!-1);
-
-        for(var currentSegment in currentType){
-          if(currentSegment.value == currentTimeline.catAction){
-            actionText += '${currentSegment.actionName} ';
-            break;
-          }
-        }
-
-    }
-
-  }
-
-
-  //然后是内容字段
-  switch(currentTimeline.catType){
-    case 3: {
-      contentText += convertSubjectTimeline(currentTimeline.objectIDSet,currentTimeline.objectNameSet);
-      break;
-    }
-
-    case 4:{
-      //牵扯到 epsUpdate
-      contentText += convertSubjectTimeline(
-        currentTimeline.objectIDSet,
-        currentTimeline.objectNameSet,
-        ep: currentTimeline.epsUpdate,
-        cat: currentTimeline.catType,
-        action: currentTimeline.catAction
-      ) ;
-    }
-  }
-
-  resultText += actionText;
-  resultText += contentText;
-
-  if(suffixText.isNotEmpty) resultText+=suffixText;
-
-
-  return resultText;
-}
-
 Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
   final resultFields = <String, dynamic>{};
-
-  const detectIDList = [
-    'id',
-    'subjectID',
-  ];
-
-  const detectNameList = [
-    'name',
-    'nameCN',
-    'title',
-  ];
-
-  const detectPropList = [
-    'epsUpdate',
-    'sort',
-    'reactions'
-  ];
 
   Set<int> objectIDSet = {};
   Set<String> objectNameSet = {};
@@ -202,7 +97,7 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
 
             String resultText = 
               map["name"].isEmpty ? 'ep.${map["sort"]}' : 
-                map["nameCN"].isEmpty ? map["name"] : map["nameCN"];
+              map["nameCN"].isEmpty ? map["name"] : map["nameCN"];
 
             objectNameSet.addAll({resultText});
           }
@@ -245,8 +140,104 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
   return resultFields;
 }
 
+List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData){
 
-//TODO Mono尚未完成 / 完成动作尚未完成
+  List<TimelineDetails> timelineDetailsList = [];
+
+  for(var bangumiTimelineData in bangumiTimelineListData){
+    final resultFields = extractBaseFields(bangumiTimelineData['memo']);
+
+    TimelineDetails timelineDetails = TimelineDetails(
+      detailID: bangumiTimelineData['id'],
+    );
+
+
+    timelineDetails
+      ..actionUserUID = bangumiTimelineData['uid']
+      ..catType = bangumiTimelineData['cat']
+      ..catAction = bangumiTimelineData['type']
+      ..timelineCreatedAt = bangumiTimelineData['createdAt']
+      ..objectIDSet = resultFields['objectIDSet']
+      ..objectNameSet = resultFields['objectNameSet']
+      ..epsUpdate = resultFields['epsUpdate'] ?? resultFields['sort']
+    ;
+
+    timelineDetailsList.add(timelineDetails);
+  }
+
+  return timelineDetailsList;
+}
+
+String convertTimelineDescription(TimelineDetails currentTimeline, {bool? authorDeclared}){
+  String resultText = "TA ";
+
+  String actionText = "";
+  String contentText = "";
+  String suffixText = "";
+	
+  /// 那么首先 划定 action 字段 行为
+  switch(currentTimeline.catType){
+   
+    //人物/日志/目录
+    case 6:
+    case 7: { actionText+="添加了 "; break;}
+
+    default: { 
+
+        List currentType = timelineEnums.elementAt(currentTimeline.catType!-1);
+
+        for(var currentSegment in currentType){
+          if(currentSegment.value == currentTimeline.catAction){
+            actionText += '${currentSegment.actionName} ';
+            break;
+          }
+        }
+
+    }
+
+  }
+
+
+  //然后是内容字段
+  switch(currentTimeline.catType){
+
+    case 3: {
+      contentText += convertSubjectTimeline(currentTimeline.objectIDSet,currentTimeline.objectNameSet);
+      break;
+    }
+
+    case 4:{
+      //牵扯到 epsUpdate
+      contentText += convertSubjectTimeline(
+        currentTimeline.objectIDSet,
+        currentTimeline.objectNameSet,
+        ep: currentTimeline.epsUpdate,
+        cat: currentTimeline.catType,
+        action: currentTimeline.catAction
+      ) ;
+    }
+
+    default :{
+      contentText += convertDefaultTimeline(
+        currentTimeline.objectIDSet,
+        currentTimeline.objectNameSet,
+        cat: currentTimeline.catType,
+        action: currentTimeline.catAction
+      );
+    }
+
+
+  }
+
+  resultText += actionText;
+  resultText += contentText;
+
+  if(suffixText.isNotEmpty) resultText+=suffixText;
+
+
+  return resultText;
+}
+
 String convertSubjectTimeline(
 
   Set<int>? objectIDSet,
@@ -276,14 +267,19 @@ String convertSubjectTimeline(
 
   else{
 
+    final List<String> timelineTextList = [];
+
     for(int index=0;index<min(5,objectNameSet.length);index++){
       int jumpID = objectIDSet.elementAt(index);
       String jumpName = objectNameSet.elementAt(index);
 
-      subjectTimelineText += '[url=${BangumiWebUrls.subject(jumpID)}]$jumpName[/url] ';
+      timelineTextList.add('[url=${BangumiWebUrls.subject(jumpID)}]$jumpName[/url]');
+
     }
 
-    if(objectNameSet.length>5) subjectTimelineText += '等 ${objectNameSet.length} 部番剧...';
+    subjectTimelineText += timelineTextList.join("、");
+
+    if(objectNameSet.length>5) subjectTimelineText += '...等 ${objectNameSet.length} 部作品';
   }
 
    
@@ -291,3 +287,110 @@ String convertSubjectTimeline(
   return subjectTimelineText;
 }
 
+//xxx 对谁 做了 什么事
+String convertDefaultTimeline(
+  Set<int>? objectIDSet,
+  Set<String>? objectNameSet,
+  {
+    int? cat,
+    int? action
+  }
+){
+  String defaultTimelineText = "";
+
+  if(objectIDSet == null || objectNameSet == null) return defaultTimelineText;
+  if(objectNameSet.isEmpty || objectIDSet.isEmpty) return defaultTimelineText;
+
+  String jumpLink = "";
+
+  //大部分实则指向的都是 subject 少部分会指向 wiki/user/doujin 这种东西
+
+  switch(cat){
+    case 1: {
+
+      if(action == TimelineCatDaily.AddFriend.value){
+        jumpLink = BangumiWebUrls.user(objectIDSet.first.toString());
+      }
+
+      else if(action == TimelineCatDaily.JoinGroup.value || action == TimelineCatDaily.CreateGroup.value){
+        jumpLink = "这里是群组ID:${objectIDSet.first}";
+      }
+
+      else if (action == TimelineCatDaily.JoinParadise.value){
+        jumpLink = "这里是乐园ID:${objectIDSet.first}";
+      }
+
+    }
+
+    case 5:{
+      if(action == TimelineCatStatus.Comment.value){
+        jumpLink = "这里是被吐槽的ID:${objectIDSet.first}";
+      }
+    }
+
+    case 8:{
+
+      jumpLink = BangumiWebUrls.character(objectIDSet.first);
+
+      //if(action == TimelineCatMono.Created.value){
+      //  jumpLink = BangumiWebUrls.character(objectIDSet.first);
+      //}
+
+      //if(action == TimelineCatMono.Collected.value){
+      //  jumpLink = BangumiWebUrls.person(objectIDSet.first);
+      //}
+      
+    }
+
+    case 9:{
+      if(
+        action == TimelineCatDoujin.AddWork.value || 
+        action == TimelineCatDoujin.CollectWork.value
+      ){
+        jumpLink = "这里是作品ID:${objectIDSet.first}";
+      }
+
+      else if(
+        action == TimelineCatDoujin.CreateClub.value ||
+         action == TimelineCatDoujin.FollowClub.value
+      ){
+        jumpLink = "这里是社团ID:${objectIDSet.first}";
+      }
+
+      else if(
+        action == TimelineCatDoujin.FollowEvent.value ||
+        action == TimelineCatDoujin.JoinEvent.value
+      ) {
+        jumpLink = "这里是活动ID:${objectIDSet.first}";
+      }
+
+
+    }
+
+    default:{
+      jumpLink = BangumiWebUrls.subject(objectIDSet.first);
+    }
+    
+  }
+
+  if(objectNameSet.isNotEmpty){
+
+    final List<String> timelineTextList = [];
+  
+    for(int index=0;index<min(5,objectNameSet.length);index++){
+      String jumpName = objectNameSet.elementAt(index);
+
+      timelineTextList.add('[url=$jumpLink]$jumpName[/url]');
+
+      
+    }
+
+    defaultTimelineText += timelineTextList.join("、");
+
+    if(objectNameSet.length>5) defaultTimelineText += '...等 ${objectNameSet.length} 个条目';
+
+  }
+
+
+  return defaultTimelineText;
+}

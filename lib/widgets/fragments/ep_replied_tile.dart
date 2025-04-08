@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -12,13 +13,15 @@ class EpRepliedTile extends ListTile {
     super.key,
     required this.epCommentData,
     this.postCommentType,
-    this.themeColor,
+    this.themeColor, 
+    this.onDeleteComment,
 
   });
 
   final EpCommentDetails epCommentData;
   final PostCommentType? postCommentType;
   final Color? themeColor;
+  final Function()? onDeleteComment;
 
   @override
   Widget build(BuildContext context) {

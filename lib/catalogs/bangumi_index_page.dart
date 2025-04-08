@@ -1,6 +1,7 @@
 
 import 'dart:async';
 
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
@@ -33,17 +34,15 @@ class _BangumiIndexPageState extends State<BangumiIndexPage> {
 
           readyQuitFlag = true;
 
-          final messager = ScaffoldMessenger.maybeOf(context);
-
           Future.delayed(const Duration(seconds: 3)).then((value){
-            messager?.clearSnackBars();
             readyQuitFlag = false;
           });
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              backgroundColor:Color.fromARGB(240, 99, 188, 243),
-              content: ScalableText("再返回一次以退出",style: TextStyle(color: Colors.black)),
+             SnackBar(
+              backgroundColor:judgeCurrentThemeColor(context),
+              content: const ScalableText("再返回一次以退出",style: TextStyle(color: Colors.black)),
+              duration: const Duration(seconds: 3),
             )
           );
           

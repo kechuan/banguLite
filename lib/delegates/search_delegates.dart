@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -245,8 +246,8 @@ class CustomSearchDelegate extends SearchDelegate<String>{
 
                       return BangumiListTile(
                         imageSize: const Size(100, 150),
-                        bangumiTitle: searchData[index].name!,
-                        imageUrl: searchData[index].coverUrl,
+                        bangumiDetails: searchData[index],
+                        
 
                         onTap: () {
                           Navigator.popAndPushNamed(

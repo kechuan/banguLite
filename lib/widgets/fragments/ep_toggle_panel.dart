@@ -53,7 +53,7 @@ class EpTogglePanel extends StatelessWidget {
     
                             return Row(
                               children: [
-                                ScalableText("${convertEPInfoType(epModel.epsData[currentEp-1]?.type)} ${currentEp-1}}",style: const TextStyle(color: Colors.grey,fontFamily: "MiSansFont")),
+                                ScalableText("${convertEPInfoType(epModel.epsData[currentEp-1]?.type)} ${currentEp-1}",style: const TextStyle(color: Colors.grey,fontFamily: "MiSansFont")),
     
                                 const Padding(padding: PaddingH6),
     
