@@ -14,14 +14,14 @@ class EpRepliedTile extends ListTile {
     required this.epCommentData,
     this.postCommentType,
     this.themeColor, 
-    this.onDeleteComment,
+    this.onUpdateComment,
 
   });
 
   final EpCommentDetails epCommentData;
   final PostCommentType? postCommentType;
   final Color? themeColor;
-  final Function()? onDeleteComment;
+  final Function(String?)? onUpdateComment;
 
   @override
   Widget build(BuildContext context) {

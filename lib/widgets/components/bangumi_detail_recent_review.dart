@@ -140,7 +140,12 @@ class BangumiDetailRecentReview extends StatelessWidget {
                                         ScalableText("${reviewModel.contentListData[index].reviewTitle}",style: const TextStyle(fontWeight: FontWeight.bold),),
 
 										                    //summary 被api限制在最大 120 长度之中
-                                        ScalableText("${reviewModel.contentListData[index].summary}${reviewModel.contentListData[index].summary?.length == 120 ? "..." : ""} "),
+                                        ScalableText(
+                                          "${reviewModel.contentListData[index].summary}",
+                                          style: const TextStyle(fontSize: 14),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 6, //兼顾移动端
+                                        ),
 
                                         Align(
                                           alignment: Alignment.centerRight,

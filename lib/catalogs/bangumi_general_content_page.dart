@@ -10,6 +10,7 @@ import 'package:bangu_lite/models/base_info.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
+import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
@@ -58,10 +59,9 @@ abstract class BangumiContentPageState<
 
   final GlobalKey<SliverAnimatedListState> animatedSliverListKey = GlobalKey();
 
+  // For record Local comment Change.
+  final Map<int,String> userCommentMap = {};
 
-  final List<String> userCommentList = [];
-  // index:comment record or just add?
-  //final Map<int,String> userCommentMap = {};
 
   @override
   Widget build(BuildContext context) {
@@ -110,16 +110,26 @@ abstract class BangumiContentPageState<
                                   postCommentType: getPostCommentType(),
                                   surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
                                   onSendMessage: (content) {
-                                    debugPrint("it will insert comment at here: $content");
-                                    fadeToaster(context: context, message: "回帖成功");
-                                    userCommentList.add(content);
 									
+									fadeToaster(context: context, message: "回帖成功");
 
-                                    WidgetsBinding.instance.addPostFrameCallback((_){
-                                      animatedSliverListKey.currentState?.insertItem(0);
-                                    });
+									final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
+									final int commentListCount = getCommentCount(contentDetail, false) ?? 0;
 
-                                    
+									int resultCommentCount = 
+										getPostCommentType() == PostCommentType.replyTopic ?
+										commentListCount :
+										commentListCount+1
+									;
+
+									resultCommentCount += userCommentMap.length;
+
+									userCommentMap.addAll({resultCommentCount:content});
+									
+									WidgetsBinding.instance.addPostFrameCallback((_){
+										animatedSliverListKey.currentState?.insertItem(0);
+									});
+									           
                                   },
                                 )
                               ),
@@ -135,12 +145,14 @@ abstract class BangumiContentPageState<
                     future: contentFuture,
                     builder: (_, snapshot) {
                   
-                      final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id);
-                      final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
-                      final int commentListCount = (getCommentCount(contentDetail, isCommentLoading) ?? 0);
+						final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id);
+						final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
+						final int commentListCount = (getCommentCount(contentDetail, isCommentLoading) ?? 0);
 
-                      //int resultCommentCount = isCommentLoading ? 3 : (commentListCount+1);
-                      int resultCommentCount = (commentListCount+1);
+                      	int resultCommentCount = getPostCommentType() == PostCommentType.replyTopic ?
+						commentListCount :
+						commentListCount+1
+						;
 
                       if(isCommentLoading){
                         return Skeletonizer.sliver(
@@ -159,10 +171,6 @@ abstract class BangumiContentPageState<
                         );
                       }
 
-                      if(getPostCommentType() == PostCommentType.replyTopic){
-                        resultCommentCount-=1;
-                      }
-
                       return SliverPadding(
                         padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
                         sliver: SliverAnimatedList(
@@ -171,14 +179,15 @@ abstract class BangumiContentPageState<
                           initialItemCount: resultCommentCount,
                           itemBuilder: (animatedContext,contentCommentIndex,animation){
                         
-                            debugPrint("$contentCommentIndex/$resultCommentCount");
+                            //debugPrint("$contentCommentIndex/$resultCommentCount");
                         
                             if(contentCommentIndex == 0){
                               return ListView(
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
                                 children: [
-                        
+
+                                  //Topic的楼主内容 也会放入到 contentRepliedComment 里面。。
                                   if(getPostCommentType() == PostCommentType.replyTopic)
                                     EpCommentView(
                                       postCommentType: PostCommentType.replyTopic,
@@ -205,19 +214,19 @@ abstract class BangumiContentPageState<
                                       children: [
                                         const ScalableText("回复",style: TextStyle(fontSize: 24)),
                                 
-                                        ScalableText("${max(0,commentListCount-1) + userCommentList.length}",style: const TextStyle(color: Colors.grey)),
+                                        ScalableText("${max(0,commentListCount-1) + userCommentMap.length}",style: const TextStyle(color: Colors.grey)),
                                       ],
                                     ),
                                   ),
                                 
                                   //无评论的显示状态
-                                  if(commentListCount == 1 && userCommentList.isEmpty)
-                                  const SizedBox(
-                                    height: 64,
-                                    child: Center(
-                                      child: ScalableText("暂无评论..."),
-                                    ),
-                                  )
+                                  if(commentListCount == 1 && userCommentMap.isEmpty)
+                                    const SizedBox(
+                                      height: 64,
+                                      child: Center(
+                                        child: ScalableText("暂无评论..."),
+                                      ),
+                                    )
                                 
                                 ],
                               );
@@ -233,90 +242,116 @@ abstract class BangumiContentPageState<
                               }
 
                               final currentEpCommentDetails =  EpCommentDetails()
-                                //..userInformation = context.read<AccountModel>().loginedUserInformations.userInformation
-                                ..userInformation = 
-                                  (									
-                                    context.read<AccountModel>()
-                                      .loginedUserInformations.userInformation
-                                        ?..userName = "818458"
-                                  )
-                                ..commentID = getSubContentID() ?? contentInfo.id
-                                ..comment = userCommentList[contentCommentIndex - resultCommentCount]
+                                ..userInformation = context.read<AccountModel>().loginedUserInformations.userInformation
+								//刚刚评论的ID理应无法被Action操作
+                                ..commentID = null
+                                ..comment = userCommentMap[contentCommentIndex]
                                 ..epCommentIndex = "${contentCommentIndex+1}"
                                 ..commentTimeStamp = DateTime.now().millisecondsSinceEpoch~/1000
                               ;
                         
-                              return FadeTransition(
-                                opacity: animation,
-                                child: Column(
-                                  children: [
-                                    if(contentCommentIndex - resultCommentCount == 0)
-                                      const Divider(),
-                                
-                                      EpCommentView(
-                                        postCommentType: getPostCommentType(),
-                                        onDeleteComment: () {
-                                  
-                                          userCommentList.removeAt(contentCommentIndex - resultCommentCount);
+                              return fadeSizeTransition(
+								animation: animation,
+								child: Column(
+									children: [
+									if(contentCommentIndex - resultCommentCount == 0)
+										const Divider(),
+								
+										EpCommentView(
+											postCommentType: getPostCommentType(),
+											
+											onUpdateComment: (content) {
 
-                                          //因为永远都不可能会移除首项 所以动画项目永远会是+1
-                                          int removeAnimatedIndex = contentCommentIndex - resultCommentCount + 1;
+												if(content == null){
+													userCommentMap.remove(contentCommentIndex - resultCommentCount);
+																		
+													SliverAnimatedList.of(animatedContext).removeItem(
+														contentCommentIndex,
+														duration: const Duration(milliseconds: 300),
+														(_,animation){			
+															return fadeSizeTransition(
+																animation: animation,
+																child: EpCommentView(
+																epCommentData: currentEpCommentDetails
+																),
+															);
+														}
+													);
+												}
 
-                                          if(getPostCommentType() == PostCommentType.replyBlog){
-                                            removeAnimatedIndex += 1;
-                                          }
-
-                                          SliverAnimatedList.of(animatedContext).removeItem(
-                                            removeAnimatedIndex,
-                                            duration: const Duration(milliseconds: 300),
-                                            (_,animation){
-
-                                              return FadeTransition(
-                                                opacity: animation,
-                                                child: SizeTransition(
-                                                  sizeFactor: animation,
-                                                  axis: Axis.vertical,
-                                                  child: EpCommentView(
-                                                    epCommentData: currentEpCommentDetails
-                                                  ),
-                                                ),
-                                              );
-                                        
-                                            });
-                                  
-                                        },
-                                        epCommentData: currentEpCommentDetails
-                                      ),
-                                                                
-                                      const Divider()
-                                  ],
-                                ),
-                              );
+												else{
+													//新增项目暂不处理
+												}
+																			
+												
+								
+								
+																			
+											},
+											epCommentData: currentEpCommentDetails
+										),
+																
+										const Divider()
+									],
+								)
                         
-                            } 
-                        
+							  );
+                            }
+							
 
-                            return FadeTransition(
-                              opacity: animation,
-                              child: Column(
-                                children: [
-                        
-                                    EpCommentView(
-                                      postCommentType: getPostCommentType(),
-                                      onDeleteComment: () {
-                                        animatedSliverListKey.currentState!.removeItem(contentCommentIndex, (_,animation) => FadeTransition(
-                                          opacity: animation,
-                                          child: const SizedBox.shrink(),
-                                        ));
-                                        
-                                      },
-                                      epCommentData: contentDetail!.contentRepliedComment![contentCommentIndex]
-                                    ),
-                        
-                                  if(contentCommentIndex < commentListCount - 1)
-                                    const Divider()
-                                ],
-                              ),
+                            return Column(
+                            	children: [
+                            					
+                            	Builder(
+                            	  builder: (_) {
+
+									final ValueNotifier<int> commentUpdateFlag = ValueNotifier(0);	
+
+                            	    return ValueListenableBuilder(
+										valueListenable: commentUpdateFlag,
+										builder: (_,__,child){
+
+											final currentEpCommentDetails = contentDetail!.contentRepliedComment![contentCommentIndex];
+
+											if(userCommentMap[contentCommentIndex] != null){
+												currentEpCommentDetails.comment = userCommentMap[contentCommentIndex];
+											}
+
+
+											return EpCommentView(
+												postCommentType: getPostCommentType(),
+												onUpdateComment: (content) {
+												
+													if(content == null){
+														SliverAnimatedList.of(animatedContext).removeItem(
+															contentCommentIndex,
+															duration: const Duration(milliseconds: 300),
+															(_,animation)=> fadeSizeTransition(
+																animation: animation,
+																child: EpCommentView(epCommentData: currentEpCommentDetails),
+															)
+															
+														);
+													}
+			
+													else{
+														userCommentMap[contentCommentIndex] = content;
+														commentUpdateFlag.value += 1;
+													}
+												
+												},
+												epCommentData: currentEpCommentDetails
+																									
+											);
+										},
+										
+									);
+                            	  }
+                            	),
+                            					
+                            	if(contentCommentIndex < commentListCount - 1)
+                            		const Divider()
+                            ],
                             );
                               
                               

@@ -169,10 +169,13 @@ List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData){
 }
 
 String convertTimelineDescription(TimelineDetails currentTimeline, {bool? authorDeclared}){
-  String resultText = "TA ";
 
+  String leadingText = "TA ";
+  String undoActionText = "";
   String actionText = "";
   String contentText = "";
+
+  //待用字段
   String suffixText = "";
 	
   /// 那么首先 划定 action 字段 行为
@@ -196,7 +199,6 @@ String convertTimelineDescription(TimelineDetails currentTimeline, {bool? author
     }
 
   }
-
 
   //然后是内容字段
   switch(currentTimeline.catType){
@@ -229,13 +231,11 @@ String convertTimelineDescription(TimelineDetails currentTimeline, {bool? author
 
   }
 
-  resultText += actionText;
-  resultText += contentText;
+  if(contentText.isEmpty) undoActionText += "撤销了一项 ";
 
-  if(suffixText.isNotEmpty) resultText+=suffixText;
+  leadingText += undoActionText + actionText + contentText + suffixText;
 
-
-  return resultText;
+  return leadingText;
 }
 
 String convertSubjectTimeline(

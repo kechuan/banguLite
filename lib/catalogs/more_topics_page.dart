@@ -48,6 +48,7 @@ class MoreTopicsPage extends StatelessWidget {
         ),
         body: EasyRefresh(
           child: ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemCount: topicsList.length,
             itemBuilder: (_,index){

@@ -5,6 +5,7 @@ import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/convert.dart';
@@ -65,27 +66,9 @@ class BangumiCommentTile extends StatelessWidget {
             //因为tile的title给的交叉轴也是unbounded的 所以需要约束
             SizedBox(
               height: 30,
-              child: ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                scrollDirection: Axis.horizontal,
-                itemExtent: 25,
-                shrinkWrap: true,
-                itemCount: ratingScore != 0 ? 5 : 0,
-                
-                itemBuilder: (_,score){
-                  if(ratingScore >= (score+1)*2){
-                    return Icon(Icons.star,color: themeColor);
-                  }
-
-                  else if(ratingScore == (score*2)+1){
-                    return Icon(Icons.star_half,color: themeColor);
-                  }
-
-                  else{
-                    return Icon(Icons.star_outline,color: themeColor);
-                  }
-
-                },
+              child: StarScoreList(
+                ratingScore: ratingScore,
+                themeColor: themeColor,
               ),
             )
 
@@ -133,6 +116,7 @@ class BangumiCommentTile extends StatelessWidget {
               ScalableText("${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"),
 
               BangumiCommentActionButton(
+                commentBlockStatus: true,
                 postCommentType: PostCommentType.subjectComment,
                 commentData: commentData,
               )

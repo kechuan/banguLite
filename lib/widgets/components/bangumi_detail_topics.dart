@@ -120,7 +120,7 @@ class BangumiDetailTopics extends StatelessWidget {
                                 title: ScalableText("${topicsList[index].contentTitle}"),
                                 trailing: ScalableText(convertDateTimeToString(topicCreateTime)),
                                 onTap: () {
-
+                            
                                   Navigator.pushNamed(
                                     context,
                                     Routes.subjectTopic,

@@ -80,7 +80,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                         child: Padding(
                           padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
                           child: ListView.separated(
-                            physics: const ScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemCount: commentListData.isEmpty ? 3 : commentListData.length,
                             separatorBuilder: (_, index) => const Divider(height: 2),

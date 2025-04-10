@@ -189,7 +189,7 @@ class FontSizeTile extends ListTile {
                         },
                         dividerColor: Colors.transparent,
                         indicatorSize: TabBarIndicatorSize.label,
-                        tabs: List.generate(5, (index) => Center(child: Text(ScaleType.values[index].sacleName)))
+                        tabs: List.generate(ScaleType.values.length, (index) => Center(child: Text(ScaleType.values[index].sacleName)))
                       ),
                     ),
                   ),
@@ -225,12 +225,12 @@ class ColorThemeTile extends ListTile{
 
           Flexible(
             child: SizedBox(
-            width: 50*(BangumiThemeColor.values.length+1),
+            width: 50*(AppThemeColor.values.length+1),
             height: 50,
             child: ListView.builder(
               physics: const ClampingScrollPhysics(),
               scrollDirection: Axis.horizontal,
-              itemCount: BangumiThemeColor.values.length+1,
+              itemCount: AppThemeColor.values.length+1,
               itemExtent: 50,
               itemBuilder: (_, index) {
     
@@ -244,8 +244,8 @@ class ColorThemeTile extends ListTile{
                         padding: PaddingH6,
                         child: UnVisibleResponse(
                           onTap: () {
-                            if(index != BangumiThemeColor.values.length){
-                              indexModel.updateThemeColor(BangumiThemeColor.values[index]);
+                            if(index != AppThemeColor.values.length){
+                              indexModel.updateThemeColor(AppThemeColor.values[index]);
                             }
                           
                             else{
@@ -271,7 +271,7 @@ class ColorThemeTile extends ListTile{
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              gradient: index == BangumiThemeColor.values.length ? 
+                              gradient: index == AppThemeColor.values.length ? 
                                 LinearGradient(
                                 begin:Alignment.bottomCenter,
                                 end:Alignment.topCenter,
@@ -283,7 +283,7 @@ class ColorThemeTile extends ListTile{
                                   Colors.yellow.withValues(alpha: 0.6),
                                 ]
                               ) : null,
-                              color: index != BangumiThemeColor.values.length ? BangumiThemeColor.values[index].color.withValues(alpha: 0.8) : null
+                              color: index != AppThemeColor.values.length ? AppThemeColor.values[index].color.withValues(alpha: 0.8) : null
                             ),
                             
                           ),
@@ -291,7 +291,7 @@ class ColorThemeTile extends ListTile{
                       ),
                     ),
 
-                    Selector<IndexModel,BangumiThemeColor?>(
+                    Selector<IndexModel,AppThemeColor?>(
                       selector: (_,indexModel) => indexModel.userConfig.currentThemeColor,
                       shouldRebuild: (previous, next){
                         if(indexModel.userConfig.isSelectedCustomColor == true) return true;
@@ -302,7 +302,7 @@ class ColorThemeTile extends ListTile{
                           child: Center(
                             child: Builder(
                               builder: (_) {
-                                if(index == BangumiThemeColor.values.length){
+                                if(index == AppThemeColor.values.length){
                                   return Offstage(
                                     offstage: !(indexModel.userConfig.isSelectedCustomColor == true),
                                     child: Icon(Icons.done,color: judgeCurrentThemeColor(context))
@@ -310,7 +310,7 @@ class ColorThemeTile extends ListTile{
                                 }
                           
                                 return Offstage(
-                                  offstage: !(themeColor == BangumiThemeColor.values.elementAt(index) && indexModel.userConfig.isSelectedCustomColor == false),
+                                  offstage: !(themeColor == AppThemeColor.values.elementAt(index) && indexModel.userConfig.isSelectedCustomColor == false),
                                   child: Icon(Icons.done,color: judgeCurrentThemeColor(context))
                                 );
                               }

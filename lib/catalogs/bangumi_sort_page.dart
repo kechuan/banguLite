@@ -4,7 +4,7 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/widgets/fragments/animated_wave_footer.dart';
+import 'package:bangu_lite/widgets/fragments/animated/animated_wave_footer.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/foundation.dart';
@@ -15,7 +15,7 @@ import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
 import 'package:bangu_lite/widgets/components/search_fliter.dart';
-import 'package:bangu_lite/widgets/fragments/animated_sort_selector.dart';
+import 'package:bangu_lite/widgets/fragments/animated/animated_sort_selector.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 

@@ -13,7 +13,8 @@ enum PostCommentType{
   replyBlog("回复博客"),
 
   //特殊
-  timeline("时间线")
+  timeline("时间线"),
+  replyTimeline("时间线"),
   ;
 
   final String commentTypeString;

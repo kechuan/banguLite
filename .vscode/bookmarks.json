@@ -84,7 +84,7 @@
 			"path": "lib/catalogs/bangumi_detail_page.dart",
 			"bookmarks": [
 				{
-					"line": 36,
+					"line": 37,
 					"column": 32,
 					"label": "subjectDetail——番剧详情"
 				}
@@ -164,7 +164,7 @@
 			"path": "lib/catalogs/send_comment_page.dart",
 			"bookmarks": [
 				{
-					"line": 28,
+					"line": 30,
 					"column": 46,
 					"label": "sendMessage —— 发送评论的页面"
 				}

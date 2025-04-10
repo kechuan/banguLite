@@ -64,7 +64,7 @@ class IndexModel extends ChangeNotifier {
     if(config == true) updateConfig();    
   }
 
-  void updateThemeColor(BangumiThemeColor themeColor){
+  void updateThemeColor(AppThemeColor themeColor){
     userConfig.currentThemeColor = themeColor;
 	  userConfig.isSelectedCustomColor = false;
     updateConfig();

@@ -95,7 +95,7 @@ enum SeasonType{
   const SeasonType(this.seasonText,this.month);
 }
 
-enum BangumiThemeColor{
+enum AppThemeColor{
   ice(Color.fromARGB(255, 219, 251, 255)),
   macha(Color.fromARGB(255, 219, 245, 223)),
   sea(Color.fromARGB(255, 140, 205, 244)), //Primary: const Color.fromARGB(255, 140, 205, 244)
@@ -103,10 +103,9 @@ enum BangumiThemeColor{
   ;
 
   final Color color;
-  const BangumiThemeColor(this.color);
+  const AppThemeColor(this.color);
 
 }
-
 
 //bangumi Type
 

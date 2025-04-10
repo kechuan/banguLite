@@ -167,7 +167,7 @@ class SelectSeasonLandscape extends StatelessWidget {
 		          ),
 		          child: AnimatedContainer(
 		            duration: const Duration(milliseconds: 300),
-		            color: convertPassedSeason(year, currentMonth) < seasonTypeIndex ? Colors.grey : BangumiThemeColor.values[seasonTypeIndex].color , //unable will be grey.,,
+		            color: convertPassedSeason(year, currentMonth) < seasonTypeIndex ? Colors.grey : AppThemeColor.values[seasonTypeIndex].color , //unable will be grey.,,
 		            child: SizedBox(child: Center(child: Text(SeasonType.values[seasonTypeIndex].seasonText))),
 		          )
 		        );
@@ -232,7 +232,7 @@ class SelectSeasonPortrait extends StatelessWidget {
 												bottomLeft: seasonTypeIndex == SeasonType.summer.index ? const Radius.circular(16) : Radius.zero,
 												bottomRight: seasonTypeIndex == SeasonType.autumn.index ? const Radius.circular(16) : Radius.zero,
 											),
-											color: convertPassedSeason(year, currentMonth) < seasonTypeIndex ? Colors.grey : BangumiThemeColor.values[seasonTypeIndex].color , //unable will be grey.,,
+											color: convertPassedSeason(year, currentMonth) < seasonTypeIndex ? Colors.grey : AppThemeColor.values[seasonTypeIndex].color , //unable will be grey.,,
 										),
 										
 										child: SizedBox(

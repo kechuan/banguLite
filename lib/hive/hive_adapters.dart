@@ -12,7 +12,7 @@ part 'hive_adapters.g.dart';
 @GenerateAdapters(
   [
     AdapterSpec<AppConfig>(),
-    AdapterSpec<BangumiThemeColor>(),
+    AdapterSpec<AppThemeColor>(),
     AdapterSpec<ThemeMode>(),
     AdapterSpec<ScaleType>(),
     AdapterSpec<Color>(),

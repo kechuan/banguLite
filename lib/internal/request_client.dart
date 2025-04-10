@@ -1,4 +1,5 @@
 
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -46,6 +47,7 @@ class BangumiAPIUrls {
 
   //static String subject(int subjectID) => '$newUrl/subjects/$subjectID';
 
+  static String timeline() => '$newUrl/timeline';
 
   static String subjectComment(int subjectID) => '$newUrl/subjects/$subjectID/comments';
   static String ep(int epID) => '$newUrl/episodes/$epID';
@@ -54,6 +56,8 @@ class BangumiAPIUrls {
   static String topicComment(int topicID) => '$newUrl/subjects/-/topics/$topicID';
   static String relations(int subjectID) => '$newUrl/subjects/$subjectID/relations';
   static String reviews(int subjectID) => '$newUrl/subjects/$subjectID/reviews';
+
+
 
   //user
   static String me = '$newUrl/me';
@@ -74,14 +78,12 @@ class BangumiAPIUrls {
 
   //comment-action put/delete 目前发评论 仅支持EP/topic内容
   
-  /// 行为允许 POST
-  
-  /// ContentArea
+  /// 行为允许 POST blog目前API没有
   /// /p1/subjects/-/topics/{topicID}
   static String postTopic(int subjectID) => topics(subjectID);
+  static String postTimeline() => timeline();
 
-  
-  /// CommentArea 行为允许 POST
+
   
   
   /// /p1/episodes/{episodeID}/comments
@@ -89,10 +91,15 @@ class BangumiAPIUrls {
   /// /p1/subjects/-/topics/{topicID}/replies
   static String postTopicComment(int topicID) => '${topicComment(topicID)}/replies';
   static String postBlogComment(int subjectID) => '${userBlog(subjectID)}/comments';
+  static String postTimelineComment(int timelineID) => '${timeline()}/$timelineID/replies';
+  
+  
 
-/// 行为允许 GET/PUT/DELETE
+  /// 行为允许 PUT/PATCH
+  static String actionSubjectComment(int subjectID) => '$newUrl/collections/subjects/$subjectID';
+
+  /// 行为允许 GET/PUT/DELETE
   static String actionTopicComment(int topicID) => '$newUrl/subjects/-/posts/$topicID';
-
   static String actionEpComment(int commentID) => '$newUrl/episodes/-/comments/$commentID';
   ///这个不允许GET
   static String actionBlogComment(int commentID) => '$newUrl/blogs/-/comments/$commentID';
@@ -173,7 +180,7 @@ class BangumiQuerys {
 		"client_secret":APPInformationRepository.bangumiAPPSecret,
 	};
 
-  	static Map<String,String> getAccessTokenQuery(
+  static Map<String,String> getAccessTokenQuery(
 		String code,
 	) => {
 		"grant_type":'authorization_code',
@@ -207,13 +214,30 @@ class BangumiQuerys {
 		"max_results":10
 	};
 
+  static Map<String,dynamic> subjectCommentQuery({
+    String? content,
+    int rate = 0,
+    StarType starType = StarType.want,
+    bool isPrivate = false,
+    List<String>? tagList
+  }){
+    return {
+      "comment": "$content",
+      "type": starType.index,
+      "rate": rate,
+      "private": isPrivate,
+      "progress": true,
+      "tags": tagList ?? [],
+    };
+  }
+
 	static Map<String,dynamic> postQuery({
 		String? content,
 		String? title,
 		String? turnstileToken
 	}) => {
-		"content": content,
 		"title": title,
+		"content": content,
 		"turnstileToken": turnstileToken
 	};
 
@@ -225,6 +249,14 @@ class BangumiQuerys {
 		"content": content,
 		"replyTo": replyTo,
 		"turnstileToken": turnstileToken
+	};
+
+	static Map<String,dynamic> editQuery({
+		String? title,
+		String? content,
+	}) => {
+		"title": title,
+		"content": content,
 	};
 
 

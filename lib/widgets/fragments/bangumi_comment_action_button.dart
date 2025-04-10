@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -16,23 +17,31 @@ class BangumiCommentActionButton extends StatefulWidget {
   const BangumiCommentActionButton({
     super.key,
     required this.commentData,
-    this.postCommentType,
+    required this.commentBlockStatus,
 
+    this.postCommentType,
     this.onReplyComment,
-    this.onDeleteComment,
-    this.onEditComment,
+    this.onUpdateComment,
+    this.onReportComment,
     this.onSticker,
 
-    
   });
   
   final BaseComment commentData;
   final PostCommentType? postCommentType;
+  final bool? commentBlockStatus;
 
-  final Function()? onReplyComment;
-  final Function()? onDeleteComment;
-  final Function()? onEditComment;
-  final Function()? onSticker;
+  /// commentID理应是一致的 只不过是引用的内容会有区别 不会存在三层评论这种情况
+  final Function(int,String)? onReplyComment;
+
+  /// Null => Delete , Exist => Edit
+  final Function(String?)? onUpdateComment;
+
+  /// reportType,Reason?
+  final Function(int,String?)? onReportComment;
+
+  /// dataLikeIndex,commentID
+  final Function(int?,int?)? onSticker;
 
   @override
   State<BangumiCommentActionButton> createState() => _BangumiCommentActionButtonState();
@@ -83,8 +92,14 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                   'referenceObject': widget.commentData.comment,
                   'preservationContent': indexModel.draftContent[widget.commentData.commentID]?.values.first
                 }
-              ).then((_){
-                widget.onReplyComment!();
+              ).then((content){
+                if(
+                  widget.onReplyComment!=null &&
+                  content is String &&
+                  widget.commentData.commentID != null
+                ){
+                  widget.onReplyComment!(widget.commentData.commentID!,content);
+                }
               });
                 
               
@@ -110,6 +125,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
               
               
             case CommentActionType.edit:{
+
               debugPrint("edit");
 
               Navigator.pushNamed(
@@ -118,44 +134,21 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                 arguments: {
                   'contentID':widget.commentData.commentID,
                   'postCommentType':widget.postCommentType,
-                  'title': widget.commentData.userInformation?.nickName ?? widget.commentData.userInformation?.userName,
-                  'referenceObject': widget.commentData.comment,
-                  'preservationContent': indexModel.draftContent[widget.commentData.commentID]?.values.first
+                  'actionType': UserContentActionType.edit,
+                  'preservationContent': widget.commentData.comment
                 }
-              ).then((_){
-                if(widget.onEditComment!=null){
-                  widget.onEditComment!();
+              ).then((content){
+                if(widget.onUpdateComment!=null && content!=null && content is String){
+                  widget.onUpdateComment!(content);
                 }
               });
 
-              
-
-              //更改的话。。 恐怕需要透过 userCommentList ?? 那可不行。。
-              // button 的位置所处的 能被太多地方所访问。。
-              // 恐怕。。需要搞一大堆的 onEdit / onDelete / onSticker 的回调。。
-              
-
-
-              //Navigator.pushNamed(
-              //  context,
-              //  Routes.sendComment,
-              //  arguments: {
-              //    'contentID':widget.commentData.commentID,
-              //    'title': '修改你的评论',
-              //    'preservationContent': widget.commentData.comment
-              //  }
-              //);
             }
       
             case CommentActionType.delete:{
-
-              if(widget.onDeleteComment!=null){
-                widget.onDeleteComment!();
+              if(widget.onUpdateComment!=null){
+                widget.onUpdateComment!(null);
               }
-
-           
-              //accountModel.
-              //animatedSliverListKey.currentState?.removeItem(index, builder);
             }
               
               
@@ -165,37 +158,53 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
           return List.generate(
             CommentActionType.values.length, (index){
 
-              bool isActionAvaliable = true;
+              CommentActionType currentCommentActionType = CommentActionType.values[index];
 
-              if(accountModel.isLogined()){
+              bool isActionAvaliable = 
+                //widget.commentBlockStatus == true || widget.commentData.commentID == null ?
+                widget.commentBlockStatus == true ?
+                false :
+                true;
 
-                 if(index == CommentActionType.reply.index){
-                    if(widget.postCommentType == PostCommentType.subjectComment){
-                      isActionAvaliable = false;
-                    }
-                 }
+                if(isActionAvaliable && accountModel.isLogined()){
 
-                 if(index == CommentActionType.sticker.index){
-                    if(
-                      widget.postCommentType == PostCommentType.postBlog || 
-                      widget.postCommentType == PostCommentType.replyBlog
-                    ){
-                      isActionAvaliable = false;
-                    }
-                 }
+                  switch(currentCommentActionType){
 
-                 if(index == CommentActionType.edit.index || index == CommentActionType.delete.index){
-                    if(widget.commentData.userInformation?.userID != accountModel.loginedUserInformations.userInformation?.userID){
-                      isActionAvaliable = false;
-                    }
-                 }
-              }
+                      case CommentActionType.reply:{
+                        if(widget.postCommentType == PostCommentType.subjectComment){
+                          isActionAvaliable = false;
+                        }
+                      }
+                        
+                      case CommentActionType.sticker:{
+                        if(
+                          widget.postCommentType == PostCommentType.postBlog || 
+                          widget.postCommentType == PostCommentType.replyBlog
+                        ){
+                          isActionAvaliable = false;
+                        }
+                      }
 
-              else{
-                isActionAvaliable = false;
-              }
-      
-             
+                      case CommentActionType.edit:
+                      case CommentActionType.delete:{
+                        if(widget.commentData.userInformation?.userID != accountModel.loginedUserInformations.userInformation?.userID){
+                          isActionAvaliable = false;
+                        }
+                      }
+
+                      default:{}
+
+
+                      
+                  }
+
+                }
+
+                else{
+                  isActionAvaliable = false;
+                }
+              
+
       
               return PopupMenuItem(
                 

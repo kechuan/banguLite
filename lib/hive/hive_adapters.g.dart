@@ -17,7 +17,7 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return AppConfig()
-      ..currentThemeColor = fields[0] as BangumiThemeColor?
+      ..currentThemeColor = fields[0] as AppThemeColor?
       ..fontScale = fields[1] as ScaleType?
       ..themeMode = fields[2] as ThemeMode?
       ..customColor = fields[3] as Color?
@@ -57,36 +57,36 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
           typeId == other.typeId;
 }
 
-class BangumiThemeColorAdapter extends TypeAdapter<BangumiThemeColor> {
+class BangumiThemeColorAdapter extends TypeAdapter<AppThemeColor> {
   @override
   final int typeId = 1;
 
   @override
-  BangumiThemeColor read(BinaryReader reader) {
+  AppThemeColor read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return BangumiThemeColor.sea;
+        return AppThemeColor.sea;
       case 1:
-        return BangumiThemeColor.macha;
+        return AppThemeColor.macha;
       case 2:
-        return BangumiThemeColor.ruby;
+        return AppThemeColor.ruby;
       case 3:
-        return BangumiThemeColor.ice;
+        return AppThemeColor.ice;
       default:
-        return BangumiThemeColor.sea;
+        return AppThemeColor.sea;
     }
   }
 
   @override
-  void write(BinaryWriter writer, BangumiThemeColor obj) {
+  void write(BinaryWriter writer, AppThemeColor obj) {
     switch (obj) {
-      case BangumiThemeColor.sea:
+      case AppThemeColor.sea:
         writer.writeByte(0);
-      case BangumiThemeColor.macha:
+      case AppThemeColor.macha:
         writer.writeByte(1);
-      case BangumiThemeColor.ruby:
+      case AppThemeColor.ruby:
         writer.writeByte(2);
-      case BangumiThemeColor.ice:
+      case AppThemeColor.ice:
         writer.writeByte(3);
     }
   }

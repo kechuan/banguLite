@@ -78,10 +78,10 @@ class MaskDisplay extends StatelessWidget {
               builder: (_,activedStatus,__) {
                 return DecoratedBox(
                   decoration: BoxDecoration(
-                    color: isDarkMode ? BangumiThemeColor.macha.color :Colors.black,
+                    color: isDarkMode ? AppThemeColor.macha.color :Colors.black,
                     boxShadow: [
                       BoxShadow(
-                        color: isDarkMode ? BangumiThemeColor.macha.color :Colors.black,
+                        color: isDarkMode ? AppThemeColor.macha.color :Colors.black,
                         blurRadius: 2,
                         spreadRadius: 1
                       )
@@ -90,8 +90,8 @@ class MaskDisplay extends StatelessWidget {
                   child: TweenAnimationBuilder<Color?>(
                     duration: const Duration(milliseconds: 300),
                     tween: ColorTween(
-                      begin: isDarkMode ? BangumiThemeColor.macha.color :Colors.black,
-                      end: isDarkMode ? (activedStatus ? Colors.black : BangumiThemeColor.macha.color) : (activedStatus ? Colors.white : Colors.black),
+                      begin: isDarkMode ? AppThemeColor.macha.color :Colors.black,
+                      end: isDarkMode ? (activedStatus ? Colors.black : AppThemeColor.macha.color) : (activedStatus ? Colors.white : Colors.black),
                     ),
                           
                     builder: (_,color,__){

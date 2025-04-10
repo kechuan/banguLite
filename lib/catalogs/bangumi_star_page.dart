@@ -368,7 +368,7 @@ Widget buildSectionList(
         
                   return ScalableText(
                     resultText,
-                    style: TextStyle(fontSize: resultText.length > 8 ? 14 : null),
+                    style: TextStyle(fontSize: resultText.length > 6 ? 12 : null),
                     maxLines: 2,
                   );
                 }

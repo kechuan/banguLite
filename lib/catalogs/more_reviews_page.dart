@@ -8,7 +8,6 @@ import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-
 @FFAutoImport()
 import 'package:bangu_lite/models/providers/review_model.dart';
 
@@ -34,7 +33,6 @@ class MoreReviewsPage extends StatelessWidget {
     return Theme(
       data: ThemeData(
         brightness: Theme.of(context).brightness,
-        //primaryColor: judgeDetailRenderColor(context,linearColor),
         colorSchemeSeed: judgeDetailRenderColor(context,bangumiThemeColor),
         fontFamily: 'MiSansFont',
       ),
@@ -44,6 +42,7 @@ class MoreReviewsPage extends StatelessWidget {
         ),
         body: EasyRefresh(
           child: ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemCount: reviewsList.length,
             itemBuilder: (_,index){

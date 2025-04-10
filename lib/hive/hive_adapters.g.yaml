@@ -21,7 +21,7 @@ types:
         index: 6
       isManuallyImageLoad:
         index: 7
-  BangumiThemeColor:
+  AppThemeColor:
     typeId: 1
     nextIndex: 4
     fields:

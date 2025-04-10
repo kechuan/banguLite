@@ -82,13 +82,15 @@ enum StarType{
   watched("看过"),
   watching("在看"),
   delay("搁置"),
-  deprecated("抛弃")
+  deprecated("抛弃"),
+
+  none("未收藏")
   ;
 
-  final String starTypeString;
+  final String starTypeName;
   
 
-  const StarType(this.starTypeString);
+  const StarType(this.starTypeName);
 
 }
 

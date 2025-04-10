@@ -1,8 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-// Blog/Index 没有子级目录
 
-import 'package:bangu_lite/internal/request_client.dart';
 
 const detectIDList = [
   'id',
@@ -28,7 +26,7 @@ const List<dynamic> timelineEnums = [
   TimelineCatSubjectSingle.values,
   TimelineCatProgress.values,
   TimelineCatStatus.values,
-  //对应 6/7 的空置
+  //Blog/Index 没有子级目录 对应 6/7 的空置
   [],
   [],
   TimelineCatMono.values,

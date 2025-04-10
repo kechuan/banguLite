@@ -42,7 +42,7 @@ class BangumiModel extends ChangeNotifier {
 
     bangumiThemeColor = null;
     
-    if(!BangumiThemeColor.values.any((currentTheme) => currentTheme.color == imageProviderColor)){
+    if(!AppThemeColor.values.any((currentTheme) => currentTheme.color == imageProviderColor)){
       imageColor ??= imageProviderColor;
     }
     

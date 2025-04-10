@@ -19,7 +19,7 @@ class EpCommentTile extends StatelessWidget {
     required this.epCommentData,
 	  this.postCommentType,
     this.themeColor, 
-    this.onDeleteComment
+    this.onUpdateComment
 
   });
   
@@ -27,7 +27,7 @@ class EpCommentTile extends StatelessWidget {
   final PostCommentType? postCommentType;
   final Color? themeColor;
 
-  final Function()? onDeleteComment;
+  final Function(String?)? onUpdateComment;
 
   @override
   Widget build(BuildContext context) {
@@ -108,9 +108,10 @@ class EpCommentTile extends StatelessWidget {
               ),
 
               BangumiCommentActionButton(
+                commentBlockStatus: commentBlockStatus,
                 commentData: epCommentData,
                 postCommentType: postCommentType,
-                onDeleteComment: onDeleteComment,
+                onUpdateComment: onUpdateComment,
               ),
               
             ],

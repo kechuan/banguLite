@@ -1,5 +1,5 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+
 
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
@@ -22,8 +22,10 @@ import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 @FFAutoImport()
 import 'package:bangu_lite/internal/const.dart';
-import 'package:provider/provider.dart';
+@FFAutoImport()
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 
+import 'package:provider/provider.dart';
 
 @FFRoute(name: '/sendComment')
 class SendCommentPage extends StatefulWidget {
@@ -33,6 +35,7 @@ class SendCommentPage extends StatefulWidget {
     this.replyID,
     this.title,
     this.postCommentType,
+    this.actionType,
     this.referenceObject,
     this.preservationContent,
 
@@ -43,6 +46,8 @@ class SendCommentPage extends StatefulWidget {
   final int? replyID;
 
   final PostCommentType? postCommentType;
+  final UserContentActionType? actionType;
+
   final String? title;
 
   //有可能是创建 但也有可能是编辑回复
@@ -68,6 +73,8 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
   final PageController toolkitPageController = PageController();
   final PageController stickerPageController = PageController();
+
+  final ValueNotifier<bool> isSendingNotifier = ValueNotifier(false);
 
   @override 
   void onResume() {
@@ -97,7 +104,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
         leading: IconButton(
           onPressed: () {
 
-			if(contentEditingController.text.isEmpty){
+			if(contentEditingController.text.isEmpty || contentEditingController.text == widget.preservationContent){
 				 Navigator.of(context).pop();
 			}
 
@@ -135,9 +142,9 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
           icon: const Icon(Icons.arrow_back),
         ),
         backgroundColor: judgeCurrentThemeColor(context).withValues(alpha: 0.8),
-        title: widget.postCommentType == PostCommentType.subjectComment ? 
-          ScalableText('吐槽 ${widget.title}',style: const TextStyle(fontSize: 18)) : 
-		      ScalableText('回复 ${widget.title}',style: const TextStyle(fontSize: 18))
+        title: widget.actionType == UserContentActionType.edit ? 
+          const ScalableText('编辑这段评论',style: TextStyle(fontSize: 18)) : 
+		      ScalableText('吐槽 ${widget.title}',style: const TextStyle(fontSize: 18))
 		    ,
         actions: [
 
@@ -154,30 +161,60 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
           const Padding(padding: PaddingH6),
 
 
-          IconButton(
-            onPressed: () {
-              if(contentEditingController.text.isEmpty){
-                //后续估计会专门出一个switch判断。。
-                fadeToaster(context: context, message: '不可发送空白内容');
-                return;
+          SizedBox(
+            child: ValueListenableBuilder(
+              valueListenable: isSendingNotifier,
+              builder: (_,isSending,__){
+            
+                Widget showIcon = isSending ? 
+                  const SizedBox(
+                    height: 25,
+                    width: 25,
+                    child: CircularProgressIndicator(strokeWidth: 3)
+                  ) : 
+                  const Icon(Icons.send);
+            
+                return IconButton(
+                  onPressed: () {
+                    if(isSending) return;
+                    if(contentEditingController.text.isEmpty){
+                      fadeToaster(context: context, message: '不可发送空白内容');
+                      return;
+                    }
+                
+                    else{
+                
+                      debugPrint("id:${widget.contentID}/${widget.postCommentType}/${widget.actionType}");
+                
+                      invokeAsyncPopOut()=> Navigator.of(context).pop(contentEditingController.text);
+            
+                      isSendingNotifier.value = true;
+            
+                      accountModel.toggleComment(
+                        commentID: widget.contentID,
+                        commentContent: contentEditingController.text,
+                        postCommentType: widget.postCommentType,
+                        actionType : widget.actionType ?? UserContentActionType.post,
+                        replyTo: widget.replyID ?? 0,
+                        fallbackAction: (message){
+                          fadeToaster(context: context, message: message,duration: const Duration(seconds: 5));
+                        }
+                      ).then((result){
+                        if(result){
+                          invokeAsyncPopOut();
+                        }
+            
+                        isSendingNotifier.value = false;
+                      });
+                
+                    }
+                  },
+                  icon: showIcon
+                );
+              
               }
-
-              else{
-
-                debugPrint("id:${widget.contentID} ${widget.postCommentType}");
-
-                //accountModel.toggleComment(
-                //  widget.contentID,
-                //  contentEditingController.text,
-                //  widget.postCommentType,
-                //  replyTo: widget.replyID ?? 0,
-                //);
-
-                Navigator.of(context).pop(contentEditingController.text);
-
-              }
-            },
-            icon: const Icon(Icons.send),
+              
+            ),
           ),
 
         ],
@@ -467,7 +504,7 @@ class StickerSelectView extends StatelessWidget {
 					    			102,
 					    			((index){
 					    			return UnVisibleResponse(
-					    				onTap: () => insertBgmSticker(index),
+					    				onTap: () => insertBgmSticker(index+23),
 					    				child: Image.asset(
 					    					'./assets/bangumiSticker/bgm${convertDigitNumString(index+24)}.gif',
 					    					scale: 0.8,
@@ -490,8 +527,8 @@ class StickerSelectView extends StatelessWidget {
 				child: TabBar(
 					onTap: (index) {stickerPageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeIn);},
 					tabs: const [
-						Tab(text: 'bgm 01-24(dsm)'),
-						Tab(text: 'bgm 25-125(Cinnamor)'),
+						Tab(text: 'bgm 01-23(dsm)'),
+						Tab(text: 'bgm 24-125(Cinnamor)'),
 					]
 				)
 			)

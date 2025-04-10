@@ -6,7 +6,6 @@
 // version: 10.1.0
 // **************************************************************************
 // ignore_for_file: prefer_const_literals_to_create_immutables,unused_local_variable,unused_import,unnecessary_import,unused_shown_name,implementation_imports,duplicate_import,library_private_types_in_public_api
-import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
@@ -147,11 +146,17 @@ FFRouteSettings getRouteSettings({
           contentID: asT<int?>(
             safeArguments['contentID'],
           ),
+          replyID: asT<int?>(
+            safeArguments['replyID'],
+          ),
           title: asT<String?>(
             safeArguments['title'],
           ),
           postCommentType: asT<PostCommentType?>(
             safeArguments['postCommentType'],
+          ),
+          actionType: asT<UserContentActionType?>(
+            safeArguments['actionType'],
           ),
           referenceObject: asT<String?>(
             safeArguments['referenceObject'],

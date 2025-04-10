@@ -26,7 +26,7 @@ class BangumiListTile extends ListTile {
   Widget build(BuildContext context) {
 
     return ListTile(
-      contentPadding: const EdgeInsets.only(left: 20),   
+      contentPadding: const EdgeInsets.only(left: 16),   
       title: Row(
         spacing: 12,
         children: [
@@ -41,7 +41,7 @@ class BangumiListTile extends ListTile {
     
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(left: 12),
+              padding: const EdgeInsets.only(left: 6),
               child: Builder(
                 builder: (_) {
                   

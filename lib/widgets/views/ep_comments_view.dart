@@ -9,12 +9,12 @@ class EpCommentView extends StatelessWidget {
     super.key, 
     required this.epCommentData,
     this.postCommentType,
-    this.onDeleteComment,
+    this.onUpdateComment,
   });
   
   final EpCommentDetails epCommentData;
   final PostCommentType? postCommentType;
-  final Function()? onDeleteComment;
+  final Function(String?)? onUpdateComment;
   
   @override
   Widget build(BuildContext context) {
@@ -25,13 +25,13 @@ class EpCommentView extends StatelessWidget {
         epCommentData: epCommentData,
         postCommentType:postCommentType,
         themeColor: Theme.of(context).scaffoldBackgroundColor,
-        onDeleteComment: onDeleteComment,
+        onUpdateComment: onUpdateComment,
       ),
       subtitle: EpRepliedTile(
         epCommentData: epCommentData,
         postCommentType:postCommentType,
         themeColor: Theme.of(context).scaffoldBackgroundColor,
-        onDeleteComment: onDeleteComment,
+        onUpdateComment: onUpdateComment,
         
       ),
     );

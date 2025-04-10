@@ -64,7 +64,7 @@ class BangumiContentAppbar extends StatelessWidget {
                   'preservationContent': indexModel.draftContent[contentID]?.values.first
                 }
               ).then((content){
-                if(content != null && content is String){
+                if(content is String){
                   debugPrint("finished Send: $content");
                   if(onSendMessage != null){
                     onSendMessage!(content);

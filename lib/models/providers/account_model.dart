@@ -249,13 +249,16 @@ class AccountModel extends ChangeNotifier {
     return getTrunsTileTokenCompleter.future;
   }
 
+  
+
   Future<bool> postContent(
 		{
       int? subjectID,
-      String? titleContent,
-		  String? contentContent,
+      String? title,
+		  String? content,
       PostCommentType? postcontentType,
       UserContentActionType actionType = UserContentActionType.post,
+      Map<String,dynamic>? subjectCommentQuery
     }
 	) async {
 
@@ -263,7 +266,7 @@ class AccountModel extends ChangeNotifier {
 
 		String requestUrl = "";
 
-		late Future<Response<dynamic>> Function(int? contentContent) contentFuture;
+		late Future<Response<dynamic>> Function() contentFuture;
 
 		if(loginedUserInformations.accessToken==null){
 			debugPrint("账号未登录");
@@ -273,27 +276,26 @@ class AccountModel extends ChangeNotifier {
 		switch(postcontentType){
 
       case PostCommentType.subjectComment:{
-
+        requestUrl = BangumiAPIUrls.actionSubjectComment(subjectID!);
       }
 
-      
       case PostCommentType.postTopic:{
-				
+				requestUrl = BangumiAPIUrls.postTopic(subjectID!);
 			}
 				
 			case PostCommentType.postBlog:{
-				
+				//缺失中
 			}
 
 			case PostCommentType.timeline:{
-				subjectID = 0;
+        requestUrl = BangumiAPIUrls.postTimeline();
 			}
 
 			default:{}
 			
 		}
 
-		if(postcontentType == null || subjectID == null || requestUrl.isEmpty){
+		if(postcontentType == null || requestUrl.isEmpty){
 			debugPrint(
 				"content空数据错误:"
 				"postcontentType:$postcontentType/subjectID:$subjectID/requestUrl:$requestUrl"
@@ -304,12 +306,13 @@ class AccountModel extends ChangeNotifier {
     await getTrunsTileToken();
 
 		switch(actionType){
+
 			case UserContentActionType.post:{
-				contentFuture = (data) => HttpApiClient.client.post(
+				contentFuture = () => HttpApiClient.client.post(
 					requestUrl,
           data: BangumiQuerys.postQuery(
-            title: titleContent,
-            content: contentContent,
+            title: title,
+            content: content,
             turnstileToken: loginedUserInformations.turnsTileToken,
           ),
 					options: Options(
@@ -318,9 +321,14 @@ class AccountModel extends ChangeNotifier {
 				);
 			}
 
+      //subjectComment 的 query 特殊
 			case UserContentActionType.edit:{
-				contentFuture = (data) => HttpApiClient.client.put(
+				contentFuture = () => HttpApiClient.client.put(
 					requestUrl,
+          data: subjectCommentQuery ?? BangumiQuerys.editQuery(
+            title: title,
+            content: content,
+          ),
 					options: Options(
 						headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!),
 					),
@@ -328,7 +336,7 @@ class AccountModel extends ChangeNotifier {
 			}
 			
 			case UserContentActionType.delete:{
-        contentFuture = (data) => HttpApiClient.client.delete(
+        contentFuture = () => HttpApiClient.client.delete(
           requestUrl,
           options: Options(
             headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!),
@@ -339,7 +347,7 @@ class AccountModel extends ChangeNotifier {
 			
 		}
 
-		await contentFuture(subjectID).then((response){
+		await contentFuture().then((response){
 			if(response.statusCode == 200){
 				contentCompleter.complete(true);
 			}
@@ -354,35 +362,26 @@ class AccountModel extends ChangeNotifier {
 
 	}
 
-/// 通用回复字段 {
-///  "content": "string",
-///  "replyTo": 0, replyComment/replyContent 的区分
-///  "turnstileToken": "string"
-
-//待测试: 在 topic之下 0 与 楼主id 的效果是否会相同? 
-//例: replyTo: 0 与 replyTo: 248073
-//嗯。。别搞这些 直接按严格不相同就行
-
 	Future<bool> toggleComment({
     int? commentID,
     String? commentContent,
     PostCommentType? postCommentType,
     UserContentActionType actionType = UserContentActionType.post,
-    int? replyTo
+    int? replyTo,
+    Function(String message)? fallbackAction
   }) async {
 
 		Completer<bool> commentCompleter = Completer();
-
 		String requestUrl = "";
 
-		late Future<Response<dynamic>> Function(int? commentContent) commentFuture;
+		late Future<Response<dynamic>> Function() commentFuture;
 
 		if(loginedUserInformations.accessToken==null){
 			debugPrint("账号未登录");
 			commentCompleter.complete(false);
 		}
 
-    if(postCommentType == null || commentID == null){
+    if(postCommentType == null || requestUrl.isEmpty){
 			debugPrint(
 				"comment空数据错误:"
 				"postCommentType:$postCommentType/commentID:$commentID"
@@ -390,61 +389,52 @@ class AccountModel extends ChangeNotifier {
 			commentCompleter.complete(false);
 		}
 
+    
+
 		switch(postCommentType){
 
       case PostCommentType.replyEpComment:{
+        requestUrl = actionType == UserContentActionType.post ?
+        BangumiAPIUrls.postEpComment(commentID!) :
+        BangumiAPIUrls.actionEpComment(commentID!);
         
-        if(actionType == UserContentActionType.post){
-          requestUrl = BangumiAPIUrls.postEpComment(commentID!);
-        }
-
-        else{
-          requestUrl = BangumiAPIUrls.actionEpComment(commentID!);
-        }
-
-
 			}
 				
 			case PostCommentType.replyTopic:{
-        if(actionType == UserContentActionType.post){
-          requestUrl = BangumiAPIUrls.postTopicComment(commentID!);
-        }
 
-        else{
-          
-        }
+        requestUrl = actionType == UserContentActionType.post ?
+        BangumiAPIUrls.postTopicComment(commentID!) :
+        BangumiAPIUrls.actionTopicComment(commentID!);
 				
 			}
 
 			case PostCommentType.replyBlog:{
-        if(actionType == UserContentActionType.post){
-          requestUrl = BangumiAPIUrls.postBlogComment(commentID!);
-        }
 
-        else{
-          requestUrl = BangumiAPIUrls.actionBlogComment(commentID!);
-        }
-				
+        requestUrl = actionType == UserContentActionType.post ?
+        BangumiAPIUrls.postBlogComment(commentID!) :
+        BangumiAPIUrls.actionBlogComment(commentID!);
+
 			}
+
+      case PostCommentType.replyTimeline:{
+        requestUrl = BangumiAPIUrls.postTimelineComment(commentID!);
+      }
 
 			default:{}
 			
 		}
 
-		
-
-    await getTrunsTileToken();
-
 		switch(actionType){
 			case UserContentActionType.post:{
-				commentFuture = (data) => HttpApiClient.client.post(
+        await getTrunsTileToken();
+
+				commentFuture = () => HttpApiClient.client.post(
 					requestUrl,
-          data: 
-            BangumiQuerys.replyQuery(
-              content: commentContent,
-              replyTo: replyTo,
-              turnstileToken: loginedUserInformations.turnsTileToken,
-            ),
+          data: BangumiQuerys.replyQuery(
+            content: commentContent,
+            replyTo: replyTo,
+            turnstileToken: loginedUserInformations.turnsTileToken,
+          ),
 					options: Options(
 						headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!),
 					),
@@ -452,8 +442,9 @@ class AccountModel extends ChangeNotifier {
 			}
 
 			case UserContentActionType.edit:{
-				commentFuture = (data) => HttpApiClient.client.put(
+				commentFuture = () => HttpApiClient.client.put(
 					requestUrl,
+          data: BangumiQuerys.editQuery(content: commentContent),
 					options: Options(
 						headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!),
 					),
@@ -461,7 +452,7 @@ class AccountModel extends ChangeNotifier {
 			}
 			
 			case UserContentActionType.delete:{
-        commentFuture = (data) => HttpApiClient.client.delete(
+        commentFuture = () => HttpApiClient.client.delete(
           requestUrl,
           options: Options(
             headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!),
@@ -469,16 +460,19 @@ class AccountModel extends ChangeNotifier {
         );
 		}
 			
-			
 		}
 
-		await commentFuture(commentID).then((response){
+		await commentFuture().then((response){
 			if(response.statusCode == 200){
 				commentCompleter.complete(true);
 			}
 
 			else{
 				commentCompleter.complete(false);
+        if(fallbackAction != null){
+          fallbackAction(response.data["message"]);
+        }
+        
 			}
 		
 		});
@@ -486,10 +480,6 @@ class AccountModel extends ChangeNotifier {
 		return commentCompleter.future;
 
 	}
-
-
-
-
 
 	//目前缺乏反馈
 	Future<bool> toggleCommentLike(
@@ -503,38 +493,32 @@ class AccountModel extends ChangeNotifier {
 
 		String requestUrl = "";
 
-		late Future<Response<dynamic>> Function(int? stickerLikeIndex) actionLikeFuture;
+		late Future<Response<dynamic>> Function() actionLikeFuture;
 
 		if(loginedUserInformations.accessToken==null){
 			debugPrint("账号未登录");
 			likeCompleter.complete(false);
 		}
 
-		bool isEffectRequest = true;
-
 		switch(postCommentType){
 			
-			//  case PostCommentType.comment:{}
+      // lacking...
+      case PostCommentType.subjectComment:{}
 				
-			case PostCommentType.replyEpComment:
 			case PostCommentType.replyEpComment:{
-				requestUrl = BangumiAPIUrls.toggleEPCommentLike(commentID!);
-			}
+        requestUrl = BangumiAPIUrls.toggleEPCommentLike(commentID!);
+      }
+
 				
 			case PostCommentType.replyTopic:
 			{
 				requestUrl = BangumiAPIUrls.toggleTopicLike(commentID!);
 			}
 				
-
-			//case PostCommentType.postBlog:
 			//case PostCommentType.replyBlog:{
 			//	requestUrl = BangumiAPIUrls.toggleBlogLike(commentID!);
 			//}	
-			//  case PostCommentType.commentTopicReply:{}
-			//  case PostCommentType.postBlog:{}
-			//  case PostCommentType.replyBlog:{}
-			//  case PostCommentType.commentBlogReply:{}
+
 
 			default:{}
 			
@@ -542,43 +526,29 @@ class AccountModel extends ChangeNotifier {
 
 		if(postCommentType == null || commentID == null || requestUrl.isEmpty){
 			debugPrint("commentLike空数据错误");
-			isEffectRequest = false;
+      return false;
 		}
 
 		switch(actionType){
 			case UserContentActionType.post:{
 
-				if(!isEffectRequest) {
-					actionLikeFuture = (data) => Future(()=>Response(requestOptions: RequestOptions()));
-				}
+				actionLikeFuture = () => HttpApiClient.client.put(
+          requestUrl,
+          options: Options(
+            headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!),
+          ),
+          data: {"value": stickerLikeIndex}
+        );
 
-				else{
-					actionLikeFuture = (data) => HttpApiClient.client.put(
-						requestUrl,
-						options: Options(
-							headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!),
-						),
-						data: {"value": stickerLikeIndex}
-					);
-				}
-
-
-				
 			}
 			
 			case UserContentActionType.delete:{
-				if(!isEffectRequest){
-					actionLikeFuture = (data) => Future(()=>Response(requestOptions: RequestOptions()));
-				}
-
-				else{
-					actionLikeFuture = (data) => HttpApiClient.client.delete(
-						requestUrl,
-						options: Options(
-							headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!),
-						),
-					);
-				}
+				actionLikeFuture = () => HttpApiClient.client.delete(
+          requestUrl,
+          options: Options(
+            headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!),
+          ),
+        );
 
 				
 			}
@@ -586,7 +556,7 @@ class AccountModel extends ChangeNotifier {
 			default: {}
 		}
 
-		await actionLikeFuture(stickerLikeIndex).then((response){
+		await actionLikeFuture().then((response){
 			if(response.statusCode == 200){
 				debugPrint("$actionType succ: $commentID => $stickerLikeIndex");
 				likeCompleter.complete(true);

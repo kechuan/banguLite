@@ -273,7 +273,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                                           trailing: Container(
                                                                             decoration: BoxDecoration(
                                                                               borderRadius: BorderRadius.circular(12),
-                                                                              color: BangumiThemeColor.macha.color
+                                                                              color: AppThemeColor.macha.color
                                                                             ),
                                                                             child: Padding(
                                                                               padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 2),

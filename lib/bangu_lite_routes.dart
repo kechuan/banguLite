@@ -85,7 +85,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// SendCommentPage : [int? contentID, String? title, PostCommentType? postCommentType, String? referenceObject, String? preservationContent]
+  /// SendCommentPage : [int? contentID, int? replyID, String? title, PostCommentType? postCommentType, UserContentActionType? actionType, String? referenceObject, String? preservationContent]
   static const String sendComment = '/sendComment';
 
   /// '/subjectComment'

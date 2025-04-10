@@ -158,7 +158,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                               }
                           
                               if(widget.airedEps < widget.totalEps){ //如果还有未放送的
-                                if(widget.airedEps == currentEpIndex) currentEpsColor = BangumiThemeColor.macha.color; //标注当前放送中最新的一集
+                                if(widget.airedEps == currentEpIndex) currentEpsColor = AppThemeColor.macha.color; //标注当前放送中最新的一集
                               }
                           
                               return SizedBox(

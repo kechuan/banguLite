@@ -229,10 +229,10 @@ class UserInformationDialog extends StatelessWidget {
 													spacing: 6,
 													runSpacing: 12,
 													children: List.generate(
-														StarType.values.length,
+														StarType.values.length-1,
 														(index){
 															return ScalableText(
-																"${StarType.values[index].starTypeString} ${statListData[index]}",
+																"${StarType.values[index].starTypeName} ${statListData[index]}",
 																style: const TextStyle(color: Colors.grey,fontSize: 14),
 
 															);

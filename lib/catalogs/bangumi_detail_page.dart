@@ -6,6 +6,7 @@ import 'package:bangu_lite/models/providers/review_model.dart';
 import 'package:bangu_lite/models/providers/webview_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_recent_review.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_relations.dart';
+import 'package:bangu_lite/widgets/dialogs/star_subject_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -53,22 +54,6 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
 
   ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
 
-
-  @override
-  void initState() {
-
-	WidgetsBinding.instance.addPostFrameCallback((_){
-		final accountModel = context.read<AccountModel>();
-
-		accountModel.getTrunsTileToken().then((status){
-			if(status) accountModel.headlessWebView?.dispose();
-		});
-	});
-
-    super.initState();
-  }
-
-
   @override
   Widget build(BuildContext context) {
 
@@ -106,7 +91,6 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
     			  return Scaffold(
     				appBar: AppBar(
     				  backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha:0.6),
-    				  
     				  title: ValueListenableBuilder(
     					valueListenable: appbarTitleNotifier, 
     					builder: (_,appbarTitle,__)=>ScalableText(appbarTitle,style: const TextStyle(color: Colors.black,fontSize: 20))),
@@ -118,8 +102,12 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
     
     					IconButton(
     					  onPressed: (){
+
+                  			debugPrint("dialog");
+
+							showStarSubjectDialog(context,preseverdText:"test");
     
-    						fadeToaster(context: context, message: 'bangumi 暂未开放 番剧吐槽 API');
+    						//fadeToaster(context: context, message: 'bangumi 暂未开放 番剧吐槽 API');
     
     						//Navigator.pushNamed(
     						//  context, 
