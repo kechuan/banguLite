@@ -197,10 +197,38 @@ class AccountModel extends ChangeNotifier {
 
     try{
       switch(relationType){
-          case UserRelationsActionType.add: await HttpApiClient.client.put(BangumiAPIUrls.addFriend(username)); break;
-          case UserRelationsActionType.remove: await HttpApiClient.client.delete(BangumiAPIUrls.removeFriend(username)); break;
-          case UserRelationsActionType.block: await HttpApiClient.client.put(BangumiAPIUrls.addBlockList(username)); break;
-          case UserRelationsActionType.removeBlock: await HttpApiClient.client.delete(BangumiAPIUrls.removeBlockList(username)); break;
+          case UserRelationsActionType.add:{
+            await HttpApiClient.client.put(
+              BangumiAPIUrls.addFriend(username),
+              options: Options(
+                headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!)
+              )
+            );
+          } 
+          case UserRelationsActionType.remove:{
+            await HttpApiClient.client.delete(
+              BangumiAPIUrls.removeFriend(username),
+              options: Options(
+                headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!)
+              )
+            );
+          } 
+          case UserRelationsActionType.block:{
+            await HttpApiClient.client.put(
+              BangumiAPIUrls.addBlockList(username),
+              options: Options(
+                headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!)
+              )
+            );
+          } 
+          case UserRelationsActionType.removeBlock:{
+            await HttpApiClient.client.delete(
+              BangumiAPIUrls.removeBlockList(username),
+              options: Options(
+                headers: BangumiQuerys.bearerTokenAccessQuery(loginedUserInformations.accessToken!)
+              )
+            );
+          } 
       }
 
       userActionCompleter.complete(true);
@@ -209,9 +237,9 @@ class AccountModel extends ChangeNotifier {
     on DioException catch(e){
       debugPrint("${e.response?.statusCode} error:${e.message}");
       userActionCompleter.complete(false);
-      if(fallbackAction!=null){
-        fallbackAction('${e.message}')!;
-      }
+
+      fallbackAction?.call('${e.message}');
+
 
     }
 
@@ -258,7 +286,8 @@ class AccountModel extends ChangeNotifier {
 		  String? content,
       PostCommentType? postcontentType,
       UserContentActionType actionType = UserContentActionType.post,
-      Map<String,dynamic>? subjectCommentQuery
+      Map<String,dynamic>? subjectCommentQuery,
+      Function(String message)? fallbackAction
     }
 	) async {
 
@@ -354,6 +383,7 @@ class AccountModel extends ChangeNotifier {
 
 			else{
 				contentCompleter.complete(false);
+        fallbackAction?.call(response.data["message"]);
 			}
 		
 		});
@@ -469,9 +499,10 @@ class AccountModel extends ChangeNotifier {
 
 			else{
 				commentCompleter.complete(false);
-        if(fallbackAction != null){
-          fallbackAction(response.data["message"]);
-        }
+        fallbackAction?.call(response.data["message"]);
+        //if(fallbackAction != null){
+        //  fallbackAction(response.data["message"]);
+        //}
         
 			}
 		

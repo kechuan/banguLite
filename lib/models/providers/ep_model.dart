@@ -219,7 +219,7 @@ class EpModel extends ChangeNotifier{
 
 	Future<void> loadEpComment() async{
 
-    int requestID = episodesID ?? epsData[selectedEp]!.epID ?? 0;
+    int requestID = episodesID ?? epsData[selectedEp]?.epID ?? 0;
     if(requestID == 0) return;
 
     if(episodesID == null){

@@ -3,8 +3,8 @@ import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comment_tile.dart';
 import 'package:flutter/material.dart';
 
-class EpRepliedCommentDialog extends StatelessWidget {
-  const EpRepliedCommentDialog({
+class EpRepliedCommentBottomSheet extends StatelessWidget {
+  const EpRepliedCommentBottomSheet({
     super.key,
     
     required this.currentComment,

@@ -78,19 +78,20 @@ enum ScoreRank{
 }
 
 enum StarType{
-  want("想看"),
-  watched("看过"),
-  watching("在看"),
-  delay("搁置"),
-  deprecated("抛弃"),
+  want(1,"想看"),
+  watched(2,"看过"),
+  watching(3,"在看"),
+  delay(4,"搁置"),
+  deprecated(5,"抛弃"),
 
-  none("未收藏")
+  none(0,"未收藏")
   ;
 
   final String starTypeName;
+  final int starTypeIndex;
   
 
-  const StarType(this.starTypeName);
+  const StarType(this.starTypeIndex,this.starTypeName);
 
 }
 

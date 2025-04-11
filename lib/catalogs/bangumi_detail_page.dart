@@ -100,44 +100,19 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
     				  ),
     				  actions: [
     
-    					IconButton(
-    					  onPressed: (){
-
-                  			debugPrint("dialog");
-
-							showStarSubjectDialog(context,preseverdText:"test");
-    
-    						//fadeToaster(context: context, message: 'bangumi 暂未开放 番剧吐槽 API');
-    
-    						//Navigator.pushNamed(
-    						//  context, 
-    						//  Routes.sendComment,
-    						//  arguments: {
-    						//    'postCommentType':PostCommentType.comment,
-    						//    'title':bangumiModel.bangumiDetails?.name ?? '',
-    						//    'preservationContent': bangumiModel.draftContent,
-    						//  }
-    						//);
-    
-    					  },
-    					  icon: const Icon(Icons.edit_document)
-    					),
-    
-    					const Padding(padding: PaddingH6),
-    
-    					ToggleThemeModeButton(
-    					  onThen: (){
-    						bangumiModel.getThemeColor(
-    						  judgeDetailRenderColor(context,bangumiModel.imageColor),
-    						  darkMode: !judgeDarknessMode(context) 
-    						  //这里是为了 切换。是 target! 而不是状态 因此得取反向的值。
-    						);
-    					  }
-    					),
-    
-    					const Padding(padding: PaddingH6),
-    
-    					IconButton(
+                ToggleThemeModeButton(
+                  onThen: (){
+                  bangumiModel.getThemeColor(
+                    judgeDetailRenderColor(context,bangumiModel.imageColor),
+                    darkMode: !judgeDarknessMode(context) 
+                    //这里是为了 切换。是 target! 而不是状态 因此得取反向的值。
+                  );
+                  }
+                ),
+      
+                const Padding(padding: PaddingH6),
+      
+                IconButton(
     					  onPressed: () async {
     						if(await canLaunchUrlString(BangumiWebUrls.subject(widget.subjectID))){
     						  await launchUrlString(BangumiWebUrls.subject(widget.subjectID));

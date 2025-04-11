@@ -46,7 +46,7 @@ class IndexModel extends ChangeNotifier {
   //毕竟 bgm也有作防冲突处理
 
   // 草稿箱 [标题:内容]
-  // 当然标题不一定存在 如果不存在直接置为空就好
+  // 当然标题不一定会存在 如果不存在直接置为空就好
   final Map<int,Map<String,String>> draftContent = {};
 
   void initModel() async {

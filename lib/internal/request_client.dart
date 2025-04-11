@@ -223,7 +223,7 @@ class BangumiQuerys {
   }){
     return {
       "comment": "$content",
-      "type": starType.index,
+      "type": starType.starTypeIndex,
       "rate": rate,
       "private": isPrivate,
       "progress": true,

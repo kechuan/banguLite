@@ -8,10 +8,13 @@ class StarSliderPanel extends StatelessWidget {
     super.key,
     required this.valueNotifier,
     required this.onChanged,
+	this.themeColor,
   });
+  
 
   final ValueNotifier<double> valueNotifier;
   final Function(double) onChanged;
+  final Color? themeColor;
 
 @override
   Widget build(BuildContext context) {
@@ -33,6 +36,7 @@ class StarSliderPanel extends StatelessWidget {
                       ratingScore: score*10~/1,
                       showEmpty: true,
                       itemExtent: 30,
+					  themeColor: themeColor,
                     ),
                   ),
 

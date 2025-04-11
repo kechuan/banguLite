@@ -2,15 +2,6 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
-//void customToaster({required BuildContext context,required String message}){
-
-//  ScaffoldMessenger.of(context).showMaterialBanner(
-//   const MaterialBanner(content: ScalableText("test"), actions: [const SizedBox.shrink()])
-    
-//  );
-
-//}
-
 void fadeToaster({
   required BuildContext context,
   required String message,

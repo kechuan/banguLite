@@ -22,8 +22,8 @@ class BangumiStarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    ValueNotifier<SortType> sortTypeNotifier = ValueNotifier<SortType>(SortType.joinTime);
-    ValueNotifier<bool> reversedSortNotifer = ValueNotifier<bool>(false);
+    final ValueNotifier<SortType> sortTypeNotifier = ValueNotifier<SortType>(SortType.joinTime);
+    final ValueNotifier<bool> reversedSortNotifer = ValueNotifier<bool>(false);
 
     final indexModel = context.read<IndexModel>();
 
@@ -85,9 +85,7 @@ class BangumiStarPage extends StatelessWidget {
                   child: SizedBox(
                     height: 50,
                     child: Row(
-                      
                       children: [
-                    
                         Expanded(
                           child: Padding(
                             padding: PaddingH6,

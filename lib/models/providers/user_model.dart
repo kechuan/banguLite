@@ -45,7 +45,7 @@ class UserModel extends ChangeNotifier{
           userName:currentUserDetail
         });
 
-        debugPrint("currentUserDetail timelineActions: ${currentUserDetail.timelineActions}");
+        //debugPrint("currentUserDetail timelineActions: ${currentUserDetail.timelineActions}");
 
         userInfomationCompleter.complete();
 

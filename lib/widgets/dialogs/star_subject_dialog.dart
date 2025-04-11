@@ -1,31 +1,49 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/bangumi_model.dart';
+import 'package:bangu_lite/widgets/dialogs/draft_content_preserve_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_slider_panel.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class StarSubjectDialog extends StatelessWidget {
   const StarSubjectDialog({
     super.key,
-    this.preseverdText,
-    this.starType = StarType.want,
+	required this.subjectID,
+	this.score = 0,
+    this.comment,
+    this.starType,
+	this.themeColor, 
+	this.onUpdateLocalStar,
+
   });
 
-  final String? preseverdText;
-  final StarType starType;
+  final Function()? onUpdateLocalStar;
+
+  final int subjectID;
+  final int score;
+  final String? comment;
+  final StarType? starType;
+  final Color? themeColor;
 
   @override
   Widget build(BuildContext context) {
 
-    final ValueNotifier<bool> commentExpandedStatusNotifier = ValueNotifier(starType != StarType.none);
+    final ValueNotifier<bool> commentExpandedStatusNotifier = ValueNotifier(comment != null);
     final ValueNotifier<double> commentRankNotifier = ValueNotifier(0);
+	final ValueNotifier<StarType> starTypeNotifier = ValueNotifier<StarType>(starType ?? StarType.none);
+	
 
     final TextEditingController contentEditingController = TextEditingController();
     final ExpansionTileController commentExpansionTileController = ExpansionTileController();
-
-    final ValueNotifier<StarType> starTypeNotifier = ValueNotifier<StarType>(starType);
 
     return Dialog(
       child: ValueListenableBuilder(
@@ -35,8 +53,9 @@ class StarSubjectDialog extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
-            width: max(300, MediaQuery.sizeOf(context).width/2.5),
-            height: max(250, MediaQuery.sizeOf(context).height/3) + (commentExpandedStatus ? 150 : 0),
+            //width: max(300, MediaQuery.sizeOf(context).width/2.5),
+			width: max(300, MediaQuery.sizeOf(context).height*9/16),
+            height: max(250, MediaQuery.sizeOf(context).height/3) + (commentExpandedStatus ? 180 : 0),
             child: Column(
               spacing: 6,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,7 +66,7 @@ class StarSubjectDialog extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const ScalableText("Bangumi收藏状态 :"),
+                    const ScalableText("Bangumi收藏状态 :",style: TextStyle(color: Color.fromARGB(255, 233, 166, 206)),),
                     
                     ValueListenableBuilder(
                       valueListenable: starTypeNotifier,
@@ -68,7 +87,11 @@ class StarSubjectDialog extends StatelessWidget {
                             starTypeNotifier.value = starType;
                             if(starType == StarType.none){
                               commentExpandedStatusNotifier.value = false;
-                              commentExpansionTileController.collapse();
+
+							  if(commentExpansionTileController.isExpanded){
+								commentExpansionTileController.collapse();
+							  }
+
                             }
                             
                           },
@@ -94,77 +117,116 @@ class StarSubjectDialog extends StatelessWidget {
                   ],
                 ),
 
-                if(!commentExpandedStatus) const Spacer(),
-
-              ValueListenableBuilder(
-                valueListenable: starTypeNotifier,
-                  builder: (_,starType,child) {
-                    return ExpansionTile(
-                      controller: commentExpansionTileController,
-                      enabled: starType != StarType.none,
-                      onExpansionChanged: (value) => commentExpandedStatusNotifier.value = value,
-                      initiallyExpanded: starType != StarType.none,
-                      title: const Text("展开评论与评分"),
-                      children: [
-                    
-                        Center(
-                          child: StarSliderPanel(
-                            valueNotifier: commentRankNotifier,
-                            onChanged: (value) => commentRankNotifier.value = value,
-                          ),
-                        ),
-                    
-                        SizedBox(
-                          width: 300,
-                          child: TextField(
-                            controller: contentEditingController,
-                            maxLines: 3,
-                            decoration: const InputDecoration(
-                              hintText: 'Typing words...',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          
-                        )
-                      ],
-                    );
-                  }
-                ),
-
-                const Spacer(),
-
+              	Expanded(
+					child: Center(
+						child: ValueListenableBuilder(
+							valueListenable: starTypeNotifier,
+								builder: (_,starType,child) {
+								return ExpansionTile(
+								controller: commentExpansionTileController,
+								enabled: starType != StarType.none,
+								onExpansionChanged: (value) => commentExpandedStatusNotifier.value = value,
+								initiallyExpanded: commentExpandedStatus,
+								title: const Text("展开评论与评分"),
+								children: [
+				
+									Center(
+										child: StarSliderPanel(
+											valueNotifier: commentRankNotifier,
+											onChanged: (value) => commentRankNotifier.value = value,
+											themeColor:themeColor
+										),
+									),
+				
+									const Padding(padding: PaddingV6),
+				
+									TextField(
+										controller: contentEditingController,
+										maxLines: 3,
+										decoration: const InputDecoration(
+											hintText: '写下吐槽...',
+											border: OutlineInputBorder(),
+										),
+									)
+								],
+								);
+							}
+							),
+					),
+				),
 
                 Row(
                   children: [
                     
                     TextButton(
-                      onPressed: () {
-                        //仅作本地收藏
-                      },
+                      onPressed: () => onUpdateLocalStar?.call(),
                       child: const ScalableText("仅本地收藏")
                     ),
 
                     const Spacer(),
-     
-
-
+					
                     Row(
                       children: [
                         TextButton(
                           onPressed: (){
-                    
-                            
-                              
-                            // Navigator.of(context).pop();
+
+							if(contentEditingController.text != (comment ?? "")){
+								showDraftContentPreserveDialog(
+									context,
+									subjectID,
+									content: contentEditingController.text,
+								);
+							}
+
+							//ScaffoldMessenger.of(context).showSnackBar(
+							//	SnackBar(
+							//		backgroundColor:judgeCurrentThemeColor(context),
+							//		content: const ScalableText("再返回一次以退出",style: TextStyle(color: Colors.black)),
+							//		duration: const Duration(seconds: 3),
+							//	)
+							//);
+
+							//Future.delayed(const Duration(seconds: 2),(){
+							//	ScaffoldMessenger.of(context).showSnackBar(
+							//		SnackBar(
+							//			backgroundColor:judgeCurrentThemeColor(context),
+							//			content: const ScalableText("what",style: TextStyle(color: Colors.black)),
+							//			duration: const Duration(seconds: 3),
+							//		)
+							//	);
+							//});
+
+
+                            //Navigator.of(context).pop();
                           }, 
                           child: const ScalableText("取消")
                         ),
                         TextButton(
-                          onPressed: (){
-                              
-                            // Navigator.of(context).pop();
+                          onPressed: () async {
+
+							invokeAsyncToaster(String message) => fadeToaster(context: context, message: "吐槽成功");
+
+							final accountModel = context.read<AccountModel>();
+
+							await accountModel.postContent(
+								subjectID:subjectID,
+								postcontentType:PostCommentType.subjectComment,
+								actionType: UserContentActionType.edit,
+								subjectCommentQuery:BangumiQuerys.subjectCommentQuery(
+									content: contentEditingController.text,
+									isPrivate: false,
+									starType:starTypeNotifier.value,
+								),
+								fallbackAction: (errorMessage) => invokeAsyncToaster(errorMessage),
+							).then((status){
+								status ? invokeAsyncToaster("吐槽成功") : null;
+							});
+
+				
                           }, 
                           child: const ScalableText("确定")
+
+						
                         ),
                       ],
                     ),
@@ -182,15 +244,25 @@ class StarSubjectDialog extends StatelessWidget {
 
 void showStarSubjectDialog(
   BuildContext context,
-  {String? preseverdText}
+  Function()? onUpdateLocalStar,
+  {
+	String? comment,
+	Color? themeColor
+	}
 ){
   showGeneralDialog(
       barrierDismissible: true,
       barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
       context: context,
       pageBuilder: (_,inAnimation,outAnimation){
+		final bangumiModel = context.read<BangumiModel>();
+
         return StarSubjectDialog(
-          preseverdText: preseverdText,
+		  subjectID: bangumiModel.subjectID,
+          comment: comment,
+		  onUpdateLocalStar: onUpdateLocalStar,
+		  themeColor: themeColor,
+
         );
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child),

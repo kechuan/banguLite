@@ -82,3 +82,4 @@ class HiveBoxKey {
                       loginUserDataBase = 'loginUserDataBase'
   ;
 }
+

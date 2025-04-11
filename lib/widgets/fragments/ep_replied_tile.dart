@@ -4,7 +4,7 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/widgets/components/ep_replied_comment_sheet.dart';
+import 'package:bangu_lite/widgets/dialogs/comment_replied_sheet.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
@@ -145,7 +145,7 @@ class ShowCommentTap extends InkResponse {
           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width,maxHeight:MediaQuery.sizeOf(context).height*3/4),
           context: context,
           builder: (_){
-            return EpRepliedCommentDialog(
+            return EpRepliedCommentBottomSheet(
               currentComment: epCommentData,
               commentIndex: commentIndex,
               postCommentType: postCommentType,

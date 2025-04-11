@@ -170,7 +170,7 @@ List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData){
 
 String convertTimelineDescription(TimelineDetails currentTimeline, {bool? authorDeclared}){
 
-  String leadingText = "TA ";
+  String leadingText = "";
   String undoActionText = "";
   String actionText = "";
   String contentText = "";

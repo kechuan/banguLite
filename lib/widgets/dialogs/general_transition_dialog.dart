@@ -1,3 +1,4 @@
+
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
@@ -23,20 +24,14 @@ void showTransitionAlertDialog(
           actions:[
             TextButton(
               onPressed: (){
-                if(cancelAction!=null) cancelAction();
-                
+                cancelAction?.call();
                 Navigator.of(context).pop();
               }, child: ScalableText(cancelText ?? "取消")
             ),
             TextButton(
               onPressed: () async {
-
-                invokePop()=> Navigator.of(context).pop();
-
-                if(confirmAction!=null){
-                  await confirmAction();
-                  invokePop();
-                }
+                confirmAction?.call();
+                Navigator.of(context).pop();
 
               }, 
               child: ScalableText(confirmText ?? "确认")

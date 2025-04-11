@@ -213,7 +213,8 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
 
    if(detailFlag){
       bangumiDetails.informationList = {
-        "eps":bangumiData["eps"] == 0 ? bangumiData["total_episodes"] : bangumiData["eps"],
+        //"eps":bangumiData["eps"] == 0 ? bangumiData["total_episodes"] : bangumiData["eps"],
+        "eps":bangumiData["total_episodes"],
         "alias":bangumiData["name_cn"].isNotEmpty ? bangumiData["name"] : "",
         "air_date": bangumiData["date"].toString()
       };

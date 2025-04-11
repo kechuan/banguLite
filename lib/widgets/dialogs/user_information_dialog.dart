@@ -67,16 +67,16 @@ class UserInformationDialog extends StatelessWidget {
     					  Expanded(
     						child: UnVisibleResponse(
     						  onTap: () {
-    							Clipboard.setData(ClipboardData(text: '${userInformation?.userName}'));
-    							fadeToaster(context: context,message: "已复制用户ID");
+    						  Clipboard.setData(ClipboardData(text: '${userInformation?.userName}'));
+    						  fadeToaster(context: context,message: "已复制用户ID");
     						  },
     						  child: ScalableText(
-    							userInformation?.nickName ?? userInformation?.userName ?? "no data",
-    							  style: const TextStyle(color: Colors.blue),
-    							  maxLines: 2,
-    							  overflow: TextOverflow.ellipsis,
-    							  textAlign: TextAlign.center,
-    							),
+    						  userInformation?.nickName ?? userInformation?.userName ?? "no data",
+    						    style: const TextStyle(color: Colors.blue),
+    						    maxLines: 2,
+    						    overflow: TextOverflow.ellipsis,
+    						    textAlign: TextAlign.center,
+    						  ),
     						),
     					  ),
     
@@ -116,14 +116,14 @@ class UserInformationDialog extends StatelessWidget {
     									  content: "确定对用户 ${userInformation?.nickName ?? userInformation?.userName} 发送好友请求吗?",
     									  confirmAction: () async {
     				  
-                          asyncToaster(String message) => fadeToaster(context: context, message: message);
+                          invokeAsyncToaster(String message) => fadeToaster(context: context, message: message);
 
                           accountModel.userRelationAction(
                             userInformation?.userName,
-                            fallbackAction: (errorMessage) => asyncToaster(errorMessage),
+                            fallbackAction: (errorMessage) => invokeAsyncToaster(errorMessage),
                           ).then((status){
                             if(status){
-                              asyncToaster("发送请求成功");
+                              invokeAsyncToaster("发送请求成功");
                             }
                             
                           });
@@ -148,15 +148,15 @@ class UserInformationDialog extends StatelessWidget {
     									  content: "确定拉入用户 ${userInformation?.nickName ?? userInformation?.userName} 进黑名单吗?",
     									  confirmAction: () async {
     				  
-    										asyncToaster(String message)=> fadeToaster(context: context, message: message);
+    										invokeAsyncToaster(String message)=> fadeToaster(context: context, message: message);
 
-											accountModel.userRelationAction(
-												userInformation?.userName,
-												relationType: UserRelationsActionType.block,
-												fallbackAction: (errorMessage) => asyncToaster(errorMessage),
-											).then((_){
-												asyncToaster("拉黑成功");
-											});
+                        accountModel.userRelationAction(
+                          userInformation?.userName,
+                          relationType: UserRelationsActionType.block,
+                          fallbackAction: (errorMessage) => invokeAsyncToaster(errorMessage),
+                        ).then((_){
+                          invokeAsyncToaster("拉黑成功");
+                        });
 
     									  },
     				  
@@ -212,7 +212,7 @@ class UserInformationDialog extends StatelessWidget {
 																
 														return ScalableText(
 															"加入时间: ${joinTime.year}-${convertDigitNumString(joinTime.month)}-${convertDigitNumString(joinTime.day)}",
-															style: const TextStyle(fontSize: 12,color: Colors.grey),
+															style: const TextStyle(fontSize: 14,color: Colors.grey),
 														);
     												}
     											),

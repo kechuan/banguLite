@@ -44,9 +44,9 @@
 			"path": "lib/models/providers/ep_model.dart",
 			"bookmarks": [
 				{
-					"line": 144,
-					"column": 54,
-					"label": "获取EPInfo信息"
+					"line": 9,
+					"column": 0,
+					"label": "EpModel —— Ep信息"
 				}
 			]
 		},
@@ -164,7 +164,7 @@
 			"path": "lib/catalogs/send_comment_page.dart",
 			"bookmarks": [
 				{
-					"line": 30,
+					"line": 31,
 					"column": 46,
 					"label": "sendMessage —— 发送评论的页面"
 				}

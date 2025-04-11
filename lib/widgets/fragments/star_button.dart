@@ -2,9 +2,11 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/star_details.dart';
+import 'package:bangu_lite/widgets/dialogs/star_subject_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +22,6 @@ class StarButton extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     final ValueNotifier<bool> isStaredNotifier = ValueNotifier(MyHive.starBangumisDataBase.containsKey(bangumiDetails.id));
-    final indexModel = context.read<IndexModel>();
 
     return ElevatedButton(
       style: ButtonStyle(
@@ -29,47 +30,20 @@ class StarButton extends StatelessWidget{
         overlayColor: WidgetStatePropertyAll(judgeCurrentThemeColor(context)),
       ),
       onPressed: () {
-        
-        //manage Function
 
-        if(isStaredNotifier.value){
-          MyHive.starBangumisDataBase.delete(bangumiDetails.id);
-          isStaredNotifier.value = false;
-        }
+        final bangumiModel = context.read<BangumiModel>();
 
-        else{
+        invokeLocalUpdateStaredBangumi() => updateLocalStaredBangumi(
+          context,
+          isStaredNotifier,
+          bangumiDetails,
+        );
 
-          final epModel = context.read<EpModel>();
-
-          //context.read<EpModel>().getEpsInformation();
-          debugPrint("lastEP: ${epModel.epsData.values.last.airDate}");
-          //EpModel(subjectID: subjectID, selectedEp: selectedEp)
-
-          MyHive.starBangumisDataBase.put(
-            bangumiDetails.id!, 
-            StarBangumiDetails()
-              ..bangumiID = bangumiDetails.id
-              ..name = bangumiDetails.name
-              ..rank = bangumiDetails.ratingList["rank"]
-              ..coverUrl = bangumiDetails.coverUrl
-              ..eps =  bangumiDetails.informationList["eps"]
-              ..score = bangumiDetails.ratingList["score"]?.toDouble()
-              ..joinDate = DateTime.now().toIso8601String().substring(0,10)
-              ..airDate = bangumiDetails.informationList["air_date"]
-              ..finishedDate = epModel.epsData.values.last.airDate
-              ..airWeekday = bangumiDetails.informationList["air_weekday"]
-          );
-
-          indexModel.starsUpdateRating.add({
-            "score": bangumiDetails.ratingList["score"],
-            "rank": bangumiDetails.ratingList["rank"]
-          });
-
-          isStaredNotifier.value = true;
-        }
-
-        indexModel.updateStar();
-        
+        showStarSubjectDialog(
+          context,
+          invokeLocalUpdateStaredBangumi,
+          themeColor:judgeDetailRenderColor(context, bangumiModel.imageColor)
+        );
       },
       child: SizedBox(
         height: 40,
@@ -96,9 +70,51 @@ class StarButton extends StatelessWidget{
       ),
     );
 
-
-                        
-
   }
 
+}
+
+
+void updateLocalStaredBangumi(
+  BuildContext context,
+  ValueNotifier<bool> isStaredNotifier,
+  BangumiDetails bangumiDetails
+){
+
+  final indexModel = context.read<IndexModel>();
+  final epModel = context.read<EpModel>();
+
+  if(isStaredNotifier.value){
+    MyHive.starBangumisDataBase.delete(bangumiDetails.id);
+    isStaredNotifier.value = false;
+  }
+
+  else{
+
+    debugPrint("lastEP: ${epModel.epsData.values.last.airDate}");
+
+    MyHive.starBangumisDataBase.put(
+      bangumiDetails.id!, 
+      StarBangumiDetails()
+        ..bangumiID = bangumiDetails.id
+        ..name = bangumiDetails.name
+        ..rank = bangumiDetails.ratingList["rank"]
+        ..coverUrl = bangumiDetails.coverUrl
+        ..eps =  bangumiDetails.informationList["eps"]
+        ..score = bangumiDetails.ratingList["score"]?.toDouble()
+        ..joinDate = DateTime.now().toIso8601String().substring(0,10)
+        ..airDate = bangumiDetails.informationList["air_date"]
+        ..finishedDate = epModel.epsData.values.last.airDate
+        ..airWeekday = bangumiDetails.informationList["air_weekday"]
+    );
+
+    indexModel.starsUpdateRating.add({
+      "score": bangumiDetails.ratingList["score"],
+      "rank": bangumiDetails.ratingList["rank"]
+    });
+
+    isStaredNotifier.value = true;
+  }
+
+  indexModel.updateStar();
 }
