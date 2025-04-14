@@ -14,12 +14,12 @@ class BangumiModel extends ChangeNotifier {
 
   int subjectID = 0;
 
-  String? turnsTileToken;
-
   BangumiDetails? bangumiDetails;
 
   Color? bangumiThemeColor;
   Color? imageColor;
+
+  //BangumiAPIUrls.userSubjectComment()
 
   Future<void> loadDetails({bool? isRefresh}) async {
 

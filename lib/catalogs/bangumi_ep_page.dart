@@ -115,7 +115,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                         SliverPinnedHeader(
                                           child: BangumiContentAppbar(
                                             contentID: epModel.epsData[selectedEp]?.epID,
-                                            titleText: "第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN!.isEmpty ? epModel.epsData[selectedEp]!.name : ""}",
+                                            titleText: convertCollectionName(epModel.epsData[max(1,selectedEp)]!, max(1,selectedEp)),
                                             webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!),
                                             postCommentType: PostCommentType.replyEpComment,
                                             surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
@@ -233,7 +233,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                 },
                                 child:BangumiContentAppbar(
                                   contentID: epModel.epsData[selectedEp]?.epID,
-                                  titleText: "第$selectedEp集 ${epModel.epsData[selectedEp]!.nameCN!.isEmpty ? epModel.epsData[selectedEp]!.name : ""}",
+                                  titleText: convertCollectionName(epModel.epsData[max(1,selectedEp)]!, max(1,selectedEp)),
                                   webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!),
                                   postCommentType: PostCommentType.replyEpComment,
                                   surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)

@@ -1,6 +1,7 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/components/app_drawer.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:flutter/material.dart';
@@ -28,8 +29,19 @@ class IndexPortial extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            leading: const ToggleThemeModeButton(),
-            //leadingWidth: 0,
+            //leading: const ToggleThemeModeButton(),
+            leading:  Builder(
+              builder: (_) {
+                return IconButton(
+                  onPressed: (){
+
+                    Scaffold.of(_).openDrawer();
+
+                  },
+                  icon: const Icon(Icons.menu)
+                );
+              }
+            ),
             flexibleSpace: const Column(
               children: [
                  Spacer(),
@@ -62,6 +74,7 @@ class IndexPortial extends StatelessWidget {
               )
             ],
           ),
+          drawer: const AppDrawer(),
           body: IndexedStack(
             index: currentPageIndex,
             children: const [

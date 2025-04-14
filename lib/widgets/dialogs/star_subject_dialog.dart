@@ -3,12 +3,11 @@ import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/custom_toaster.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
-import 'package:bangu_lite/widgets/dialogs/draft_content_preserve_dialog.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_slider_panel.dart';
 import 'package:flutter/material.dart';
@@ -18,31 +17,34 @@ class StarSubjectDialog extends StatelessWidget {
   const StarSubjectDialog({
     super.key,
 	required this.subjectID,
-	this.score = 0,
-    this.comment,
-    this.starType,
+	this.commentDetails,
+
 	this.themeColor, 
 	this.onUpdateLocalStar,
 
   });
 
   final Function()? onUpdateLocalStar;
-
+  
+  final CommentDetails? commentDetails;
   final int subjectID;
-  final int score;
-  final String? comment;
-  final StarType? starType;
   final Color? themeColor;
 
   @override
   Widget build(BuildContext context) {
 
-    final ValueNotifier<bool> commentExpandedStatusNotifier = ValueNotifier(comment != null);
-    final ValueNotifier<double> commentRankNotifier = ValueNotifier(0);
-	final ValueNotifier<StarType> starTypeNotifier = ValueNotifier<StarType>(starType ?? StarType.none);
-	
+	final accountModel = context.read<AccountModel>();
 
-    final TextEditingController contentEditingController = TextEditingController();
+    final ValueNotifier<bool> commentExpandedStatusNotifier = ValueNotifier(commentDetails?.comment != null);
+    final ValueNotifier<double> commentRankNotifier = ValueNotifier((commentDetails?.rate ?? 0).toDouble());
+	final ValueNotifier<StarType> starTypeNotifier = ValueNotifier<StarType>(
+		StarType.values.firstWhere(
+			(currentType)=>currentType.starTypeIndex == commentDetails?.type,
+			orElse: () => StarType.none
+		)
+	);
+
+    final TextEditingController contentEditingController = TextEditingController(text: commentDetails?.comment);
     final ExpansionTileController commentExpansionTileController = ExpansionTileController();
 
     return Dialog(
@@ -50,10 +52,9 @@ class StarSubjectDialog extends StatelessWidget {
         valueListenable: commentExpandedStatusNotifier,
         builder: (_,commentExpandedStatus,child) {
           return AnimatedContainer(
-            padding: const EdgeInsets.all(16),
+            padding: Padding16,
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
-            //width: max(300, MediaQuery.sizeOf(context).width/2.5),
 			width: max(300, MediaQuery.sizeOf(context).height*9/16),
             height: max(250, MediaQuery.sizeOf(context).height/3) + (commentExpandedStatus ? 180 : 0),
             child: Column(
@@ -72,6 +73,7 @@ class StarSubjectDialog extends StatelessWidget {
                       valueListenable: starTypeNotifier,
                         builder: (_,starType,child) {
                         return PopupMenuButton<StarType>(
+						  enabled: accountModel.isLogined(),
                           initialValue: starTypeNotifier.value,
                           position:PopupMenuPosition.under,
                           itemBuilder: (_) => List.generate(
@@ -101,10 +103,16 @@ class StarSubjectDialog extends StatelessWidget {
                               children: [
                                 Padding(
                                   padding: PaddingH6,
-                                  child: ScalableText(starType.starTypeName),
+                                  child: ScalableText(
+									starType.starTypeName,
+									style: TextStyle(
+										color: accountModel.isLogined() ? null : Colors.grey
+
+									),
+								),
                                 ),
                             
-                                const Icon(Icons.arrow_drop_down)
+                                Icon(Icons.arrow_drop_down,color: accountModel.isLogined() ? null : Colors.grey,)
                             
                               ],
                             ),
@@ -145,6 +153,7 @@ class StarSubjectDialog extends StatelessWidget {
 										maxLines: 3,
 										decoration: const InputDecoration(
 											hintText: '写下吐槽...',
+											hintStyle: TextStyle(color: Colors.grey),
 											border: OutlineInputBorder(),
 										),
 									)
@@ -156,80 +165,64 @@ class StarSubjectDialog extends StatelessWidget {
 				),
 
                 Row(
+				  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     
                     TextButton(
-                      onPressed: () => onUpdateLocalStar?.call(),
+                      onPressed: (){
+						onUpdateLocalStar?.call();
+						Navigator.of(context).pop();
+					  },
                       child: const ScalableText("仅本地收藏")
                     ),
 
-                    const Spacer(),
-					
-                    Row(
-                      children: [
-                        TextButton(
-                          onPressed: (){
 
-							if(contentEditingController.text != (comment ?? "")){
-								showDraftContentPreserveDialog(
-									context,
-									subjectID,
-									content: contentEditingController.text,
-								);
-							}
+					if(accountModel.isLogined())
+                    	const Spacer(),
 
-							//ScaffoldMessenger.of(context).showSnackBar(
-							//	SnackBar(
-							//		backgroundColor:judgeCurrentThemeColor(context),
-							//		content: const ScalableText("再返回一次以退出",style: TextStyle(color: Colors.black)),
-							//		duration: const Duration(seconds: 3),
-							//	)
-							//);
-
-							//Future.delayed(const Duration(seconds: 2),(){
-							//	ScaffoldMessenger.of(context).showSnackBar(
-							//		SnackBar(
-							//			backgroundColor:judgeCurrentThemeColor(context),
-							//			content: const ScalableText("what",style: TextStyle(color: Colors.black)),
-							//			duration: const Duration(seconds: 3),
-							//		)
-							//	);
-							//});
-
-
-                            //Navigator.of(context).pop();
-                          }, 
-                          child: const ScalableText("取消")
-                        ),
-                        TextButton(
-                          onPressed: () async {
-
-							invokeAsyncToaster(String message) => fadeToaster(context: context, message: "吐槽成功");
-
-							final accountModel = context.read<AccountModel>();
-
-							await accountModel.postContent(
-								subjectID:subjectID,
-								postcontentType:PostCommentType.subjectComment,
-								actionType: UserContentActionType.edit,
-								subjectCommentQuery:BangumiQuerys.subjectCommentQuery(
-									content: contentEditingController.text,
-									isPrivate: false,
-									starType:starTypeNotifier.value,
+					if(accountModel.isLogined())
+						Row(
+							children: [
+								TextButton(
+								onPressed: ()=> Navigator.of(context).pop(), 
+								child: const ScalableText("取消")
 								),
-								fallbackAction: (errorMessage) => invokeAsyncToaster(errorMessage),
-							).then((status){
-								status ? invokeAsyncToaster("吐槽成功") : null;
-							});
+								TextButton(
+								onPressed: () async {
 
-				
-                          }, 
-                          child: const ScalableText("确定")
+									onUpdateLocalStar?.call();
+
+									
+
+									invokeAsyncPop()=> Navigator.of(context).pop();
+									invokeRequestSnackBar(String message) => showRequestSnackBar(context,message: message);
+
+									showRequestSnackBar(context);
+
+									accountModel.postContent(
+										subjectID:subjectID.toString(),
+										postcontentType:PostCommentType.subjectComment,
+										actionType: UserContentActionType.edit,
+										subjectCommentQuery:BangumiQuerys.subjectCommentQuery(
+											content: contentEditingController.text,
+											isPrivate: false,
+											starType:starTypeNotifier.value,
+										),
+										fallbackAction: (errorMessage) => invokeRequestSnackBar(errorMessage),
+									).then((status){
+										status ? invokeRequestSnackBar("回帖成功") : null;
+									});
+
+									invokeAsyncPop();
 
 						
-                        ),
-                      ],
-                    ),
+								}, 
+								child: const ScalableText("确定")
+
+								
+								),
+							],
+						),
                   ],
                 )
             
@@ -246,9 +239,10 @@ void showStarSubjectDialog(
   BuildContext context,
   Function()? onUpdateLocalStar,
   {
+	CommentDetails? commentDetails,
 	String? comment,
 	Color? themeColor
-	}
+  }
 ){
   showGeneralDialog(
       barrierDismissible: true,
@@ -259,7 +253,7 @@ void showStarSubjectDialog(
 
         return StarSubjectDialog(
 		  subjectID: bangumiModel.subjectID,
-          comment: comment,
+		  commentDetails: commentDetails,
 		  onUpdateLocalStar: onUpdateLocalStar,
 		  themeColor: themeColor,
 

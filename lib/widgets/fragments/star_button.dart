@@ -1,7 +1,9 @@
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -13,11 +15,13 @@ import 'package:provider/provider.dart';
 
 class StarButton extends StatelessWidget{
   const StarButton({
-    super.key, 
-    required this.bangumiDetails
+    super.key,
+    required this.bangumiDetails,
+    this.commentDetails
   });
 
   final BangumiDetails bangumiDetails;
+  final CommentDetails? commentDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +46,7 @@ class StarButton extends StatelessWidget{
         showStarSubjectDialog(
           context,
           invokeLocalUpdateStaredBangumi,
+          commentDetails:commentDetails,
           themeColor:judgeDetailRenderColor(context, bangumiModel.imageColor)
         );
       },
@@ -56,12 +61,23 @@ class StarButton extends StatelessWidget{
           child: ValueListenableBuilder(
             valueListenable: isStaredNotifier,
             builder: (_,isStared,child){
+
+              String starText = "已收藏";
+
+              if(commentDetails?.type != null){
+
+                starText = StarType.values.firstWhere((currentType){
+                  return currentType.starTypeIndex == commentDetails!.type;
+                }).starTypeName;
+
+              }
+
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 6,
                 children: [
                   isStared ? const Icon(Icons.star) : const Icon(Icons.star_outline),
-                  isStared ? const ScalableText("已收藏") : const ScalableText("加入收藏"),
+                  isStared ? ScalableText(starText) : const ScalableText("加入收藏"),
                 ],
               );
             }

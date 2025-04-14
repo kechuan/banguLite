@@ -11,6 +11,7 @@ const List<String> routeNames = <String>[
   '/Blog',
   '/commentPreview',
   '/index',
+  '/loginAuth',
   '/moreReviews',
   '/moreTopics',
   '/photoView',
@@ -51,6 +52,11 @@ class Routes {
   ///
   /// [name] : '/index'
   static const String index = '/index';
+
+  /// '/loginAuth'
+  ///
+  /// [name] : '/loginAuth'
+  static const String loginAuth = '/loginAuth';
 
   /// '/moreReviews'
   ///

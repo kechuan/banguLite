@@ -6,7 +6,7 @@
 
 
 
-![Platform](https://img.shields.io/badge/support%20platform-android%7Cwindow-green)
+![Platform](https://img.shields.io/badge/support%20platform-android%7Cwindow-green)[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b5d3920ab1d04d3baaca63ce5a8ea09a)](https://app.codacy.com/gh/kechuan/banguLite?utm_source=github.com&utm_medium=referral&utm_content=kechuan/banguLite&utm_campaign=Badge_Grade)
 
 
 

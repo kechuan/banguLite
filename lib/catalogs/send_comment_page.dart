@@ -11,7 +11,6 @@ import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
 import 'package:bangu_lite/widgets/dialogs/draft_content_preserve_dialog.dart';
-import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -20,13 +19,14 @@ import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
+import 'package:provider/provider.dart';
 
 @FFAutoImport()
 import 'package:bangu_lite/internal/const.dart';
 @FFAutoImport()
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 
-import 'package:provider/provider.dart';
+
 
 @FFRoute(name: '/sendComment')
 class SendCommentPage extends StatefulWidget {
@@ -110,6 +110,14 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 			}
 
 			else{
+
+				showDraftContentPreserveDialog(
+					context,
+					widget.contentID ?? 0,
+					title: titleEditingController.text.isEmpty ? "" : titleEditingController.text,
+					content: contentEditingController.text,
+				);
+				
 				
 
 			}

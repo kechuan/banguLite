@@ -91,6 +91,10 @@ abstract class BangumiContentPageState<
                   selector: (_, model) => (contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?) ?? createEmptyDetailData(),
                   shouldRebuild: (previous, next) => previous.detailID != next.detailID,
                   builder: (_, contentDetailData, contentComment) {
+
+                    
+
+
                     return Scrollbar(
                       thumbVisibility: true,
                       interactive: true,
@@ -111,24 +115,24 @@ abstract class BangumiContentPageState<
                                   surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
                                   onSendMessage: (content) {
 									
-									fadeToaster(context: context, message: "回帖成功");
+                                    fadeToaster(context: context, message: "回帖成功");
 
-									final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
-									final int commentListCount = getCommentCount(contentDetail, false) ?? 0;
+                                    final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
+                                    final int commentListCount = getCommentCount(contentDetail, false) ?? 0;
 
-									int resultCommentCount = 
-										getPostCommentType() == PostCommentType.replyTopic ?
-										commentListCount :
-										commentListCount+1
-									;
+                                    int resultCommentCount = 
+                                      getPostCommentType() == PostCommentType.replyTopic ?
+                                      commentListCount :
+                                      commentListCount+1
+                                    ;
 
-									resultCommentCount += userCommentMap.length;
+                                    resultCommentCount += userCommentMap.length;
 
-									userCommentMap.addAll({resultCommentCount:content});
-									
-									WidgetsBinding.instance.addPostFrameCallback((_){
-										animatedSliverListKey.currentState?.insertItem(0);
-									});
+                                    userCommentMap.addAll({resultCommentCount:content});
+                                    
+                                    WidgetsBinding.instance.addPostFrameCallback((_){
+                                      animatedSliverListKey.currentState?.insertItem(0);
+                                    });
 									           
                                   },
                                 )

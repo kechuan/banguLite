@@ -4,6 +4,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/fragments/app_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
@@ -57,30 +58,10 @@ class IndexLandscape extends StatelessWidget {
                             padding: EdgeInsets.only(top: max(0,constraint.maxHeight-658))
                           ),
 
-                          UnVisibleResponse(
-                            onTap: () {
-                              //if(accountModel.loginedUserInformations.userInformation?.userID != null){
-                              //  Navigator.pushNamed(context,Routes.userPage,arguments: accountModel.loginedUserInformations.userInformation?.userID);
-                              //}
-
-                              //else{
-                              //  Navigator.pushNamed(context,Routes.login,arguments: accountModel.loginedUserInformations.userInformation?.userID);
-                              //}
-                            },
-                            child: SizedBox(
-                              height: 30,
-                              width: 30,
-                              child: Builder(
-                                builder: (_){
-                                  if(accountModel.loginedUserInformations.userInformation?.avatarUrl != null){
-                                    return CachedImageLoader(imageUrl: accountModel.loginedUserInformations.userInformation?.avatarUrl);
-                                  }
-                                  else{
-                                    return Icon(MdiIcons.accountCircleOutline,size: 30);
-                                  }
-                                } 
-                              )
-                            ),
+                          const SizedBox(
+                            height: 30,
+                            width: 30,
+                            child: AppUserAvatar()
                           ),
 
                           const ToggleThemeModeButton(),

@@ -42,8 +42,6 @@ Future<void> registerBGMLoginDeepLink() async {
   debugPrint("register windows bgm.tv deepLink success");
 }
 
-//bool firstLink = true;
-
 void listenAPPLink() async{
 
   if(Platform.isWindows){

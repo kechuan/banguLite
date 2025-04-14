@@ -30,8 +30,6 @@ class BuildEps extends StatelessWidget {
     final bangumiModel = context.read<BangumiModel>();
 
     int totalEps = informationList["eps"] ?? 0;
-    //String airDate = informationList["air_date"] ?? "";
-
     int airedEps = 0;
 
     if(totalEps != 0){

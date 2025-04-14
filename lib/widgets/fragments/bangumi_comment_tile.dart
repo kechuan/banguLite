@@ -102,6 +102,8 @@ class BangumiCommentTile extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: CommentReaction(
+                    commentID: commentData.commentID,
+                    postCommentType: PostCommentType.subjectComment,
                     commentReactions: commentData.commentReactions,
                     themeColor: themeColor,
                   ),
@@ -116,7 +118,6 @@ class BangumiCommentTile extends StatelessWidget {
               ScalableText("${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"),
 
               BangumiCommentActionButton(
-                commentBlockStatus: true,
                 postCommentType: PostCommentType.subjectComment,
                 commentData: commentData,
               )

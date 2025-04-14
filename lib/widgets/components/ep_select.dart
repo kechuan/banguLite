@@ -104,8 +104,8 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
           
           			//TabView
           			SizedBox(
-                  height: widget.portialMode == true ? constraint.maxHeight - 80 : 250,
-                  
+                  //height: widget.portialMode == true ? constraint.maxHeight - 80 : (60*3+6*3),
+                  height: widget.portialMode == true ? constraint.maxHeight - 80 : MediaQuery.sizeOf(context).width/6,
                   child: ValueListenableBuilder(
                   valueListenable: epSegementsIndexNotifier,
                   builder: (_,currentSegment,child) {

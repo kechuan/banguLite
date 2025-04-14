@@ -1,6 +1,7 @@
 
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
@@ -32,7 +33,6 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
   Future? commentFuture; //better than in stateless.
 
-
   @override
   Widget build(BuildContext context) {
 
@@ -40,7 +40,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
       final bangumiModel = context.read<BangumiModel>();
       final commentModel = context.read<CommentModel>();
-
+      
       commentFuture ??= commentModel.loadComments();
 
         return Padding(

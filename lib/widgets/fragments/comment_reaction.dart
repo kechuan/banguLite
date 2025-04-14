@@ -44,7 +44,7 @@ class CommentReaction extends StatelessWidget {
     }
 
     bool isServerDataContain = commentReactions!.entries.any((userList){
-      if(userList.value.contains(accountModel.loginedUserInformations.userInformation!.getName())){
+      if(userList.value.contains(accountModel.loginedUserInformations.userInformation?.getName())){
         reactDataLikeNotifier.value = userList.key;
         return true;
       }
@@ -87,6 +87,8 @@ class CommentReaction extends StatelessWidget {
                       padding: const WidgetStatePropertyAll(PaddingH6),
                     ),
                     onPressed:  () {
+                      debugPrint("reactDataLike:$reactDataLike, dataLikeIndex:$dataLikeIndex, subject:$commentID");
+
                       if(!isReactAble) return;
                                 
                       if(reactDataLike == dataLikeIndex){

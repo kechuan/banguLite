@@ -34,7 +34,7 @@ class BangumiAPIUrls {
 
   static const String subject = '$baseUrl/v0/subjects';
   static const String eps = '$baseUrl/v0/episodes';
-  static const String search = '$baseUrl/search/subject';
+  static const String search = '$baseUrl/v0/search/subject';
 
   static const String bangumiSubjectSort = '$baseUrl/v0/search/subjects';
 
@@ -57,12 +57,18 @@ class BangumiAPIUrls {
   static String relations(int subjectID) => '$newUrl/subjects/$subjectID/relations';
   static String reviews(int subjectID) => '$newUrl/subjects/$subjectID/reviews';
 
+  static String groups() => '$newUrl/groups';
+  static String groupTopics(String groupName) => '$newUrl/groups/$groupName/topics';
+  static String groupComment(int postID) => '$newUrl/groups/-/posts/$postID';
 
 
   //user
   static String me = '$newUrl/me';
 
   static String user(String username) => '$newUrl/users/$username';
+
+  static String userSubjectComment(String username,int subjectID) => '$baseUrl/v0/users/$username/collections/$subjectID';
+
   static String userBlog(int blogID) => '$newUrl/blogs/$blogID';
   static String userBlogPicture(int blogID) => '${userBlog(blogID)}/photos';
 
@@ -80,37 +86,44 @@ class BangumiAPIUrls {
   
   /// 行为允许 POST blog目前API没有
   /// /p1/subjects/-/topics/{topicID}
-  static String postTopic(int subjectID) => topics(subjectID);
-  static String postTimeline() => timeline();
+  /// 
 
-
-  
-  
-  /// /p1/episodes/{episodeID}/comments
   static String postEpComment(int epID) => epComment(epID);
-  /// /p1/subjects/-/topics/{topicID}/replies
+  
+  static String postTopic(int subjectID) => topics(subjectID);
   static String postTopicComment(int topicID) => '${topicComment(topicID)}/replies';
+
   static String postBlogComment(int subjectID) => '${userBlog(subjectID)}/comments';
+
+  static String postGroupTopic(String groupName) => groupTopics(groupName);
+  static String postGroupComment(int postID) => '${groupComment(postID)}/replies';
+
+  
+  static String postTimeline() => timeline();
   static String postTimelineComment(int timelineID) => '${timeline()}/$timelineID/replies';
   
   
-
+  //Checked API format.
   /// 行为允许 PUT/PATCH
   static String actionSubjectComment(int subjectID) => '$newUrl/collections/subjects/$subjectID';
 
   /// 行为允许 GET/PUT/DELETE
-  static String actionTopicComment(int topicID) => '$newUrl/subjects/-/posts/$topicID';
+  /// '$newUrl/subjects/-/topics/$topicID';
+  static String actionTopicComment(int topicID) => topicComment(topicID);
   static String actionEpComment(int commentID) => '$newUrl/episodes/-/comments/$commentID';
+  static String actionGroupComment(int postID) => groupComment(postID);
+  
   ///这个不允许GET
   static String actionBlogComment(int commentID) => '$newUrl/blogs/-/comments/$commentID';
 
-  
-  
-  
 
   /// 行为允许 PUT/DELETE
+  
+  //static String toggleSubjectCommentLike(int commentID) => '${actionSubjectComment(commentID)}/like';
+  static String toggleSubjectCommentLike(int commentID) => '/subjects/-/collects/$commentID/like';
   static String toggleEPCommentLike(int commentID) => '${actionEpComment(commentID)}/like';
   static String toggleTopicLike(int commentID) => '${actionTopicComment(commentID)}/like';
+  static String toggleGroupLike(int commentID) => '${actionGroupComment(commentID)}/like';
 
 
   //other

@@ -1,6 +1,7 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/user_details.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -78,13 +79,16 @@ void appRouteMethodListener(BuildContext context,String link){
         
 }
 
-void appLoginMethodListener(BuildContext context,String link){
+void appLoginMethodListener(BuildContext context,String link) async {
   final accountModel = context.read<AccountModel>();
   
   debugPrint("detected BangumiLogin: $link");
 
   if(link.startsWith(APPInformationRepository.bangumiOAuthCallbackUri.scheme)){
+
     final code = link.split("code=").last;
-    accountModel.getAccessToken(code);
+    await accountModel.getAccessToken(code).then((result){
+      accountModel.notifyListeners();
+    });
   }
 }

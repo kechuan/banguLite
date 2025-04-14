@@ -57,7 +57,6 @@ class BuildDetailImages extends StatelessWidget {
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: imageProvider,
-                  //fit: BoxFit.contain,
                   fit: BoxFit.fill,
                 ),
                 borderRadius: BorderRadius.circular(16)

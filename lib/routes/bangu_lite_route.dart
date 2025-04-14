@@ -24,6 +24,7 @@ import '../catalogs/bangumi_comment_preview.dart';
 import '../catalogs/bangumi_detail_page.dart';
 import '../catalogs/bangumi_ep_page.dart';
 import '../catalogs/bangumi_index_page.dart';
+import '../catalogs/bangumi_login_auth_page.dart';
 import '../catalogs/bangumi_picture_view_page.dart';
 import '../catalogs/bangumi_topic_page.dart';
 import '../catalogs/bangumi_webview_page.dart';
@@ -79,6 +80,16 @@ FFRouteSettings getRouteSettings({
         name: name,
         arguments: arguments,
         builder: () => BangumiIndexPage(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
+        ),
+      );
+    case '/loginAuth':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => BangumiAuthPage(
           key: asT<Key?>(
             safeArguments['key'],
           ),

@@ -17,7 +17,7 @@ class BangumiCommentActionButton extends StatefulWidget {
   const BangumiCommentActionButton({
     super.key,
     required this.commentData,
-    required this.commentBlockStatus,
+    this.commentBlockStatus,
 
     this.postCommentType,
     this.onReplyComment,
@@ -73,7 +73,6 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
 
     final accountModel = context.read<AccountModel>();
     final indexModel = context.read<IndexModel>();
-    
 
     return CompositedTransformTarget(
       link: stickerLayerLink,
@@ -106,16 +105,9 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
             }
               
             case CommentActionType.sticker:{
-              if(widget.postCommentType != PostCommentType.subjectComment){
-                stickerSelectOverlay.showStickerSelectOverlay(
-                  widget.commentData.commentID
-                );
-              }
-
-              else{
-                fadeToaster(context: context, message: "官方API暂只支持 剧集/讨论 的表情贴纸");
-              }
-              
+              stickerSelectOverlay.showStickerSelectOverlay(
+                widget.commentData.commentID
+              );
             }
               
             case CommentActionType.report:{

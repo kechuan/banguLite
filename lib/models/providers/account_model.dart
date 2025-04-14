@@ -10,7 +10,6 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/user_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -28,13 +27,9 @@ class AccountModel extends ChangeNotifier {
 		loadUserDetail();
 		verifySessionValidity(
       loginedUserInformations.accessToken,
-      fallbackAction: (statusCode){
-        if(statusCode == BangumiResponseStatusCode.unauthorized){
-          launchUrlString(BangumiWebUrls.webAuthPage());
-        }
-      }
     ).then((status){
 		if(status){
+      isLogining = false;
 			updateAccessToken(loginedUserInformations.refreshToken);
 		}
 		
@@ -43,7 +38,26 @@ class AccountModel extends ChangeNotifier {
 		});
 	}
 
-	bool isLogined() => loginedUserInformations.accessToken!=null;
+
+  bool? isLogining;
+
+  bool isLogined() => loginedUserInformations.accessToken!=null;
+
+  void resetLoginStatus(){
+    isLogining = null;
+    loginedUserInformations = getDefaultLoginedUserInformations();
+    notifyListeners();
+  }
+
+  void login(){
+    isLogining = true;
+    launchUrlString(BangumiWebUrls.webAuthPage());
+    notifyListeners();
+  }
+
+  
+
+
 
 	void loadUserDetail(){
 		loginedUserInformations = MyHive.loginUserDataBase.get('loginUserInformations') ?? getDefaultLoginedUserInformations();
@@ -105,12 +119,13 @@ class AccountModel extends ChangeNotifier {
 		return verifyCompleter.future;
 	}
 
-	Future<void> getAccessToken(String code) async{
+	Future<bool> getAccessToken(String code) async{
+    Completer<bool> getAccessTokenCompleter = Completer();
 		try{
-		await HttpApiClient.client.post(
-			BangumiWebUrls.oAuthToken,
-			data: BangumiQuerys.getAccessTokenQuery(code),
-		).then((response) async {
+      await HttpApiClient.client.post(
+        BangumiWebUrls.oAuthToken,
+        data: BangumiQuerys.getAccessTokenQuery(code),
+      ).then((response) async {
 			if(response.statusCode == 200){
 			debugPrint("accessToken: Valid, ${DateTime.now().millisecondsSinceEpoch~/1000} / ${loginedUserInformations.expiredTime}");
 
@@ -121,18 +136,25 @@ class AccountModel extends ChangeNotifier {
         if(statusCode == BangumiResponseStatusCode.unauthorized){
           launchUrlString(BangumiWebUrls.webAuthPage());
         }
-      }
-      ).then((isValid){
+      }).then((isValid){
 				if(isValid){
-				loginedUserInformations
-					..accessToken = response.data["access_token"]
-					..expiredTime = DateTime.now().millisecondsSinceEpoch~/1000 + (response.data["expires_in"] as int)
-					..refreshToken = response.data["refresh_token"]
-				;
+          loginedUserInformations
+            ..accessToken = response.data["access_token"]
+            ..expiredTime = DateTime.now().millisecondsSinceEpoch~/1000 + (response.data["expires_in"] as int)
+            ..refreshToken = response.data["refresh_token"]
+          ;
 
-				updateLoginInformation(loginedUserInformations);
+          updateLoginInformation(loginedUserInformations);
+          isLogining = false;
+          getAccessTokenCompleter.complete(true);
 					
 				}
+        
+        else{
+          loginedUserInformations = getDefaultLoginedUserInformations();
+          isLogining = false;
+          getAccessTokenCompleter.complete(false);
+        }
 			});
 
 			
@@ -142,8 +164,14 @@ class AccountModel extends ChangeNotifier {
 		}
 
 		on DioException catch(e){
-		debugPrint(" ${e.response?.statusCode} error:${e.message}");
+		  debugPrint(" ${e.response?.statusCode} error:${e.message}");
+      getAccessTokenCompleter.complete(false);
+      isLogining = false;
+      loginedUserInformations = getDefaultLoginedUserInformations();
 		}
+
+    return getAccessTokenCompleter.future;
+    
 	}
 
 	Future<void> updateAccessToken(String? refreshToken) async{
@@ -277,11 +305,9 @@ class AccountModel extends ChangeNotifier {
     return getTrunsTileTokenCompleter.future;
   }
 
-  
-
   Future<bool> postContent(
 		{
-      int? subjectID,
+      String? subjectID,
       String? title,
 		  String? content,
       PostCommentType? postcontentType,
@@ -304,21 +330,15 @@ class AccountModel extends ChangeNotifier {
 
 		switch(postcontentType){
 
-      case PostCommentType.subjectComment:{
-        requestUrl = BangumiAPIUrls.actionSubjectComment(subjectID!);
-      }
-
-      case PostCommentType.postTopic:{
-				requestUrl = BangumiAPIUrls.postTopic(subjectID!);
-			}
-				
+      case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.actionSubjectComment(int.parse(subjectID!));
+      case PostCommentType.postTopic: requestUrl = BangumiAPIUrls.postTopic(int.parse(subjectID!));
 			case PostCommentType.postBlog:{
 				//缺失中
 			}
 
-			case PostCommentType.timeline:{
-        requestUrl = BangumiAPIUrls.postTimeline();
-			}
+			case PostCommentType.timeline: requestUrl = BangumiAPIUrls.postTimeline();
+
+      case PostCommentType.replyGroupTopic: requestUrl = BangumiAPIUrls.postGroupTopic(subjectID!);
 
 			default:{}
 			
@@ -534,22 +554,14 @@ class AccountModel extends ChangeNotifier {
 		switch(postCommentType){
 			
       // lacking...
-      case PostCommentType.subjectComment:{}
-				
-			case PostCommentType.replyEpComment:{
-        requestUrl = BangumiAPIUrls.toggleEPCommentLike(commentID!);
-      }
-
-				
-			case PostCommentType.replyTopic:
-			{
-				requestUrl = BangumiAPIUrls.toggleTopicLike(commentID!);
-			}
+      case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.toggleSubjectCommentLike(commentID!);
+			case PostCommentType.replyEpComment: requestUrl = BangumiAPIUrls.toggleEPCommentLike(commentID!);
+			case PostCommentType.replyTopic: requestUrl = BangumiAPIUrls.toggleTopicLike(commentID!);
+      case PostCommentType.replyGroupTopic: requestUrl = BangumiAPIUrls.toggleGroupLike(commentID!);
 				
 			//case PostCommentType.replyBlog:{
-			//	requestUrl = BangumiAPIUrls.toggleBlogLike(commentID!);
+			//	requestUrl = BangumiAPIUrls.toggleGroupLike(commentID!);
 			//}	
-
 
 			default:{}
 			
@@ -601,6 +613,11 @@ class AccountModel extends ChangeNotifier {
 
 		return likeCompleter.future;
 	}
+
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+  }
 
 }
 

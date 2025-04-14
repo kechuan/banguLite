@@ -98,7 +98,7 @@ class SettingsPage extends StatelessWidget {
                   
                       Padding(
                         padding: PaddingH16V12,
-                        child: ScalableText("设置",style:TextStyle(color:Colors.grey.withValues(alpha: 0.8))),
+                        child: ScalableText("功能设置",style:TextStyle(color:Colors.grey.withValues(alpha: 0.8))),
                       ),
                   
                       ListView.separated(
