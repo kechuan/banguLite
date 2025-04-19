@@ -151,6 +151,12 @@ String convertDateTimeToString(DateTime dateTime){
 int convertAiredEps(String? bangumiDate){
 	if(bangumiDate == null) return 0;
 
+  bool isAired = convertDateTime(bangumiDate).isBefore(DateTime.now());
+
+  if(!isAired) return 0;
+
+
+
 	int residualDateTime = (DateTime.now().millisecondsSinceEpoch - convertDateTime(bangumiDate).millisecondsSinceEpoch);
 
 	//放送开始附带一集 因此+1

@@ -1,3 +1,4 @@
+
 import 'package:bangu_lite/bangu_lite_routes.dart';
 
 
@@ -7,8 +8,6 @@ import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/max_number_input_formatter.dart';
-import 'package:bangu_lite/models/providers/account_model.dart';
-import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
 import 'package:bangu_lite/widgets/dialogs/draft_content_preserve_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -19,28 +18,35 @@ import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
-import 'package:provider/provider.dart';
 
 @FFAutoImport()
 import 'package:bangu_lite/internal/const.dart';
 @FFAutoImport()
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 
-
-
 @FFRoute(name: '/sendComment')
 class SendCommentPage extends StatefulWidget {
   const SendCommentPage({
     super.key,
+
     this.contentID,
     this.replyID,
     this.title,
     this.postCommentType,
     this.actionType,
     this.referenceObject,
+
+    this.onSendMessage,
+
     this.preservationContent,
 
+    this.themeColor,
+
+  
+
   });
+
+  final Function(String)? onSendMessage;
 
   //如果是 timeline 则应无需 id
   final int? contentID;
@@ -57,6 +63,8 @@ class SendCommentPage extends StatefulWidget {
 
   //草稿箱/编辑回复 依赖字段
   final String? preservationContent;
+
+  final Color? themeColor;
 
 
   @override
@@ -75,8 +83,6 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
   final PageController toolkitPageController = PageController();
   final PageController stickerPageController = PageController();
 
-  final ValueNotifier<bool> isSendingNotifier = ValueNotifier(false);
-
   @override 
   void onResume() {
     expandedToolKitNotifier.value = false;
@@ -92,9 +98,6 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
   @override
   Widget build(BuildContext context) {
 
-    final indexModel = context.read<IndexModel>();
-    final accountModel = context.read<AccountModel>();
-
     if(widget.preservationContent!=null && contentEditingController.text.isEmpty){
       contentEditingController.text = widget.preservationContent ?? '';
     }
@@ -105,32 +108,29 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
         leading: IconButton(
           onPressed: () {
 
-			if(contentEditingController.text.isEmpty || contentEditingController.text == widget.preservationContent){
-				 Navigator.of(context).pop();
-			}
+            if(contentEditingController.text.isEmpty || contentEditingController.text == widget.preservationContent){
+              Navigator.of(context).pop();
+            }
 
-			else{
+            else{
 
-				showDraftContentPreserveDialog(
-					context,
-					widget.contentID ?? 0,
-					title: titleEditingController.text.isEmpty ? "" : titleEditingController.text,
-					content: contentEditingController.text,
-				);
-				
-				
+              showDraftContentPreserveDialog(
+                context,
+                widget.contentID ?? 0,
+                title: titleEditingController.text.isEmpty ? "" : titleEditingController.text,
+                content: contentEditingController.text,
+              );
+              
+              
 
-			}
+            }
 
 
           },
           icon: const Icon(Icons.arrow_back),
         ),
         backgroundColor: judgeCurrentThemeColor(context).withValues(alpha: 0.8),
-        title: widget.actionType == UserContentActionType.edit ? 
-          const ScalableText('编辑这段评论',style: TextStyle(fontSize: 18)) : 
-		      ScalableText('吐槽 ${widget.title}',style: const TextStyle(fontSize: 18))
-		    ,
+        title: ScalableText(widget.title ??'吐槽 ${widget.title}',style: const TextStyle(fontSize: 18)),
         actions: [
 
           IconButton(
@@ -145,63 +145,27 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
           const Padding(padding: PaddingH6),
 
-
-          SizedBox(
-            child: ValueListenableBuilder(
-              valueListenable: isSendingNotifier,
-              builder: (_,isSending,__){
-            
-                Widget showIcon = isSending ? 
-                  const SizedBox(
-                    height: 25,
-                    width: 25,
-                    child: CircularProgressIndicator(strokeWidth: 3)
-                  ) : 
-                  const Icon(Icons.send);
-            
-                return IconButton(
-                  onPressed: () {
-                    if(isSending) return;
-                    if(contentEditingController.text.isEmpty){
-                      fadeToaster(context: context, message: '不可发送空白内容');
-                      return;
-                    }
-                
-                    else{
-                
-                      debugPrint("id:${widget.contentID}/${widget.postCommentType}/${widget.actionType}");
-                
-                      invokeAsyncPopOut()=> Navigator.of(context).pop(contentEditingController.text);
-            
-                      isSendingNotifier.value = true;
-            
-                      accountModel.toggleComment(
-                        commentID: widget.contentID,
-                        commentContent: contentEditingController.text,
-                        postCommentType: widget.postCommentType,
-                        actionType : widget.actionType ?? UserContentActionType.post,
-                        replyTo: widget.replyID ?? 0,
-                        fallbackAction: (message){
-                          fadeToaster(context: context, message: message,duration: const Duration(seconds: 5));
-                        }
-                      ).then((result){
-                        if(result){
-                          invokeAsyncPopOut();
-                        }
-            
-                        isSendingNotifier.value = false;
-                      });
-                
-                    }
-                  },
-                  icon: showIcon
-                );
+          IconButton(
+            onPressed: () {
               
+              if(contentEditingController.text.isEmpty){
+                fadeToaster(context: context, message: '不可发送空白内容');
+                return;
               }
-              
-            ),
-          ),
+          
+              else{
+          
+                //debugPrint("id:${widget.contentID}/${widget.postCommentType}/${widget.actionType}");
+                //widget.onSendMessage?.call(contentEditingController.text);
 
+                Navigator.of(context).pop(contentEditingController.text);
+
+          
+              }
+            },
+            icon: const Icon(Icons.send)
+          ),
+        
         ],
       ),
       body: ValueListenableBuilder(
@@ -226,9 +190,17 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxHeight: 200),
                   child: BBCodeText(
-                    data: '[quote]${widget.referenceObject}[/quote]',
+                    data: '${widget.title?.split('回复').last} 说: ${widget.referenceObject}',
+                    //data: convertBangumiCommentSticker(widget.referenceObject ?? ""),
                     stylesheet: BBStylesheet(
-                      tags: [AdapterQuoteTag()],
+                      tags: [
+                        AdapterQuoteTag(),
+                        BangumiStickerTag(),
+                        BoldTag(),
+                        ItalicTag(),
+                        SizeTag(),
+                        PatchColorTag(),
+                      ],
                       selectableText: true,
                       defaultText: const TextStyle(fontFamily: "MiSansFont")
                     ),
@@ -460,48 +432,48 @@ class StickerSelectView extends StatelessWidget {
 						}
 
 					    return PageView(
-					    controller: stickerPageController,
-					    children: [
-					    	GridView(
-					    		gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-					    			crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 16 : 8
-					    		),
-					    		children: List.generate(
-					    		23,
-					    		((index){
-					    			return UnVisibleResponse(
-					    			onTap: () => insertBgmSticker(index),
-					    			child: Image.asset(
-					    				'./assets/bangumiSticker/bgm${convertDigitNumString(index+1)}.gif',
-					    				scale: 0.8,
-					    			)
-					    			);
-					    		})
-					    		),
-					    	),
-					    
-					    	GridView(
-					    
-					    		gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-					    			crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 16 : 8
-					    		),
-					    		children: List.generate(
-					    			102,
-					    			((index){
-					    			return UnVisibleResponse(
-					    				onTap: () => insertBgmSticker(index+23),
-					    				child: Image.asset(
-					    					'./assets/bangumiSticker/bgm${convertDigitNumString(index+24)}.gif',
-					    					scale: 0.8,
-					    				)
-					    		);
-					    	})
-					    	),
-					    ),
-					    
-					    ],
-					    
-					    );
+                controller: stickerPageController,
+                children: [
+                  GridView(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 16 : 8
+                    ),
+                    children: List.generate(
+                    23,
+                    ((index){
+                      return UnVisibleResponse(
+                      onTap: () => insertBgmSticker(index),
+                      child: Image.asset(
+                        './assets/bangumiSticker/bgm${convertDigitNumString(index+1)}.gif',
+                        scale: 0.8,
+                      )
+                      );
+                    })
+                    ),
+                  ),
+                
+                  GridView(
+                
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 16 : 8
+                    ),
+                    children: List.generate(
+                      102,
+                      ((index){
+                      return UnVisibleResponse(
+                        onTap: () => insertBgmSticker(index+23),
+                        child: Image.asset(
+                          './assets/bangumiSticker/bgm${convertDigitNumString(index+24)}.gif',
+                          scale: 0.8,
+                        )
+                    );
+                  })
+                  ),
+                ),
+                
+                ],
+                
+                );
 					  }
 					),
 				),

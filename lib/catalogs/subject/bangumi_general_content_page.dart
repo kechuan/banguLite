@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/base_details.dart';
@@ -10,11 +11,14 @@ import 'package:bangu_lite/models/base_info.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
+import 'package:bangu_lite/models/user_details.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
+import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -47,10 +51,12 @@ abstract class BangumiContentPageState<
   int? getSubContentID() => null;
 
   PostCommentType? getPostCommentType();
-  Color? getcurrentSubjectThemeColor() => null;
+  Color? getcurrentSubjectThemeColor();
 
   //blog日志里面的内容
-  Widget? getFooterWidget() => null;
+
+  List<String>? getTrailingPhotosUri() => null;
+  
 
   int? getCommentCount(D? contentDetail, bool isLoading);
 
@@ -84,16 +90,13 @@ abstract class BangumiContentPageState<
 
             return Theme(
               data: Theme.of(context).copyWith(
-                scaffoldBackgroundColor: getcurrentSubjectThemeColor(),
+                scaffoldBackgroundColor: judgeDarknessMode(context) ? null : getcurrentSubjectThemeColor(),
               ),
               child: Scaffold(
                 body: Selector<M, D>(
                   selector: (_, model) => (contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?) ?? createEmptyDetailData(),
                   shouldRebuild: (previous, next) => previous.detailID != next.detailID,
                   builder: (_, contentDetailData, contentComment) {
-
-                    
-
 
                     return Scrollbar(
                       thumbVisibility: true,
@@ -106,36 +109,39 @@ abstract class BangumiContentPageState<
                         slivers: [
                           MultiSliver(
                             children: [
-                              SliverPinnedHeader(
-                                child: BangumiContentAppbar(
-                                  contentID: getSubContentID() ?? contentInfo.id,
-                                  titleText: contentInfo.contentTitle,
-                                  webUrl: getWebUrl(getSubContentID() ?? contentInfo.id),
-                                  postCommentType: getPostCommentType(),
-                                  surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
-                                  onSendMessage: (content) {
-									
-                                    fadeToaster(context: context, message: "回帖成功");
-
-                                    final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
-                                    final int commentListCount = getCommentCount(contentDetail, false) ?? 0;
-
-                                    int resultCommentCount = 
-                                      getPostCommentType() == PostCommentType.replyTopic ?
-                                      commentListCount :
-                                      commentListCount+1
-                                    ;
-
-                                    resultCommentCount += userCommentMap.length;
-
-                                    userCommentMap.addAll({resultCommentCount:content});
-                                    
-                                    WidgetsBinding.instance.addPostFrameCallback((_){
-                                      animatedSliverListKey.currentState?.insertItem(0);
-                                    });
-									           
-                                  },
-                                )
+                              
+                              SliverSafeArea(
+                                sliver: SliverPinnedHeader(
+                                  child: BangumiContentAppbar(
+                                    contentID: getSubContentID() ?? contentInfo.id,
+                                    titleText: contentInfo.contentTitle,
+                                    webUrl: getWebUrl(getSubContentID() ?? contentInfo.id),
+                                    postCommentType: getPostCommentType(),
+                                    surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
+                                    onSendMessage: (content) {
+                                                  
+                                      fadeToaster(context: context, message: "回帖成功");
+                                
+                                      final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
+                                      final int commentListCount = getCommentCount(contentDetail, false) ?? 0;
+                                
+                                      int resultCommentCount = 
+                                        getPostCommentType() == PostCommentType.replyTopic ?
+                                        commentListCount :
+                                        commentListCount+1
+                                      ;
+                                
+                                      resultCommentCount += userCommentMap.length;
+                                
+                                      userCommentMap.addAll({resultCommentCount:content});
+                                      
+                                      WidgetsBinding.instance.addPostFrameCallback((_){
+                                        animatedSliverListKey.currentState?.insertItem(0);
+                                      });
+                                                             
+                                    },
+                                  )
+                                ),
                               ),
                                     
                               contentComment!
@@ -149,14 +155,14 @@ abstract class BangumiContentPageState<
                     future: contentFuture,
                     builder: (_, snapshot) {
                   
-						final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id);
-						final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
-						final int commentListCount = (getCommentCount(contentDetail, isCommentLoading) ?? 0);
+						          final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id);
+						          final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
+						          final int commentListCount = (getCommentCount(contentDetail, isCommentLoading) ?? 0);
 
                       	int resultCommentCount = getPostCommentType() == PostCommentType.replyTopic ?
-						commentListCount :
-						commentListCount+1
-						;
+						            commentListCount :
+						            commentListCount+1
+						            ;
 
                       if(isCommentLoading){
                         return Skeletonizer.sliver(
@@ -186,6 +192,7 @@ abstract class BangumiContentPageState<
                             //debugPrint("$contentCommentIndex/$resultCommentCount");
                         
                             if(contentCommentIndex == 0){
+
                               return ListView(
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
@@ -209,7 +216,18 @@ abstract class BangumiContentPageState<
                                         ..commentReactions = contentDetail?.contentReactions
                                     ),
                         
-                                  getFooterWidget() ?? const SizedBox.shrink(),
+                                    ...List.generate(
+                                      getTrailingPhotosUri()?.length ?? 0,
+                                      (index) {
+                                        return Padding(
+                                          padding: Padding12,
+                                          child: CachedNetworkImage(
+                                            imageUrl: getTrailingPhotosUri()![index],
+                                            //photoViewStatus: true,
+                                          ),
+                                        );
+                                      }
+                                    ),
                                 
                                   Padding(
                                     padding: const EdgeInsets.all(16),
@@ -246,8 +264,14 @@ abstract class BangumiContentPageState<
                               }
 
                               final currentEpCommentDetails =  EpCommentDetails()
-                                ..userInformation = context.read<AccountModel>().loginedUserInformations.userInformation
-								//刚刚评论的ID理应无法被Action操作
+                                //..userInformation = context.read<AccountModel>().loginedUserInformations.userInformation
+                                ..userInformation = 
+                                (
+                                  UserInformation()
+                                    ..userName = "1002838"
+                                )
+
+								                //刚刚评论的ID理应无法被Action操作
                                 ..commentID = null
                                 ..comment = userCommentMap[contentCommentIndex]
                                 ..epCommentIndex = "${contentCommentIndex+1}"
@@ -255,51 +279,51 @@ abstract class BangumiContentPageState<
                               ;
                         
                               return fadeSizeTransition(
-								animation: animation,
-								child: Column(
-									children: [
-									if(contentCommentIndex - resultCommentCount == 0)
-										const Divider(),
-								
-										EpCommentView(
-											postCommentType: getPostCommentType(),
-											
-											onUpdateComment: (content) {
+                                animation: animation,
+                                child: Column(
+                                  children: [
+                                  if(contentCommentIndex - resultCommentCount == 0)
+                                    const Divider(),
+                                
+                                    EpCommentView(
+                                      postCommentType: getPostCommentType(),
+                                      
+                                      onUpdateComment: (content) {
 
-												if(content == null){
-													userCommentMap.remove(contentCommentIndex - resultCommentCount);
-																		
-													SliverAnimatedList.of(animatedContext).removeItem(
-														contentCommentIndex,
-														duration: const Duration(milliseconds: 300),
-														(_,animation){			
-															return fadeSizeTransition(
-																animation: animation,
-																child: EpCommentView(
-																epCommentData: currentEpCommentDetails
-																),
-															);
-														}
-													);
-												}
+                                        if(content == null){
+                                          userCommentMap.remove(contentCommentIndex - resultCommentCount);
+                                                    
+                                          SliverAnimatedList.of(animatedContext).removeItem(
+                                            contentCommentIndex,
+                                            duration: const Duration(milliseconds: 300),
+                                            (_,animation){			
+                                              return fadeSizeTransition(
+                                                animation: animation,
+                                                child: EpCommentView(
+                                                epCommentData: currentEpCommentDetails
+                                                ),
+                                              );
+                                            }
+                                          );
+                                        }
 
-												else{
-													//新增项目暂不处理
-												}
-																			
-												
-								
-								
-																			
-											},
-											epCommentData: currentEpCommentDetails
-										),
-																
-										const Divider()
-									],
-								)
-                        
-							  );
+                                        else{
+                                          //新增项目暂不处理
+                                        }
+                                                      
+                                        
+                                
+                                
+                                                      
+                                      },
+                                      epCommentData: currentEpCommentDetails
+                                    ),
+                                                
+                                    const Divider()
+                                  ],
+                                )
+                                        
+                              );
                             }
 							
 
@@ -309,47 +333,47 @@ abstract class BangumiContentPageState<
                             	Builder(
                             	  builder: (_) {
 
-									final ValueNotifier<int> commentUpdateFlag = ValueNotifier(0);	
+									                final ValueNotifier<int> commentUpdateFlag = ValueNotifier(0);	
 
                             	    return ValueListenableBuilder(
-										valueListenable: commentUpdateFlag,
-										builder: (_,__,child){
+                                    valueListenable: commentUpdateFlag,
+                                    builder: (_,__,child){
 
-											final currentEpCommentDetails = contentDetail!.contentRepliedComment![contentCommentIndex];
+                                      final currentEpCommentDetails = contentDetail!.contentRepliedComment![contentCommentIndex];
 
-											if(userCommentMap[contentCommentIndex] != null){
-												currentEpCommentDetails.comment = userCommentMap[contentCommentIndex];
-											}
+                                      if(userCommentMap[contentCommentIndex] != null){
+                                        currentEpCommentDetails.comment = userCommentMap[contentCommentIndex];
+                                      }
 
 
-											return EpCommentView(
-												postCommentType: getPostCommentType(),
-												onUpdateComment: (content) {
-												
-													if(content == null){
-														SliverAnimatedList.of(animatedContext).removeItem(
-															contentCommentIndex,
-															duration: const Duration(milliseconds: 300),
-															(_,animation)=> fadeSizeTransition(
-																animation: animation,
-																child: EpCommentView(epCommentData: currentEpCommentDetails),
-															)
-															
-														);
-													}
-			
-													else{
-														userCommentMap[contentCommentIndex] = content;
-														commentUpdateFlag.value += 1;
-													}
-												
-												},
-												epCommentData: currentEpCommentDetails
-																									
-											);
-										},
-										
-									);
+                                      return EpCommentView(
+                                        postCommentType: getPostCommentType(),
+                                        onUpdateComment: (content) {
+                                        
+                                          if(content == null){
+                                            SliverAnimatedList.of(animatedContext).removeItem(
+                                              contentCommentIndex,
+                                              duration: const Duration(milliseconds: 300),
+                                              (_,animation)=> fadeSizeTransition(
+                                                animation: animation,
+                                                child: EpCommentView(epCommentData: currentEpCommentDetails),
+                                              )
+                                              
+                                            );
+                                          }
+                      
+                                          else{
+                                            userCommentMap[contentCommentIndex] = content;
+                                            commentUpdateFlag.value += 1;
+                                          }
+                                        
+                                        },
+                                        epCommentData: currentEpCommentDetails
+                                                                  
+                                      );
+                                    },
+                                    
+                                  );
                             	  }
                             	),
                             					

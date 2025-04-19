@@ -1,4 +1,4 @@
-import 'package:bangu_lite/catalogs/bangumi_general_content_page.dart';
+import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/topic_details.dart';
@@ -14,12 +14,14 @@ class BangumiTopicPage extends StatefulWidget {
   const BangumiTopicPage({
     super.key,
     required this.topicModel,
-	  required this.topicInfo,
+    required this.index,
+	  //required this.topicInfo,
     this.themeColor
   });
 
   final TopicModel topicModel;
-  final TopicInfo topicInfo;
+  final int index;
+  //final TopicInfo topicInfo;
   final Color? themeColor;
 
   @override
@@ -35,7 +37,7 @@ class _BangumiTopicPageState extends BangumiContentPageState
 >{
 
   @override
-  TopicInfo getContentInfo() => widget.topicInfo;
+  TopicInfo getContentInfo() => widget.topicModel.contentListData[widget.index];
 
   @override
   TopicModel getContentModel() => widget.topicModel;
@@ -65,5 +67,6 @@ class _BangumiTopicPageState extends BangumiContentPageState
 
   @override
   Future<void> loadContent(int topicID) => getContentModel().loadContentDetail(topicID);
+
   
 }

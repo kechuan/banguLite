@@ -46,6 +46,7 @@ class BangumiDetailRelations extends StatelessWidget {
                       return NotificationListener<ScrollNotification>(
                         onNotification: (_) => true,
                         child: ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemExtent: 200,
                           itemCount: relationModel.contentListData.length,

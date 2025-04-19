@@ -102,8 +102,8 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                                   child: Column(
                                     spacing: 12,
                                     children: [
-                                      const ScalableText("打开外部浏览器以查看图片"),
-                                      ScalableText("link: ${widget.imageUrl}"),
+                                      const ScalableText("点击跳转以查看图片",style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ScalableText("link: ${widget.imageUrl}",maxLines: 3,overflow: TextOverflow.ellipsis,textAlign: TextAlign.center,),
                                     ],
                                   ),
                                 ): const SizedBox.shrink(),
@@ -175,19 +175,25 @@ class LoadingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  SizedBox(
+    return SizedBox(
       height: 200,
       width: 200,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
+      child: Card(
+      shadowColor: Colors.white,
+      elevation: 6,
+        child: Center(
+          child: Column(
+            spacing: 16,
+            mainAxisAlignment: MainAxisAlignment.center,
 
-            const CircularProgressIndicator(),
-
-            ScalableText(progress ?? ""),
-
-          ],
+            children: [
+        
+              const CircularProgressIndicator(),
+        
+              ScalableText(progress ?? ""),
+        
+            ],
+          ),
         ),
       ),
     );

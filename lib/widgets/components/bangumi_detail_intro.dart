@@ -3,6 +3,8 @@
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
@@ -45,8 +47,6 @@ class IntroPortrait extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final commentModel = context.read<CommentModel>();
 
     return Column(
       spacing: 12,
@@ -124,11 +124,8 @@ class IntroPortrait extends StatelessWidget {
             
           ]
         ),
-    
-        StarButton(
-          bangumiDetails: bangumiDetails,
-          commentDetails: commentModel.userCommentDetails
-        ),
+
+        StarButton(bangumiDetails: bangumiDetails),
     
         LayoutBuilder(
           builder: (_,constraint) {
@@ -143,8 +140,8 @@ class IntroPortrait extends StatelessWidget {
         InkResponse(
           onTap: () {
     
-            //final EpModel epModel = context.read<EpModel>();
             showModalBottomSheet(
+              backgroundColor: judgeDetailRenderColor(context,context.read<BangumiModel>().bangumiThemeColor).withValues(alpha: 0.8),
               constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
               context: context,
               
@@ -228,7 +225,6 @@ class IntroPortrait extends StatelessWidget {
                             }
     
                             return ScalableText("$airedEps/${bangumiDetails.informationList["eps"]}");
-                            //return ScalableText("${convertAiredEps(bangumiDetails.informationList["air_date"])}/${bangumiDetails.informationList["eps"]}");
                           }
                         ),
     
@@ -320,7 +316,6 @@ class IntroLandscape extends StatelessWidget {
                         width: 120,
                         child: StarButton(
                           bangumiDetails: bangumiDetails,
-                          commentDetails: commentModel.userCommentDetails
                         )
                       )
                     ),

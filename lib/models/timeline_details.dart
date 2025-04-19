@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/bangumi_define/timeline_const.dart';
 import 'package:bangu_lite/models/base_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/user_details.dart';
 
 // 广场timeline 与 用户timeline需求数据
 
@@ -15,8 +17,14 @@ class TimelineDetails extends BaseDetails {
   int? get timelineID => detailID;
   
   //这里的 UID 是指代的最初始的ID 不是 userName
-  int? actionUserUID;
+  
 
+  CommentDetails? commentDetails;
+
+  //UserInformation? actionUser;
+  //String? comment;
+  //Map<int,Set<String>>? commentReactions;
+  
   // int => String
   int? catType;
   int? catAction;
@@ -24,15 +32,14 @@ class TimelineDetails extends BaseDetails {
 
   Set<int>? objectIDSet;
   Set<String>? objectNameSet;
-  
+
   //parent Object?
   int? subObjectID;
   //对番剧进行评价 而非 progress更新时 独有的字段
-  String? comment;
+  
 
   //暂且作废 因为字段藏在 [subject][subject]内部
-  //Map<int,Set<String>>? commentReactions;
-
+  
 
   // progress 更新 4/0
   int? epsUpdate;
@@ -85,6 +92,7 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
 
   Set<int> objectIDSet = {};
   Set<String> objectNameSet = {};
+  Map<int,Set<String>>? commentReactions = {};
 
   void recursiveExtract(Map<String, dynamic> map) {
     for (final entry in map.entries) {
@@ -114,7 +122,23 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
       }
       
       else if(detectPropList.contains(key)){
-        resultFields[key] = value;
+
+        switch (key) {
+
+          case 'comment':
+          case 'sort':
+          case 'epsUpdate':{
+            resultFields[key] = value;
+          }
+
+          case 'reactions':{
+            commentReactions = loadReactionDetails(value);
+            resultFields[key] = commentReactions;
+          }
+            
+  
+        }
+        
       }
 
       else if (value is Map<String, dynamic>) {
@@ -151,15 +175,21 @@ List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData){
       detailID: bangumiTimelineData['id'],
     );
 
-
+    //可能不一定有 Comment 但一定会有 userInformation
     timelineDetails
-      ..actionUserUID = bangumiTimelineData['uid']
+      ..commentDetails = (
+        CommentDetails()
+          ..userInformation = loadUserInformations(bangumiTimelineData['user'])
+          ..comment = resultFields['comment']
+          ..commentReactions = resultFields['reactions']
+      )
       ..catType = bangumiTimelineData['cat']
       ..catAction = bangumiTimelineData['type']
       ..timelineCreatedAt = bangumiTimelineData['createdAt']
       ..objectIDSet = resultFields['objectIDSet']
       ..objectNameSet = resultFields['objectNameSet']
       ..epsUpdate = resultFields['epsUpdate'] ?? resultFields['sort']
+     
     ;
 
     timelineDetailsList.add(timelineDetails);
@@ -231,7 +261,11 @@ String convertTimelineDescription(TimelineDetails currentTimeline, {bool? author
 
   }
 
-  if(contentText.isEmpty) undoActionText += "撤销了一项 ";
+  if(contentText.isEmpty && currentTimeline.catType != 1) undoActionText += "撤销了一项 ";
+
+  if(currentTimeline.commentDetails?.comment != null){
+	suffixText = '[quote]${currentTimeline.commentDetails!.comment ?? ""}[/quote]';
+  }
 
   leadingText += undoActionText + actionText + contentText + suffixText;
 

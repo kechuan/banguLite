@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/comment_replied_sheet.dart';
@@ -37,7 +38,7 @@ class EpRepliedTile extends ListTile {
       child: Container(
         decoration: BoxDecoration(border: Border.all()),
         child: ListTile(
-          tileColor: Theme.of(context).brightness == Brightness.light ? const Color.fromARGB(225, 212, 232, 215) : const Color.fromARGB(255, 118, 121, 119),
+          tileColor: judgeDarknessMode(context) ? const Color.fromARGB(255, 118, 121, 119) : const Color.fromARGB(225, 212, 232, 215),
           title: Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +101,7 @@ class EpRepliedTile extends ListTile {
                     epCommentData: epCommentData,
                     child: ScalableText(
                       "> 点击查看 ${epCommentData.repliedComment!.length} 条评论",
-                      style: const TextStyle(color: Colors.blueAccent),
+                      style: TextStyle(color: judgeDarknessMode(context) ? const Color.fromARGB(225, 212, 232, 215) : Colors.blueAccent),
                     )
                   ),
                   

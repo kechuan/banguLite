@@ -1,4 +1,5 @@
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 
 import 'package:bangu_lite/models/star_details.dart';
 import 'package:bangu_lite/models/timeline_details.dart';
@@ -19,7 +20,8 @@ part 'hive_adapters.g.dart';
     AdapterSpec<StarBangumiDetails>(),
     AdapterSpec<UserInformation>(),
     AdapterSpec<LoginedUserInformations>(),
-    AdapterSpec<TimelineDetails>()
+    //AdapterSpec<CommentDetails>(),
+    //AdapterSpec<TimelineDetails>()
   ]    
 )
 // Annotations must be on some element

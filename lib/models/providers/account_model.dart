@@ -4,7 +4,6 @@ import 'dart:async';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/response_status_code.dart';
-import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/user_details.dart';
@@ -413,11 +412,11 @@ class AccountModel extends ChangeNotifier {
 	}
 
 	Future<bool> toggleComment({
+    int? contentID,
     int? commentID,
     String? commentContent,
     PostCommentType? postCommentType,
     UserContentActionType actionType = UserContentActionType.post,
-    int? replyTo,
     Function(String message)? fallbackAction
   }) async {
 
@@ -431,13 +430,7 @@ class AccountModel extends ChangeNotifier {
 			commentCompleter.complete(false);
 		}
 
-    if(postCommentType == null || requestUrl.isEmpty){
-			debugPrint(
-				"comment空数据错误:"
-				"postCommentType:$postCommentType/commentID:$commentID"
-			);
-			commentCompleter.complete(false);
-		}
+
 
     
 
@@ -445,7 +438,7 @@ class AccountModel extends ChangeNotifier {
 
       case PostCommentType.replyEpComment:{
         requestUrl = actionType == UserContentActionType.post ?
-        BangumiAPIUrls.postEpComment(commentID!) :
+        BangumiAPIUrls.postEpComment(contentID!) :
         BangumiAPIUrls.actionEpComment(commentID!);
         
 			}
@@ -453,7 +446,7 @@ class AccountModel extends ChangeNotifier {
 			case PostCommentType.replyTopic:{
 
         requestUrl = actionType == UserContentActionType.post ?
-        BangumiAPIUrls.postTopicComment(commentID!) :
+        BangumiAPIUrls.postTopicComment(contentID!) :
         BangumiAPIUrls.actionTopicComment(commentID!);
 				
 			}
@@ -461,7 +454,7 @@ class AccountModel extends ChangeNotifier {
 			case PostCommentType.replyBlog:{
 
         requestUrl = actionType == UserContentActionType.post ?
-        BangumiAPIUrls.postBlogComment(commentID!) :
+        BangumiAPIUrls.postBlogComment(contentID!) :
         BangumiAPIUrls.actionBlogComment(commentID!);
 
 			}
@@ -474,6 +467,14 @@ class AccountModel extends ChangeNotifier {
 			
 		}
 
+    if(postCommentType == null || requestUrl.isEmpty){
+			debugPrint(
+				"comment空数据错误:"
+				"postCommentType:$postCommentType/commentID:$commentID"
+			);
+			return false;
+		}
+
 		switch(actionType){
 			case UserContentActionType.post:{
         await getTrunsTileToken();
@@ -482,7 +483,7 @@ class AccountModel extends ChangeNotifier {
 					requestUrl,
           data: BangumiQuerys.replyQuery(
             content: commentContent,
-            replyTo: replyTo,
+            replyTo: commentID ?? 0,
             turnstileToken: loginedUserInformations.turnsTileToken,
           ),
 					options: Options(
@@ -520,10 +521,6 @@ class AccountModel extends ChangeNotifier {
 			else{
 				commentCompleter.complete(false);
         fallbackAction?.call(response.data["message"]);
-        //if(fallbackAction != null){
-        //  fallbackAction(response.data["message"]);
-        //}
-        
 			}
 		
 		});
@@ -537,7 +534,10 @@ class AccountModel extends ChangeNotifier {
 		int? commentID,
 		int stickerLikeIndex,
 		PostCommentType? postCommentType,
-		{UserContentActionType actionType = UserContentActionType.post}
+		{
+      UserContentActionType actionType = UserContentActionType.post,
+      Function(String message)? fallbackAction
+    }
 	) async {
 
 		Completer<bool> likeCompleter = Completer();
@@ -602,11 +602,13 @@ class AccountModel extends ChangeNotifier {
 		await actionLikeFuture().then((response){
 			if(response.statusCode == 200){
 				debugPrint("$actionType succ: $commentID => $stickerLikeIndex");
+        fallbackAction?.call("贴条成功");
 				likeCompleter.complete(true);
 			}
 
 			else{
 				likeCompleter.complete(false);
+        fallbackAction?.call("${response.data["message"]}");
 			}
 		
 		});

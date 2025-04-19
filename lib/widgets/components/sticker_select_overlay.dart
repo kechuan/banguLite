@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
@@ -113,61 +114,69 @@ class StickerSelectOverlay{
                   child: ClipRRect(
                     borderRadius:BorderRadius.circular(16),
                     child: Material(
-                    
-                      child: Column(
-                        spacing: 6,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-          
-                              const SizedBox.shrink(),
-          
-                              const ScalableText("贴纸选择"),
-          
-                              IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: () => opacityListenable.value = 0.0,
-                              )
-                            ]
-                            
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: judgeDarknessMode(context) ? Colors.white : Colors.transparent,
                           ),
-          
-                          Expanded(
-                            child: GridView(
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 4
-                              ),
-                              children: List.generate(
-                                12, ((index){
-                                  return GridTile(
-                                    child: InkResponse(
-                                      onTap: () {
-                                        final accountModel = context.read<AccountModel>();
-
-                                        debugPrint("postCommentType:$postCommentType");
-          
-                                        accountModel.toggleCommentLike(
-                                          commentID, 
-                                          stickerDataLike[index],
-                                          postCommentType,
-                                        );
-
-                                        opacityListenable.value = 0.0;
-
-                                      },
-                                      child: Image.asset(
-                                        "assets/bangumiSticker/bgm${convertStickerDatalike(stickerDataLike[index])}.gif",
-                                        scale: 0.8,
-                                      ),
-                                    )
-                                  );
-                                })
+                          borderRadius: BorderRadius.circular(16)
+                          
+                        ),
+                        child: Column(
+                          spacing: 6,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                  
+                                const SizedBox.shrink(),
+                                  
+                                const ScalableText("贴纸选择"),
+                                  
+                                IconButton(
+                                  icon: const Icon(Icons.close),
+                                  onPressed: () => opacityListenable.value = 0.0,
+                                )
+                              ]
+                              
+                            ),
+                                  
+                            Expanded(
+                              child: GridView(
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 4
+                                ),
+                                children: List.generate(
+                                  12, ((index){
+                                    return GridTile(
+                                      child: InkResponse(
+                                        onTap: () {
+                                          final accountModel = context.read<AccountModel>();
+                        
+                                          debugPrint("postCommentType:$postCommentType");
+                                  
+                                          accountModel.toggleCommentLike(
+                                            commentID, 
+                                            stickerDataLike[index],
+                                            postCommentType,
+                                          );
+                        
+                                          opacityListenable.value = 0.0;
+                        
+                                        },
+                                        child: Image.asset(
+                                          "assets/bangumiSticker/bgm${convertStickerDatalike(stickerDataLike[index])}.gif",
+                                          scale: 0.8,
+                                        ),
+                                      )
+                                    );
+                                  })
+                                ),
                               ),
                             ),
-                          ),
-                        
-                        ],
+                          
+                          ],
+                        ),
                       )
                     
                     ),

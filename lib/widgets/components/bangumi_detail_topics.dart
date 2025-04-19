@@ -125,8 +125,8 @@ class BangumiDetailTopics extends StatelessWidget {
                                     context,
                                     Routes.subjectTopic,
                                     arguments: {
-                                      "topicInfo":topicsList[index],
                                       "topicModel":context.read<TopicModel>(),
+                                      "index":index,
                                       "themeColor":judgeDetailRenderColor(context,bangumiModel.bangumiThemeColor)
                                     }
                                   );

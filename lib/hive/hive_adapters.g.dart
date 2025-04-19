@@ -57,7 +57,7 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
           typeId == other.typeId;
 }
 
-class BangumiThemeColorAdapter extends TypeAdapter<AppThemeColor> {
+class AppThemeColorAdapter extends TypeAdapter<AppThemeColor> {
   @override
   final int typeId = 1;
 
@@ -97,7 +97,7 @@ class BangumiThemeColorAdapter extends TypeAdapter<AppThemeColor> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is BangumiThemeColorAdapter &&
+      other is AppThemeColorAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -301,13 +301,14 @@ class LoginedUserInformationsAdapter
       ..accessToken = fields[0] as String?
       ..expiredTime = (fields[9] as num?)?.toInt()
       ..refreshToken = fields[10] as String?
-      ..userInformation = fields[12] as UserInformation?;
+      ..userInformation = fields[12] as UserInformation?
+      ..turnsTileToken = fields[13] as String?;
   }
 
   @override
   void write(BinaryWriter writer, LoginedUserInformations obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.accessToken)
       ..writeByte(9)
@@ -315,7 +316,9 @@ class LoginedUserInformationsAdapter
       ..writeByte(10)
       ..write(obj.refreshToken)
       ..writeByte(12)
-      ..write(obj.userInformation);
+      ..write(obj.userInformation)
+      ..writeByte(13)
+      ..write(obj.turnsTileToken);
   }
 
   @override
@@ -329,7 +332,7 @@ class LoginedUserInformationsAdapter
           typeId == other.typeId;
 }
 
-class UserInformationsAdapter extends TypeAdapter<UserInformation> {
+class UserInformationAdapter extends TypeAdapter<UserInformation> {
   @override
   final int typeId = 8;
 
@@ -339,8 +342,9 @@ class UserInformationsAdapter extends TypeAdapter<UserInformation> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return UserInformation()
-      ..userID = (fields[0] as num?)?.toInt()
+    return UserInformation(
+      userID: (fields[0] as num?)?.toInt(),
+    )
       ..userName = fields[1] as String?
       ..nickName = fields[2] as String?
       ..avatarUrl = fields[3] as String?
@@ -375,68 +379,7 @@ class UserInformationsAdapter extends TypeAdapter<UserInformation> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is UserInformationsAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class TimelineDetailsAdapter extends TypeAdapter<TimelineDetails> {
-  @override
-  final int typeId = 9;
-
-  @override
-  TimelineDetails read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return TimelineDetails(
-      detailID: (fields[9] as num?)?.toInt(),
-    )
-      ..actionUserUID = (fields[0] as num?)?.toInt()
-      ..catType = (fields[1] as num?)?.toInt()
-      ..catAction = (fields[2] as num?)?.toInt()
-      ..timelineCreatedAt = (fields[3] as num?)?.toInt()
-      ..objectIDSet = (fields[4] as Set?)?.cast<int>()
-      ..objectNameSet = (fields[5] as Set?)?.cast<String>()
-      ..subObjectID = (fields[6] as num?)?.toInt()
-      ..comment = fields[7] as String?
-      ..epsUpdate = (fields[8] as num?)?.toInt();
-  }
-
-  @override
-  void write(BinaryWriter writer, TimelineDetails obj) {
-    writer
-      ..writeByte(10)
-      ..writeByte(0)
-      ..write(obj.actionUserUID)
-      ..writeByte(1)
-      ..write(obj.catType)
-      ..writeByte(2)
-      ..write(obj.catAction)
-      ..writeByte(3)
-      ..write(obj.timelineCreatedAt)
-      ..writeByte(4)
-      ..write(obj.objectIDSet)
-      ..writeByte(5)
-      ..write(obj.objectNameSet)
-      ..writeByte(6)
-      ..write(obj.subObjectID)
-      ..writeByte(7)
-      ..write(obj.comment)
-      ..writeByte(8)
-      ..write(obj.epsUpdate)
-      ..writeByte(9)
-      ..write(obj.detailID);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TimelineDetailsAdapter &&
+      other is UserInformationAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -12,7 +12,7 @@ abstract class BaseInfo {
 abstract class ContentInfo extends BaseInfo {
   ContentInfo({
     super.id,
-	this.contentTitle
+	  this.contentTitle
   });
   
   //title

@@ -34,14 +34,19 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
     await Future.wait(
       [
         loadContentDetail(selectedBlogID),
-        loadBlogComment(selectedBlogID)
+        loadBlogComment(selectedBlogID),
+        loadBlogPhotos(selectedBlogID),
+        
       ]
     ).then((responseList){
       final commentResponse = responseList[1] as Response;
+      final photoResponse = responseList[2] as Response;
 
-      if (commentResponse.data != null) {
-        contentDetailData[selectedBlogID]?.blogReplies = loadEpCommentDetails(commentResponse.data);
+      if (commentResponse.data != null && photoResponse.data != null) {
         debugPrint("blog: $selectedBlogID load blogComment done");
+        contentDetailData[selectedBlogID]?.blogReplies = loadEpCommentDetails(commentResponse.data);
+        contentDetailData[selectedBlogID]?.trailingPhotosUri = loadBlogPhotoDetails(photoResponse.data);
+        
         blogFullContentCompleter.complete();
         notifyListeners();
       }
@@ -57,6 +62,14 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
 
     return await HttpApiClient.client.get(
       BangumiAPIUrls.blogComment(blogID),
+    );
+  }
+
+  Future<Response> loadBlogPhotos(int blogID) async {
+    if(blogID == 0) return Response(requestOptions: RequestOptions());
+
+    return await HttpApiClient.client.get(
+      BangumiAPIUrls.blogPhotos(blogID),
     );
   }
 

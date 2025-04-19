@@ -25,8 +25,9 @@ class BuildEps extends StatelessWidget {
   Widget build(BuildContext context) {
 
     //注意 在这里 portial模式会在点击 放送详情之后才会加载EPModel 而 landscape则不会。。简直太神奇了
+    //回答: 因为portal展示是 透过 Dialog 机制 这也就导致它在 layout Tree 上是和 indexModel 仅次一级的 自然读取不了任何信息
 
-    final epModel = context.read<EpModel>(); //那没办法 只能让你以watch形式监控了
+    final epModel = context.read<EpModel>();
     final bangumiModel = context.read<BangumiModel>();
 
     int totalEps = informationList["eps"] ?? 0;

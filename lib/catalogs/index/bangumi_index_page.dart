@@ -2,12 +2,14 @@
 import 'dart:async';
 
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/widgets/views/index_landscape.dart';
 import 'package:bangu_lite/widgets/views/index_portial.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 @FFRoute(name: '/index')
 
@@ -20,9 +22,13 @@ class BangumiIndexPage extends StatefulWidget {
 
 class _BangumiIndexPageState extends State<BangumiIndexPage> {
   final ValueNotifier<int> selectedPageIndexNotifier = ValueNotifier<int>(0);
+  
 
   @override
   Widget build(BuildContext context) {
+
+    final indexModel = context.read<IndexModel>();
+
     bool readyQuitFlag = false;
 
     return PopScope(
@@ -37,7 +43,8 @@ class _BangumiIndexPageState extends State<BangumiIndexPage> {
           Future.delayed(const Duration(seconds: 3)).then((value){
             readyQuitFlag = false;
           });
-
+          
+          
           ScaffoldMessenger.of(context).showSnackBar(
              SnackBar(
               backgroundColor:judgeCurrentThemeColor(context),

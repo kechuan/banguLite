@@ -7,14 +7,19 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 
 class AppUserAvatar extends StatelessWidget {
-  const AppUserAvatar({super.key});
+  const AppUserAvatar({
+    super.key,
+    this.onTap,
+  });
+
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final accountModel = Provider.of<AccountModel>(context); 
+    final accountModel = context.read<AccountModel>(); 
 
     return UnVisibleResponse(
-        onTap: () {
+        onTap: onTap ?? () {
       
           invokePushLogin() => Navigator.pushNamed(context, Routes.loginAuth);
       

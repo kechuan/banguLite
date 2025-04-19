@@ -1,4 +1,5 @@
 
+import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:dio/dio.dart';
@@ -28,6 +29,7 @@ class HttpApiClient{
 
 class BangumiAPIUrls {
   static const String baseUrl = "https://api.bgm.tv";
+  static const String newUrl = "https://next.bgm.tv/p1";
   static const String baseResourceUrl = "https://lain.bgm.tv";
 
   static const String calendar = '$baseUrl/calendar';   
@@ -39,42 +41,57 @@ class BangumiAPIUrls {
   static const String bangumiSubjectSort = '$baseUrl/v0/search/subjects';
 
   //以v1为代表的新api
-  static const String newUrl = "https://next.bgm.tv/p1";
 
   //subject : GET/POST 通用 只要是只需求 subjectID 而非 需求具体的 sub-contentID 都能使用
   /// EP,Subject 划分 内容/评论 因此划分 comments 与 空
   /// Topic 则是单个一体 因此才会有 topics 这个字段
 
-  //static String subject(int subjectID) => '$newUrl/subjects/$subjectID';
+  //static String subject(int subjectID) => '${subjects()}/$subjectID';
 
   static String timeline() => '$newUrl/timeline';
 
-  static String subjectComment(int subjectID) => '$newUrl/subjects/$subjectID/comments';
-  static String ep(int epID) => '$newUrl/episodes/$epID';
-  static String epComment(int epID) => '$newUrl/episodes/$epID/comments';
-  static String topics(int subjectID) => '$newUrl/subjects/$subjectID/topics';
-  static String topicComment(int topicID) => '$newUrl/subjects/-/topics/$topicID';
-  static String relations(int subjectID) => '$newUrl/subjects/$subjectID/relations';
-  static String reviews(int subjectID) => '$newUrl/subjects/$subjectID/reviews';
-
+  static String subjects() => '$newUrl/subjects';
+  static String topics() => '${subjects()}/-/topics';
+  static String episodes() => '$newUrl/episodes';
   static String groups() => '$newUrl/groups';
-  static String groupTopics(String groupName) => '$newUrl/groups/$groupName/topics';
-  static String groupComment(int postID) => '$newUrl/groups/-/posts/$postID';
+  
 
+  static String relations(int subjectID) => '${subjects()}/$subjectID/relations';
+  static String reviews(int subjectID) => '${subjects()}/$subjectID/reviews';
+
+  //Posts 则是 一个 用户管理它 在 subject 内发布的内容(collections之外)
+  static String subjectPosts() => '${subjects()}/-/posts';
+  
+
+  static String groupsTopics() => '${groups()}/-/topics';
+  
+  
+  static String groupTopics(String groupName) => '${groups()}/$groupName/topics';
+
+
+  static String ep(int epID) => '${episodes()}/$epID';
+  static String topic(int subjectID) => '${subjects()}/$subjectID/topics';
+  
+  static String subjectComment(int subjectID) => '${subjects()}/$subjectID/comments';
+  static String epComment(int epID) => '${episodes()}/$epID/comments';
+  static String topicComment(int topicID) => '${topics()}/$topicID';
+  static String groupComment(int postID) => '${groupsTopics()}/$postID';
+
+  //surf information
+  static String latestGroupTopics() => groupsTopics();
+  static String latestSubjectTopics() => topics();
 
   //user
   static String me = '$newUrl/me';
 
   static String user(String username) => '$newUrl/users/$username';
-
   static String userSubjectComment(String username,int subjectID) => '$baseUrl/v0/users/$username/collections/$subjectID';
 
   static String userBlog(int blogID) => '$newUrl/blogs/$blogID';
-  static String userBlogPicture(int blogID) => '${userBlog(blogID)}/photos';
-
   static String userTimeline(String username) => '${user(username)}/timeline';
   
   static String blogComment(int blogID) => '${userBlog(blogID)}/comments';
+  static String blogPhotos(int blogID) => '${userBlog(blogID)}/photos';
 
   //user-relation
   static String addBlockList(String username) => '$newUrl/blocklist/$username';
@@ -90,7 +107,7 @@ class BangumiAPIUrls {
 
   static String postEpComment(int epID) => epComment(epID);
   
-  static String postTopic(int subjectID) => topics(subjectID);
+  static String postTopic(int subjectID) => topic(subjectID);
   static String postTopicComment(int topicID) => '${topicComment(topicID)}/replies';
 
   static String postBlogComment(int subjectID) => '${userBlog(subjectID)}/comments';
@@ -108,9 +125,11 @@ class BangumiAPIUrls {
   static String actionSubjectComment(int subjectID) => '$newUrl/collections/subjects/$subjectID';
 
   /// 行为允许 GET/PUT/DELETE
-  /// '$newUrl/subjects/-/topics/$topicID';
-  static String actionTopicComment(int topicID) => topicComment(topicID);
-  static String actionEpComment(int commentID) => '$newUrl/episodes/-/comments/$commentID';
+  /// '${subjects()}/-/topics/$topicID';
+  static String actionTopicComment(int commentID) => '${subjectPosts()}/$commentID';
+  static String actionEpComment(int commentID) => '${episodes()}/-/comments/$commentID';
+
+  // 只允许 GET/PUT
   static String actionGroupComment(int postID) => groupComment(postID);
   
   ///这个不允许GET
@@ -120,15 +139,15 @@ class BangumiAPIUrls {
   /// 行为允许 PUT/DELETE
   
   //static String toggleSubjectCommentLike(int commentID) => '${actionSubjectComment(commentID)}/like';
-  static String toggleSubjectCommentLike(int commentID) => '/subjects/-/collects/$commentID/like';
+  static String toggleSubjectCommentLike(int commentID) => '${subjects()}/-/collects/$commentID/like';  
   static String toggleEPCommentLike(int commentID) => '${actionEpComment(commentID)}/like';
   static String toggleTopicLike(int commentID) => '${actionTopicComment(commentID)}/like';
   static String toggleGroupLike(int commentID) => '${actionGroupComment(commentID)}/like';
 
 
   //other
-  static String imgur(String imageSuffix) => '$baseResourceUrl/pic/photo/l/$imageSuffix';
-  static String imgurThumbnail(
+  static String imgurl(String imageSuffix) => '$baseResourceUrl/pic/photo/l/$imageSuffix';
+  static String imgurlThumbnail(
     String imagePath,
     {
       int width = 0,
@@ -244,6 +263,16 @@ class BangumiQuerys {
     };
   }
 
+  static Map<String,dynamic> groupsTopicsQuery({
+		BangumiSurfGroupType? mode,
+		int? limit,
+		int? offset
+	}) => {
+		"mode": mode?.name ?? "all",
+		"limit": limit ?? 20,
+		"offset": offset ?? 0
+	};
+
 	static Map<String,dynamic> postQuery({
 		String? content,
 		String? title,
@@ -268,7 +297,7 @@ class BangumiQuerys {
 		String? title,
 		String? content,
 	}) => {
-		"title": title,
+		"title": title ?? "",
 		"content": content,
 	};
 

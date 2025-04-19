@@ -4,7 +4,9 @@ import 'package:bangu_lite/models/timeline_details.dart';
 
 class UserInformation {
 
-  UserInformation();
+  UserInformation({
+    this.userID
+  });
 
   int? userID;
   String? userName;
@@ -15,8 +17,10 @@ class UserInformation {
   int? joinedAtTimeStamp;
   int? group;
 
-  String getName() => nickName ?? userName ?? '';
+  String getName() => nickName ?? userName ?? '$userID';
 
+  factory UserInformation.empty() => UserInformation(userID: 0);
+  
 }
 
 class UserDetails{
@@ -56,12 +60,11 @@ UserInformation getDefaultUserInformations()=> UserInformation();
 LoginedUserInformations getDefaultLoginedUserInformations() => LoginedUserInformations();
 
 
-UserInformation loadUserInformations(
-  Map<String,dynamic> bangumiUserData,
-  
-){
+UserInformation loadUserInformations(Map<String,dynamic>? bangumiUserData){
 
-  final userInformation = UserInformation();
+  final userInformation = UserInformation.empty();
+
+  if(bangumiUserData == null || bangumiUserData.isEmpty) return userInformation;
 
   userInformation
     ..userID = bangumiUserData["id"]

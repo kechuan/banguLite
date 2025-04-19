@@ -1,17 +1,12 @@
 
-import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/relation_model.dart';
 import 'package:bangu_lite/models/providers/review_model.dart';
-import 'package:bangu_lite/models/providers/webview_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_recent_review.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_relations.dart';
-import 'package:bangu_lite/widgets/dialogs/star_subject_dialog.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';

@@ -33,7 +33,4 @@ class RelationModel extends BaseModel<RelationDetails,Null>{
   @override
   String getContentListUrl(int subjectID) => BangumiAPIUrls.relations(subjectID);
   
-  @override
-  String getContentDetailUrl(int contentID) => "";
-  
 }

@@ -1,7 +1,10 @@
+
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -55,6 +58,26 @@ class BangumiContentAppbar extends StatelessWidget {
             
           IconButton(
             onPressed: (){
+
+              invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
+                context,
+                message: message,
+                requestStatus: requestStatus,
+              );
+
+              invokeSendComment(String message) => accountModel.toggleComment(
+                contentID: contentID,
+                commentContent: message,
+                postCommentType: postCommentType,
+                actionType : UserContentActionType.post,
+                fallbackAction: (errorMessage)=> invokeRequestSnackBar(message: errorMessage,requestStatus: false)
+              );
+
+              if(accountModel.isLogined() == false){
+                fadeToaster(context: context, message: "评论功能需求登录用户");
+                return;
+              }
+
               Navigator.of(context).pushNamed(
                 Routes.sendComment,
                 arguments: {
@@ -63,15 +86,31 @@ class BangumiContentAppbar extends StatelessWidget {
                   'title': titleText,
                   'preservationContent': indexModel.draftContent[contentID]?.values.first
                 }
-              ).then((content){
+              ).then((content) async {
+
+                debugPrint("[PostContent] id:$contentID/$postCommentType");
+
                 if(content is String){
-                  debugPrint("finished Send: $content");
-                  if(onSendMessage != null){
-                    onSendMessage!(content);
-                  }
+
+                                      
+                  invokeRequestSnackBar(message: "UI回帖成功",requestStatus: true);
+                  onSendMessage?.call(content);
+                    
+
+                  //invokeRequestSnackBar();
+
+                  ////网络层 Callback
+                  //await invokeSendComment(content).then((result){
+                  //  debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
+                  //  //UI层 Callback
+                  //  if(result){
+                  //    invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
+                  //    onSendMessage?.call(content);
+                  //  }
+                    
+                  //});
+
                 }
-
-
                 
               });
             },
@@ -85,7 +124,7 @@ class BangumiContentAppbar extends StatelessWidget {
               }
             },
             icon: Transform.rotate(
-              angle: -45,
+              angle: 45,
               child: const Icon(Icons.link),
             )
           ),

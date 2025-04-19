@@ -77,84 +77,88 @@ class CommentReaction extends StatelessWidget {
                 Colors.grey.withValues(alpha: 0.8)
               ;
 
-              return SizedBox(
-                width: 80,
-                child: SizedBox(
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(buttonColor),
-
-                      padding: const WidgetStatePropertyAll(PaddingH6),
-                    ),
-                    onPressed:  () {
-                      debugPrint("reactDataLike:$reactDataLike, dataLikeIndex:$dataLikeIndex, subject:$commentID");
-
-                      if(!isReactAble) return;
-                                
-                      if(reactDataLike == dataLikeIndex){
-                                
-                        accountModel.toggleCommentLike(
-                          commentID,
-                          dataLikeIndex,
-                          postCommentType,
-                          actionType: UserContentActionType.delete
-                        ).then((result){
-                          if(result){
-                            reactDataLikeNotifier.value = -1;
-                          } 
-                        });
-                                
-                      }
-                                
-                      else{
-                                
-                        accountModel.toggleCommentLike(
-                          commentID,
-                          dataLikeIndex,
-                          postCommentType,
-                        ).then((result){
-                          if(result){
-                            reactDataLikeNotifier.value = dataLikeIndex;
-                          } 
-                        });
-                                
-                      }
-                                
-                      debugPrint("postCommentType:$postCommentType, id: $commentID");
-                                
-                    },
-                    child: Tooltip(
-                      triggerMode: TooltipTriggerMode.tap,
-                      message: 
-                        "${commentReactions![dataLikeIndex]?.take(6).join("、")}等"
-                        "${(commentReactions![dataLikeIndex]?.length ?? 0)}人",
-                      textStyle: TextStyle(
-                        color: judgeDarknessMode(context) ? Colors.black : Colors.white
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                        
-                          Image.asset(
-                            "assets/bangumiSticker/bgm$stickerIndex.gif",
-                            scale: 0.8,
-                          ),
-                          
-                          ScalableText("${(commentReactions![dataLikeIndex]?.length ?? 0) + (
-                              reactDataLike == dataLikeIndex ? 
-                                (
-                                  isServerDataContain ? 
-                                  reactDataLike != dataLikeIndex ? -1 : 0 :
-                                  reactDataLike == dataLikeIndex ? 1 : 0
-                                ) :
-                              reactDataLike == dataLikeIndex ? 1 : 0
-                            )
-                          }"),
-                        ],
-                      ),
-                    ),
-                      
+              return Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: judgeDarknessMode(context) ? Colors.white : buttonColor ?? Colors.grey.withValues(alpha: 0.8),
                   ),
+                  borderRadius: BorderRadius.circular(20)
+                ),
+                width: 80,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(buttonColor),
+                
+                    padding: const WidgetStatePropertyAll(PaddingH6),
+                  ),
+                  onPressed:  () {
+                    debugPrint("reactDataLike:$reactDataLike, dataLikeIndex:$dataLikeIndex, subject:$commentID");
+                
+                    if(!isReactAble) return;
+                              
+                    if(reactDataLike == dataLikeIndex){
+                              
+                      accountModel.toggleCommentLike(
+                        commentID,
+                        dataLikeIndex,
+                        postCommentType,
+                        actionType: UserContentActionType.delete
+                      ).then((result){
+                        if(result){
+                          reactDataLikeNotifier.value = -1;
+                        } 
+                      });
+                              
+                    }
+                              
+                    else{
+                              
+                      accountModel.toggleCommentLike(
+                        commentID,
+                        dataLikeIndex,
+                        postCommentType,
+                      ).then((result){
+                        if(result){
+                          reactDataLikeNotifier.value = dataLikeIndex;
+                        } 
+                      });
+                              
+                    }
+                              
+                    debugPrint("postCommentType:$postCommentType, id: $commentID");
+                              
+                  },
+                  child: Tooltip(
+                    triggerMode: TooltipTriggerMode.tap,
+                    message: 
+                      "${commentReactions![dataLikeIndex]?.take(6).join("、")}等"
+                      "${(commentReactions![dataLikeIndex]?.length ?? 0)}人",
+                    textStyle: TextStyle(
+                      color: judgeDarknessMode(context) ? Colors.black : Colors.white
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                      
+                        Image.asset(
+                          "assets/bangumiSticker/bgm$stickerIndex.gif",
+                          scale: 0.8,
+                        ),
+                        
+                        ScalableText("${(commentReactions![dataLikeIndex]?.length ?? 0) + (
+                            reactDataLike == dataLikeIndex ? 
+                              (
+                                isServerDataContain ? 
+                                reactDataLike != dataLikeIndex ? -1 : 0 :
+                                reactDataLike == dataLikeIndex ? 1 : 0
+                              ) :
+                            reactDataLike == dataLikeIndex ? 1 : 0
+                          )
+                        }"),
+                      ],
+                    ),
+                  ),
+                    
                 ),
               );
           

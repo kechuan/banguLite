@@ -1,7 +1,6 @@
 
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
@@ -140,7 +139,10 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
                               onPressed: (){
 
-                                if(commentModel.commentsData.values.first.length == 1 && commentModel.commentsData.values.first[0].userInformation?.userID == 0){
+                                if(
+                                  commentModel.commentsData.values.first.length == 1 && 
+                                  commentModel.commentsData.values.first[0].commentID == 0
+                                ){
                                   debugPrint("no comment");
                                   return;
                                 }

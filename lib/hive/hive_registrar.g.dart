@@ -8,13 +8,13 @@ import 'package:bangu_lite/hive/hive_adapters.dart';
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(AppConfigAdapter());
-    registerAdapter(BangumiThemeColorAdapter());
+    registerAdapter(AppThemeColorAdapter());
     registerAdapter(ColorAdapter());
     registerAdapter(LoginedUserInformationsAdapter());
     registerAdapter(ScaleTypeAdapter());
     registerAdapter(StarBangumiDetailsAdapter());
     registerAdapter(ThemeModeAdapter());
-    registerAdapter(TimelineDetailsAdapter());
-    registerAdapter(UserInformationsAdapter());
+    //registerAdapter(TimelineDetailsAdapter());
+    registerAdapter(UserInformationAdapter());
   }
 }

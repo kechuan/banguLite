@@ -197,6 +197,9 @@ class WaitingBuilder extends StatelessWidget {
         }
       }),
       builder: (_,snapshot) {
+        //这里实际上是等待上层的notifyListener Rebuild 
+        //而不是等待Future 如果Future的10s通过了 那么就意味着这次请求肯定失败了
+
         switch(snapshot.connectionState){
     
           case ConnectionState.done:{

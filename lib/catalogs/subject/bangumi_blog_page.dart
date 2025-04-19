@@ -1,4 +1,4 @@
-import 'package:bangu_lite/catalogs/bangumi_general_content_page.dart';
+import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/models/blog_details.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -47,18 +47,17 @@ class _BangumiBlogPageState extends BangumiContentPageState
   ReviewInfo getContentInfo() => widget.reviewModel.contentListData[widget.selectedBlogIndex];
 
   @override 
-  int? getSubContentID() => widget.reviewModel.contentListData[widget.selectedBlogIndex].blogID;
+  int? getSubContentID() => getContentInfo().blogID;
 
+  //日志所关联的图片
   @override
-  String? getContentBannerUri() => widget.reviewModel.contentDetailData[widget.selectedBlogIndex]?.bannerUri;
+  List<String>? getTrailingPhotosUri() => widget.reviewModel.contentDetailData[getSubContentID()]?.trailingPhotosUri;
 
   @override
   BlogDetails createEmptyDetailData() => BlogDetails.empty();
 
   @override
   Color? getcurrentSubjectThemeColor() => widget.themeColor;
-
-
 
   @override
   bool isContentLoading(int? blogID){
@@ -80,7 +79,6 @@ class _BangumiBlogPageState extends BangumiContentPageState
   PostCommentType? getPostCommentType() => PostCommentType.replyBlog;
   
   @override
-  //String getWebUrl(int? blogID) => BangumiWebUrls.userBlog(widget.selectedBlogID ?? blogID ?? 0);
   String getWebUrl(int? blogID)=> BangumiWebUrls.userBlog(blogID ?? 0);
 
   @override

@@ -40,3 +40,27 @@ enum CommentActionType{
 
   const CommentActionType(this.actionTypeString);
 }
+
+enum UserContentActionType{
+  post("发表"),
+  delete("删除"),
+  edit("编辑"),
+  ;
+
+  final String actionTypeString;
+
+  const UserContentActionType(this.actionTypeString);
+}
+
+enum UserRelationsActionType{
+    add("发送好友请求"),
+    remove("删除好友"),
+    block("拉黑该用户"),
+    removeBlock("解除拉黑该用户"),
+  ;
+
+  final String relationTypeString;
+  
+
+  const UserRelationsActionType(this.relationTypeString);
+}

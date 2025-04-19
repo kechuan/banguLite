@@ -1,7 +1,7 @@
 {
 	"files": [
 		{
-			"path": "lib/catalogs/bangumi_ep_page.dart",
+			"path": "lib/catalogs/subject/bangumi_ep_page.dart",
 			"bookmarks": [
 				{
 					"line": 270,
@@ -21,7 +21,7 @@
 			]
 		},
 		{
-			"path": "lib/catalogs/bangumi_calendar_page.dart",
+			"path": "lib/catalogs/index/bangumi_calendar_page.dart",
 			"bookmarks": [
 				{
 					"line": 128,
@@ -34,7 +34,7 @@
 			"path": "lib/main.dart",
 			"bookmarks": [
 				{
-					"line": 34,
+					"line": 35,
 					"column": 25,
 					"label": "Android——SystemChromeSetting"
 				}
@@ -51,10 +51,10 @@
 			]
 		},
 		{
-			"path": "lib/catalogs/more_topics_page.dart",
+			"path": "lib/catalogs/subject/more_topics_page.dart",
 			"bookmarks": [
 				{
-					"line": 16,
+					"line": 12,
 					"column": 0,
 					"label": "更多讨论列表——moreTopics"
 				}
@@ -64,14 +64,14 @@
 			"path": "lib/internal/custom_bbcode_tag.dart",
 			"bookmarks": [
 				{
-					"line": 12,
+					"line": 14,
 					"column": 0,
 					"label": "BBCodeTag"
 				}
 			]
 		},
 		{
-			"path": "lib/catalogs/bangumi_comment_page.dart",
+			"path": "lib/catalogs/subject/bangumi_comment_page.dart",
 			"bookmarks": [
 				{
 					"line": 14,
@@ -81,7 +81,7 @@
 			]
 		},
 		{
-			"path": "lib/catalogs/bangumi_detail_page.dart",
+			"path": "lib/catalogs/subject/bangumi_detail_page.dart",
 			"bookmarks": [
 				{
 					"line": 37,
@@ -91,7 +91,7 @@
 			]
 		},
 		{
-			"path": "lib/catalogs/settings_page.dart",
+			"path": "lib/catalogs/index/settings_page.dart",
 			"bookmarks": [
 				{
 					"line": 18,
@@ -101,7 +101,7 @@
 			]
 		},
 		{
-			"path": "lib/catalogs/bangumi_blog_page.dart",
+			"path": "lib/catalogs/subject/bangumi_blog_page.dart",
 			"bookmarks": [
 				{
 					"line": 17,
@@ -114,7 +114,7 @@
 			"path": "lib/widgets/fragments/ep_comment_tile.dart",
 			"bookmarks": [
 				{
-					"line": 16,
+					"line": 17,
 					"column": 0,
 					"label": "EPComment —— 当前EP评论"
 				}
@@ -124,14 +124,14 @@
 			"path": "lib/models/providers/account_model.dart",
 			"bookmarks": [
 				{
-					"line": 16,
+					"line": 15,
 					"column": 43,
 					"label": "AccountModel —— 账号系统"
 				}
 			]
 		},
 		{
-			"path": "lib/catalogs/bangumi_topic_page.dart",
+			"path": "lib/catalogs/subject/bangumi_topic_page.dart",
 			"bookmarks": [
 				{
 					"line": 14,
@@ -161,12 +161,32 @@
 			]
 		},
 		{
-			"path": "lib/catalogs/send_comment_page.dart",
+			"path": "lib/catalogs/surf/send_comment_page.dart",
 			"bookmarks": [
 				{
-					"line": 31,
+					"line": 30,
 					"column": 46,
 					"label": "sendMessage —— 发送评论的页面"
+				}
+			]
+		},
+		{
+			"path": "lib/widgets/dialogs/star_subject_dialog.dart",
+			"bookmarks": [
+				{
+					"line": 19,
+					"column": 49,
+					"label": "starSubjectDialog —— 收藏番剧Dialog"
+				}
+			]
+		},
+		{
+			"path": "lib/widgets/components/app_drawer.dart",
+			"bookmarks": [
+				{
+					"line": 15,
+					"column": 41,
+					"label": "AppDrawer —— 侧边栏"
 				}
 			]
 		}

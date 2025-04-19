@@ -17,6 +17,7 @@ const detectNameList = [
 const detectPropList = [
   'epsUpdate',
   'sort',
+  'comment',
   'reactions'
 ];
 

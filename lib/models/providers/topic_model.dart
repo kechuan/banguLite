@@ -25,7 +25,7 @@ class TopicModel extends BaseModel<TopicInfo, TopicDetails> {
   @override
   TopicDetails createEmptyDetails() => TopicDetails.empty();
   @override
-  String getContentListUrl(int subjectID) => BangumiAPIUrls.topics(subjectID);
+  String getContentListUrl(int subjectID) => BangumiAPIUrls.topic(subjectID);
   @override
   String getContentDetailUrl(int contentID) => BangumiAPIUrls.topicComment(contentID);
   @override

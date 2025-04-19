@@ -77,6 +77,7 @@ enum ScoreRank{
 
 }
 
+//目前。。删除收藏的方式好像是。。从时间线直接删除??
 enum StarType{
   want(1,"想看"),
   watched(2,"看过"),

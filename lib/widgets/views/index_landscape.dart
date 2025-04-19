@@ -1,19 +1,16 @@
 import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
+import 'package:bangu_lite/catalogs/index/bangumi_star_page.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/app_user_avatar.dart';
-import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
-import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
-import 'package:bangu_lite/catalogs/bangumi_sort_page.dart';
+import 'package:bangu_lite/catalogs/index/bangumi_calendar_page.dart';
+import 'package:bangu_lite/catalogs/index/bangumi_sort_page.dart';
 import 'package:bangu_lite/delegates/search_delegates.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
 class IndexLandscape extends StatelessWidget {

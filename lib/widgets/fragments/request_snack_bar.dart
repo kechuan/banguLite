@@ -11,6 +11,7 @@ void showRequestSnackBar(
   }
 ){
 
+  
   late Widget trailingWidget;
 
   switch(requestStatus){
@@ -37,6 +38,7 @@ void showRequestSnackBar(
       
   }
 
+  
   ScaffoldMessenger.of(context).removeCurrentSnackBar();
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(

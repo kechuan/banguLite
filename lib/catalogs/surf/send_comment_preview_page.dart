@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 @FFRoute(name: '/commentPreview')
-class BangumiCommentPreview extends StatelessWidget {
-  const BangumiCommentPreview({
+class SendCommentPreview extends StatelessWidget {
+  const SendCommentPreview({
     super.key,
     required this.renderText,
   });

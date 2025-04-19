@@ -21,9 +21,12 @@ class IndexModel extends ChangeNotifier {
   int selectedWeekDay = DateTime.now().weekday;
   SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month);
 
-  static Completer? loadFuture; //适用作用目标只有一个的对象里
-  
   int starUpdateFlag = 0;
+
+  Completer? loadFuture; //适用作用目标只有一个的对象里
+
+  
+  
 
   //除了 星期一-日之外 还有一个 最热门 的属性存放评分7.0+的番剧
   Map<String, List<BangumiDetails>> calendarBangumis = {

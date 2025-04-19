@@ -1,9 +1,17 @@
 
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/models/user_details.dart';
 import 'package:dio/dio.dart';
 
 abstract class BaseComment {
   BaseComment({
+
+
+    // CommentDetails 实际上不需要这个字段 
+    // 但。。有些 通用的页面需要这个字段。而我不可能就为了这一个字段再开一个 特化的类
+    // 那就干脆直接填平好了
+    this.contentID,
+
     this.commentID,
     this.userInformation,
     this.comment,
@@ -11,33 +19,56 @@ abstract class BaseComment {
     this.commentReactions,
   });
 
+  int? contentID;
+
   int? commentID;
   UserInformation? userInformation;
   String? comment;
   int? commentTimeStamp;
   Map<int,Set<String>>? commentReactions;
 
-  
+  factory BaseComment.empty(){
+    throw UnimplementedError('factory should implemented in subclass');
+  }
 
 }
 
 class CommentDetails extends BaseComment{
 
+  CommentDetails({
+    super.commentID
+  });
+
   //普通 comment 没有回复 也没有index
   int? rate;
-  int? type;
+  //int? type;
+  StarType? type;
+
+  factory CommentDetails.empty() => CommentDetails(commentID: 0);
 }
 
 class EpCommentDetails extends BaseComment{
+
+  EpCommentDetails({
+    super.commentID
+  });
+
   String? epCommentIndex;
 
   int? state;
   List<EpCommentDetails>? repliedComment;
 
+  factory EpCommentDetails.empty() => EpCommentDetails(commentID: 0);
+
 }
 
 
 List<CommentDetails> loadCommentResponse(Response commentDetailResponse) {
+
+  //例子: https://next.bgm.tv/p1/subjects/295884/comments?limit=1
+  // Uri().path =>/p1/subjects/295884/comments 
+
+  commentDetailResponse.requestOptions.path;
 
     final List<CommentDetails> commentDetailsList = [];
 
@@ -54,14 +85,15 @@ List<CommentDetails> loadCommentResponse(Response commentDetailResponse) {
       final CommentDetails commentDetails = CommentDetails();
       
         commentDetails
+          
           ..commentID = currentComment["id"]
           ..userInformation = loadUserInformations(currentComment["user"])
           
-
           ..rate = currentComment["rate"]
-          ..type = currentComment["type"]
-          
-          
+          ..type = StarType.values.firstWhere(
+            (element) => element.starTypeIndex == currentComment["type"]
+          )
+
           ..comment = currentComment["comment"]
           ..commentTimeStamp = currentComment["updatedAt"]
           ..commentReactions = loadReactionDetails(currentComment["reactions"])
@@ -94,6 +126,7 @@ List<EpCommentDetails> loadEpCommentDetails(
 		currentCommentIndex+=1;
 
 			currentEpComment
+        ..contentID = currentEpCommentMap["mainID"]
         ..commentID = currentEpCommentMap["id"]
         ..comment = currentEpCommentMap["content"]
         ..state = currentEpCommentMap["state"]

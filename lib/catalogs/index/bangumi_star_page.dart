@@ -410,7 +410,7 @@ String getUpdateText(
                     
     case SortType.rank:{
 
-      debugPrint("resultIndex:$resultIndex item: ${item.name}/${item.rank}/${item.score} => ${starsUpdateRating[resultIndex]} ");
+      //debugPrint("resultIndex:$resultIndex item: ${item.name}/${item.rank}/${item.score} => ${starsUpdateRating[resultIndex]} ");
 
       int starRank = MyHive.starBangumisDataBase.values.elementAt(resultIndex).rank!;
 

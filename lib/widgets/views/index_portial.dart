@@ -1,12 +1,11 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
+import 'package:bangu_lite/catalogs/index/bangumi_star_page.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/app_drawer.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
-import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
-import 'package:bangu_lite/catalogs/bangumi_sort_page.dart';
+import 'package:bangu_lite/catalogs/index/bangumi_calendar_page.dart';
+import 'package:bangu_lite/catalogs/index/bangumi_sort_page.dart';
 import 'package:bangu_lite/delegates/search_delegates.dart';
 import 'package:provider/provider.dart';
 
@@ -28,14 +27,15 @@ class IndexPortial extends StatelessWidget {
       builder: (_,currentPageIndex,railLeading) {
 
         return Scaffold(
+          drawerEnableOpenDragGesture: true,
           appBar: AppBar(
             //leading: const ToggleThemeModeButton(),
             leading:  Builder(
-              builder: (_) {
+              builder: (context) {
                 return IconButton(
                   onPressed: (){
 
-                    Scaffold.of(_).openDrawer();
+                    Scaffold.of(context).openDrawer();
 
                   },
                   icon: const Icon(Icons.menu)

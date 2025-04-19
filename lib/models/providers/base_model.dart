@@ -8,7 +8,12 @@ import 'package:flutter/material.dart';
 /// [I] => Info / 入口
 /// [D] => Detail / 详情
 /// 有些数据 并不存在后续的内容 因此 [D] 允许为 nullable
-abstract class BaseModel<I extends BaseInfo, D extends BaseDetails?> extends ChangeNotifier {
+abstract class BaseModel
+<
+  I extends BaseInfo,
+  D extends BaseDetails?
+> extends ChangeNotifier {
+
   BaseModel({
     required this.subjectID,
   });
@@ -18,7 +23,7 @@ abstract class BaseModel<I extends BaseInfo, D extends BaseDetails?> extends Cha
   final Map<int, D> contentDetailData = {};
 
   Future<void> loadSubjectSubContentList({
-    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic> queryParameters = const {},
     bool isReloaded = false
   }) async {
 
@@ -29,8 +34,8 @@ abstract class BaseModel<I extends BaseInfo, D extends BaseDetails?> extends Cha
       contentDetailData.clear();
     }
 
-    if (contentListData.isNotEmpty) {
-      debugPrint("topics already loaded");
+    if (contentListData.isNotEmpty && queryParameters.isEmpty) {
+      debugPrint("contentList is already loaded");
       return;
     }
 

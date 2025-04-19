@@ -98,8 +98,7 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
         fontFamily: 'MiSansFont',
         scrollbarTheme: const ScrollbarThemeData(
           thickness: WidgetStatePropertyAll(0.0) //it work
-          //trackVisibility: WidgetStatePropertyAll(false), //not work. strange.
-          //thumbVisibility: WidgetStatePropertyAll(false),
+
         ),
         
       ),
@@ -110,9 +109,6 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
             child: TabBar(
               controller: commentTabController,
               isScrollable: true,
-              //indicatorColor: judgeCurrentThemeColor(context),
-              //unselectedLabelColor: judgeCurrentThemeColor(context),
-              //labelColor: judgeCurrentThemeColor(context),
               indicatorSize: TabBarIndicatorSize.tab,
               labelPadding: EdgeInsets.symmetric(horizontal: MediaQuery.sizeOf(context).width/min(widget.totalPageLength*2.5,14)), // 同屏数量*2
               

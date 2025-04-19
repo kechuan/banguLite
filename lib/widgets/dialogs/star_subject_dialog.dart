@@ -1,13 +1,15 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/bangumi_details.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
-import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_slider_panel.dart';
 import 'package:flutter/material.dart';
@@ -16,15 +18,17 @@ import 'package:provider/provider.dart';
 class StarSubjectDialog extends StatelessWidget {
   const StarSubjectDialog({
     super.key,
-	required this.subjectID,
-	this.commentDetails,
-
-	this.themeColor, 
-	this.onUpdateLocalStar,
+    required this.subjectID,
+    this.commentDetails,
+    
+    this.themeColor, 
+    this.onUpdateLocalStar,
+    this.onUpdateBangumiStar
 
   });
 
   final Function()? onUpdateLocalStar;
+  final Function({String? message,bool? requestStatus})? onUpdateBangumiStar;
   
   final CommentDetails? commentDetails;
   final int subjectID;
@@ -37,12 +41,7 @@ class StarSubjectDialog extends StatelessWidget {
 
     final ValueNotifier<bool> commentExpandedStatusNotifier = ValueNotifier(commentDetails?.comment != null);
     final ValueNotifier<double> commentRankNotifier = ValueNotifier((commentDetails?.rate ?? 0).toDouble());
-	final ValueNotifier<StarType> starTypeNotifier = ValueNotifier<StarType>(
-		StarType.values.firstWhere(
-			(currentType)=>currentType.starTypeIndex == commentDetails?.type,
-			orElse: () => StarType.none
-		)
-	);
+    final ValueNotifier<StarType> starTypeNotifier = ValueNotifier<StarType>(commentDetails?.type ?? StarType.none);
 
     final TextEditingController contentEditingController = TextEditingController(text: commentDetails?.comment);
     final ExpansionTileController commentExpansionTileController = ExpansionTileController();
@@ -55,7 +54,7 @@ class StarSubjectDialog extends StatelessWidget {
             padding: Padding16,
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
-			width: max(300, MediaQuery.sizeOf(context).height*9/16),
+			      width: max(300, MediaQuery.sizeOf(context).height*9/16),
             height: max(250, MediaQuery.sizeOf(context).height/3) + (commentExpandedStatus ? 180 : 0),
             child: Column(
               spacing: 6,
@@ -73,7 +72,7 @@ class StarSubjectDialog extends StatelessWidget {
                       valueListenable: starTypeNotifier,
                         builder: (_,starType,child) {
                         return PopupMenuButton<StarType>(
-						  enabled: accountModel.isLogined(),
+						              enabled: accountModel.isLogined(),
                           initialValue: starTypeNotifier.value,
                           position:PopupMenuPosition.under,
                           itemBuilder: (_) => List.generate(
@@ -90,9 +89,9 @@ class StarSubjectDialog extends StatelessWidget {
                             if(starType == StarType.none){
                               commentExpandedStatusNotifier.value = false;
 
-							  if(commentExpansionTileController.isExpanded){
-								commentExpansionTileController.collapse();
-							  }
+                              if(commentExpansionTileController.isExpanded){
+                              commentExpansionTileController.collapse();
+                              }
 
                             }
                             
@@ -104,12 +103,12 @@ class StarSubjectDialog extends StatelessWidget {
                                 Padding(
                                   padding: PaddingH6,
                                   child: ScalableText(
-									starType.starTypeName,
-									style: TextStyle(
-										color: accountModel.isLogined() ? null : Colors.grey
+                                    starType.starTypeName,
+                                    style: TextStyle(
+                                      color: accountModel.isLogined() ? null : Colors.grey
 
-									),
-								),
+                                    ),
+                                  ),
                                 ),
                             
                                 Icon(Icons.arrow_drop_down,color: accountModel.isLogined() ? null : Colors.grey,)
@@ -165,14 +164,14 @@ class StarSubjectDialog extends StatelessWidget {
 				),
 
                 Row(
-				  mainAxisAlignment: MainAxisAlignment.end,
+				           mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     
                     TextButton(
                       onPressed: (){
-						onUpdateLocalStar?.call();
-						Navigator.of(context).pop();
-					  },
+                        onUpdateLocalStar?.call();
+                        Navigator.of(context).pop();
+                        },
                       child: const ScalableText("仅本地收藏")
                     ),
 
@@ -188,36 +187,37 @@ class StarSubjectDialog extends StatelessWidget {
 								child: const ScalableText("取消")
 								),
 								TextButton(
-								onPressed: () async {
+									onPressed: () async {
 
-									onUpdateLocalStar?.call();
+										invokeAsyncPop(StarType status)=> Navigator.of(context).pop(status);
 
-									
+										if(!MyHive.starBangumisDataBase.containsKey(subjectID)){
+											onUpdateLocalStar?.call();
+										}
 
-									invokeAsyncPop()=> Navigator.of(context).pop();
-									invokeRequestSnackBar(String message) => showRequestSnackBar(context,message: message);
+                    onUpdateBangumiStar?.call();
 
-									showRequestSnackBar(context);
+										accountModel.postContent(
+											subjectID:subjectID.toString(),
+											postcontentType:PostCommentType.subjectComment,
+											actionType: UserContentActionType.edit,
+											subjectCommentQuery:BangumiQuerys.subjectCommentQuery(
+												content: contentEditingController.text,
+												isPrivate: false,
+												starType:starTypeNotifier.value,
+											),
+											fallbackAction: (errorMessage) => onUpdateBangumiStar?.call(message: errorMessage,requestStatus: false),
+										).then((status){
+                      
+                      status ? onUpdateBangumiStar?.call(message: "收藏成功",requestStatus:true) : null;
+										});
 
-									accountModel.postContent(
-										subjectID:subjectID.toString(),
-										postcontentType:PostCommentType.subjectComment,
-										actionType: UserContentActionType.edit,
-										subjectCommentQuery:BangumiQuerys.subjectCommentQuery(
-											content: contentEditingController.text,
-											isPrivate: false,
-											starType:starTypeNotifier.value,
-										),
-										fallbackAction: (errorMessage) => invokeRequestSnackBar(errorMessage),
-									).then((status){
-										status ? invokeRequestSnackBar("回帖成功") : null;
-									});
+		
+										invokeAsyncPop(starTypeNotifier.value);
 
-									invokeAsyncPop();
-
-						
-								}, 
-								child: const ScalableText("确定")
+							
+									}, 
+									child: const ScalableText("确定")
 
 								
 								),
@@ -235,31 +235,41 @@ class StarSubjectDialog extends StatelessWidget {
   }
 }
 
-void showStarSubjectDialog(
+Future<StarType?> showStarSubjectDialog(
   BuildContext context,
-  Function()? onUpdateLocalStar,
   {
-	CommentDetails? commentDetails,
-	String? comment,
-	Color? themeColor
+    Function()? onUpdateLocalStar,
+    Function({String? message,bool? requestStatus})? onUpdateBangumiStar,
+    BangumiDetails? bangumiDetails,
+    CommentDetails? commentDetails,
+    String? comment,
+    Color? themeColor
   }
 ){
-  showGeneralDialog(
-      barrierDismissible: true,
-      barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
-      context: context,
-      pageBuilder: (_,inAnimation,outAnimation){
-		final bangumiModel = context.read<BangumiModel>();
+  
+  Completer<StarType?> starTypeCompleter = Completer();
 
-        return StarSubjectDialog(
-		  subjectID: bangumiModel.subjectID,
-		  commentDetails: commentDetails,
-		  onUpdateLocalStar: onUpdateLocalStar,
-		  themeColor: themeColor,
+	showGeneralDialog(
+		barrierDismissible: true,
+		barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
+		context: context,
+		pageBuilder: (_,inAnimation,outAnimation){
+			final bangumiModel = context.read<BangumiModel>();
 
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child),
-      transitionDuration: const Duration(milliseconds: 300)
-    );
+			return StarSubjectDialog(
+				subjectID: bangumiModel.subjectID,
+				commentDetails: commentDetails,
+				onUpdateLocalStar: onUpdateLocalStar,
+        onUpdateBangumiStar: onUpdateBangumiStar,
+				themeColor: themeColor,
+
+			);
+		},
+		transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child),
+		transitionDuration: const Duration(milliseconds: 300)
+	).then((result){
+		if(result is StarType?) starTypeCompleter.complete(result);
+	});
+
+	return starTypeCompleter.future;
 }

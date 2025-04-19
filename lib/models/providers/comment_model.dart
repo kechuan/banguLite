@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math';
 
 
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/user_details.dart';
 import 'package:dio/dio.dart';
@@ -86,7 +87,9 @@ class CommentModel extends ChangeNotifier {
           ..commentTimeStamp = DateTime.parse(userStarInformation.data["updated_at"]).toLocal().millisecondsSinceEpoch
           ..comment = userStarInformation.data["comment"]
           ..rate = userStarInformation.data["rate"]
-          ..type = userStarInformation.data["type"]
+          ..type = StarType.values.firstWhere(
+            (element) => element.starTypeIndex == userStarInformation.data["type"]
+          )
         ;
 
         notifyListeners();
@@ -130,15 +133,7 @@ class CommentModel extends ChangeNotifier {
         debugPrint("comment subjectID $subjectID: was empty!");
 
         //因为 null/[] 已经被用来占用为 标志位了 无数据返回部分就以这种形式进行处理
-        commentsData.addAll(
-          {
-            1:
-            [
-              CommentDetails()
-                ..userInformation = (UserInformation()..userID = 0)
-            ]
-          }
-        );
+        commentsData.addAll({0:[CommentDetails.empty()]});
 
         notifyListeners();
         return;
@@ -229,12 +224,7 @@ class CommentModel extends ChangeNotifier {
         debugPrint("wrong! server no response");
 
         commentsData.addAll({
-  
-            pageIndex:
-            [
-              CommentDetails()
-                ..userInformation = (UserInformation()..userID = 0)
-            ]
+          pageIndex:[CommentDetails.empty()]
         });
       }
 
@@ -250,6 +240,12 @@ class CommentModel extends ChangeNotifier {
       fallbackAction?.call("Request Error:${e.toString()}");
     }
 
+  }
+
+  @override
+  void notifyListeners() {
+    //For exernal use with no warnning hint
+    super.notifyListeners();
   }
 
   @override

@@ -6,6 +6,7 @@ import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
+import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -58,15 +59,9 @@ class EpCommentTile extends StatelessWidget {
             
             children: [
 
-              UnVisibleResponse(
-                onTap: () {
-                  showUserInfomationDialog(context,epCommentData.userInformation);
-                },
-                child: SizedBox(
-                  height: 50,
-                  width: 50,
-                  child: CachedImageLoader(imageUrl: epCommentData.userInformation?.avatarUrl)
-                ),
+              BangumiUserAvatar(
+                size: 50,
+                userInformation: epCommentData.userInformation,
               ),
 
               //可压缩信息 Expanded
@@ -108,8 +103,8 @@ class EpCommentTile extends StatelessWidget {
               ),
 
               BangumiCommentActionButton(
-                commentBlockStatus: commentBlockStatus,
                 commentData: epCommentData,
+                commentBlockStatus: commentBlockStatus,
                 postCommentType: postCommentType,
                 onUpdateComment: onUpdateComment,
               ),

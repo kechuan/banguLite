@@ -3,6 +3,7 @@ import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
+import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
@@ -30,6 +31,8 @@ class BangumiCommentTile extends StatelessWidget {
     final int ratingScore = commentData.rate ?? 0;
     DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(commentData.commentTimeStamp!*1000);
 
+    debugPrint("${commentData.comment}:${commentData.type}");
+
     return ListTile(
       title: Padding(
         padding: const EdgeInsets.only(bottom: 12),
@@ -37,33 +40,40 @@ class BangumiCommentTile extends StatelessWidget {
           spacing: 12,
           children: [
             
-            Builder(builder: (_){
-              if(commentData.userInformation?.avatarUrl==null) return Image.asset("assets/icons/icon.png",height: 50,width: 50,);
+            Builder(
+              builder: (_){
+                if(commentData.userInformation?.avatarUrl==null) return Image.asset("assets/icons/icon.png",height: 50,width: 50,);
 
-              return UnVisibleResponse(
-                onTap: () {
-                  showUserInfomationDialog(context, commentData.userInformation);
-                },
-                child: SizedBox(
-                  height: 50,
-                  width: 50,
-                  child: CachedImageLoader(imageUrl: commentData.userInformation?.avatarUrl!,photoViewStatus: true,)
-                ),
-              );
+                return BangumiUserAvatar(
+                  size: 50,
+                  userInformation: commentData.userInformation,
+                );
 
-            }),
+              }
+            ),
 
 
             Expanded(
-              child: ScalableText(
-                  commentData.userInformation?.nickName ?? "nameID",
-                  style: TextStyle(color: themeColor),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ScalableText(
+                    commentData.userInformation?.nickName ?? "nameID",
+                    style: TextStyle(color: themeColor),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis
+                  ),
+
+                  ScalableText(
+                    '${commentData.type?.starTypeName}',
+                    style: const TextStyle(color: Colors.grey,fontSize: 14),
+                  ),
+                ],
+              ),
             ),
 
             //因为tile的title给的交叉轴也是unbounded的 所以需要约束
+            
             SizedBox(
               height: 30,
               child: StarScoreList(

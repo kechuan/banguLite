@@ -9,6 +9,7 @@ import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 
 import 'package:bangu_lite/widgets/components/sticker_select_overlay.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -78,26 +79,64 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
       link: stickerLayerLink,
       child: PopupMenuButton<CommentActionType>(
         onSelected: (commentAction){
+
+          debugPrint("contentID: ${widget.commentData.contentID}, reply:${widget.commentData.commentID}");
+
+          invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
+            context,
+            message: message,
+            requestStatus: requestStatus,
+          );
+
+          invokeSendComment(String message)=> accountModel.toggleComment(
+            contentID: widget.commentData.contentID,
+            commentID: widget.commentData.commentID,
+            commentContent: message,
+            postCommentType: widget.postCommentType,
+            actionType : commentAction == CommentActionType.edit ? UserContentActionType.edit : UserContentActionType.post,
+            fallbackAction: (message){
+              fadeToaster(context: context, message: message,duration: const Duration(seconds: 5));
+            }
+          ); 
+
+
           switch(commentAction){
-      
+
             case CommentActionType.reply:{
+
               Navigator.pushNamed(
                 context,
                 Routes.sendComment,
                 arguments: {
                   'contentID':widget.commentData.commentID,
                   'postCommentType':widget.postCommentType,
-                  'title': widget.commentData.userInformation?.nickName ?? widget.commentData.userInformation?.userName,
-                  'referenceObject': widget.commentData.comment,
+                  'title': '回复 ${widget.commentData.userInformation?.nickName ?? widget.commentData.userInformation?.userName}',
+                  'referenceObject': '${widget.commentData.comment}',
                   'preservationContent': indexModel.draftContent[widget.commentData.commentID]?.values.first
                 }
-              ).then((content){
-                if(
-                  widget.onReplyComment!=null &&
-                  content is String &&
-                  widget.commentData.commentID != null
-                ){
-                  widget.onReplyComment!(widget.commentData.commentID!,content);
+              ).then((content) async{
+
+                if(content is String){
+
+                  invokeRequestSnackBar();
+
+                  //网络层 Callback
+                  await invokeSendComment(content).then((result){
+
+                    if(result){
+                      debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
+                      //UI层 Callback
+
+                      widget.onReplyComment?.call(widget.commentData.commentID!,content);
+                    }
+
+   
+                    invokeRequestSnackBar(requestStatus: result);
+                    
+
+                  });
+
+                
                 }
               });
                 
@@ -120,18 +159,38 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
 
               debugPrint("edit");
 
+              
+
               Navigator.pushNamed(
                 context,
                 Routes.sendComment,
                 arguments: {
                   'contentID':widget.commentData.commentID,
                   'postCommentType':widget.postCommentType,
-                  'actionType': UserContentActionType.edit,
+                  'title': '编辑这段评论',
                   'preservationContent': widget.commentData.comment
                 }
-              ).then((content){
-                if(widget.onUpdateComment!=null && content!=null && content is String){
-                  widget.onUpdateComment!(content);
+              ).then((content) async{
+                if(content is String){
+
+                  invokeRequestSnackBar();
+
+                  //widget.onUpdateComment?.call(content);
+
+                  //网络层 Callback
+                  await invokeSendComment(content).then((result){
+                    if(result){
+                      debugPrint("[EditContent] sendMessageResult:$result SendContent: $content");
+                      //UI层 Callback
+                      widget.onUpdateComment?.call(content);
+                      //widget.onReplyComment?.call(widget.commentData.commentID!,content);
+                    }
+
+                    invokeRequestSnackBar(requestStatus: result);
+                    
+
+                  });
+
                 }
               });
 
@@ -153,10 +212,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
               CommentActionType currentCommentActionType = CommentActionType.values[index];
 
               bool isActionAvaliable = 
-                //widget.commentBlockStatus == true || widget.commentData.commentID == null ?
-                widget.commentBlockStatus == true ?
-                false :
-                true;
+                widget.commentBlockStatus == true ? false : true;
 
                 if(isActionAvaliable && accountModel.isLogined()){
 
@@ -179,6 +235,10 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
 
                       case CommentActionType.edit:
                       case CommentActionType.delete:{
+                        if(widget.postCommentType == PostCommentType.subjectComment){
+                          isActionAvaliable = false;
+                        }
+
                         if(widget.commentData.userInformation?.userID != accountModel.loginedUserInformations.userInformation?.userID){
                           isActionAvaliable = false;
                         }

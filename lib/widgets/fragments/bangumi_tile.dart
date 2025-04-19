@@ -62,7 +62,9 @@ class BangumiListTile extends ListTile {
 
                         DecoratedBox(
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black),
+                            border: Border.all(
+                              color: judgeDarknessMode(context) ? Colors.white : Colors.black,
+                            ),
                             borderRadius: BorderRadius.circular(6),
                             color: judgeCurrentThemeColor(context).withValues(alpha: 0.2)
                           ),
@@ -89,11 +91,11 @@ class BangumiListTile extends ListTile {
                           builder: (_) {
 
                             int totalEps = bangumiDetails?.informationList["eps"];
-                            int? airedEps = currentBangumiTime != null ? convertAiredEps(currentBangumiTime.toString()) : null;
+                            int airedEps = currentBangumiTime != null ? convertAiredEps(currentBangumiTime.toString()) : 0;
 
                             return ScalableText(
                               "共 $totalEps 话"
-                              "${ airedEps != null ? " · ${airedEps >= totalEps ? "已完结" : "更新至第 $airedEps 话"}" : ""}",
+                              " · ${ airedEps != 0 ? airedEps >= totalEps ? "已完结" : "更新至第 $airedEps 话" : "暂未放送"}",
                               style: const TextStyle(fontSize: 12),
                             );
                           }

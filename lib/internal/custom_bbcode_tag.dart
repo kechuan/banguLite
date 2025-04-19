@@ -5,7 +5,9 @@ import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/widgets/fragments/comment_image_panel.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 import 'package:bbob_dart/bbob_dart.dart' as bbob;
@@ -159,7 +161,7 @@ class AdapterQuoteDisplay extends StatelessWidget{
                         //color: Colors.white,
                         border:Border(bottom: BorderSide(color: Colors.grey, width: 1))
                       ),
-                    child: ScalableText("$author said:", style: headerTextStyle),
+                    child: ScalableText("$author 说:", style: headerTextStyle),
                     
                   ),
                 Builder(
@@ -169,15 +171,23 @@ class AdapterQuoteDisplay extends StatelessWidget{
                       (currentSpan){
                         return TextSpan(
                           text: currentSpan.toPlainText(),
-                          style: currentSpan.style!.merge(TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
+                          style: currentSpan.style?.merge(TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
                         );
                       }
                     ).toList();
 
-                    return Container(
+                    return UnVisibleResponse(
+                      onTap: () => Clipboard.setData(
+                        ClipboardData(
+                          text: content.last.toPlainText().split('说:').last.trim()
+                        )
+                      ),
+                      child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                        child: RichText(text: TextSpan(children: newInlineSpan)));
+                        padding: const EdgeInsets.all(5),
+                        child: RichText(text: TextSpan(children: newInlineSpan))
+                      ),
+                    );
                   }
                 )
               ],
@@ -294,7 +304,7 @@ class LateLoadImgTag extends AdvancedTag {
     String imageUrl = element.children.first.textContent;
 
     if(tagName == "photo"){
-      imageUrl = BangumiAPIUrls.imgur(imageUrl);
+      imageUrl = BangumiAPIUrls.imgurl(imageUrl);
     }
 
     //debugPrint("lateLoad textContent:${imageUrl}");

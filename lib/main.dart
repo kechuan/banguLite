@@ -4,6 +4,7 @@ import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/platforms/register_windows_applink.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/models/providers/user_model.dart';
 import 'package:bangu_lite/models/providers/webview_model.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
@@ -56,6 +57,7 @@ class MainApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<IndexModel>(create: (_) => IndexModel()),
+        ChangeNotifierProvider<TimelineFlowModel>(create: (_) => TimelineFlowModel()),
         ChangeNotifierProvider<AccountModel>(create: (_) => AccountModel()),
         ChangeNotifierProvider<UserModel>(create: (_) => UserModel()),
         ChangeNotifierProvider<WebViewModel>(create: (_) => WebViewModel()),

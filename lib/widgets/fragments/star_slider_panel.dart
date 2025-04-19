@@ -45,7 +45,7 @@ class StarSliderPanel extends StatelessWidget {
                     child: SizedBox(
                       width: 200,
                       child: Slider(
-                        value: score,
+                        value: score.clamp(0.0, 1.0),
                         onChanged: (value)=> valueNotifier.value = value,
                         divisions: 10,
                       ),

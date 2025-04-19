@@ -1,3 +1,4 @@
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/base_details.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/user_details.dart';
@@ -20,7 +21,7 @@ class BlogDetails extends ContentDetails{
   UserInformation? userInfo;
 
   //尾部图片
-  String? bannerUri; 
+  List<String> trailingPhotosUri = [];
 
   List<EpCommentDetails>? get blogReplies => contentRepliedComment;
   set blogReplies(List<EpCommentDetails>? value) => contentRepliedComment = value;
@@ -36,5 +37,16 @@ BlogDetails loadBlogDetails(Map<String,dynamic> blogData){
     content: blogData["content"],
   );
 
-  return currentBlog..bannerUri = blogData["icon"];
+  return currentBlog;
+}
+
+List<String> loadBlogPhotoDetails(Map<String,dynamic> blogPhotoData){
+
+  final List<String> photoUrlsList = [];
+
+  for(dynamic currentPhoto in blogPhotoData["data"]){
+    photoUrlsList.add(BangumiAPIUrls.imgurl(currentPhoto["target"]));
+  }
+
+  return photoUrlsList;
 }

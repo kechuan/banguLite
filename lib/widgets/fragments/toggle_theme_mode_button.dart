@@ -8,14 +8,19 @@ import 'package:provider/provider.dart';
 class ToggleThemeModeButton extends StatelessWidget {
   const ToggleThemeModeButton({
     super.key,
+    this.isDetailText,
     this.onThen
   });
 
   final void Function()? onThen;
+  final bool? isDetailText;
 
   @override
   Widget build(BuildContext context) {
     return InkResponse(
+      containedInkWell: true,
+      hoverColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       onTap: (){
 
         final indexModel = context.read<IndexModel>();
@@ -34,11 +39,28 @@ class ToggleThemeModeButton extends StatelessWidget {
         selector: (_, indexModel) => indexModel.userConfig.themeMode!,
         shouldRebuild: (previous, next) => previous!=next,
         builder: (_, currentTheme, child){
-          return Icon(
-            judgeDarknessMode(context) ? 
-            Icons.dark_mode_outlined :
-            Icons.wb_sunny_outlined
-            ,size: min(30,MediaQuery.sizeOf(context).width/15));
+
+          if(isDetailText == true){
+            return ListTile(
+              leading: Icon(
+                judgeDarknessMode(context) ? 
+                Icons.dark_mode_outlined :
+                Icons.wb_sunny_outlined,
+                size: min(30,MediaQuery.sizeOf(context).width/15)
+              ),
+              title: const Text("切换主题模式"),
+            );
+          }
+
+          else{
+            return Icon(
+              judgeDarknessMode(context) ? 
+              Icons.dark_mode_outlined :
+              Icons.wb_sunny_outlined,
+              size: min(30,MediaQuery.sizeOf(context).width/15)
+            );
+          }
+
         },
       ),
     );
