@@ -4,6 +4,8 @@ import 'package:bangu_lite/models/base_info.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+
+
 /// 抽象的内容模型基类
 /// [I] => Info / 入口
 /// [D] => Detail / 详情
@@ -18,7 +20,7 @@ abstract class BaseModel
     required this.subjectID,
   });
 
-  final int subjectID;
+  final dynamic subjectID;
   final List<I> contentListData = [];
   final Map<int, D> contentDetailData = {};
 
@@ -97,7 +99,7 @@ abstract class BaseModel
   }
 
   // 抽象方法：获取API URL
-  String getContentListUrl(int subjectID);
+  String getContentListUrl(dynamic subjectID);
   
   // 抽象方法：获取详情API URL
   String? getContentDetailUrl(int contentID) => null;

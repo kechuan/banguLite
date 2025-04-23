@@ -28,9 +28,9 @@ enum BangumiSocialHubType{
 
 enum BangumiTimelineType{
   all("全部",Icons.history),
-  timeline("时间线",Icons.history),
-  group("小组",Icons.forum_outlined),
   subject("条目",Icons.crop_free),
+  group("小组",Icons.forum_outlined),
+  timeline("时间线",Icons.history),
   //条目 有两组内容 Topic / Blog
   // 但API目前只有 trending 与 latest Topic 并没有 Blog...
 
@@ -47,15 +47,16 @@ enum BangumiTimelineType{
 
 enum BangumiSurfGroupType {
 
-  all("全部"),
-  joined("我加入的"),
-  created("我创立的"),
-  replied("我回复过"),
+  all("全部","热门"),
+  joined("我加入的","我加入的"),
+  created("我创立的","我创立的"),
+  replied("我回复过",""),
   ;
 
   final String typeName;
+  final String groupsType;
   
 
-  const BangumiSurfGroupType(this.typeName);
+  const BangumiSurfGroupType(this.typeName,this.groupsType);
 
 }

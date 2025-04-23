@@ -14,7 +14,6 @@ import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/models/user_details.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
-import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
@@ -264,12 +263,11 @@ abstract class BangumiContentPageState<
                               }
 
                               final currentEpCommentDetails =  EpCommentDetails()
-                                //..userInformation = context.read<AccountModel>().loginedUserInformations.userInformation
-                                ..userInformation = 
-                                (
-                                  UserInformation()
-                                    ..userName = "1002838"
-                                )
+                                ..userInformation = context.read<AccountModel>().loginedUserInformations.userInformation
+                                //..userInformation = 
+                                //(
+                                //  UserInformation()..userName = "august3416"
+                                //)
 
 								                //刚刚评论的ID理应无法被Action操作
                                 ..commentID = null

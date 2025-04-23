@@ -48,18 +48,16 @@ class CommentDetails extends BaseComment{
 }
 
 class EpCommentDetails extends BaseComment{
+  EpCommentDetails({super.commentID});
 
-  EpCommentDetails({
-    super.commentID
-  });
+  List<EpCommentDetails>? repliedComment;
 
   String? epCommentIndex;
 
   int? state;
-  List<EpCommentDetails>? repliedComment;
+
 
   factory EpCommentDetails.empty() => EpCommentDetails(commentID: 0);
-
 }
 
 
@@ -126,6 +124,7 @@ List<EpCommentDetails> loadEpCommentDetails(
 		currentCommentIndex+=1;
 
 			currentEpComment
+        // not pass in GroupTopicDetails
         ..contentID = currentEpCommentMap["mainID"]
         ..commentID = currentEpCommentMap["id"]
         ..comment = currentEpCommentMap["content"]

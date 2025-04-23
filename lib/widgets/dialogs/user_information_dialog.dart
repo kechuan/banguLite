@@ -1,3 +1,4 @@
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
@@ -5,6 +6,7 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/user_model.dart';
@@ -20,6 +22,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class UserInformationDialog extends StatelessWidget {
   const UserInformationDialog({
@@ -59,9 +62,9 @@ class UserInformationDialog extends StatelessWidget {
     					children: [
     						  
     					  SizedBox(
-    						height: 50,
-    						width: 50,
-    						child: CachedImageLoader(imageUrl: userInformation?.avatarUrl)
+    						  height: 50,
+    						  width: 50,
+    						  child: CachedImageLoader(imageUrl: userInformation?.avatarUrl)
     					  ),
     						  
     					  //可压缩信息 Expanded
@@ -85,7 +88,24 @@ class UserInformationDialog extends StatelessWidget {
     						children: [
     
     						  TextButton(
-    							onPressed: (){},
+    							onPressed: (){
+
+									if(userInformation?.userName != null){
+
+                    Navigator.pushNamed(
+                      context,
+                      Routes.webview,
+                      arguments: {"url":BangumiWebUrls.userTimeline(userInformation!.userName!)},
+                    );
+
+                        
+										//launchUrlString(
+                    //  mode: LaunchMode.inAppWebView,
+                    //  BangumiWebUrls.userTimeline(userInformation!.userName!)
+                    //);
+									}
+									
+								},
     							child: const ScalableText(
     							  "TA的主页",
     							  style: TextStyle(decoration: TextDecoration.underline),
@@ -99,11 +119,11 @@ class UserInformationDialog extends StatelessWidget {
     				  
     								UnVisibleResponse(
     								  onTap: (){
-    									if(accountModel.loginedUserInformations.accessToken == null) return;
+    									  if(accountModel.loginedUserInformations.accessToken == null) return;
     								  },
     								  child: Icon(
-    									Icons.email_outlined,
-    									color: accountModel.loginedUserInformations.accessToken == null ? Colors.grey : null,
+                        Icons.email_outlined,
+                        color: accountModel.loginedUserInformations.accessToken == null ? Colors.grey : null,
     								  )
     								  
     								),
@@ -117,17 +137,17 @@ class UserInformationDialog extends StatelessWidget {
     									  content: "确定对用户 ${userInformation?.nickName ?? userInformation?.userName} 发送好友请求吗?",
     									  confirmAction: () async {
     				  
-                          invokeAsyncToaster(String message) => fadeToaster(context: context, message: message);
+											invokeAsyncToaster(String message) => fadeToaster(context: context, message: message);
 
-                          accountModel.userRelationAction(
-                            userInformation?.userName,
-                            fallbackAction: (errorMessage) => invokeAsyncToaster(errorMessage),
-                          ).then((status){
-                            if(status){
-                              invokeAsyncToaster("发送请求成功");
-                            }
-                            
-                          });
+											accountModel.userRelationAction(
+												userInformation?.userName,
+												fallbackAction: (errorMessage) => invokeAsyncToaster(errorMessage),
+											).then((status){
+												if(status){
+												invokeAsyncToaster("发送请求成功");
+												}
+												
+											});
     				  
     									  },
     				  
@@ -151,13 +171,13 @@ class UserInformationDialog extends StatelessWidget {
     				  
     										invokeAsyncToaster(String message)=> fadeToaster(context: context, message: message);
 
-                        accountModel.userRelationAction(
-                          userInformation?.userName,
-                          relationType: UserRelationsActionType.block,
-                          fallbackAction: (errorMessage) => invokeAsyncToaster(errorMessage),
-                        ).then((_){
-                          invokeAsyncToaster("拉黑成功");
-                        });
+											accountModel.userRelationAction(
+											userInformation?.userName,
+											relationType: UserRelationsActionType.block,
+											fallbackAction: (errorMessage) => invokeAsyncToaster(errorMessage),
+											).then((_){
+												invokeAsyncToaster("拉黑成功");
+											});
 
     									  },
     				  
@@ -263,6 +283,8 @@ class UserInformationDialog extends StatelessWidget {
     												return Wrap(
 														spacing: 6,
     													children: [
+
+
 															ScalableText(
 																covertPastDifferentTime(timelineActions![index].timelineCreatedAt),
 																style: const TextStyle(color: Colors.blueGrey,fontSize: 14),
@@ -270,15 +292,7 @@ class UserInformationDialog extends StatelessWidget {
 
 															BBCodeText(
 																data: convertTimelineDescription(timelineActions[index]),
-																stylesheet: BBStylesheet(
-																	tags: allEffectTag,
-																	defaultText: TextStyle(
-																		fontFamily: 'MiSansFont',
-																		fontSize: AppFontSize.s16,
-																		//奇怪 这里必须特地指定属性。。但是其他的地方却不需要 我感觉是 Dialog作用域 + TextStyle 带来的问题
-																		color: judgeDarknessMode(context) ? Colors.white : Colors.black,
-																	)
-																)
+																stylesheet: appDefaultStyleSheet(context)
 															),
     													],
     												);

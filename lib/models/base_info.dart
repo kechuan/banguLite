@@ -14,11 +14,17 @@ abstract class ContentInfo extends BaseInfo {
     super.id,
 	  this.contentTitle
   });
-  
+
+  //Blog/Topic 应需求
+  int? sourceID;
+  //String? sourceTitle;
+
   //title
   String? contentTitle;
 
   int? createdTime;
+  int? updatedTime;
+  
   int? repliesCount;
   String? lastRepliedNickName;
   int? lastRepliedTime;

@@ -4,7 +4,7 @@
 			"path": "lib/catalogs/subject/bangumi_ep_page.dart",
 			"bookmarks": [
 				{
-					"line": 270,
+					"line": 265,
 					"column": 38,
 					"label": "EPInfo"
 				}
@@ -64,7 +64,7 @@
 			"path": "lib/internal/custom_bbcode_tag.dart",
 			"bookmarks": [
 				{
-					"line": 14,
+					"line": 27,
 					"column": 0,
 					"label": "BBCodeTag"
 				}
@@ -187,6 +187,46 @@
 					"line": 15,
 					"column": 41,
 					"label": "AppDrawer —— 侧边栏"
+				}
+			]
+		},
+		{
+			"path": "lib/widgets/dialogs/user_information_dialog.dart",
+			"bookmarks": [
+				{
+					"line": 26,
+					"column": 53,
+					"label": "UserInfoDialog —— 用户信息"
+				}
+			]
+		},
+		{
+			"path": "lib/widgets/fragments/bangumi_content_appbar.dart",
+			"bookmarks": [
+				{
+					"line": 13,
+					"column": 52,
+					"label": "contentAppBar —— 通用AppBar"
+				}
+			]
+		},
+		{
+			"path": "lib/catalogs/subject/bangumi_general_content_page.dart",
+			"bookmarks": [
+				{
+					"line": 28,
+					"column": 39,
+					"label": "GeneralContentPage —— 通用内容页"
+				}
+			]
+		},
+		{
+			"path": "lib/internal/extract.dart",
+			"bookmarks": [
+				{
+					"line": 2,
+					"column": 0,
+					"label": "extract —— 提取工具类"
 				}
 			]
 		}

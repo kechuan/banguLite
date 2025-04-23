@@ -81,9 +81,11 @@ UserInformation loadUserInformations(Map<String,dynamic>? bangumiUserData){
 
 
 UserDetails loadUserDetails(
-	Map<String,dynamic> bangumiUserDetailsData,
+	Map<String,dynamic>? bangumiUserDetailsData,
 	{UserInformation? currentUserInformation}
 ){
+  if(bangumiUserDetailsData == null || bangumiUserDetailsData.isEmpty) return UserDetails();
+
 	UserDetails userDetails = UserDetails();
 
 	userDetails

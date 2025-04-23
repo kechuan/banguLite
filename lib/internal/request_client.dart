@@ -49,6 +49,7 @@ class BangumiAPIUrls {
   //static String subject(int subjectID) => '${subjects()}/$subjectID';
 
   static String timeline() => '$newUrl/timeline';
+  static String timelineReply(int timelineID) => '${timeline()}/$timelineID/replies';
 
   static String subjects() => '$newUrl/subjects';
   static String topics() => '${subjects()}/-/topics';
@@ -64,8 +65,6 @@ class BangumiAPIUrls {
   
 
   static String groupsTopics() => '${groups()}/-/topics';
-  
-  
   static String groupTopics(String groupName) => '${groups()}/$groupName/topics';
 
 
@@ -89,6 +88,7 @@ class BangumiAPIUrls {
 
   static String userBlog(int blogID) => '$newUrl/blogs/$blogID';
   static String userTimeline(String username) => '${user(username)}/timeline';
+  
   
   static String blogComment(int blogID) => '${userBlog(blogID)}/comments';
   static String blogPhotos(int blogID) => '${userBlog(blogID)}/photos';
@@ -171,6 +171,11 @@ class BangumiWebUrls{
 
   static String ep(int epID) => '$baseUrl/ep/$epID';
   static String user(String username) => '$baseUrl/user/$username';
+  static String userTimeline(String username) => '${user(username)}/timeline';
+
+  //接受数字ID 与 name 作为参数
+  static String group(dynamic groupName) => '$baseUrl/group/$groupName';
+
   static String userBlog(int blogID) => '$baseUrl/blog/$blogID';
 
   static String relativeSubject(int subjectID) => '$relativeUrl/subject/$subjectID';
@@ -263,6 +268,20 @@ class BangumiQuerys {
     };
   }
 
+  static Map<String,dynamic> groupsQuery({
+    BangumiSurfGroupType? mode,
+    String? sort,
+		int? limit,
+		int? offset
+  }) => groupsTopicsQuery(
+    mode: mode,
+    limit: limit,
+    offset: offset
+  )
+    // posts/topics/members/created/updated
+    ..["sort"] = sort ?? "members"
+  ;
+
   static Map<String,dynamic> groupsTopicsQuery({
 		BangumiSurfGroupType? mode,
 		int? limit,
@@ -308,6 +327,7 @@ class BangumiQuerys {
                           epQuery = {"subject_id":0,"limit":100,"offset":0},
                           relationsQuery = {"type":2,"limit":20,"offset":0},
                           reviewsQuery = {"limit":20,"offset":0},
+                          groupTopicQuery = {"limit":20,"offset":0},
                           timelineQuery = {"limit":10}
   ;
                              

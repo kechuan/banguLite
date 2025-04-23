@@ -2,6 +2,7 @@
 
 
 
+
 const detectIDList = [
   'id',
   'subjectID',
@@ -18,7 +19,8 @@ const detectPropList = [
   'epsUpdate',
   'sort',
   'comment',
-  'reactions'
+  'tsukkomi', //吐槽
+  'reactions',
 ];
 
 const List<dynamic> timelineEnums = [
@@ -48,6 +50,8 @@ enum TimelineCat {
 
   final int value;
   final String catName;
+
+  int getValue(TimelineCat timelineCatType) => timelineCatType.value;
   
 
   const TimelineCat(this.value,this.catName);
@@ -56,7 +60,7 @@ enum TimelineCat {
 enum TimelineCatDaily {
 
   MysteriousAction(0, "神秘的行动"),
-  Register(1, "注册"),
+  Register(1, "注册Bangumi"),
   AddFriend(2, "添加好友"),
   JoinGroup(3, "加入小组"),
   CreateGroup(4, "创建小组"),
@@ -120,7 +124,7 @@ enum TimelineCatProgress {
 enum TimelineCatStatus {
 
   UpdateSignature(0, "更新签名"),
-  Comment(1, "吐槽"),
+  Comment(1, "时间线吐槽"),
   ChangeNickname(2, "修改昵称");
 
   final int value;
@@ -152,14 +156,3 @@ enum TimelineCatDoujin {
   const TimelineCatDoujin(this.value, this.actionName);
 }
 
-//enum TimelineCatSubjectBatch {
-
-//  Books(1, "阅读书"),
-//  Anime(2, "观看番组"),
-//  Music(3, "听音乐"),
-//  Games(4, "游玩游戏");
-
-//  final int value;
-//  final String actionName;
-//  const TimelineCatSubjectBatch(this.value, this.actionName);
-//}

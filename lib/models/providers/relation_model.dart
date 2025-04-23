@@ -31,6 +31,6 @@ class RelationModel extends BaseModel<RelationDetails,Null>{
   List<RelationDetails> createEmptyInfoList() => [RelationDetails.empty()];
 
   @override
-  String getContentListUrl(int subjectID) => BangumiAPIUrls.relations(subjectID);
+  String getContentListUrl(dynamic subjectID) => BangumiAPIUrls.relations(subjectID);
   
 }

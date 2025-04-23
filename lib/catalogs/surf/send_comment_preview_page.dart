@@ -24,13 +24,7 @@ class SendCommentPreview extends StatelessWidget {
         padding: Padding16,
         child: BBCodeText(
           data: convertBangumiCommentSticker(renderText),
-          stylesheet: BBStylesheet(
-            tags: allEffectTag,
-            defaultText: TextStyle(
-              fontFamily: 'MiSansFont',
-              color: judgeDarknessMode(context) ? Colors.white : Colors.black,
-            )
-          ),
+          stylesheet: appDefaultStyleSheet(context)
         ),
       ),
 

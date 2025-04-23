@@ -75,7 +75,7 @@ class _StarButtonState extends State<StarButton> {
               
               commentDetails:
                 userCommentDetails?..type = 
-                  localStarType ?? userCommentDetails?.type
+                  localStarType ?? userCommentDetails.type
               ,
               themeColor:judgeDetailRenderColor(context, bangumiModel.imageColor)
             ).then((result){
@@ -101,7 +101,7 @@ class _StarButtonState extends State<StarButton> {
                 String starText = "已收藏";
           
                 if(userCommentDetails != null){
-                  starText = (localStarType ?? userCommentDetails!.type ?? StarType.none).starTypeName;
+                  starText = (localStarType ?? userCommentDetails.type ?? StarType.none).starTypeName;
                 }
                 
           

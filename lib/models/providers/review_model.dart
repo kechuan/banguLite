@@ -79,7 +79,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
   @override
   BlogDetails createEmptyDetails() => BlogDetails.empty();
   @override
-  String getContentListUrl(int subjectID) => BangumiAPIUrls.reviews(subjectID);
+  String getContentListUrl(dynamic subjectID) => BangumiAPIUrls.reviews(subjectID);
   @override
   //String getContentDetailUrl(int contentID) => BangumiAPIUrls.userBlog(selectedBlogID);
   String getContentDetailUrl(int contentID) => BangumiAPIUrls.userBlog(contentID);

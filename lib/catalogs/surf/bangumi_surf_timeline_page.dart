@@ -1,10 +1,13 @@
+import 'dart:math';
+
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
-import 'package:bangu_lite/models/timeline_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/views/timeline_list_view.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +16,9 @@ import 'package:provider/provider.dart';
 
 @FFRoute(name: '/Timeline')
 class BangumiTimelinePage extends StatefulWidget {
-  const BangumiTimelinePage({super.key});
+  const BangumiTimelinePage({
+    super.key,
+  });
 
   @override
   State<BangumiTimelinePage> createState() => _BangumiTimelinePageState();
@@ -23,18 +28,21 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
   
   final ValueNotifier<BangumiSurfGroupType> groupTypeNotifier = ValueNotifier(BangumiSurfGroupType.all);
   final PageController timelinePageController = PageController();
+  final ScrollController scrollController = ScrollController();
   late TabController tabController; // 新增TabController声明
+
 
   @override
   void initState() {
 
-	super.initState();
+    super.initState();
 
-	tabController = TabController(
-	  vsync: this,
-	  length: BangumiTimelineType.values.length,
-	);
-	
+    tabController = TabController(
+      initialIndex : 1,
+      vsync: this,
+      length: BangumiTimelineType.values.length,
+    );
+    
 	  tabController.addListener((){
 		//疑问:
 		//如果不添加这种设置 在左右划屏幕的时候 就会直接被取消动画 而
@@ -55,15 +63,14 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
 
   @override
   void dispose() {
-	tabController.dispose();
-	timelinePageController.dispose();
-	super.dispose();
+    tabController.dispose();
+    timelinePageController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
 
-	final timelineFlowModel = context.read<TimelineFlowModel>();
 	
 	return Scaffold(
 	  appBar: AppBar(
@@ -142,47 +149,32 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
 		  ),
 
 		  Expanded(
-			child: EasyRefresh(
-				triggerAxis: Axis.vertical,
-				header: const MaterialHeader(),
-				onRefresh: () {
-					timelineFlowModel.requestSelectedTimeLineType(
-						BangumiTimelineType.values[tabController.index],
-						queryParameters: 
-							BangumiTimelineType.values[tabController.index] == BangumiTimelineType.group ?	
-							BangumiQuerys.groupsTopicsQuery(mode: groupTypeNotifier.value) :
-							null
-					);
-				},
-				child: PageView.builder(
-					controller: timelinePageController,
-					onPageChanged: (value) {
-						tabController.animateTo(value);
-					},
-					itemBuilder: (_, timelineIndex){
-						return ValueListenableBuilder(
-							valueListenable: groupTypeNotifier,
-							builder: (_,currentGroupType,__) {
-							
-								return AnimatedList(
-									initialItemCount: 15,
-									shrinkWrap: true,
-									itemBuilder: (_,index,animation){
-										return Container(
-											color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
-											//height: 70,
-											child: BangumiTimelineTile(
-												timelineDetails: TimelineDetails(),
-											)
-											//child: ScalableText("$timelineIndex - $index"),
-										);
-									}
-								);
-							}
-						);
-					},
-				),
-			),
+			  child: EasyRefresh(
+          scrollController: scrollController,
+          triggerAxis: Axis.vertical,
+          
+          child: PageView.builder(
+            controller: timelinePageController,
+            onPageChanged: (value) {
+              tabController.animateTo(value);
+            },
+            itemBuilder: (_, timelineIndex){
+              return ValueListenableBuilder(
+                valueListenable: groupTypeNotifier,
+                builder: (_,currentGroupType,__) {
+
+                  return BangumiTimelineContentView(
+                    tabController: tabController, 
+                    timelinePageController: timelinePageController,
+                    groupTypeNotifier: groupTypeNotifier,
+                    
+                  );
+                
+                  }
+              );
+            },
+          ),
+        ),
 		  )
 		],
 	  ),

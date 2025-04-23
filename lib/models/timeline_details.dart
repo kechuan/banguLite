@@ -1,6 +1,7 @@
 
 import 'dart:math';
 
+import 'package:bangu_lite/internal/extract.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/bangumi_define/timeline_const.dart';
 import 'package:bangu_lite/models/base_details.dart';
@@ -16,31 +17,23 @@ class TimelineDetails extends BaseDetails {
 
   int? get timelineID => detailID;
   
-  //这里的 UID 是指代的最初始的ID 不是 userName
-  
-
+  //因为部分 timeline 不仅携带 comment 信息 甚至还有 replies 只能直接运用 commentDetails 信息了
   CommentDetails? commentDetails;
 
-  //UserInformation? actionUser;
-  //String? comment;
-  //Map<int,Set<String>>? commentReactions;
-  
   // int => String
   int? catType;
   int? catAction;
   int? timelineCreatedAt;
 
-  Set<int>? objectIDSet;
+  Set<dynamic>? objectIDSet;
   Set<String>? objectNameSet;
 
   //parent Object?
   int? subObjectID;
   //对番剧进行评价 而非 progress更新时 独有的字段
-  
 
-  //暂且作废 因为字段藏在 [subject][subject]内部
+  int? replies;
   
-
   // progress 更新 4/0
   int? epsUpdate;
 
@@ -57,6 +50,7 @@ class TimelineDetails extends BaseDetails {
       case 4: // 收视进度
       {
         if(catAction == 0){
+          //contentText += "([url=${BangumiWebUrls.subject(objectIDSet!.first)}]${objectNameSet!.first}[/url]  Ep.$epsUpdate )";
           contentText += "([url=${BangumiWebUrls.subject(objectIDSet!.first)}]${objectNameSet!.first}[/url]  Ep.$epsUpdate )";
         }
 
@@ -87,82 +81,6 @@ class TimelineDetails extends BaseDetails {
   }
 }
 
-Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
-  final resultFields = <String, dynamic>{};
-
-  Set<int> objectIDSet = {};
-  Set<String> objectNameSet = {};
-  Map<int,Set<String>>? commentReactions = {};
-
-  void recursiveExtract(Map<String, dynamic> map) {
-    for (final entry in map.entries) {
-      final key = entry.key;
-      final value = entry.value;
-
-      if (detectNameList.contains(key)) {
-        
-          if(key == 'name' || key == 'nameCN'){
-
-            String resultText = 
-              map["name"].isEmpty ? 'ep.${map["sort"]}' : 
-              map["nameCN"].isEmpty ? map["name"] : map["nameCN"];
-
-            objectNameSet.addAll({resultText});
-          }
-
-          else{
-            objectNameSet.addAll({value});
-          }
-      }
-
-      else if(detectIDList.contains(key)){
-        int resultID = map[key];
-        objectIDSet.addAll({resultID});
-
-      }
-      
-      else if(detectPropList.contains(key)){
-
-        switch (key) {
-
-          case 'comment':
-          case 'sort':
-          case 'epsUpdate':{
-            resultFields[key] = value;
-          }
-
-          case 'reactions':{
-            commentReactions = loadReactionDetails(value);
-            resultFields[key] = commentReactions;
-          }
-            
-  
-        }
-        
-      }
-
-      else if (value is Map<String, dynamic>) {
-        recursiveExtract(value);
-      } 
-
-      else if (value is List) {
-        for (final item in value) {
-          if (item is Map<String, dynamic>) {
-            recursiveExtract(item);
-          }
-        }
-      }
-    }
-
-    resultFields['objectIDSet'] = objectIDSet;
-    resultFields['objectNameSet'] = objectNameSet;
-
-
-  }
-
-  recursiveExtract(data);
-  return resultFields;
-}
 
 List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData){
 
@@ -182,9 +100,11 @@ List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData){
           ..userInformation = loadUserInformations(bangumiTimelineData['user'])
           ..comment = resultFields['comment']
           ..commentReactions = resultFields['reactions']
+
       )
       ..catType = bangumiTimelineData['cat']
       ..catAction = bangumiTimelineData['type']
+      ..replies = bangumiTimelineData['replies']
       ..timelineCreatedAt = bangumiTimelineData['createdAt']
       ..objectIDSet = resultFields['objectIDSet']
       ..objectNameSet = resultFields['objectNameSet']
@@ -207,6 +127,8 @@ String convertTimelineDescription(TimelineDetails currentTimeline, {bool? author
 
   //待用字段
   String suffixText = "";
+
+
 	
   /// 那么首先 划定 action 字段 行为
   switch(currentTimeline.catType){
@@ -261,10 +183,23 @@ String convertTimelineDescription(TimelineDetails currentTimeline, {bool? author
 
   }
 
-  if(contentText.isEmpty && currentTimeline.catType != 1) undoActionText += "撤销了一项 ";
+  if(contentText.isEmpty && !(currentTimeline.catType == 1 || currentTimeline.catType == 5)) undoActionText += "撤销了一项 ";
 
-  if(currentTimeline.commentDetails?.comment != null){
-	suffixText = '[quote]${currentTimeline.commentDetails!.comment ?? ""}[/quote]';
+  //时间线吐槽
+  if(currentTimeline.catType == 5 && currentTimeline.catAction == 1){
+    actionText = "[url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}]${TimelineCatStatus.Comment.actionName}";
+
+    //感觉以后可以做一个proxy 用于 增加时 额外添加一个 /s 字符。。
+    if(currentTimeline.replies != 0){
+      actionText += ' (${currentTimeline.replies}条评论)';
+    }
+
+    actionText += '[/url]';
+    
+  }
+
+  if(currentTimeline.commentDetails?.comment?.isEmpty == false){
+	  suffixText = '[quote]${currentTimeline.commentDetails!.comment ?? ""}[/quote]';
   }
 
   leadingText += undoActionText + actionText + contentText + suffixText;
@@ -274,7 +209,7 @@ String convertTimelineDescription(TimelineDetails currentTimeline, {bool? author
 
 String convertSubjectTimeline(
 
-  Set<int>? objectIDSet,
+  Set<dynamic>? objectIDSet,
   Set<String>? objectNameSet,
   {
     int? ep,
@@ -285,6 +220,7 @@ String convertSubjectTimeline(
   String subjectTimelineText = "";
 
   if(objectIDSet == null || objectNameSet == null) return subjectTimelineText;
+  if(objectIDSet.isEmpty && objectNameSet.isEmpty) return subjectTimelineText;
 
   //注意 如果ep值被提供 则说明 可能存在 ID对多的name 这取决于当时为 single 亦或者是 batch
   // single 时 则为 子夫 4/2
@@ -323,7 +259,7 @@ String convertSubjectTimeline(
 
 //xxx 对谁 做了 什么事
 String convertDefaultTimeline(
-  Set<int>? objectIDSet,
+  Set<dynamic>? objectIDSet,
   Set<String>? objectNameSet,
   {
     int? cat,
@@ -333,7 +269,7 @@ String convertDefaultTimeline(
   String defaultTimelineText = "";
 
   if(objectIDSet == null || objectNameSet == null) return defaultTimelineText;
-  if(objectNameSet.isEmpty || objectIDSet.isEmpty) return defaultTimelineText;
+  if(objectNameSet.isEmpty && objectIDSet.isEmpty) return defaultTimelineText;
 
   String jumpLink = "";
 
@@ -347,7 +283,9 @@ String convertDefaultTimeline(
       }
 
       else if(action == TimelineCatDaily.JoinGroup.value || action == TimelineCatDaily.CreateGroup.value){
-        jumpLink = "这里是群组ID:${objectIDSet.first}";
+        //jumpLink = "这里是群组ID:${objectIDSet.first}";
+        // objectNameList: {boring, 靠谱人生茶话会}
+        jumpLink = BangumiWebUrls.group(objectIDSet.first);
       }
 
       else if (action == TimelineCatDaily.JoinParadise.value){

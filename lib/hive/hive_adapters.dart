@@ -1,8 +1,6 @@
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/models/comment_details.dart';
 
 import 'package:bangu_lite/models/star_details.dart';
-import 'package:bangu_lite/models/timeline_details.dart';
 import 'package:bangu_lite/models/user_details.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';

@@ -2,16 +2,22 @@ import 'dart:async';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/timeline_details.dart';
+import 'package:bangu_lite/models/surf_timeline_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+//全局Model
 class TimelineFlowModel extends ChangeNotifier {
   TimelineFlowModel();
 
-  final Map<BangumiTimelineType,List<TimelineDetails>> timelinesData = {};
+  final Map<BangumiTimelineType,List<SurfTimelineDetails>> timelinesData = {
+    BangumiTimelineType.all: [],
+    BangumiTimelineType.subject: [],
+    BangumiTimelineType.group: [],
+    BangumiTimelineType.timeline: [],
+  };
 
-   //上滑 与 初次载入时触发
+   //上滑 或 初次载入时触发
   Future<bool> requestSelectedTimeLineType(
     BangumiTimelineType timelineType,
     {
@@ -25,7 +31,6 @@ class TimelineFlowModel extends ChangeNotifier {
 
     late Future<List<Response<dynamic>>> Function() timelineFuture;
     
-
     if(timelineType == BangumiTimelineType.all){
       timelinesData.clear();
     }
@@ -43,7 +48,7 @@ class TimelineFlowModel extends ChangeNotifier {
             HttpApiClient.client.get(BangumiAPIUrls.latestSubjectTopics()),
             HttpApiClient.client.get(
               BangumiAPIUrls.latestGroupTopics(),
-              queryParameters: BangumiQuerys.groupsTopicsQuery()
+              queryParameters: queryParameters ?? BangumiQuerys.groupsTopicsQuery()
             ),
             HttpApiClient.client.get(BangumiAPIUrls.timeline()),
           ]
@@ -90,31 +95,44 @@ class TimelineFlowModel extends ChangeNotifier {
        
     }
 
-    await timelineFuture().then((response){
+      await timelineFuture().then((response){
 
-      for(var currentResponse in response) {
-        if(currentResponse.statusCode == 200){
+        // (skip)all /subject / groups / timeline
 
-          timelinesData[timelineType] = loadTimelineDetails(currentResponse.data);
-
-          // load Response Data
-          //if(timelineType == BangumiTimelineType.all){
-          //  timelinesData[timelineType] = loadTimelineDetails(currentResponse.data);
-          //}
-
-          //else{
-          //  timelinesData[timelineType] = loadTimelineDetails(currentResponse.data);
-          //}
+        if(response.length>1){
+          for(int responseIndex = 0; responseIndex < response.length; responseIndex++){
+            if(response[responseIndex].statusCode == 200){
+              timelinesData[BangumiTimelineType.values[responseIndex+1]] = loadSurfTimelineDetails(
+                response[responseIndex].data,
+                bangumiTimelineType: BangumiTimelineType.values[responseIndex+1]
+              );
+            }
+          }
         }
 
-      }
+        else{
 
-      notifyListeners();
+          if(timelineType != BangumiTimelineType.timeline){
+            timelinesData[timelineType] = loadSurfTimelineDetails(
+              response[0].data["data"],
+              bangumiTimelineType: timelineType
+            );
+          }
+
+          else{
+            timelinesData[timelineType] = loadSurfTimelineDetails(
+              response[0].data,
+              bangumiTimelineType: timelineType
+            );
+          }
+          
+        }
+
+
+        notifyListeners();
       requestTimelineCompleter.complete(true);
 			
 		});
-
-    
 
     return requestTimelineCompleter.future;
     

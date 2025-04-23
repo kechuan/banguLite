@@ -55,7 +55,7 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage> w
         title: ValueListenableBuilder(
           valueListenable: currentSurfingTitleNotifier,
           builder: (_,title,__) {
-            return Text(title);
+            return Text(title,style: const TextStyle(fontSize: 16));
           }
         ),
         actions: [
@@ -85,51 +85,54 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage> w
                     borderRadius: BorderRadius.circular(24),
                   ),
                   
-                  child: TextField(
-                    textAlign: TextAlign.center,
-                    //虽然没有 align/center 来直接作用 输入文字 但好在有这种 textAlignVertical
-                    textAlignVertical: const TextAlignVertical(y: -0.4),
-                    readOnly: true,
-                    controller: urlController,
-                    keyboardType: TextInputType.url,
+                  child: SizedBox(
+                    height: 50,
+                    child: TextField(
+                      textAlign: TextAlign.center,
+                      //虽然没有 align/center 来直接作用 输入文字 但好在有这种 textAlignVertical
+                      textAlignVertical: const TextAlignVertical(y: -0.4),
+                      readOnly: true,
+                      controller: urlController,
+                      keyboardType: TextInputType.url,
+                      
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(MdiIcons.web),
                     
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      prefixIcon: Icon(MdiIcons.web),
-
-                      suffixIcon: ValueListenableBuilder(
-                        valueListenable: progressNotifier,
-                        builder: (_,progress,child) {
-        
-                          if (progress == 0) {
-                            return const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 3)
+                        suffixIcon: ValueListenableBuilder(
+                          valueListenable: progressNotifier,
+                          builder: (_,progress,child) {
+                            
+                            if (progress == 0) {
+                              return const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(strokeWidth: 3)
+                              );
+                            }
+                            
+                            return IconButton(
+                              icon: progress < 1.0 ? const Icon(Icons.close,size: 24,) : const Icon(Icons.refresh,size: 24,),
+                              onPressed: () {
+                                if(progress < 1.0){
+                                  webviewModel.webViewController?.stopLoading();
+                                }
+                            
+                                else{
+                                  webviewModel.webViewController?.reload();
+                                }
+                            
+                                progressNotifier.value = 0;
+                    
+                              },
                             );
+                    
                           }
-        
-                          return ElevatedButton(
-                            child: progress < 1.0 ? const Icon(Icons.close,size: 24,) : const Icon(Icons.refresh,size: 24,),
-                            onPressed: () {
-                              if(progress < 1.0){
-                                webviewModel.webViewController?.stopLoading();
-                              }
-        
-                              else{
-                                webviewModel.webViewController?.reload();
-                              }
-        
-                              progressNotifier.value = 0;
-                  
-                            },
-                          );
-
-                        }
+                        ),
+                        
                       ),
                       
                     ),
-                    
                   ),
                 );
                 
@@ -145,6 +148,7 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage> w
                   initialUrlRequest: URLRequest(url: WebUri(currentSurfingUrlNotifier.value)),
                   initialSettings: webviewModel.settings,
                   pullToRefreshController: pullToRefreshController,
+                  
                   onTitleChanged: (controller, title) {
                     currentSurfingTitleNotifier.value = title ?? "";
                   },

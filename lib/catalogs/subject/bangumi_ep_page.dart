@@ -161,44 +161,39 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
               
                                                   return Padding(
                                                     padding: EdgeInsets.only(top:MediaQuery.paddingOf(context).top),
-                                                    child: AnimatedSize(
+                                                    child: AnimatedContainer(
                                                       duration: const Duration(milliseconds: 300),
-                                                      child:ColoredBox(
-                                                        color: indexModel.userConfig.currentThemeColor!.color.withValues(alpha:opacityDegree),
-                                                        child: SizedBox(
-                                                          height: opacityDegree == 0.8 ? 120 : 60,
-                                                          child: Column(
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          children: [
-                                                        
-                                                            SizedBox(
-                                                              height: 60,
-                                                              child: EpTogglePanel(currentEp: selectedEp,totalEps: widget.totalEps)
-                                                            ),
-                                                        
-                                                            AnimatedSize(
-                                                              duration: const Duration(milliseconds: 300),
-                                                              child: SizedBox(
-                                                                height: opacityDegree == 0.8 ? 60 : 0,
-                                                                child: EpCommentsProgressSlider(
-                                                                  commnetProgress: commentProgress,
-                                                                  offstage: opacityDegree == 0.8 ? false : true,
-                                                                  onChanged: (progress){
-                                                                    scrollViewController.jumpTo(progress*(scrollViewController.position.maxScrollExtent - sliverViewStartOffset) + sliverViewStartOffset);
-                                                                    commentProgress = progress;
-                                                                    debugPrint("maxScrollExtent:${scrollViewController.position.maxScrollExtent}");
-                                                                  }
-                                                                ),
-                                                              
-                                                              )
-                                                            ),
-                                                              
-                                                        
-                                                          ],
+                                                      color: indexModel.userConfig.currentThemeColor!.color.withValues(alpha:opacityDegree),
+                                                      height: opacityDegree == 0.8 ? 120 : 60,
+                                                      child:Column(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      children: [
+                                                                                                            
+                                                        SizedBox(
+                                                          height: 60,
+                                                          child: EpTogglePanel(currentEp: selectedEp,totalEps: widget.totalEps)
                                                         ),
-                                                        
+                                                                                                            
+                                                        AnimatedSize(
+                                                          duration: const Duration(milliseconds: 300),
+                                                          child: SizedBox(
+                                                            height: opacityDegree == 0.8 ? 60 : 0,
+                                                            child: EpCommentsProgressSlider(
+                                                              commnetProgress: commentProgress,
+                                                              offstage: opacityDegree == 0.8 ? false : true,
+                                                              onChanged: (progress){
+                                                                scrollViewController.jumpTo(progress*(scrollViewController.position.maxScrollExtent - sliverViewStartOffset) + sliverViewStartOffset);
+                                                                commentProgress = progress;
+                                                                debugPrint("maxScrollExtent:${scrollViewController.position.maxScrollExtent}");
+                                                              }
+                                                            ),
+                                                          
+                                                          )
                                                         ),
-                                                      )
+                                                          
+                                                                                                            
+                                                      ],
+                                                                                                            )
                                                     
                                                                                 
                                                     ),
@@ -273,7 +268,7 @@ class EpInfo extends StatelessWidget {
     required this.selectedEp,
   });
 
-  final Map<int,EpsInfo> epsInfo;
+  final Map<num,EpsInfo> epsInfo;
   final int selectedEp;
 
 

@@ -1,17 +1,14 @@
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
-import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/comment_details.dart';
-import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 class BangumiCommentTile extends StatelessWidget {
@@ -31,7 +28,7 @@ class BangumiCommentTile extends StatelessWidget {
     final int ratingScore = commentData.rate ?? 0;
     DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(commentData.commentTimeStamp!*1000);
 
-    debugPrint("${commentData.comment}:${commentData.type}");
+    //debugPrint("${commentData.comment}:${commentData.type}");
 
     return ListTile(
       title: Padding(
@@ -96,11 +93,7 @@ class BangumiCommentTile extends StatelessWidget {
             behavior: ScrollConfiguration.of(context).copyWith(physics: const NeverScrollableScrollPhysics()),
             child: BBCodeText(
               data: convertBangumiCommentSticker(commentData.comment ?? "comment"),
-              stylesheet: BBStylesheet(
-                tags: allEffectTag,
-                selectableText: true,
-                defaultText: TextStyle(fontFamily: 'MiSansFont',fontSize: AppFontSize.s16)
-              ),
+              stylesheet: appDefaultStyleSheet(context,selectableText:true)
             ),
           ),
 

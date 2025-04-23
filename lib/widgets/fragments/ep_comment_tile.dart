@@ -4,13 +4,10 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
-import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
-import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
@@ -149,14 +146,7 @@ class EpCommentTile extends StatelessWidget {
             [
                BBCodeText(
                 data: convertBangumiCommentSticker(epCommentData.comment ?? ""),
-                stylesheet: BBStylesheet(
-                  tags: allEffectTag,
-                  selectableText: true,
-                  defaultText: TextStyle(
-                    fontFamily: 'MiSansFont',
-                    fontSize: AppFontSize.s16,
-                  )
-                ),
+                stylesheet: appDefaultStyleSheet(context,selectableText: true)
               ) 
             
             ] : null,

@@ -22,8 +22,8 @@ class EpModel extends ChangeNotifier{
   int subjectID;
   int selectedEp;
   
-  final Map<int,EpsInfo> epsData = {};
-  final Map<int,List<EpCommentDetails>> epCommentData = {}; 
+  final Map<num,EpsInfo> epsData = {};
+  final Map<num,List<EpCommentDetails>> epCommentData = {}; 
 
   //double => 浮点 #3 / #3-1 etc
   final Map<int,Map<double,int>> userCommentLikeData = {}; 
@@ -194,7 +194,7 @@ class EpModel extends ChangeNotifier{
         
           List<EpsInfo> currentRangeEpsData = loadEpsData(response);
 
-          int? epOffset = currentRangeEpsData.isEmpty ? 0 : currentRangeEpsData[0].epIndex;
+          num? epOffset = currentRangeEpsData.isEmpty ? 0 : currentRangeEpsData[0].epIndex;
 
           if(epOffset!=null){
             for(int epInfoIndex = 0; epInfoIndex < currentRangeEpsData.length; epInfoIndex++){

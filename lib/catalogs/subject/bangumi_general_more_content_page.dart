@@ -65,7 +65,6 @@ abstract class BangumiGeneralMoreContentPageState<
                 }
 
                 else{
-                  invokeToaster(message: "已获取到新内容");
 
                   animatedListKey.currentState?.insertAllItems(
                     getContentModel().contentListData.isEmpty ? 0 : initalLength-1, 
@@ -73,17 +72,12 @@ abstract class BangumiGeneralMoreContentPageState<
                     duration: const Duration(milliseconds: 300),
                   );
 
-                  debugPrint("[old] current/total:${scrollController.offset}/${scrollController.position.maxScrollExtent}");
-
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    debugPrint("[new] current/total:${scrollController.offset}/${scrollController.position.maxScrollExtent}");
-
                     scrollController.animateTo(
                       scrollController.offset+120,
                       duration: const Duration(milliseconds: 500), 
                       curve: Curves.easeOutCubic
                     );
-
                   });
 
                   

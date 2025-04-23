@@ -23,9 +23,9 @@ class CachedImageLoader extends StatelessWidget {
     return DecoratedBox(
       decoration: borderDecoration ?? BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-          border: Border.all(width: 1)
-        ),
-        child: Builder(
+        border: Border.all(width: 1)
+      ),
+      child: Builder(
           builder: (_){
 
             if(imageUrl!=null){

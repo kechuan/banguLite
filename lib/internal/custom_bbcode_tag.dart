@@ -13,6 +13,19 @@ import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:bbob_dart/bbob_dart.dart' as bbob;
 import 'package:url_launcher/url_launcher_string.dart';
 
+BBStylesheet appDefaultStyleSheet(BuildContext context,{bool selectableText = false}){
+  return BBStylesheet(
+    tags: allEffectTag,
+    selectableText: selectableText,
+    defaultText: TextStyle(
+      overflow: TextOverflow.ellipsis,
+      fontSize: 16,
+      fontFamily: 'MiSansFont',
+      color: judgeDarknessMode(context) ? Colors.white : Colors.black,
+    )
+  );
+}
+
 final allEffectTag = [
 	BoldTag(),
 	ItalicTag(),

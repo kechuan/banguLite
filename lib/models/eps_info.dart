@@ -8,7 +8,7 @@ class EpsInfo {
 
   String? description;
 
-  int? epIndex;
+  num? epIndex;
   num? sort; //同类条目的排序和集数
   int? epID;
   int? commentLength;
