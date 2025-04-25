@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/index/bangumi_star_page.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -33,11 +35,7 @@ class IndexPortial extends StatelessWidget {
             leading:  Builder(
               builder: (context) {
                 return IconButton(
-                  onPressed: (){
-
-                    Scaffold.of(context).openDrawer();
-
-                  },
+                  onPressed: ()=>Scaffold.of(context).openDrawer(),
                   icon: const Icon(Icons.menu)
                 );
               }
@@ -74,7 +72,10 @@ class IndexPortial extends StatelessWidget {
               )
             ],
           ),
-          drawer: const AppDrawer(),
+          drawer: Drawer(
+            width: min(350, MediaQuery.sizeOf(context).width*3/4),
+            child: const AppDrawer()
+          ),
           body: IndexedStack(
             index: currentPageIndex,
             children: const [

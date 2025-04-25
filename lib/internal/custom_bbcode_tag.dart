@@ -1,4 +1,5 @@
 
+import 'package:bangu_lite/internal/callback.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
@@ -31,34 +32,35 @@ final allEffectTag = [
 	ItalicTag(),
 	UnderlineTag(),
 	StrikeThroughTag(),
-	//ColorTag(),
-  	PatchColorTag(),
+  PatchColorTag(),
 	SizeTag(),
-	//ImgTag(),
-  	CodeTag(),
-	LateLoadImgTag(),
-  	LateLoadImgTag(tagName: "photo"),
-	UrlTag(
-    onTap: (link) async => 
-      await canLaunchUrlString(link).then(
-		(launchable){
-			if(launchable){
-				bus.emit('AppRoute', link);	
-			}
-			
-		}
-	)
-  ),
-	//QuoteTag(),
-  	AdapterQuoteTag(),
+  CodeTag(),
+
+  AdapterQuoteTag(),
 	LeftAlignTag(),
 	CenterAlignTag(),
 	RightAlignTag(),
 	MaskTag(),
-  //SpoilerTag()
-	BangumiStickerTag()
+	BangumiStickerTag(),
+
+  //RichTag
+  LateLoadImgTag(),
+  LateLoadImgTag(tagName: "photo"),
+	UrlTag(
+    onTap: (link) async => 
+      await canLaunchUrlString(link).then(
+      (launchable){
+        if(launchable){
+          bus.emit('AppRoute', link);	
+        }
+        
+      }
+    )
+  ),
   
 ];
+
+//final richLessEffectTag = allEffectTag.getRange(0, allEffectTag.length - 3);
 
 class MaskDisplay extends StatelessWidget {
   final String maskText;
@@ -230,18 +232,57 @@ class CodeTag extends AdvancedTag{
       WidgetSpan(
         child: Padding(
           padding: Padding16,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius:BorderRadius.circular(6),
-              color: Colors.white,
-            ),
-            
-            child: ScalableText(
-              codeText,
-              
-            ),
+          child: Builder(
+            builder: (context) {
+              return Container(
+                color: Colors.grey.withValues(alpha: 0.1),
+                child: Column(
+                  children: [
+                
+                    Padding(
+                      padding: PaddingH6,
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                                      
+                            const ScalableText("Code",style: TextStyle(fontSize: 14,color: Colors.grey)),
+                                      
+                                      
+                            IconButton(
+                              onPressed: ()=> copyClipboardCallback(context, codeText),
+                              icon: const Icon(Icons.copy),
+                              iconSize: 18,
+                              color: Colors.grey,
+                            ),
+                          ],
+                        ),
+                    ),
+                
+                    UnVisibleResponse(
+                      onTap: ()=> copyClipboardCallback(context, codeText),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius:BorderRadius.circular(6),
+                          color: Colors.white,
+                        ),
+                        
+                        child: ScalableText(
+                          codeText,
+                          selectable: true,
+                        ),
+                      ),
+                    ),
+                
+                  
+                
+                
+                  ],
+                ),
+              );
+            }
           ),
         ),
+        
       )
     ];
   }

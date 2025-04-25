@@ -328,23 +328,3 @@ String convertInsertContent({String originalText = '',String insertText = '',int
 
 
 
-//TimelineCat convertTimelineCatType(int catType){
-//  return TimelineCat.values.firstWhere((element) => element.value == catType);
-//}
-
-//String convertTimelineCatAction(TimelineCat timelineCat,int catAction){
-//  String resultText = "";
-
-//  switch(timelineCat){
-//    case TimelineCat.Blog:
-//    case TimelineCat.Index:{
-
-//    }
-
-//    default:{
-//      resultText = TimelineCatDaily.values.firstWhere((element) => element.value == catAction).actionName;
-//    }
-//  }
-
-//  return resultText;
-//}

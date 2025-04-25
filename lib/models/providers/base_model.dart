@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/base_details.dart';
 import 'package:bangu_lite/models/base_info.dart';
@@ -22,14 +24,18 @@ abstract class BaseModel
 
   final dynamic subjectID;
   final List<I> contentListData = [];
-  final Map<int, D> contentDetailData = {};
 
-  Future<void> loadSubjectSubContentList({
+  /// group 将 groupName 作为属性 一己之力将 int 属性更改为 dynamic
+  final Map<dynamic, D> contentDetailData = {};
+
+  Future<bool> loadSubjectSubContentList({
     Map<String, dynamic> queryParameters = const {},
     bool isReloaded = false
   }) async {
 
-    if (subjectID == 0) return;
+    Completer<bool> completer = Completer();
+
+    if (subjectID == 0) return false;
 
     if (isReloaded) {
       contentListData.clear();
@@ -38,7 +44,7 @@ abstract class BaseModel
 
     if (contentListData.isNotEmpty && queryParameters.isEmpty) {
       debugPrint("contentList is already loaded");
-      return;
+      return false;
     }
 
     try {
@@ -46,12 +52,24 @@ abstract class BaseModel
         getContentListUrl(subjectID),
         queryParameters: queryParameters
       ).then((response) {
-        subContentListResponseDataCallback(response);
+        if(response.statusCode == 200){
+          subContentListResponseDataCallback(response);
+          completer.complete(true);
+        }
+
+        else{
+          completer.complete(false);
+        }
+        
       });
 
-    } on DioException catch (e) {
+    } 
+    
+    on DioException catch (e) {
       debugPrint("Request Error: ${e.toString()}");
     }
+
+    return completer.future;
   }
 
   void subContentListResponseDataCallback(Response subContentListResponseData){
@@ -69,7 +87,7 @@ abstract class BaseModel
   }
     
   // 抽象方法：加载特定内容详情
-  Future<dynamic> loadContentDetail(int contentID,{Map<String, dynamic>? queryParameters}) async {
+  Future<void> loadContentDetail(int contentID,{Map<String, dynamic>? queryParameters}) async {
 
     if(getContentDetailUrl(contentID) == null) return;
 

@@ -59,7 +59,7 @@ List<GroupInfo> loadGroupsInfo(List bangumiGroupsListData){
     GroupInfo currentGroupInfo = GroupInfo(id: bangumiGroupsData['id']);
 
     currentGroupInfo
-      ..groupName = bangumiGroupsData['title']
+      ..groupName = bangumiGroupsData['name']
       ..groupTitle = bangumiGroupsData['title']
       ..groupAvatar = bangumiGroupsData['icon']['large']
       ..membersCount = bangumiGroupsData['members']

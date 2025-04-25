@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
+import 'package:bangu_lite/internal/callback.dart';
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -39,8 +41,6 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
   @override
   Widget build(BuildContext context) {
 
-	
-	
       return Consumer<TimelineFlowModel>(
         builder: (_,timelineFlowModel,__) {
           return EasyRefresh(
@@ -63,32 +63,22 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
                     BangumiQuerys.groupsTopicsQuery(mode: widget.groupTypeNotifier.value) :
                     null
                 ).then((result){
-                    if(result){
-                      
+                    
+                  final currentTimelineData = timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]];
 
-                      final currentTimelineData = timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]];
-
-                      final int receiveLength = max(0,currentTimelineData?.length ?? 0 - initalLength);
-
-                      if(receiveLength == 0){
-                        invokeToaster();
-                      }
-
-                      else{
-                        animatedKey.currentState?.insertAllItems(
-                        max(0,initalLength-1), 
-                        receiveLength,
-                        duration: const Duration(milliseconds: 300),
-                      );
-
-                    }
-
-                  }
+                  animatedListAppendContentCallback(
+                    result,
+                    initalLength,
+                    currentTimelineData,
+                    animatedKey,
+                    fallbackAction: invokeToaster,
+                  );
+                  
                 });
               },
-                onLoad: () {
-                  
-                },
+              onLoad: () {
+                
+              },
               child: Column(
                 children: [
                   Expanded(
@@ -99,13 +89,12 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
                       shrinkWrap: true,
                       itemBuilder: (_,index,animation){
                         return Container(
+                          padding: PaddingH12,
                           color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
-                          //height: 70,
                           child: BangumiTimelineTile(
                             surfTimelineDetails: timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]![index],
                             timelineType: BangumiTimelineType.values[widget.tabController.index],
                           )
-                          //child: ScalableText("$timelineIndex - $index"),
                         );
                       }
                     ),

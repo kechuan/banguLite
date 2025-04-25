@@ -2,8 +2,7 @@ import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/extract.dart';
 import 'package:bangu_lite/models/base_details.dart';
 import 'package:bangu_lite/models/comment_details.dart';
-import 'package:bangu_lite/models/group_details.dart';
-import 'package:bangu_lite/models/group_topic_details.dart';
+
 import 'package:bangu_lite/models/group_topic_info.dart';
 import 'package:bangu_lite/models/timeline_details.dart';
 import 'package:bangu_lite/models/topic_info.dart';
@@ -20,16 +19,22 @@ class SurfTimelineDetails extends BaseDetails {
   
   BangumiTimelineType? bangumiTimelineType;
   String? sourceTitle; // Subject&Group
-  int? sourceID;
+  dynamic sourceID;
+  //int? sourceID;
   
   int? replies;
   int? updatedAt;
 
 }
 
+
+
 List<SurfTimelineDetails> loadSurfTimelineDetails(
-  List surfTimelineListData,
-  {BangumiTimelineType bangumiTimelineType = BangumiTimelineType.timeline}
+  List<dynamic> surfTimelineListData,
+  {
+    BangumiTimelineType bangumiTimelineType = BangumiTimelineType.timeline,
+
+  }
 ){
 
   List<SurfTimelineDetails> surfTimelineDetailsList = [];
@@ -46,6 +51,7 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
           ..bangumiTimelineType = bangumiTimelineType
           ..title = infoDataList[index].topicTitle
           ..sourceTitle = extractNameCNData(surfTimelineListData[index]["subject"])
+          //破坏行为
           ..sourceID = infoDataList[index].subjectID
           ..commentDetails = (
             CommentDetails()
@@ -66,26 +72,35 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
     }
       
     case BangumiTimelineType.group:{
-      List<GroupTopicInfo> groupDataList = loadGroupTopicInfo(surfTimelineListData);
+      //isGroupSource 从 group来源得到的就已经是 GroupTopicInfo 了
+
+      List<GroupTopicInfo> groupDataList;
+
+      if(surfTimelineListData is List<GroupTopicInfo>){
+        groupDataList = surfTimelineListData;
+      }
+
+      else{
+        groupDataList = loadGroupTopicInfo(surfTimelineListData);
+      }
+
 
       for(int index = 0; index < groupDataList.length; index++){
         SurfTimelineDetails surfTimelineDetails = SurfTimelineDetails(
           //groupTopicID
-          detailID: surfTimelineListData[index]["id"],
+          detailID: groupDataList[index].topicInfo?.topicID,
         )
           ..bangumiTimelineType = bangumiTimelineType
-          ..title = groupDataList[index].groupInfo?.groupTitle
-          ..sourceTitle = groupDataList[index].groupInfo?.groupName
+          ..title = groupDataList[index].topicInfo?.topicTitle
+          ..sourceTitle = groupDataList[index].groupInfo?.groupTitle
           //groupID
-          ..sourceID = groupDataList[index].groupInfo?.groupID
+          ..sourceID = groupDataList[index].groupInfo?.groupName
           ..commentDetails = (
             CommentDetails()
-              ..userInformation = loadUserInformations(
-                surfTimelineListData[index]["user"] ?? surfTimelineListData[index]["creator"]
-              )
+              ..userInformation = groupDataList[index].topicInfo?.userInformation
           )
-          ..replies = surfTimelineListData[index]["replyCount"]
-          ..updatedAt = surfTimelineListData[index]["updatedAt"]
+          ..replies = groupDataList[index].topicInfo?.repliesCount
+          ..updatedAt = groupDataList[index].groupInfo?.updatedTime
 
         ;
 

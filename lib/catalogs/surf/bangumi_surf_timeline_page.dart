@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -170,7 +171,7 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
                     
                   );
                 
-                  }
+                }
               );
             },
           ),

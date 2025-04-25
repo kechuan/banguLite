@@ -134,8 +134,8 @@ String convertTimelineDescription(TimelineDetails currentTimeline, {bool? author
   switch(currentTimeline.catType){
    
     //人物/日志/目录
-    case 6:
-    case 7: { actionText+="添加了 "; break;}
+    case 6: { actionText+="发布日志 "; }
+    case 7: { actionText+="添加了 "; }
 
     default: { 
 
@@ -288,16 +288,24 @@ String convertDefaultTimeline(
         jumpLink = BangumiWebUrls.group(objectIDSet.first);
       }
 
+      else if(action == TimelineCatDaily.JoinGroup.value || action == TimelineCatDaily.CreateGroup.value){
+        //jumpLink = "这里是群组ID:${objectIDSet.first}";
+        // objectNameList: {boring, 靠谱人生茶话会}
+        jumpLink = BangumiWebUrls.group(objectIDSet.first);
+      }
+
       else if (action == TimelineCatDaily.JoinParadise.value){
         jumpLink = "这里是乐园ID:${objectIDSet.first}";
       }
 
     }
 
-    case 5:{
-      if(action == TimelineCatStatus.Comment.value){
-        jumpLink = "这里是被吐槽的ID:${objectIDSet.first}";
-      }
+    //case 5: 时间线吐槽由外部进行处理 非内部 
+
+    case 6:{
+      //timeline的日志不携带 源id信息 所以无法追踪到 源subject
+      jumpLink = BangumiWebUrls.userBlog(objectIDSet.first);
+
     }
 
     case 8:{

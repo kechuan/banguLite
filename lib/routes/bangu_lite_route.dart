@@ -8,8 +8,11 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables,unused_local_variable,unused_import,unnecessary_import,unused_shown_name,implementation_imports,duplicate_import,library_private_types_in_public_api
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/models/group_details.dart';
+import 'package:bangu_lite/models/group_topic_info.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
+import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/models/providers/review_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
 import 'package:bangu_lite/models/review_details.dart';
@@ -18,6 +21,7 @@ import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/widgets.dart';
 
 import '../catalogs/about_page.dart';
+import '../catalogs/bangumi_group_topic_page.dart';
 import '../catalogs/bangumi_picture_view_page.dart';
 import '../catalogs/bangumi_webview_page.dart';
 import '../catalogs/index/bangumi_index_page.dart';
@@ -72,6 +76,9 @@ FFRouteSettings getRouteSettings({
           key: asT<Key?>(
             safeArguments['key'],
           ),
+          selectedGroupInfo: asT<GroupInfo?>(
+            safeArguments['selectedGroupInfo'],
+          ),
         ),
       );
     case '/Timeline':
@@ -95,6 +102,25 @@ FFRouteSettings getRouteSettings({
           renderText: asT<String>(
             safeArguments['renderText'],
           )!,
+        ),
+      );
+    case '/groupTopic':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => BangumiGroupTopicPage(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
+          groupsModel: asT<GroupsModel>(
+            safeArguments['groupsModel'],
+          )!,
+          groupTopicInfo: asT<GroupTopicInfo>(
+            safeArguments['groupTopicInfo'],
+          )!,
+          themeColor: asT<Color?>(
+            safeArguments['themeColor'],
+          ),
         ),
       );
     case '/index':

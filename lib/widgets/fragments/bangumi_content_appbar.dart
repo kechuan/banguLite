@@ -57,16 +57,16 @@ class BangumiContentAppbar extends StatelessWidget {
             ),
           ),
 
-          IconButton(
-            onPressed: (){
-              final userModel = context.read<UserModel>();
+          //IconButton(
+          //  onPressed: (){
+          //    final userModel = context.read<UserModel>();
               
-              fadeToaster(context: context, message: "删除user august3416信息");
+          //    fadeToaster(context: context, message: "删除user august3416信息");
 
-              userModel.userData.remove('august3416');
-            }, 
-            icon: const Icon(Icons.abc)
-          ),
+          //    userModel.userData.remove('august3416');
+          //  }, 
+          //  icon: const Icon(Icons.abc)
+          //),
             
           IconButton(
             onPressed: (){
@@ -105,22 +105,22 @@ class BangumiContentAppbar extends StatelessWidget {
                 if(content is String){
 
                                       
-                  invokeRequestSnackBar(message: "UI回帖成功",requestStatus: true);
-                  onSendMessage?.call(content);
+                  //invokeRequestSnackBar(message: "UI回帖成功",requestStatus: true);
+                  //onSendMessage?.call(content);
                     
 
-                  //invokeRequestSnackBar();
+                  invokeRequestSnackBar();
 
-                  ////网络层 Callback
-                  //await invokeSendComment(content).then((result){
-                  //  debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
-                  //  //UI层 Callback
-                  //  if(result){
-                  //    invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
-                  //    onSendMessage?.call(content);
-                  //  }
+                  //网络层 Callback
+                  await invokeSendComment(content).then((result){
+                    debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
+                    //UI层 Callback
+                    if(result){
+                      invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
+                      onSendMessage?.call(content);
+                    }
                     
-                  //});
+                  });
 
                 }
                 

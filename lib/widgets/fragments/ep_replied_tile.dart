@@ -2,12 +2,14 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/comment_replied_sheet.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 class EpRepliedTile extends ListTile {
   const EpRepliedTile({
@@ -74,12 +76,15 @@ class EpRepliedTile extends ListTile {
                                       return const ScalableText("发言已隐藏",style: TextStyle(fontStyle: FontStyle.italic));
                                     }
 
+                                    
+
                                     return ScalableText(
                                       "${epCommentData.repliedComment![index].comment}",
                                       maxLines: 3,
                                       style: const TextStyle(overflow: TextOverflow.ellipsis,),
                                       
                                     );
+
                                   }
                                 ),
                               ),

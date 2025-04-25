@@ -19,6 +19,14 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
       final value = entry.value;
 
       if (detectNameList.contains(key)) {
+
+          if(key == 'nickname'){
+            //更改昵称 "nickname": {"before": "123","after": "456"}
+            if(value is Map){
+              objectNameSet.add(value["after"]);
+              continue;
+            }
+          }
         
           if(key == 'name' || key == 'nameCN'){
 

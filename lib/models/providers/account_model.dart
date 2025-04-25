@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/response_status_code.dart';
+import 'package:bangu_lite/internal/extension.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/user_details.dart';
@@ -28,8 +29,18 @@ class AccountModel extends ChangeNotifier {
       loginedUserInformations.accessToken,
     ).then((status){
 		if(status){
-      isLogining = false;
-			updateAccessToken(loginedUserInformations.refreshToken);
+
+      debugPrint("expired at:${loginedUserInformations.expiredTime}" );
+
+      loginedUserInformations.expiredTime?.let((it) {
+        //3天后执行刷新
+        final differenceTime = DateTime.fromMillisecondsSinceEpoch(it!*1000).difference(DateTime.now());
+        if(differenceTime > const Duration(days: 3) && differenceTime < const Duration(days: 7)){
+          updateAccessToken(loginedUserInformations.refreshToken);
+        }
+
+      });
+
 		}
 		
 		notifyListeners();
@@ -295,6 +306,12 @@ class AccountModel extends ChangeNotifier {
 
         }
       },
+      onReceivedError: (controller, request, error) {
+        debugPrint("error:${error.description}");
+        getTrunsTileTokenCompleter.complete(false);
+        headlessWebView?.dispose();
+
+      },
 
     );
 
@@ -451,6 +468,14 @@ class AccountModel extends ChangeNotifier {
 				
 			}
 
+      case PostCommentType.replyGroupTopic:{
+
+        requestUrl = actionType == UserContentActionType.post ?
+        BangumiAPIUrls.postGroupTopicComment(contentID!) :
+        BangumiAPIUrls.actionTopicComment(commentID!);
+				
+			}
+
 			case PostCommentType.replyBlog:{
 
         requestUrl = actionType == UserContentActionType.post ?
@@ -557,7 +582,7 @@ class AccountModel extends ChangeNotifier {
       case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.toggleSubjectCommentLike(commentID!);
 			case PostCommentType.replyEpComment: requestUrl = BangumiAPIUrls.toggleEPCommentLike(commentID!);
 			case PostCommentType.replyTopic: requestUrl = BangumiAPIUrls.toggleTopicLike(commentID!);
-      case PostCommentType.replyGroupTopic: requestUrl = BangumiAPIUrls.toggleGroupLike(commentID!);
+      case PostCommentType.replyGroupTopic: requestUrl = BangumiAPIUrls.toggleGroupTopicLike(commentID!);
 				
 			//case PostCommentType.replyBlog:{
 			//	requestUrl = BangumiAPIUrls.toggleGroupLike(commentID!);

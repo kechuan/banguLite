@@ -2,8 +2,10 @@ import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/index/bangumi_star_page.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/components/app_drawer.dart';
 import 'package:bangu_lite/widgets/fragments/app_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
@@ -24,8 +26,10 @@ class IndexLandscape extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    final ValueNotifier<bool> expandedMenuNotifier = ValueNotifier(false);
+
     final indexModel = context.read<IndexModel>();
-    final accountModel = context.read<AccountModel>();
+    
     
     return ValueListenableBuilder(
       valueListenable: selectedPageIndexNotifier,
@@ -108,12 +112,41 @@ class IndexLandscape extends StatelessWidget {
                 const VerticalDivider(width: 1),
             
                 Expanded(
-                  child: IndexedStack(
-                    index: currentPageIndex,
-                    children: const [
-                      BangumiCalendarPage(),
-                      BangumiSortPage(),
-                      BangumiStarPage()
+                  child: Stack(
+                    children: [
+
+                      IndexedStack(
+                        index: currentPageIndex,
+                        children: const [
+                          BangumiCalendarPage(),
+                          BangumiSortPage(),
+                          BangumiStarPage()
+                        ],
+                      ),
+
+                      ValueListenableBuilder(
+                        valueListenable: expandedMenuNotifier,
+                        builder: (_,menuExpandedStatus,menu) {
+                          return AnimatedPositioned(
+                            left: menuExpandedStatus ? 0 : -350,
+                            width: min(350, MediaQuery.sizeOf(context).width*3/4),
+                            height: MediaQuery.sizeOf(context).height,
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeOut,
+                            child: menu!
+                            
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Material(
+                            color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
+                            child: const AppDrawer()
+                          )
+                        ),
+                      )
+
+
                     ],
                   ),
                 )
@@ -124,21 +157,32 @@ class IndexLandscape extends StatelessWidget {
         );
       },
       child: Padding( 
-        padding: const EdgeInsets.symmetric(vertical: 50),
+        padding: const EdgeInsets.symmetric(vertical: 25),
         child: Column(
+          spacing: 24,
           children: [
-            const Icon(Icons.live_tv_rounded),
-            const ScalableText("BanguLite"),
 
-            Padding(
-              padding: const EdgeInsets.only(top: 30),
-              child: IconButton(
-                onPressed: ()=> showSearch(
-                  context: context,
-                  delegate: CustomSearchDelegate()
-                ),
-                icon: const Icon(Icons.search)
+            const Column(
+              
+              children: [
+                Icon(Icons.live_tv_rounded),
+                ScalableText("BanguLite"),
+              ],
+            ),
+
+
+            IconButton(
+              onPressed: ()=> expandedMenuNotifier.value = !expandedMenuNotifier.value,
+              icon: const Icon(Icons.menu)
+            ),
+            
+
+            IconButton(
+              onPressed: ()=> showSearch(
+                context: context,
+                delegate: CustomSearchDelegate()
               ),
+              icon: const Icon(Icons.search)
             ),
               
           ],

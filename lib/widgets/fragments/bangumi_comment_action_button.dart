@@ -225,8 +225,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                         
                       case CommentActionType.sticker:{
                         if(
-                          widget.postCommentType == PostCommentType.postBlog || 
-                          widget.postCommentType == PostCommentType.replyBlog
+                          widget.postCommentType == PostCommentType.replyBlog 
                         ){
                           isActionAvaliable = false;
                         }

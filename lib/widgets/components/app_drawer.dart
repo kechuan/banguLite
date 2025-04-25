@@ -23,166 +23,162 @@ class AppDrawer extends StatelessWidget {
     final indexModel = context.read<IndexModel>();
     ValueNotifier<bool> isExpandedNotifier = ValueNotifier(true);
 
-    return Drawer(
-      width: min(350, MediaQuery.sizeOf(context).width*3/4),
-      
-      child: Padding(
-        padding: Padding12+PaddingV24,
-        child: EasyRefresh(
-          child: SingleChildScrollView(
-            child: Column(
-              spacing: 24,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-            
-                const ScalableText("账号区域",style: TextStyle(fontSize: 14,color: Colors.grey)),
-            
-                Selector<AccountModel,bool>(
-                  selector: (context,accountModel)=>accountModel.isLogined(),
-                  builder: (_,loginedStatus,child) {
-                    return Column(
-                      children: [
-            
-                        ListTile(
-                          
-                          onTap: () {
-                            
-                            invokePushLogin() => Navigator.pushNamed(context, Routes.loginAuth);
+    return Padding(
+      padding: Padding12+PaddingV24,
+      child: EasyRefresh(
+        child: SingleChildScrollView(
+          child: Column(
+            spacing: 24,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+          
+              const ScalableText("账号区域",style: TextStyle(fontSize: 14,color: Colors.grey)),
+          
+              Selector<AccountModel,bool>(
+                selector: (context,accountModel)=>accountModel.isLogined(),
+                builder: (_,loginedStatus,child) {
+                  return Column(
+                    children: [
+          
+                      ListTile(
                         
-                            Future.wait(
-                              [
-                                precacheImage(
-                                  const AssetImage('assets/icons/icon.png'),
-                                  context
-                                ),
-                        
-                                precacheImage(
-                                  const AssetImage('assets/icons/bangumi_logo.png'),
-                                  context
-                                ),
-                              ]
-                            ).then(
-                              (_)=>invokePushLogin()
-                            );
-                                            
-                          },
-                          title: Row(
-                            spacing: 12,
-                            children: [
+                        onTap: () {
                           
-                              Builder(builder: (_){
-                                if(!loginedStatus){
-                                  return const SizedBox(
-                                    height: 50,
-                                    width: 50,
-                                    child: Icon(Icons.account_circle_outlined,size: 35)
-                                  );
-                                }
-                          
-                                else{
-                                  return const SizedBox(
-                                    height: 50,
-                                    width: 50,
-                                    child: AppUserAvatar()
-                                  );
-                                }
-                              }),
-                                            
-                          
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ScalableText(accountModel.loginedUserInformations.userInformation?.nickName ?? "游客模式",maxLines: 3,overflow: TextOverflow.ellipsis),
-                                    ScalableText(loginedStatus ? "@${accountModel.loginedUserInformations.userInformation?.userID}" : "登录以解锁在线模式",style: const TextStyle(fontSize: 12,color: Colors.grey)),
-                                  ],
-                                ),
-                              ),
-
-                              if(loginedStatus)
-                                ElevatedButton(
-                                  onPressed: ()=> accountModel.resetLoginStatus(),
-                                  child: const Row(
-                                    children: [
-                                      Icon(Icons.logout),
-                                      Text("登出"),
-                                    ],
-                                  )
-                                )
-                              
-                            ],
-                          ),
-                                            
-                         
-                        ),
-            
-                        ...List.generate(
-                          BangumiPrivateHubType.values.length, 
-                          (index) => ListTile(
-                            leading: Icon(BangumiPrivateHubType.values[index].iconData),
-                            title: Text(BangumiPrivateHubType.values[index].typeName),
-                            onTap: ()=>fadeToaster(context: context, message: "暂未开放"),
-                          )
-                        )
+                          invokePushLogin() => Navigator.pushNamed(context, Routes.loginAuth);
                       
-                      ],
-                    );
-                  }
-                ),
-            
-                ExpansionTile(
-                  tilePadding: EdgeInsets.zero,
-                  title: const ScalableText("Bangumi 广场",style: TextStyle(fontSize: 14,color: Colors.grey)),
-                  initiallyExpanded: true,
-                  trailing: ValueListenableBuilder(
-                    valueListenable: isExpandedNotifier,
-                    builder: (_,isExpanded,child)=> isExpanded ? const Icon(Icons.keyboard_arrow_down_outlined) : const Icon(Icons.keyboard_arrow_right_outlined),
-                  ),
-                  onExpansionChanged: (value) => isExpandedNotifier.value = value,
-                  
-                    children: List.generate(
-                      BangumiSocialHubType.values.length, 
-                      (index) => ListTile(
-                        leading: Icon(BangumiSocialHubType.values[index].iconData),
-                        title: Text(BangumiSocialHubType.values[index].typeName),
-                        onTap: (){
-                          
-                          if(BangumiSocialHubType.values[index] == BangumiSocialHubType.group){
-                            Navigator.pushNamed(context, Routes.groups);
-                          }
-
-                          else if(BangumiSocialHubType.values[index] == BangumiSocialHubType.timeline){
-                            Navigator.pushNamed(context, Routes.timeline);
-                          }
-                          //Navigator.pushNamed(context, Routes.socialHub,arguments: BangumiPrivateHubType.values[_])
+                          Future.wait(
+                            [
+                              precacheImage(
+                                const AssetImage('assets/icons/icon.png'),
+                                context
+                              ),
+                      
+                              precacheImage(
+                                const AssetImage('assets/icons/bangumi_logo.png'),
+                                context
+                              ),
+                            ]
+                          ).then(
+                            (_)=>invokePushLogin()
+                          );
+                                          
                         },
+                        title: Row(
+                          spacing: 12,
+                          children: [
+                        
+                            Builder(builder: (_){
+                              if(!loginedStatus){
+                                return const SizedBox(
+                                  height: 50,
+                                  width: 50,
+                                  child: Icon(Icons.account_circle_outlined,size: 35)
+                                );
+                              }
+                        
+                              else{
+                                return const SizedBox(
+                                  height: 50,
+                                  width: 50,
+                                  child: AppUserAvatar()
+                                );
+                              }
+                            }),
+                                          
+                        
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ScalableText(accountModel.loginedUserInformations.userInformation?.nickName ?? "游客模式",maxLines: 3,overflow: TextOverflow.ellipsis),
+                                  ScalableText(loginedStatus ? "@${accountModel.loginedUserInformations.userInformation?.userID}" : "登录以解锁在线模式",style: const TextStyle(fontSize: 12,color: Colors.grey)),
+                                ],
+                              ),
+                            ),
+    
+                            if(loginedStatus)
+                              ElevatedButton(
+                                onPressed: ()=> accountModel.resetLoginStatus(),
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.logout),
+                                    Text("登出"),
+                                  ],
+                                )
+                              )
+                            
+                          ],
+                        ),
+                                          
+                       
+                      ),
+          
+                      ...List.generate(
+                        BangumiPrivateHubType.values.length, 
+                        (index) => ListTile(
+                          leading: Icon(BangumiPrivateHubType.values[index].iconData),
+                          title: Text(BangumiPrivateHubType.values[index].typeName),
+                          onTap: ()=>fadeToaster(context: context, message: "暂未开放"),
+                        )
                       )
-                    )
                     
-                  ),
-            
-                const ScalableText("杂项",style: TextStyle(fontSize: 14,color: Colors.grey)),
-            
-                Column(
-                  children: [
+                    ],
+                  );
+                }
+              ),
+          
+              ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                title: const ScalableText("Bangumi 广场",style: TextStyle(fontSize: 14,color: Colors.grey)),
+                initiallyExpanded: true,
+                trailing: ValueListenableBuilder(
+                  valueListenable: isExpandedNotifier,
+                  builder: (_,isExpanded,child)=> isExpanded ? const Icon(Icons.keyboard_arrow_down_outlined) : const Icon(Icons.keyboard_arrow_right_outlined),
+                ),
+                onExpansionChanged: (value) => isExpandedNotifier.value = value,
                 
-                    const ToggleThemeModeButton(isDetailText: true),
-                
-                    ListTile(
-                      leading: const Icon(Icons.settings),
-                      title: const Text("设置"),
+                  children: List.generate(
+                    BangumiSocialHubType.values.length, 
+                    (index) => ListTile(
+                      leading: Icon(BangumiSocialHubType.values[index].iconData),
+                      title: Text(BangumiSocialHubType.values[index].typeName),
                       onTap: (){
-                        indexModel.updateCachedSize();
-                        Navigator.pushNamed(context,Routes.settings);
+                        
+                        if(BangumiSocialHubType.values[index] == BangumiSocialHubType.group){
+                          Navigator.pushNamed(context, Routes.groups);
+                        }
+    
+                        else if(BangumiSocialHubType.values[index] == BangumiSocialHubType.timeline){
+                          Navigator.pushNamed(context, Routes.timeline);
+                        }
+                        //Navigator.pushNamed(context, Routes.socialHub,arguments: BangumiPrivateHubType.values[_])
                       },
                     )
+                  )
                   
-                  ],
-                )
-            
-              ],
-            ),
+                ),
+          
+              const ScalableText("杂项",style: TextStyle(fontSize: 14,color: Colors.grey)),
+          
+              Column(
+                children: [
+              
+                  const ToggleThemeModeButton(isDetailText: true),
+              
+                  ListTile(
+                    leading: const Icon(Icons.settings),
+                    title: const Text("设置"),
+                    onTap: (){
+                      indexModel.updateCachedSize();
+                      Navigator.pushNamed(context,Routes.settings);
+                    },
+                  )
+                
+                ],
+              )
+          
+            ],
           ),
         ),
       ),

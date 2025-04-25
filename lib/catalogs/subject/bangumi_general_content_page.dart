@@ -11,7 +11,6 @@ import 'package:bangu_lite/models/base_info.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
-import 'package:bangu_lite/models/user_details.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -119,8 +118,6 @@ abstract class BangumiContentPageState<
                                     surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
                                     onSendMessage: (content) {
                                                   
-                                      fadeToaster(context: context, message: "回帖成功");
-                                
                                       final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
                                       final int commentListCount = getCommentCount(contentDetail, false) ?? 0;
                                 
@@ -198,14 +195,19 @@ abstract class BangumiContentPageState<
                                 children: [
 
                                   //Topic的楼主内容 也会放入到 contentRepliedComment 里面。。
-                                  if(getPostCommentType() == PostCommentType.replyTopic)
-                                    EpCommentView(
-                                      postCommentType: PostCommentType.replyTopic,
-                                      epCommentData: contentDetail!.contentRepliedComment![contentCommentIndex]
-                                    ),
-                                  
-                                  if(getPostCommentType() != PostCommentType.replyTopic)
-                                    EpCommentView(
+
+                                  Builder(builder: (_){
+                                    if(
+                                      getPostCommentType() == PostCommentType.replyTopic ||
+                                      getPostCommentType() == PostCommentType.replyGroupTopic
+                                    ){
+                                      return EpCommentView(
+                                        postCommentType: PostCommentType.replyTopic,
+                                        epCommentData: contentDetail!.contentRepliedComment?[contentCommentIndex] ?? EpCommentDetails()
+                                      );
+                                    }
+                                    
+                                    return EpCommentView(
                                       postCommentType: getPostCommentType(),
                                       epCommentData: EpCommentDetails()
                                         ..userInformation = contentInfo.userInformation
@@ -213,8 +215,11 @@ abstract class BangumiContentPageState<
                                         ..comment = contentDetail?.content
                                         ..commentTimeStamp = contentInfo.createdTime
                                         ..commentReactions = contentDetail?.contentReactions
-                                    ),
+                                    );
+                                    
                         
+                                  }),
+                                  
                                     ...List.generate(
                                       getTrailingPhotosUri()?.length ?? 0,
                                       (index) {
@@ -337,7 +342,7 @@ abstract class BangumiContentPageState<
                                     valueListenable: commentUpdateFlag,
                                     builder: (_,__,child){
 
-                                      final currentEpCommentDetails = contentDetail!.contentRepliedComment![contentCommentIndex];
+                                      final currentEpCommentDetails = contentDetail!.contentRepliedComment?[contentCommentIndex] ?? EpCommentDetails();
 
                                       if(userCommentMap[contentCommentIndex] != null){
                                         currentEpCommentDetails.comment = userCommentMap[contentCommentIndex];

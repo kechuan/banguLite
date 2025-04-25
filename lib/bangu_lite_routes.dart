@@ -12,6 +12,7 @@ const List<String> routeNames = <String>[
   '/Groups',
   '/Timeline',
   '/commentPreview',
+  '/groupTopic',
   '/index',
   '/loginAuth',
   '/moreReviews',
@@ -44,6 +45,10 @@ class Routes {
   /// '/Groups'
   ///
   /// [name] : '/Groups'
+  ///
+  /// [constructors] :
+  ///
+  /// BangumiGroupsPage : [GroupInfo? selectedGroupInfo]
   static const String groups = '/Groups';
 
   /// '/Timeline'
@@ -59,6 +64,15 @@ class Routes {
   ///
   /// SendCommentPreview : [String(required) renderText]
   static const String commentPreview = '/commentPreview';
+
+  /// '/groupTopic'
+  ///
+  /// [name] : '/groupTopic'
+  ///
+  /// [constructors] :
+  ///
+  /// BangumiGroupTopicPage : [GroupsModel(required) groupsModel, GroupTopicInfo(required) groupTopicInfo, Color? themeColor]
+  static const String groupTopic = '/groupTopic';
 
   /// '/index'
   ///

@@ -1,5 +1,6 @@
 
 import 'package:bangu_lite/models/base_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/group_details.dart';
 import 'package:bangu_lite/models/user_details.dart';
 
@@ -8,10 +9,12 @@ class GroupTopicDetails extends ContentDetails {
     super.detailID,
   });
 
+  String? groupTopicTitle;
+
   GroupInfo? groupInfo;
 
   int? get groupTopicID => detailID;
-  String? groupTopicTitle;
+  
   int? topicReplyCount;
 
 
@@ -31,6 +34,7 @@ GroupTopicDetails loadGroupTopicDetails(Map<String,dynamic> bangumiGroupTopicDat
       ..updatedTime = bangumiGroupTopicData['updatedAt']
       ..groupTopicTitle = bangumiGroupTopicData['title']
       ..topicReplyCount = bangumiGroupTopicData['replyCount']
+      ..contentRepliedComment = loadEpCommentDetails(bangumiGroupTopicData['replies'])
     ;
 
   return currentGroupTopicDetails;

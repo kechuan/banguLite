@@ -10,6 +10,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+
+const excludeImageFormatted = [
+  "avif",
+];
+
 class CommentImagePanel extends StatefulWidget {
   const CommentImagePanel({
     super.key,
@@ -46,7 +51,10 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
 
                 RequestByteInformation pictureRequestInformation = snapshot.data;
 
-                bool isValid = pictureRequestInformation.contentLength != null;
+                bool isValid = 
+                  pictureRequestInformation.contentLength != null ||
+                  excludeImageFormatted.contains(pictureRequestInformation.contentType?.split("/")[1]) == true
+                ;
 
                 debugPrint("loadStatus: ${indexModel.userConfig.isManuallyImageLoad}");
 

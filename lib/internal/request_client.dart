@@ -51,21 +51,27 @@ class BangumiAPIUrls {
   static String timeline() => '$newUrl/timeline';
   static String timelineReply(int timelineID) => '${timeline()}/$timelineID/replies';
 
+  //基底
   static String subjects() => '$newUrl/subjects';
   static String topics() => '${subjects()}/-/topics';
   static String episodes() => '$newUrl/episodes';
   static String groups() => '$newUrl/groups';
+
+  static String blogs() => '$newUrl/blogs';
+
+  //Posts 则是 一个 用户管理它 在 subject 内发布的内容(collections之外)
+  static String subjectPosts() => '${subjects()}/-/posts';
+  static String groupPosts() => '${groups()}/-/posts';
+
+  static String groupsTopics() => '${groups()}/-/topics';
   
 
   static String relations(int subjectID) => '${subjects()}/$subjectID/relations';
   static String reviews(int subjectID) => '${subjects()}/$subjectID/reviews';
 
-  //Posts 则是 一个 用户管理它 在 subject 内发布的内容(collections之外)
-  static String subjectPosts() => '${subjects()}/-/posts';
-  
 
-  static String groupsTopics() => '${groups()}/-/topics';
   static String groupTopics(String groupName) => '${groups()}/$groupName/topics';
+  static String groupTopic(int groupTopicID) => '${groupsTopics()}/$groupTopicID';
 
 
   static String ep(int epID) => '${episodes()}/$epID';
@@ -74,7 +80,7 @@ class BangumiAPIUrls {
   static String subjectComment(int subjectID) => '${subjects()}/$subjectID/comments';
   static String epComment(int epID) => '${episodes()}/$epID/comments';
   static String topicComment(int topicID) => '${topics()}/$topicID';
-  static String groupComment(int postID) => '${groupsTopics()}/$postID';
+  static String groupTopicComment(int postID) => '${groupPosts()}/$postID';
 
   //surf information
   static String latestGroupTopics() => groupsTopics();
@@ -86,7 +92,7 @@ class BangumiAPIUrls {
   static String user(String username) => '$newUrl/users/$username';
   static String userSubjectComment(String username,int subjectID) => '$baseUrl/v0/users/$username/collections/$subjectID';
 
-  static String userBlog(int blogID) => '$newUrl/blogs/$blogID';
+  static String userBlog(int blogID) => '${blogs()}/$blogID';
   static String userTimeline(String username) => '${user(username)}/timeline';
   
   
@@ -113,27 +119,26 @@ class BangumiAPIUrls {
   static String postBlogComment(int subjectID) => '${userBlog(subjectID)}/comments';
 
   static String postGroupTopic(String groupName) => groupTopics(groupName);
-  static String postGroupComment(int postID) => '${groupComment(postID)}/replies';
+  static String postGroupTopicComment(int postID) => '${actionGroupTopicComment(postID)}/replies';
 
   
   static String postTimeline() => timeline();
   static String postTimelineComment(int timelineID) => '${timeline()}/$timelineID/replies';
   
   
-  //Checked API format.
   /// 行为允许 PUT/PATCH
   static String actionSubjectComment(int subjectID) => '$newUrl/collections/subjects/$subjectID';
 
   /// 行为允许 GET/PUT/DELETE
   /// '${subjects()}/-/topics/$topicID';
+
+  static String actionGroupTopicComment(int commentID) => '${groupsTopics()}/$commentID';
   static String actionTopicComment(int commentID) => '${subjectPosts()}/$commentID';
   static String actionEpComment(int commentID) => '${episodes()}/-/comments/$commentID';
-
-  // 只允许 GET/PUT
-  static String actionGroupComment(int postID) => groupComment(postID);
+  static String actiongroupTopicComment(int postID) => groupTopicComment(postID);
   
   ///这个不允许GET
-  static String actionBlogComment(int commentID) => '$newUrl/blogs/-/comments/$commentID';
+  static String actionBlogComment(int commentID) => '${blogs()}/-/comments/$commentID';
 
 
   /// 行为允许 PUT/DELETE
@@ -142,7 +147,7 @@ class BangumiAPIUrls {
   static String toggleSubjectCommentLike(int commentID) => '${subjects()}/-/collects/$commentID/like';  
   static String toggleEPCommentLike(int commentID) => '${actionEpComment(commentID)}/like';
   static String toggleTopicLike(int commentID) => '${actionTopicComment(commentID)}/like';
-  static String toggleGroupLike(int commentID) => '${actionGroupComment(commentID)}/like';
+  static String toggleGroupTopicLike(int commentID) => '${actiongroupTopicComment(commentID)}/like';
 
 
   //other
@@ -175,6 +180,7 @@ class BangumiWebUrls{
 
   //接受数字ID 与 name 作为参数
   static String group(dynamic groupName) => '$baseUrl/group/$groupName';
+  static String groupTopic(int postID) => '$baseUrl/group/topic/$postID';
 
   static String userBlog(int blogID) => '$baseUrl/blog/$blogID';
 

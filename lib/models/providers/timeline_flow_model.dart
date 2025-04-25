@@ -21,6 +21,7 @@ class TimelineFlowModel extends ChangeNotifier {
   Future<bool> requestSelectedTimeLineType(
     BangumiTimelineType timelineType,
     {
+	  bool? isAppend,
       Map<String,dynamic>? queryParameters,
       Function(String message)? fallbackAction,
     }
@@ -34,12 +35,6 @@ class TimelineFlowModel extends ChangeNotifier {
     if(timelineType == BangumiTimelineType.all){
       timelinesData.clear();
     }
-
-    else{
-      timelinesData.remove(timelineType);
-    }
-
-    
 
     switch(timelineType){
       case BangumiTimelineType.all:{
@@ -95,7 +90,7 @@ class TimelineFlowModel extends ChangeNotifier {
        
     }
 
-      await timelineFuture().then((response){
+	await timelineFuture().then((response){
 
         // (skip)all /subject / groups / timeline
 
@@ -112,27 +107,40 @@ class TimelineFlowModel extends ChangeNotifier {
 
         else{
 
-          if(timelineType != BangumiTimelineType.timeline){
-            timelinesData[timelineType] = loadSurfTimelineDetails(
-              response[0].data["data"],
-              bangumiTimelineType: timelineType
-            );
-          }
+			if(response[0].statusCode != 200){
+				fallbackAction?.call("请求失败 ${response[0].statusCode} ${response[0].data["message"]}");
+				requestTimelineCompleter.complete(false);
+				return;
+			}
 
-          else{
-            timelinesData[timelineType] = loadSurfTimelineDetails(
-              response[0].data,
-              bangumiTimelineType: timelineType
-            );
-          }
+			dynamic extractResponseData = 
+				timelineType != BangumiTimelineType.timeline ?
+				response[0].data["data"] :
+				response[0].data 
+			;
+
+			if(isAppend == true){
+				timelinesData[timelineType]?.addAll(
+					loadSurfTimelineDetails(
+					extractResponseData,
+					bangumiTimelineType: timelineType
+				));
+			}
+
+			else{
+				timelinesData[timelineType] = loadSurfTimelineDetails(
+					extractResponseData,
+					bangumiTimelineType: timelineType
+				);
+			}
           
         }
 
 
         notifyListeners();
-      requestTimelineCompleter.complete(true);
+		requestTimelineCompleter.complete(true);
 			
-		});
+	});
 
     return requestTimelineCompleter.future;
     
