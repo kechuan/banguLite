@@ -115,11 +115,7 @@ class AccountModel extends ChangeNotifier {
 			on DioException catch(e){
 				debugPrint(" ${e.response?.statusCode} verifySessionValidity:${e.message}");
 
-        if(fallbackAction!=null){
-          fallbackAction(e.response?.statusCode);
-        }
-
-        
+        fallbackAction?.call(e.response?.statusCode);
 
 				verifyCompleter.complete(false);
 			}
@@ -627,7 +623,6 @@ class AccountModel extends ChangeNotifier {
 		await actionLikeFuture().then((response){
 			if(response.statusCode == 200){
 				debugPrint("$actionType succ: $commentID => $stickerLikeIndex");
-        fallbackAction?.call("贴条成功");
 				likeCompleter.complete(true);
 			}
 

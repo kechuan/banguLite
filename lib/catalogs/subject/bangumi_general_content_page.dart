@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 
 import 'package:bangu_lite/internal/lifecycle.dart';
@@ -202,7 +201,7 @@ abstract class BangumiContentPageState<
                                       getPostCommentType() == PostCommentType.replyGroupTopic
                                     ){
                                       return EpCommentView(
-                                        postCommentType: PostCommentType.replyTopic,
+                                        postCommentType: getPostCommentType(),
                                         epCommentData: contentDetail!.contentRepliedComment?[contentCommentIndex] ?? EpCommentDetails()
                                       );
                                     }

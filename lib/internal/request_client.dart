@@ -275,18 +275,20 @@ class BangumiQuerys {
   }
 
   static Map<String,dynamic> groupsQuery({
-    BangumiSurfGroupType? mode,
+    String? modeName,
     String? sort,
 		int? limit,
 		int? offset
-  }) => groupsTopicsQuery(
-    mode: mode,
-    limit: limit,
-    offset: offset
-  )
+  }) => {
+		"mode": modeName ?? "all",
+		"limit": limit ?? 20,
+		"offset": offset ?? 0,
+    "sort": sort ?? "members"
+	};
+  
     // posts/topics/members/created/updated
-    ..["sort"] = sort ?? "members"
-  ;
+    
+  
 
   static Map<String,dynamic> groupsTopicsQuery({
 		BangumiSurfGroupType? mode,

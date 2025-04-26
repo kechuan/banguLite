@@ -2,8 +2,6 @@ import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/index/bangumi_star_page.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/app_drawer.dart';
 import 'package:bangu_lite/widgets/fragments/app_user_avatar.dart';

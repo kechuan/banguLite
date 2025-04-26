@@ -32,7 +32,7 @@ class SettingsPage extends StatelessWidget {
       ClearCacheTile(),
       ConfigTile(),
       AboutTile(),
-      TestTile()
+      //TestTile()
     ];
 
 

@@ -1,4 +1,4 @@
-import 'dart:math';
+
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/callback.dart';
@@ -8,9 +8,7 @@ import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
-import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -70,15 +68,13 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
                     result,
                     initalLength,
                     currentTimelineData,
-                    animatedKey,
+                    animatedListKey:animatedKey,
                     fallbackAction: invokeToaster,
                   );
                   
                 });
               },
-              onLoad: () {
-                
-              },
+
               child: Column(
                 children: [
                   Expanded(

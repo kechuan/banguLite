@@ -53,13 +53,9 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
 
         //只能这样了 阈值设置在 1 之内 好在jumpPage的时候只能是整数值
 
-        if((commentTabController.index - widget.commentPageController.page!).abs() < 0.9){
-          return;
-        }
+        if((commentTabController.index - widget.commentPageController.page!).abs() < 0.9) return;
 
-        widget.commentPageController.jumpToPage(
-          commentTabController.index, 
-        );
+        widget.commentPageController.jumpToPage(commentTabController.index);
       });
     
   }

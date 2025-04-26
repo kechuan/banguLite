@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/custom_toaster.dart';
-import 'package:bangu_lite/internal/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -10,9 +9,8 @@ void animatedListAppendContentCallback(
   bool result,
   int initalLength,
   List? selectedData,
-  GlobalKey<dynamic> animatedListKey,
-  
   {
+	GlobalKey<dynamic>? animatedListKey,
     ScrollController? animatedListController,
     Function({String? message})? fallbackAction,
   }
@@ -26,25 +24,19 @@ void animatedListAppendContentCallback(
       }
 
       else{
-        animatedListKey.currentState?.insertAllItems(
+        animatedListKey?.currentState?.insertAllItems(
           max(0,initalLength-1), 
           receiveLength,
           duration: const Duration(milliseconds: 300),
         );
 
-        animatedListController?.let(
-          (_){
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              animatedListController.animateTo(
-                animatedListController.offset + 120,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOut
-              );
-            });
-          }
-        );
-
-        
+		WidgetsBinding.instance.addPostFrameCallback((_) {
+			animatedListController?.animateTo(
+				animatedListController.offset + 120,
+				duration: const Duration(milliseconds: 300),
+				curve: Curves.easeOut
+			);
+		});
 
     }
 

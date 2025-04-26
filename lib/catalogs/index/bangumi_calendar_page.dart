@@ -131,7 +131,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                 future: calendarLoadFuture,
                 builder: (_, snapshot) {
             
-                  debugPrint("index rebuild: screenWidth:${MediaQuery.sizeOf(context).width}");
+                  //debugPrint("index rebuild: screenWidth:${MediaQuery.sizeOf(context).width}");
                   final calendarBangumis = indexModel.calendarBangumis;
             
                   return CustomScrollView(

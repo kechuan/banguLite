@@ -32,6 +32,7 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
     BangumiSurfGroupType mode = BangumiSurfGroupType.all,
     int? limit,
     int? offset,
+    Map<String,String>? accessQuery,
     Function({String? message})? fallbackAction
   }) async {
 
@@ -40,13 +41,22 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
     await HttpApiClient.client.get(
       BangumiAPIUrls.groups(),
       queryParameters: BangumiQuerys.groupsQuery(
-        mode: mode,
+        modeName: mode == BangumiSurfGroupType.created ? "managed" : mode.name,
         limit: limit,
         offset: offset,
-      )
+      ),
+      options: Options(headers: accessQuery),
     ).then((response){
       if(response.statusCode == 200){
-        groupsData[mode] = loadGroupsInfo(response.data["data"]);
+
+        if(offset == 0){
+          groupsData[mode] = loadGroupsInfo(response.data["data"]);  
+        }
+
+        else{
+          groupsData[mode]!.addAll(loadGroupsInfo(response.data["data"]));
+        }
+
         requestGroupsCompleter.complete(true);
         notifyListeners();
       }
@@ -63,14 +73,15 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
 
 
   Future<bool> loadGroupTopics({
-    int? offset = 0
+    int? offset = 0,
+    bool? isAppend,
   }) async {
 
     Completer<bool> groupTopicCompleter = Completer();
 
     if(selectedGroupInfo == null) return false;
 
-    contentListData.clear();
+    if(isAppend != true) contentListData.clear();
 
     await loadSubjectSubContentList(
       queryParameters: BangumiQuerys.topicsQuery

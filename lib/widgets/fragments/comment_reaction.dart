@@ -4,6 +4,7 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -88,42 +89,45 @@ class CommentReaction extends StatelessWidget {
                 child: ElevatedButton(
                   style: ButtonStyle(
                     backgroundColor: WidgetStatePropertyAll(buttonColor),
-                
                     padding: const WidgetStatePropertyAll(PaddingH6),
                   ),
                   onPressed:  () {
-                    debugPrint("reactDataLike:$reactDataLike, dataLikeIndex:$dataLikeIndex, subject:$commentID");
-                
+
                     if(!isReactAble) return;
-                              
-                    if(reactDataLike == dataLikeIndex){
-                              
+
+                    invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
+                      context,
+                      message: message,
+                      requestStatus: requestStatus,
+                    );
+
+                    debugPrint("reactDataLike:$reactDataLike, dataLikeIndex:$dataLikeIndex, subject:$commentID");
+
+                    invokeRequestSnackBar();
+
                       accountModel.toggleCommentLike(
                         commentID,
                         dataLikeIndex,
                         postCommentType,
-                        actionType: UserContentActionType.delete
+                        actionType: reactDataLike == dataLikeIndex ? UserContentActionType.delete : UserContentActionType.post,
                       ).then((result){
                         if(result){
-                          reactDataLikeNotifier.value = -1;
-                        } 
+
+                          if(reactDataLike == dataLikeIndex){
+                            reactDataLikeNotifier.value = -1;
+                          }
+
+                          else{
+                            reactDataLikeNotifier.value = dataLikeIndex;
+                          }
+
+                          invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
+                          
+                        }
+
+                        
                       });
-                              
-                    }
-                              
-                    else{
-                              
-                      accountModel.toggleCommentLike(
-                        commentID,
-                        dataLikeIndex,
-                        postCommentType,
-                      ).then((result){
-                        if(result){
-                          reactDataLikeNotifier.value = dataLikeIndex;
-                        } 
-                      });
-                              
-                    }
+
                               
                     debugPrint("postCommentType:$postCommentType, id: $commentID");
                               
