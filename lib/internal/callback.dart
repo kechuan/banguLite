@@ -8,7 +8,8 @@ import 'package:flutter/services.dart';
 void animatedListAppendContentCallback(
   bool result,
   int initalLength,
-  List? selectedData,
+  int receiveLength,
+  
   {
 	GlobalKey<dynamic>? animatedListKey,
     ScrollController? animatedListController,
@@ -16,9 +17,6 @@ void animatedListAppendContentCallback(
   }
 ){
   if(result){
-
-    final int receiveLength = max(0,selectedData?.length ?? 0 - initalLength);
-
       if(receiveLength == 0){
         fallbackAction?.call();
       }

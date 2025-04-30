@@ -42,7 +42,9 @@ Future<void> registerBGMLoginDeepLink() async {
   debugPrint("register windows bgm.tv deepLink success");
 }
 
-void listenAPPLink() async{
+Future<String> listenAPPLink() async{
+
+  String listenUri = "";
 
   if(Platform.isWindows){
     await registerBGMLoginDeepLink();
@@ -51,8 +53,12 @@ void listenAPPLink() async{
   debugPrint("listenAPPLink");
 
   AppLinks().uriLinkStream.listen((uri) async {
+    listenUri = uri.toString();
     handleLink(uri); //开启监听
+
   });
+
+  return listenUri;
 }
 
 bool handleLink(Uri uri) {

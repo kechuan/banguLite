@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/callback.dart';
 import 'package:bangu_lite/internal/const.dart';
@@ -25,7 +27,6 @@ import 'package:bangu_lite/models/group_details.dart';
 class BangumiGroupsPage extends StatefulWidget {
   const BangumiGroupsPage({
     super.key,
-    
     this.selectedGroupInfo
   });
 
@@ -45,13 +46,19 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
   final animatedGroupTopicsListController = ScrollController();
 
   @override
+  void initState() {
+    groupTitleNotifier.value = widget.selectedGroupInfo?.groupTitle;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     final timelineFlowModel = context.read<TimelineFlowModel>();
 
     return ChangeNotifierProvider(
 		//prevent Pass 0 return;
-		create: (_) => GroupsModel(subjectID: 'groups'),
+		create: (_) => GroupsModel(subjectID: 'groupsTopic',selectedGroupInfo: widget.selectedGroupInfo),
 		child: Scaffold(
 		
 			body: Builder(
@@ -77,8 +84,10 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 											child: Container(
 											color: Theme.of(context).colorScheme.surface.withValues(alpha:0.8),
 											child: ExpansionTile(
+                        tilePadding: const EdgeInsets.all(6),
 												controller: expansionTileController,
 												title: Row(
+                          spacing: 6,
                           children: [
                             IconButton(onPressed: ()=> Navigator.of(context).pop(), icon: const Icon(Icons.arrow_back)),
                           
@@ -91,7 +100,6 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 												),
 												children: [
                           GroupsSelectView(
-                            animatedGroupsListController:animatedGroupTopicsListController,
                             sliverAnimatedListKey:sliverAnimatedListKey, 
                             expansionTileController: expansionTileController, 
                             groupTitleNotifier: groupTitleNotifier,
@@ -132,7 +140,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 																										
 														return BangumiTimelineTile(
 															surfTimelineDetails: selectedGroupData[index],
-															timelineType: BangumiTimelineType.group,
+															//timelineType: BangumiTimelineType.group,
 															
 															groupTopicInfo: 
 																groupsModel.contentListData.isEmpty ?
@@ -201,10 +209,12 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
           timelineFlowModel.timelinesData[BangumiTimelineType.group] ?? [] :
           groupsModel.contentListData;
 
+          final int receiveLength = max(0,newSelectedGroupData.length);
+
           animatedListAppendContentCallback(
             result,
             initalLength,
-            newSelectedGroupData,
+            receiveLength,
             animatedListKey:sliverAnimatedListKey,
             fallbackAction: invokeToaster,
             animatedListController: animatedGroupTopicsListController

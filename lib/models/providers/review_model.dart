@@ -15,6 +15,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
   ReviewModel({
     required super.subjectID
   }){
+    if(subjectID == "blog") return;
     loadSubjectReviews();
   }
 

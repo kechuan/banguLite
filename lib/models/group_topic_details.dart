@@ -9,7 +9,9 @@ class GroupTopicDetails extends ContentDetails {
     super.detailID,
   });
 
-  String? groupTopicTitle;
+  String? get groupTopicTitle => contentTitle;
+  set groupTopicTitle(String? value) => contentTitle = value;
+  //String? groupTopicTitle;
 
   GroupInfo? groupInfo;
 

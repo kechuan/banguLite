@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/callback.dart';
 import 'package:bangu_lite/internal/const.dart';
@@ -13,7 +15,7 @@ import 'package:provider/provider.dart';
 class GroupsSelectView extends StatefulWidget {
   const GroupsSelectView({
     super.key,
-    required this.animatedGroupsListController,
+    //required this.animatedGroupsListController,
     required this.sliverAnimatedListKey,
     required this.expansionTileController,
     required this.groupTitleNotifier, 
@@ -23,7 +25,7 @@ class GroupsSelectView extends StatefulWidget {
 
   });
 
-  final ScrollController animatedGroupsListController;
+  //final ScrollController animatedGroupsListController;
   final GlobalKey<SliverAnimatedListState> sliverAnimatedListKey;
   final ExpansionTileController expansionTileController;
   final ValueNotifier<String?> groupTitleNotifier;
@@ -106,7 +108,7 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
                     child: GridView.builder(
                       scrollDirection: Axis.vertical,
                       primary: false,
-                      //controller:animatedGroupListController,
+                      controller:animatedGroupListController,
                       itemCount: groupsModel.groupsData.values.elementAt(tabController.index).length,
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
@@ -192,18 +194,20 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
     await groupsModel.loadGroups(
         mode: BangumiSurfGroupType.values[index],
         offset: isAppend == true ? selectedGroupDataLength : 0,
-        accessQuery: BangumiQuerys.bearerTokenAccessQuery(accountModel.loginedUserInformations.accessToken ?? ""),
+        accessQuery: BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken ?? ""),
         fallbackAction: invokeToaster,
       ).then((result){
         
         List newSelectedGroupData = groupsModel.groupsData[BangumiSurfGroupType.values[index]]!;
 
+        final int receiveLength = max(0,newSelectedGroupData.length);
+
         animatedListAppendContentCallback(
           result,
           isAppend == true ? selectedGroupDataLength : 0,
-          newSelectedGroupData,
+          receiveLength,
           fallbackAction: invokeToaster,
-          animatedListController: widget.animatedGroupsListController
+          animatedListController: animatedGroupListController
         );
 
         groupsModel.notifyListeners();

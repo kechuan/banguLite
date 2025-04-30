@@ -33,7 +33,6 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
   List<dynamic> surfTimelineListData,
   {
     BangumiTimelineType bangumiTimelineType = BangumiTimelineType.timeline,
-
   }
 ){
 
@@ -100,7 +99,7 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
               ..userInformation = groupDataList[index].topicInfo?.userInformation
           )
           ..replies = groupDataList[index].topicInfo?.repliesCount
-          ..updatedAt = groupDataList[index].groupInfo?.updatedTime
+          ..updatedAt = groupDataList[index].topicInfo?.lastRepliedTime
 
         ;
 
@@ -119,24 +118,16 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
         )
           ..bangumiTimelineType = bangumiTimelineType
             //筛选时间线是否吐槽 则会以 commentDetails 是否含有 comment && bangumiTimelineType 判断
-            ..title = 
-              //Not Have BBCode
-              surfTimelineListData[index]?["memo"]?["status"]?["tsukkomi"] ??  
-              //BBCode
-              convertTimelineDescription(timelineDataList[index])
-
-          ..commentDetails = (
-            CommentDetails()
-              ..userInformation = loadUserInformations(
-                surfTimelineListData[index]["user"] ?? surfTimelineListData[index]["creator"]
-              )
-          )
+          ..title = convertTimelineDescription(timelineDataList[index])
+          ..commentDetails = timelineDataList[index].commentDetails
           ..replies = surfTimelineListData[index]["replies"]
-          ..updatedAt = surfTimelineListData[index]["updatedAt"]
-
+          ..updatedAt = surfTimelineListData[index]["createdAt"]
         ;
 
         surfTimelineDetailsList.add(surfTimelineDetails);
+
+
+
       }
     }
 

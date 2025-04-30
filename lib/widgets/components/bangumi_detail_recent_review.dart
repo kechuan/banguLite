@@ -29,7 +29,6 @@ class BangumiDetailRecentReview extends StatelessWidget {
 
     final ValueNotifier<bool> reviewCollapseStatusNotifier = ValueNotifier(true);
 
-
     return Padding(
       padding: Padding16,
       child: Consumer<ReviewModel>(
@@ -170,7 +169,8 @@ class BangumiDetailRecentReview extends StatelessWidget {
                                   Routes.blog,
                                    arguments: {
                                     "reviewModel":reviewModel,
-                                    "selectedBlogIndex": index,
+                                    //"selectedBlogIndex": index,
+                                    "reviewInfo": reviewModel.contentListData[index],
                                     //"themeColor": judgeDetailRenderColor(context,bangumiThemeColor),
                                   }
                                 );

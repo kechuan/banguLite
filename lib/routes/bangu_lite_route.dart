@@ -60,8 +60,8 @@ FFRouteSettings getRouteSettings({
           reviewModel: asT<ReviewModel>(
             safeArguments['reviewModel'],
           )!,
-          selectedBlogIndex: asT<int>(
-            safeArguments['selectedBlogIndex'],
+          reviewInfo: asT<ReviewInfo>(
+            safeArguments['reviewInfo'],
           )!,
           themeColor: asT<Color?>(
             safeArguments['themeColor'],
@@ -296,8 +296,8 @@ FFRouteSettings getRouteSettings({
           topicModel: asT<TopicModel>(
             safeArguments['topicModel'],
           )!,
-          index: asT<int>(
-            safeArguments['index'],
+          topicInfo: asT<TopicInfo>(
+            safeArguments['topicInfo'],
           )!,
           themeColor: asT<Color?>(
             safeArguments['themeColor'],
@@ -357,10 +357,11 @@ FFRouteSettings getRouteSettings({
         ),
       );
     default:
+    
       return FFRouteSettings(
         name: FFRoute.notFoundName,
         routeName: FFRoute.notFoundRouteName,
-        builder: notFoundPageBuilder ?? () => Container(),
+        builder: notFoundPageBuilder ?? () => const BangumiAuthPage(),
       );
   }
 }

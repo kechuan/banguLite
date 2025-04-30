@@ -22,7 +22,7 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
   
   final ValueNotifier<BangumiSurfGroupType> groupTypeNotifier = ValueNotifier(BangumiSurfGroupType.all);
   final PageController timelinePageController = PageController();
-  final ScrollController scrollController = ScrollController();
+  final EasyRefreshController topicListViewEasyRefreshController = EasyRefreshController();
   late TabController tabController; // 新增TabController声明
 
 
@@ -32,25 +32,18 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
     super.initState();
 
     tabController = TabController(
-      initialIndex : 1,
+      initialIndex : BangumiTimelineType.all.index,
       vsync: this,
       length: BangumiTimelineType.values.length,
     );
     
 	  tabController.addListener((){
-		//疑问:
-		//如果不添加这种设置 在左右划屏幕的时候 就会直接被取消动画 而
-		//但如果添加了这种设置 那么主动点击的时候。。就直接被return掉了
 
-		//只能这样了 阈值设置在 1 之内 好在jumpPage的时候只能是整数值
+      if((tabController.index - timelinePageController.page!).abs() < 0.9){
+        return;
+      }
 
-		if((tabController.index - timelinePageController.page!).abs() < 0.9){
-		  return;
-		}
-
-		timelinePageController.jumpToPage(
-		  tabController.index, 
-		);
+      timelinePageController.jumpToPage(tabController.index);
 	  });
 	
   }
@@ -77,76 +70,75 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
 			onTap: (value) {
 			  tabController.animateTo(value);
 			},
+      indicatorSize: TabBarIndicatorSize.tab,
 			tabs: List.generate(
 			  BangumiTimelineType.values.length, (index){
 
 				if(index == BangumiTimelineType.group.index){
 				  return Tab(
-					
-					child: Column(
-					  mainAxisAlignment: MainAxisAlignment.center,
-					  children: [
+            
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
 
-						ValueListenableBuilder(
-						  valueListenable: groupTypeNotifier,
-						  builder: (_,groupType,child) {
-							if(groupType == BangumiSurfGroupType.all) return const SizedBox.shrink();
-							return ScalableText(groupTypeNotifier.value.typeName,style: const TextStyle(fontSize: 12));
-						  }
-						),
+              ValueListenableBuilder(
+                valueListenable: groupTypeNotifier,
+                builder: (_,groupType,child) {
+                if(groupType == BangumiSurfGroupType.all) return const SizedBox.shrink();
+                  return ScalableText(groupTypeNotifier.value.typeName,style: const TextStyle(fontSize: 12));
+                }
+              ),
 
 
-						Row(
-						  mainAxisAlignment: MainAxisAlignment.spaceAround,
-						  spacing: 6,
-						  children: [
-							ScalableText(BangumiTimelineType.values[index].typeName),
-						  
-							PopupMenuButton<BangumiSurfGroupType>(
-							  padding: EdgeInsets.zero,
-							  initialValue: BangumiSurfGroupType.all,
-							  itemBuilder: (_){
-								return BangumiSurfGroupType.values.map(
-								  (currentGroupType){
-									 return PopupMenuItem<BangumiSurfGroupType>(
-									  value: currentGroupType,
-									  child: Text(currentGroupType.typeName),
-									);
-								  }).toList();
-							  },
-							  onSelected:(value){
-						  
-								groupTypeNotifier.value = value;
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                spacing: 6,
+                children: [
+                ScalableText(BangumiTimelineType.values[index].typeName),
+                
+                PopupMenuButton<BangumiSurfGroupType>(
+                  padding: EdgeInsets.zero,
+                  initialValue: BangumiSurfGroupType.all,
+                  itemBuilder: (_){
+                  return BangumiSurfGroupType.values.map(
+                    (currentGroupType){
+                    return PopupMenuItem<BangumiSurfGroupType>(
+                      value: currentGroupType,
+                      child: Text(currentGroupType.typeName),
+                    );
+                    }).toList();
+                  },
+                  onSelected:(value){
 
-								timelinePageController.animateToPage(
-								  index,
-								  duration: const Duration(milliseconds: 300),
-								  curve: Curves.easeOut
-								);
-							  },
-							  child: const Icon(Icons.arrow_drop_down),
-						  
-							)
-						  
-						  ],
-						),
-					  ],
-					),
-				  );
+                    timelinePageController.animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut
+                    ).then((_){
+                      groupTypeNotifier.value = value;
+                      topicListViewEasyRefreshController.callRefresh();
+                    });
+
+                    
+                  },
+                  child: const Icon(Icons.arrow_drop_down),
+                
+                )
+                
+                ],
+              ),
+              ],
+            ),
+          );
 				}
 
-				return Tab(
-				  text: BangumiTimelineType.values[index].typeName,
-				);
+				return Tab(text: BangumiTimelineType.values[index].typeName);
 			  }
 			)
 		  ),
 
 		  Expanded(
 			  child: EasyRefresh(
-          scrollController: scrollController,
-          triggerAxis: Axis.vertical,
-          
           child: PageView.builder(
             controller: timelinePageController,
             onPageChanged: (value) {
@@ -161,7 +153,8 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
                     tabController: tabController, 
                     timelinePageController: timelinePageController,
                     groupTypeNotifier: groupTypeNotifier,
-                    
+                    topicListViewEasyRefreshController: topicListViewEasyRefreshController,
+
                   );
                 
                 }

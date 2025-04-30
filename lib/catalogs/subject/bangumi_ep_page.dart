@@ -39,7 +39,6 @@ class BangumiEpPage extends StatefulWidget {
   final int totalEps;
   final Color? bangumiThemeColor;
 
-  //final Set<GlobalKey> epCommentGlobalKeySet = {};
 
   @override
   State<BangumiEpPage> createState() => _BangumiEpPageState();
@@ -108,26 +107,33 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                   physics:physics,
                                   slivers: [
                                               
-                                    MultiSliver(
-                                      pushPinnedChildren: true,
-                                      children: [
-                                  
-                                        SliverPinnedHeader(
-                                          child: BangumiContentAppbar(
-                                            contentID: epModel.epsData[selectedEp]?.epID,
-                                            titleText: convertCollectionName(epModel.epsData[max(1,selectedEp)]!, max(1,selectedEp)),
-                                            webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!),
-                                            postCommentType: PostCommentType.replyEpComment,
-                                            surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
-                                          ),
-                                        ),
-                                        
-                                  
-                                        EpInfo(
-                                          key: epInfoKey,
-                                          epsInfo: epModel.epsData,selectedEp: selectedEp
-                                        ),
-                                      ],
+                                    Selector<EpModel,EpsInfo?>(
+                                      selector: (_, epModel) => epModel.epsData[epModel.selectedEp],
+                                      shouldRebuild: (previous, next)=> previous!=next,
+                                      builder: (_,currentEpInfoData,child){
+                                        return MultiSliver(
+                                          pushPinnedChildren: true,
+                                          children: [
+                                                                          
+                                            SliverPinnedHeader(
+                                              child: BangumiContentAppbar(
+                                                contentID: epModel.epsData[selectedEp]?.epID,
+                                                titleText: convertCollectionName(epModel.epsData[max(1,selectedEp)], max(1,selectedEp)),
+                                                webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]?.epID ?? 0),
+                                                postCommentType: PostCommentType.replyEpComment,
+                                                surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
+                                              ),
+                                            ),
+                                            
+                                                                          
+                                            EpInfo(
+                                              key: epInfoKey,
+                                              epsInfo: epModel.epsData,selectedEp: selectedEp
+                                            ),
+                                            
+                                          ],
+                                        );
+                                      }
                                     ),
                                   
                                     MultiSliver(
@@ -169,9 +175,15 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                                       mainAxisAlignment: MainAxisAlignment.start,
                                                       children: [
                                                                                                             
-                                                        SizedBox(
-                                                          height: 60,
-                                                          child: EpTogglePanel(currentEp: selectedEp,totalEps: widget.totalEps)
+                                                        Selector<EpModel,EpsInfo?>(
+                                                          selector: (_, epModel) => epModel.epsData[epModel.selectedEp],
+                                                          shouldRebuild: (previous, next)=> previous!=next,
+                                                          builder: (_,currentEpInfoData,child){
+                                                            return SizedBox(
+                                                              height: 60,
+                                                              child: EpTogglePanel(currentEp: selectedEp,totalEps: epModel.epsData.length ?? widget.totalEps)
+                                                            );
+                                                          }
                                                         ),
                                                                                                             
                                                         AnimatedSize(
@@ -228,8 +240,8 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                 },
                                 child:BangumiContentAppbar(
                                   contentID: epModel.epsData[selectedEp]?.epID,
-                                  titleText: convertCollectionName(epModel.epsData[max(1,selectedEp)]!, max(1,selectedEp)),
-                                  webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]!.epID!),
+                                  titleText: convertCollectionName(epModel.epsData[max(1,selectedEp)], max(1,selectedEp)),
+                                  webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]?.epID ?? 0),
                                   postCommentType: PostCommentType.replyEpComment,
                                   surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
                                 )
@@ -275,8 +287,6 @@ class EpInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    
-
     if(epsInfo.isEmpty){
       return const Skeletonizer(
         child: SkeletonListTileTemplate()
@@ -291,15 +301,15 @@ class EpInfo extends StatelessWidget {
           title: Wrap(
             spacing: 12,
             children: [
-              ScalableText("${epsInfo[selectedEp]!.nameCN ?? epsInfo[selectedEp]!.name}"),
-              ScalableText("${epsInfo[selectedEp]!.airDate}",style: const TextStyle(fontSize: 14,color: Colors.grey)),
+              ScalableText("${epsInfo[selectedEp]?.nameCN ?? epsInfo[selectedEp]?.name}"),
+              ScalableText("${epsInfo[selectedEp]?.airDate}",style: const TextStyle(fontSize: 14,color: Colors.grey)),
             ],
           ),
           
         ),
     
         ListTile(
-          title:  ScalableText("${epsInfo[selectedEp]!.description}"),
+          title:  ScalableText("${epsInfo[selectedEp]?.description}"),
         ),
     
        

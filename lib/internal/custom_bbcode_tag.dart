@@ -1,6 +1,7 @@
 
 import 'package:bangu_lite/internal/callback.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/extension.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -27,6 +28,7 @@ BBStylesheet appDefaultStyleSheet(BuildContext context,{bool selectableText = fa
   );
 }
 
+
 final allEffectTag = [
 	BoldTag(),
 	ItalicTag(),
@@ -34,8 +36,7 @@ final allEffectTag = [
 	StrikeThroughTag(),
   PatchColorTag(),
 	SizeTag(),
-  CodeTag(),
-
+  
   AdapterQuoteTag(),
 	LeftAlignTag(),
 	CenterAlignTag(),
@@ -58,9 +59,9 @@ final allEffectTag = [
     )
   ),
   
+  CodeTag(),
 ];
 
-//final richLessEffectTag = allEffectTag.getRange(0, allEffectTag.length - 3);
 
 class MaskDisplay extends StatelessWidget {
   final String maskText;
@@ -217,14 +218,17 @@ class AdapterQuoteDisplay extends StatelessWidget{
 
 class CodeTag extends AdvancedTag{
 
-  CodeTag() : super("code");
+  //同种名称的 不同功能 or 不同名称 同种功能
+  /// CodeTag({this.tagName = 'code'}) : super("code");
+  /// CodeTag({this.tagName = 'code'}) : super(tagName ?? "code");
+  CodeTag({this.tagName = 'code'}) : super("code");
+
+  final String? tagName;
 
   @override
   List<InlineSpan> parse(FlutterRenderer renderer, bbob.Element element) {
 
-    if (element.children.isEmpty) {
-      return [TextSpan(text: "[$tag]")];
-    }
+    if (element.children.isEmpty) return [TextSpan(text: "[$tag]")];
 
     String codeText = element.children.first.textContent;
 
@@ -238,25 +242,26 @@ class CodeTag extends AdvancedTag{
                 color: Colors.grey.withValues(alpha: 0.1),
                 child: Column(
                   children: [
-                
-                    Padding(
-                      padding: PaddingH6,
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                                      
-                            const ScalableText("Code",style: TextStyle(fontSize: 14,color: Colors.grey)),
-                                      
-                                      
-                            IconButton(
-                              onPressed: ()=> copyClipboardCallback(context, codeText),
-                              icon: const Icon(Icons.copy),
-                              iconSize: 18,
-                              color: Colors.grey,
-                            ),
-                          ],
-                        ),
-                    ),
+                    
+                    if(tagName != 'codeExample')
+                      Padding(
+                        padding: PaddingH6,
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                                        
+                              const ScalableText("Code",style: TextStyle(fontSize: 14,color: Colors.grey)),
+                                        
+                                        
+                              IconButton(
+                                onPressed: ()=> copyClipboardCallback(context, codeText),
+                                icon: const Icon(Icons.copy),
+                                iconSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ],
+                          ),
+                      ),
                 
                     UnVisibleResponse(
                       onTap: ()=> copyClipboardCallback(context, codeText),

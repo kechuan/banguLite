@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -17,12 +18,17 @@ class EpRepliedTile extends ListTile {
     this.themeColor, 
     this.onUpdateComment,
 
+    this.authorType
+
+
   });
 
   final EpCommentDetails epCommentData;
   final PostCommentType? postCommentType;
   final Color? themeColor;
   final Function(String?)? onUpdateComment;
+
+  final BangumiCommentAuthorType? authorType;
 
   @override
   Widget build(BuildContext context) {

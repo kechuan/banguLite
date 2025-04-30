@@ -116,18 +116,19 @@ class UserInformationDialog extends StatelessWidget {
     				  
     								UnVisibleResponse(
     								  onTap: (){
-    									  if(accountModel.loginedUserInformations.accessToken == null) return;
+    									  if(AccountModel.loginedUserInformations.accessToken == null) return;
+                        fadeToaster(context: context, message: "暂未开放");
     								  },
     								  child: Icon(
                         Icons.email_outlined,
-                        color: accountModel.loginedUserInformations.accessToken == null ? Colors.grey : null,
+                        color: AccountModel.loginedUserInformations.accessToken == null ? Colors.grey : null,
     								  )
     								  
     								),
     				  
     								UnVisibleResponse(
     								  onTap: (){
-    									if(accountModel.loginedUserInformations.accessToken == null) return;
+    									if(AccountModel.loginedUserInformations.accessToken == null) return;
     									showTransitionAlertDialog(
     									  context,
     									  title: "发送好友请求",
@@ -153,13 +154,13 @@ class UserInformationDialog extends StatelessWidget {
     								  child: Icon(
     								  
     									MdiIcons.accountPlusOutline,
-    									color: accountModel.loginedUserInformations.accessToken == null ? Colors.grey : null,
+    									color: AccountModel.loginedUserInformations.accessToken == null ? Colors.grey : null,
     								  )
     								),
     				  
     								UnVisibleResponse(
     								  onTap: (){
-    									if(accountModel.loginedUserInformations.accessToken == null) return;
+    									if(AccountModel.loginedUserInformations.accessToken == null) return;
     									showTransitionAlertDialog(
     									  context,
     									  title: "拉黑用户",
@@ -182,7 +183,7 @@ class UserInformationDialog extends StatelessWidget {
     								  },
     								  child: Icon(
     									Icons.no_accounts_outlined,
-    									color: accountModel.loginedUserInformations.accessToken == null ? Colors.grey : null,
+    									color: AccountModel.loginedUserInformations.accessToken == null ? Colors.grey : null,
     								  )
     								)
     							  ],

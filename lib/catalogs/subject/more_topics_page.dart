@@ -53,9 +53,8 @@ class MoreTopicsPageState extends BangumiGeneralMoreContentPageState
       context,
         Routes.subjectTopic,
         arguments: {
-          //"topicInfo":getContentModel().contentListData[index],
           "topicModel":getContentModel(),
-          "index": index,
+          "topicInfo":getContentModel().contentListData[index]
         }
       );
   }; 

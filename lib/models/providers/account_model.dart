@@ -19,7 +19,7 @@ class AccountModel extends ChangeNotifier {
 		initModel();
 	}
 
-	LoginedUserInformations loginedUserInformations = getDefaultLoginedUserInformations();
+	static LoginedUserInformations loginedUserInformations = getDefaultLoginedUserInformations();
 
   HeadlessInAppWebView? headlessWebView;
 

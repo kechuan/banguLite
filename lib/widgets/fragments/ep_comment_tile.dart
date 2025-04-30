@@ -1,3 +1,4 @@
+import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/convert.dart';
@@ -16,12 +17,13 @@ class EpCommentTile extends StatelessWidget {
     required this.epCommentData,
 	  this.postCommentType,
     this.themeColor, 
-    this.onUpdateComment
-
+    this.onUpdateComment,
+    this.authorType
   });
   
   final EpCommentDetails epCommentData;
   final PostCommentType? postCommentType;
+  final BangumiCommentAuthorType? authorType;
   final Color? themeColor;
 
   final Function(String?)? onUpdateComment;
@@ -61,15 +63,38 @@ class EpCommentTile extends StatelessWidget {
               ),
 
               //可压缩信息 Expanded
-              Expanded(
+              Flexible(
                 flex: 2,
-                child: ScalableText(
-                  epCommentData.userInformation?.nickName ?? epCommentData.userInformation?.userName ?? "no data",
-                    style: const TextStyle(color: Colors.blue),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                child: Row(
+                  spacing: 6,
+                  children: [
+
+                    Expanded(
+                      child: ScalableText(
+                        epCommentData.userInformation?.nickName ?? epCommentData.userInformation?.userName ?? "no data"
+                        "${authorType?.typeName}",
+                          style: const TextStyle(color: Colors.blue),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+
+                    ScalableText(
+                      authorType?.typeName == null ? "" : "(${authorType?.typeName})",
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold
+                      ),
+
+                    ),
+
+                  ],
+                ),
               ),
+
+             
+
+              
 
               
 
@@ -161,8 +186,6 @@ class EpCommentTile extends StatelessWidget {
 
                       int? commentIndex = int.tryParse(epCommentData.epCommentIndex?.split('-').first ?? '');
                       int? replyIndex = int.tryParse(epCommentData.epCommentIndex?.split('-').length == 1 ? '' : epCommentData.epCommentIndex?.split('-').last ?? '');
-
-
 
                       return Align(
                         alignment: Alignment.centerRight,

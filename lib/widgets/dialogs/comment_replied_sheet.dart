@@ -1,3 +1,4 @@
+import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comment_tile.dart';
@@ -6,7 +7,6 @@ import 'package:flutter/material.dart';
 class EpRepliedCommentBottomSheet extends StatelessWidget {
   const EpRepliedCommentBottomSheet({
     super.key,
-    
     required this.currentComment,
     this.commentIndex,
     this.postCommentType,
@@ -35,6 +35,7 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
             return Column(  
               children: [
                 EpCommentTile(
+                  postCommentType: postCommentType,
                   epCommentData: currentComment,
                   themeColor:themeColor
                 ),
@@ -47,7 +48,11 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
           return EpCommentTile(
             postCommentType: postCommentType,
             epCommentData: currentComment.repliedComment![index-1],
-            themeColor: themeColor
+            themeColor: themeColor,
+            authorType: 
+            currentComment.repliedComment![index-1].userInformation?.userID == currentComment.userInformation?.userID ?
+            BangumiCommentAuthorType.levelAuthor:
+            null ,
           );
         }
 

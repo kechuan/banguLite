@@ -8,6 +8,7 @@ class TopicModel extends BaseModel<TopicInfo, TopicDetails> {
   TopicModel({
     required super.subjectID
   }){
+    if(subjectID == 'topic') return;
     loadSubjectTopics();
   }
 

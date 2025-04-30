@@ -5,7 +5,9 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/group_details.dart';
 import 'package:bangu_lite/models/group_topic_info.dart';
 import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/models/surf_timeline_details.dart';
@@ -23,13 +25,10 @@ class BangumiTimelineTile extends StatelessWidget {
   const BangumiTimelineTile({
     super.key,
     required this.surfTimelineDetails, 
-    this.timelineType,
     this.groupTopicInfo
-	
   });
 
   final SurfTimelineDetails surfTimelineDetails;
-  final BangumiTimelineType? timelineType;
 
   final GroupTopicInfo? groupTopicInfo;
 
@@ -41,35 +40,23 @@ class BangumiTimelineTile extends StatelessWidget {
 
 			debugPrint("timeline DetailID:${surfTimelineDetails.detailID}");
 
-      //web Match but not Match in PostID
-
-			switch(timelineType){
-				//等待逻辑分离 => Topic/Blog 以便timeline也能访问。。
+			switch(surfTimelineDetails.bangumiTimelineType){
 				case BangumiTimelineType.subject:{
-					//Navigator.pushNamed(
-					//	context,
-					//	Routes.subjectTopic,
-					//	arguments: {
-					//		"topicModel":context.read<TopicModel>(),
-					//		"index":index,
-					//		"themeColor":judgeDetailRenderColor(context,bangumiModel.bangumiThemeColor)
-					//	}
-					//);
 
-          launchUrlString(BangumiWebUrls.subjectTopic(surfTimelineDetails.detailID ?? 0));
+          bus.emit(
+            "AppRoute",
+            BangumiWebUrls.subjectTopic(surfTimelineDetails.detailID ?? 0)
+          );
+
 				}
 					
 				case BangumiTimelineType.group:{
 
-					Navigator.pushNamed(
-						context,
-						Routes.groupTopic,
-						arguments: {
-							'groupsModel':context.read<GroupsModel>(),
-              'groupTopicInfo':groupTopicInfo,
-						}
-					);
-				}
+					bus.emit(
+            "AppRoute",
+            BangumiWebUrls.groupTopic(surfTimelineDetails.detailID ?? 0)
+          );
+        }
 					
 
 				default:{}
@@ -128,57 +115,69 @@ class BangumiTimelineTile extends StatelessWidget {
 															
 								children: [
 							
-								ScalableText(
-									"${timelineType?.typeName == BangumiTimelineType.timeline.typeName ? timelineType?.typeName : "${timelineType?.typeName} · "}",
-									
-									style: const TextStyle(fontSize: 14,color: Colors.grey)
-								),
+									ScalableText(
+										"${surfTimelineDetails.bangumiTimelineType?.typeName}"
+										"${surfTimelineDetails.sourceTitle == null ? "" : " · "}"
+										,
+										style: const TextStyle(fontSize: 14,color: Colors.grey)
+									),
 
-								Flexible(
-									child: UnVisibleResponse(
+									Flexible(
+										child: UnVisibleResponse(
 										onTap: (){
 
-											switch(timelineType) {
-											  
-											  case BangumiTimelineType.subject:{
-												Navigator.pushNamed(
+											debugPrint("sourceID: ${surfTimelineDetails.sourceID}");
+
+											switch(surfTimelineDetails.bangumiTimelineType) {
+											
+												case BangumiTimelineType.subject:{
+													Navigator.pushNamed(
 													context,
 													Routes.subjectDetail,
 													arguments: {"subjectID":surfTimelineDetails.sourceID},
-												);
-											  }
-											    
-											    
-												//case BangumiTimelineType.group:{
-												//		Navigator.pushNamed(
-												//			context,
-												//			Routes.group,
-												//			arguments: {"groupID":surfTimelineDetails.sourceID},
-												//		);
-												//}
+													);
+												}
+														
+												case BangumiTimelineType.group:{
+													Navigator.pushNamed(
+														context,
+														Routes.groups,
+														arguments: {
+															"selectedGroupInfo":GroupInfo(
+																id:surfTimelineDetails.detailID
+															)
+															..groupName = surfTimelineDetails.sourceID
+															..groupTitle = surfTimelineDetails.sourceTitle
+														},
+													);
+												}
 
-											  default:{}
-											    
-											    
+												case BangumiTimelineType.timeline:{
+													//timeline对话界面
+														//Navigator.pushNamed(
+														//	context,
+														//	Routes.groups,
+														//	arguments: {
+														//		"selectedGroupInfo":GroupInfo(id:surfTimelineDetails.detailID)..groupName = surfTimelineDetails.sourceID
+														//	},
+														//);
+												}
+
+												default:{}
 
 											}
 
 											
 										},
-										child: UnVisibleResponse(
-											onTap: (){
-												debugPrint("${surfTimelineDetails.sourceID}");
-											},
-											child: ScalableText(                              
-												surfTimelineDetails.sourceTitle ?? "",
-												style: const TextStyle(fontSize: 14,color: Colors.grey,decoration: TextDecoration.underline),
-												maxLines: 2,
-												textAlign: TextAlign.left,
-												overflow: TextOverflow.ellipsis,
-											),
+										child: ScalableText(                              
+										surfTimelineDetails.sourceTitle ?? "",
+										style: const TextStyle(fontSize: 14,color: Colors.grey,decoration: TextDecoration.underline),
+										maxLines: 2,
+										textAlign: TextAlign.left,
+										overflow: TextOverflow.ellipsis,
+										),
 										),
 									),
-								),
 								],
 							),
 						),

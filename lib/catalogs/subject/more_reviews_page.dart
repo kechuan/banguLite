@@ -55,7 +55,7 @@ class MoreReviewsPageState extends BangumiGeneralMoreContentPageState
         Routes.blog,
         arguments: {
           "reviewModel":getContentModel(),
-		  "selectedBlogIndex": index,
+          "reviewInfo": getContentModel().contentListData[index],
           "themeColor": judgeDetailRenderColor(context,bangumiThemeColor),
         }
       );

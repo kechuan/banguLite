@@ -19,7 +19,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
   @override
   ThemeData appBarTheme(BuildContext context) {
     return super.appBarTheme(context).copyWith(
-      inputDecorationTheme: const InputDecorationTheme()
+      inputDecorationTheme: const InputDecorationTheme(),
     );
   }
 

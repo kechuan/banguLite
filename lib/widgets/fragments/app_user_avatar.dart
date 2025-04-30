@@ -16,12 +16,11 @@ class AppUserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accountModel = context.read<AccountModel>(); 
 
     return UnVisibleResponse(
         onTap: onTap ?? () {
       
-          invokePushLogin() => Navigator.pushNamed(context, Routes.loginAuth);
+          invokePushLogin() => Navigator.pushNamed(context, Routes.loginAuth,arguments: {'key':const Key('loginAuth')});
       
           Future.wait(
             [
@@ -43,8 +42,8 @@ class AppUserAvatar extends StatelessWidget {
         child: Selector<AccountModel,bool>(
           selector: (_, accountModel) => accountModel.isLogined(),
           builder: (_,isLogined,child){
-            if(accountModel.loginedUserInformations.userInformation?.avatarUrl != null){
-              return CachedImageLoader(imageUrl: accountModel.loginedUserInformations.userInformation?.avatarUrl);
+            if(AccountModel.loginedUserInformations.userInformation?.avatarUrl != null){
+              return CachedImageLoader(imageUrl: AccountModel.loginedUserInformations.userInformation?.avatarUrl);
             }
             else{
               return Icon(MdiIcons.accountCircleOutline,size: 30);

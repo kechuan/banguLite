@@ -12,11 +12,14 @@ import 'package:dio/dio.dart';
 //但适用规则 GroupDetails 基本等于 info 
 // 而对于 Detail 来说 其子信息应当是 
 
-
 class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
 
   //仅占位
-  GroupsModel({required super.subjectID}){
+  GroupsModel({
+    super.subjectID = 'groups',
+    this.selectedGroupInfo
+  }){
+    if(subjectID == 'groups') return;
     loadGroups();
   }
 

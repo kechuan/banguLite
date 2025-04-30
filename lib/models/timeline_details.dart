@@ -35,7 +35,7 @@ class TimelineDetails extends BaseDetails {
   int? replies;
   
   // progress 更新 4/0
-  int? epsUpdate;
+  num? epsUpdate;
 
   String getActionDescription() {
     String actionText = "把 番剧 ";
@@ -128,8 +128,6 @@ String convertTimelineDescription(TimelineDetails currentTimeline, {bool? author
   //待用字段
   String suffixText = "";
 
-
-	
   /// 那么首先 划定 action 字段 行为
   switch(currentTimeline.catType){
    
@@ -212,7 +210,7 @@ String convertSubjectTimeline(
   Set<dynamic>? objectIDSet,
   Set<String>? objectNameSet,
   {
-    int? ep,
+    num? ep,
     int? cat,
     int? action
   }
@@ -228,7 +226,7 @@ String convertSubjectTimeline(
 
   if(cat == 4 && action == 2){
      subjectTimelineText += '[url=${BangumiWebUrls.subject(objectIDSet.last)}]${objectNameSet.last}[/url] ';
-     subjectTimelineText += "( [url=${BangumiWebUrls.ep(objectIDSet.first)}]Ep.$ep ${objectNameSet.first}[/url] )";
+     subjectTimelineText += "( [url=${BangumiWebUrls.ep(objectIDSet.first)}?subjectID=${objectIDSet.last}&selectedEp=$ep]Ep.$ep ${objectNameSet.first}[/url] )";
   } 
 
   else if(cat == 4 && action == 0){

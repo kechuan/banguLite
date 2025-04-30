@@ -173,10 +173,9 @@ int convertPassedSeason(int year,int month){
   else if(year > currentTime.year) {return 0;}
 
   else{
+    
     return judgeSeasonRange(month).index;
   }
-
-
 
 }
 

@@ -188,6 +188,10 @@ class BangumiWebUrls{
   static String relativeSubjectComment(int subjectID) => '$relativeUrl/subject/$subjectID/comments';
   static String relativeSubjectTopic(int topicID) => '$relativeUrl/subject/topic/$topicID';
   static String relativeEp(int epID) => '$relativeUrl/ep/$epID';
+  static String relativeGroupTopic(int postID) => '$relativeUrl/group/topic/$postID';
+  static String relativeBlog(int blogID) => '$relativeUrl/blog/$blogID';
+  static String relativeGroup(dynamic groupName) => '$relativeUrl/group/$groupName';
+  
 
   static String person(int personID) => '$baseUrl/person/$personID';
   static String character(int characterID) => '$baseUrl/character/$characterID';
@@ -234,7 +238,7 @@ class BangumiQuerys {
 		"accept": "application/json"
 	};
 
-	static Map<String,String> bearerTokenAccessQuery(String accessToken) => {
+	static Map<String,String> bearerTokenAccessQuery(String? accessToken) => {
 		"Authorization": 'Bearer $accessToken',
 		"accept": "application/json"
 	};
@@ -336,7 +340,8 @@ class BangumiQuerys {
                           relationsQuery = {"type":2,"limit":20,"offset":0},
                           reviewsQuery = {"limit":20,"offset":0},
                           groupTopicQuery = {"limit":20,"offset":0},
-                          timelineQuery = {"limit":10}
+                          //until字段 timelineID count Down
+                          timelineQuery = {"limit":20,}
   ;
                              
 
@@ -353,7 +358,7 @@ class BangumiDatas {
       "type": [2],
       "tag": [],
       "rank": [">2", "<=99999"],
-      "air_date": [">=2016-01-01","<${DateTime.now().toString().substring(0,10)}"],
+      "air_date": [">=${DateTime.now().year}-01-01","<${DateTime.now().toString().substring(0,10)}"],
       "rating": [">=5","<9"],
       "nsfw": false,
     }
@@ -364,7 +369,7 @@ class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.6.1",
+                      version = "0.7.0",
                       author = "kechuan"
   ;
 

@@ -132,8 +132,8 @@ class SelectSeasonLandscape extends StatelessWidget {
 		height: 50,
 		width: 300,
 		child: DefaultTabController(
-		//tabbar 无法透过 rebuild 刷新 initialIndex.
-		initialIndex: convertPassedSeason(selectedYear,seasonTypeNotifier.value.month),
+		//initialIndex 无法透过 rebuild 重建index 除非是彻头彻尾的 build 才可以.
+    initialIndex: seasonTypeNotifier.value.index,
 		length: SeasonType.values.length,
 		child: TabBar(
 		  labelPadding: const EdgeInsets.all(0),

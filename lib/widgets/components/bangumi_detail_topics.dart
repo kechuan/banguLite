@@ -120,13 +120,15 @@ class BangumiDetailTopics extends StatelessWidget {
                                 title: ScalableText("${topicsList[index].contentTitle}"),
                                 trailing: ScalableText(convertDateTimeToString(topicCreateTime)),
                                 onTap: () {
+                                  
+                                  final topicModel = context.read<TopicModel>();
                             
                                   Navigator.pushNamed(
                                     context,
                                     Routes.subjectTopic,
                                     arguments: {
-                                      "topicModel":context.read<TopicModel>(),
-                                      "index":index,
+                                      "topicModel":topicModel,
+                                      "topicInfo":topicModel.contentListData[index],
                                       "themeColor":judgeDetailRenderColor(context,bangumiModel.bangumiThemeColor)
                                     }
                                   );

@@ -20,7 +20,7 @@ class BangumiGroupTopicPage extends StatefulWidget {
     super.key,
     required this.groupsModel,
     required this.groupTopicInfo,
-    //required this.index,
+    
     this.themeColor
   });
 

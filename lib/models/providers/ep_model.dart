@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/comment_details.dart';
@@ -12,12 +14,15 @@ class EpModel extends ChangeNotifier{
   EpModel({
     this.subjectID = 0,
     this.selectedEp = 0,
-    this.episodesID,
+    //this.episodesID,
   }){
+    //遇到直接需要加载Ep Page 的页面话 需要做 Completer 处理
     getEpsInformation();
   }
 
-  final int? episodesID; //一旦提供 则只能是固定数据
+  //final int? episodesID; //一旦提供 则只能是固定数据
+
+  Completer? getEpsInformationCompleter;
 
   int subjectID;
   int selectedEp;
@@ -26,7 +31,7 @@ class EpModel extends ChangeNotifier{
   final Map<num,List<EpCommentDetails>> epCommentData = {}; 
 
   //double => 浮点 #3 / #3-1 etc
-  final Map<int,Map<double,int>> userCommentLikeData = {}; 
+  final Map<int,Map<num,int>> userCommentLikeData = {}; 
 
   void updateSelectedEp(int newEp){
     if(newEp == selectedEp) return;
@@ -101,13 +106,13 @@ class EpModel extends ChangeNotifier{
             dataLikeIndex, 
             (commentReactionData){
               commentReactionData.add(
-                accountModel.loginedUserInformations.userInformation!.getName()
+                AccountModel.loginedUserInformations.userInformation!.getName()
               );
               return commentReactionData;
             }, 
             ifAbsent: (){
               return { 
-                accountModel.loginedUserInformations.userInformation!.getName()
+                AccountModel.loginedUserInformations.userInformation!.getName()
               };
             }
           );
@@ -121,13 +126,13 @@ class EpModel extends ChangeNotifier{
             dataLikeIndex, 
             (commentReactionData){
               commentReactionData.add(
-                accountModel.loginedUserInformations.userInformation!.getName()
+                AccountModel.loginedUserInformations.userInformation!.getName()
               );
               return commentReactionData;
             }, 
             ifAbsent: (){
               return { 
-                accountModel.loginedUserInformations.userInformation!.getName()
+                AccountModel.loginedUserInformations.userInformation!.getName()
               };
             }
           );
@@ -145,10 +150,10 @@ class EpModel extends ChangeNotifier{
 
 	Future<void> getEpsInformation({int? offset}) async {
 
-    //导入新方法
-    if(subjectID == 0 && episodesID != null){
+    if(getEpsInformationCompleter != null) return;
 
-    }
+    getEpsInformationCompleter ??= Completer();
+
 
     int requestOffset = (offset ?? 0)*100;
     int requestLimit = 100;
@@ -172,7 +177,7 @@ class EpModel extends ChangeNotifier{
         
     }
 
-    if(epsData[requestOffset+1]!= null){
+    if(epsData[requestOffset+1] != null){
       debugPrint("loading Info ${requestOffset+1}~${requestOffset+100}");
       return;
     }
@@ -190,7 +195,7 @@ class EpModel extends ChangeNotifier{
           
     ).then((response){
 
-        if(response.data != null && response.data["data"] != null){
+        if(response.data["data"] != null){
         
           List<EpsInfo> currentRangeEpsData = loadEpsData(response);
 
@@ -206,28 +211,38 @@ class EpModel extends ChangeNotifier{
 
           debugPrint("currentEpsData Length:${epsData.length}");
 
+          getEpsInformationCompleter?.complete();
+
           notifyListeners(); //完成
 
         }
 
+        else{
+          debugPrint("getEpsInformation Error: ${response.statusCode} ${response.statusMessage}");
+          getEpsInformationCompleter?.complete();
+        }
+
+
+
     });
+
+    return getEpsInformationCompleter?.future;
 
 	}
 
 	Future<void> loadEpComment() async{
 
-    int requestID = episodesID ?? epsData[selectedEp]?.epID ?? 0;
-    if(requestID == 0) return;
-
-    if(episodesID == null){
+      //TODO 加载顺序有问题
       if(epsData.isEmpty){
-        await getEpsInformation();
+        await getEpsInformationCompleter?.future ?? await getEpsInformation();
+        
         if(epsData.isEmpty) return;
       }
 
       else{
         if(epsData[selectedEp] == null){
-          await getEpsInformation(offset: convertSegement(selectedEp,100));
+
+          await getEpsInformationCompleter?.future ?? await getEpsInformation(offset: convertSegement(selectedEp,100));
           if(epsData.isEmpty) return;
         }
       }
@@ -242,7 +257,11 @@ class EpModel extends ChangeNotifier{
         
         return;
       }
-    }
+    
+
+
+    int requestID = epsData[selectedEp]?.epID ?? 0;
+    if(requestID == 0) return;
 
 		//初始化占位
 		epCommentData[selectedEp] = [];

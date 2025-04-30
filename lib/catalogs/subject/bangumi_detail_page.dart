@@ -89,7 +89,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
               final commentModel = context.read<CommentModel>();
 
               commentModel.loadUserComment(
-                currentUserInformation: accountModel.loginedUserInformations.userInformation
+                currentUserInformation: AccountModel.loginedUserInformations.userInformation
               );
       
               return Scaffold(

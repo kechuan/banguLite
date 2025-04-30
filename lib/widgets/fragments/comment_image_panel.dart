@@ -186,22 +186,18 @@ class LoadingCard extends StatelessWidget {
     return SizedBox(
       height: 200,
       width: 200,
-      child: Card(
-      shadowColor: Colors.white,
-      elevation: 6,
-        child: Center(
-          child: Column(
-            spacing: 16,
-            mainAxisAlignment: MainAxisAlignment.center,
-
-            children: [
-        
-              const CircularProgressIndicator(),
-        
-              ScalableText(progress ?? ""),
-        
-            ],
-          ),
+      child: Center(
+        child: Column(
+          spacing: 16,
+          mainAxisAlignment: MainAxisAlignment.center,
+      
+          children: [
+      
+            const CircularProgressIndicator(),
+      
+            ScalableText(progress ?? ""),
+      
+          ],
         ),
       ),
     );

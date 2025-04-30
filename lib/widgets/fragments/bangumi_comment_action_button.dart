@@ -237,7 +237,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                           isActionAvaliable = false;
                         }
 
-                        if(widget.commentData.userInformation?.userID != accountModel.loginedUserInformations.userInformation?.userID){
+                        if(widget.commentData.userInformation?.userID != AccountModel.loginedUserInformations.userInformation?.userID){
                           isActionAvaliable = false;
                         }
                       }

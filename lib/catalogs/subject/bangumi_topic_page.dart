@@ -14,14 +14,12 @@ class BangumiTopicPage extends StatefulWidget {
   const BangumiTopicPage({
     super.key,
     required this.topicModel,
-    required this.index,
-	  //required this.topicInfo,
+	  required this.topicInfo,
     this.themeColor
   });
 
   final TopicModel topicModel;
-  final int index;
-  //final TopicInfo topicInfo;
+  final TopicInfo topicInfo;
   final Color? themeColor;
 
   @override
@@ -37,7 +35,7 @@ class _BangumiTopicPageState extends BangumiContentPageState
 >{
 
   @override
-  TopicInfo getContentInfo() => widget.topicModel.contentListData[widget.index];
+  TopicInfo getContentInfo() => widget.topicInfo;
 
   @override
   TopicModel getContentModel() => widget.topicModel;
@@ -47,7 +45,6 @@ class _BangumiTopicPageState extends BangumiContentPageState
 
   @override
   TopicDetails createEmptyDetailData() => TopicDetails.empty();
-
 
   @override
   PostCommentType? getPostCommentType() => PostCommentType.replyTopic;

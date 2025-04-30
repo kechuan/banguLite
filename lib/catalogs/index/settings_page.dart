@@ -475,17 +475,18 @@ class ClearCacheTile extends ListTile{
           child: Center(
             child: ListTile(
               onTap: () async {
-                //Dialog: DefaultCacheManager().emptyCache();
                 computingStatusNotifier.value = true;
             
                 final indexModel = context.read<IndexModel>();
-            
-                await MyHive.cachedImageDir.delete(recursive: true).then((_){
-                  indexModel.updateCachedSize().then(
-                    (_)=>computingStatusNotifier.value = false
-                  );
-                          
-                });
+
+                if(MyHive.cachedImageDir.existsSync()){
+                  await MyHive.cachedImageDir.delete(recursive: true).then((_){
+                    indexModel.updateCachedSize().then(
+                      (_)=>computingStatusNotifier.value = false
+                    );
+                  });
+                }
+                
               },
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

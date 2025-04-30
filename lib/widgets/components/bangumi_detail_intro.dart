@@ -5,7 +5,6 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
-import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_eps.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_images.dart';
@@ -268,7 +267,7 @@ class IntroLandscape extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final commentModel = context.read<CommentModel>();
+    
 
     return Column(
       spacing: 12,

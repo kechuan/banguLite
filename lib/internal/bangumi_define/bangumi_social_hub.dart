@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 
+enum BangumiCommentAuthorType{
+  author('楼主'),
+  levelAuthor('层主'),
+  self('自己')
+  ;
+
+  final String typeName;
+
+  const BangumiCommentAuthorType(this.typeName);
+}
+
 enum BangumiPrivateHubType{
 
-  user("个人中心",Icons.account_circle_outlined),
+//  user("个人中心",Icons.account_circle_outlined),
   email("消息提醒",Icons.email_outlined),
   ;
 
@@ -16,7 +27,8 @@ enum BangumiSocialHubType{
   //超展开隔离 实则允许切换
 
   group("小组",Icons.forum_outlined),
-  timeline("时间线",Icons.history),
+  timeline("时间线",Icons.clear_all_sharp),
+  history("历史记录",Icons.history),
   
   ;
 

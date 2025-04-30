@@ -17,13 +17,15 @@ class BangumiBlogPage extends StatefulWidget {
   const BangumiBlogPage({
     super.key,
     required this.reviewModel,
-    required this.selectedBlogIndex,
+    required this.reviewInfo,
+    
     this.themeColor,
   });
 
   
   final ReviewModel reviewModel;
-  final int selectedBlogIndex;
+  final ReviewInfo reviewInfo;
+  
 
   final Color? themeColor;
 
@@ -44,7 +46,7 @@ class _BangumiBlogPageState extends BangumiContentPageState
   ReviewModel getContentModel() => widget.reviewModel;
 
   @override
-  ReviewInfo getContentInfo() => widget.reviewModel.contentListData[widget.selectedBlogIndex];
+  ReviewInfo getContentInfo() => widget.reviewInfo;
 
   @override 
   int? getSubContentID() => getContentInfo().blogID;

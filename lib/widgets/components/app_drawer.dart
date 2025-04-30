@@ -43,7 +43,7 @@ class AppDrawer extends StatelessWidget {
                         
                         onTap: () {
                           
-                          invokePushLogin() => Navigator.pushNamed(context, Routes.loginAuth);
+                          invokePushLogin() => Navigator.pushNamed(context, Routes.loginAuth,arguments: {'key':const Key('loginAuth')});
                       
                           Future.wait(
                             [
@@ -90,8 +90,8 @@ class AppDrawer extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  ScalableText(accountModel.loginedUserInformations.userInformation?.nickName ?? "游客模式",maxLines: 3,overflow: TextOverflow.ellipsis),
-                                  ScalableText(loginedStatus ? "@${accountModel.loginedUserInformations.userInformation?.userID}" : "登录以解锁在线模式",style: const TextStyle(fontSize: 12,color: Colors.grey)),
+                                  ScalableText(AccountModel.loginedUserInformations.userInformation?.nickName ?? "游客模式",maxLines: 3,overflow: TextOverflow.ellipsis),
+                                  ScalableText(loginedStatus ? "@${AccountModel.loginedUserInformations.userInformation?.userID}" : "登录以解锁在线模式",style: const TextStyle(fontSize: 12,color: Colors.grey)),
                                 ],
                               ),
                             ),
@@ -112,16 +112,18 @@ class AppDrawer extends StatelessWidget {
                                           
                        
                       ),
-          
-                      ...List.generate(
-                        BangumiPrivateHubType.values.length, 
-                        (index) => ListTile(
-                          leading: Icon(BangumiPrivateHubType.values[index].iconData),
-                          title: Text(BangumiPrivateHubType.values[index].typeName),
-                          onTap: ()=>fadeToaster(context: context, message: "暂未开放"),
+
+
+                      if(loginedStatus)
+                        ...List.generate(
+                          BangumiPrivateHubType.values.length, 
+                          (index) => ListTile(
+                            leading: Icon(BangumiPrivateHubType.values[index].iconData),
+                            title: Text(BangumiPrivateHubType.values[index].typeName),
+                            onTap: ()=>fadeToaster(context: context, message: "暂未开放"),
+                          )
                         )
-                      )
-                    
+
                     ],
                   );
                 }
@@ -143,15 +145,24 @@ class AppDrawer extends StatelessWidget {
                       leading: Icon(BangumiSocialHubType.values[index].iconData),
                       title: Text(BangumiSocialHubType.values[index].typeName),
                       onTap: (){
+
+                        switch(BangumiSocialHubType.values[index]){
+                          case BangumiSocialHubType.group:{
+                            Navigator.pushNamed(context, Routes.groups);
+                          }
+                          case BangumiSocialHubType.timeline:{
+                            Navigator.pushNamed(context, Routes.timeline);
+                          }
+
+                          case BangumiSocialHubType.history:{
+                            debugPrint("暂未开放");
+                            //Navigator.pushNamed(context, Routes.timeline);
+                          }
+                          
+                           
+                        }
                         
-                        if(BangumiSocialHubType.values[index] == BangumiSocialHubType.group){
-                          Navigator.pushNamed(context, Routes.groups);
-                        }
-    
-                        else if(BangumiSocialHubType.values[index] == BangumiSocialHubType.timeline){
-                          Navigator.pushNamed(context, Routes.timeline);
-                        }
-                        //Navigator.pushNamed(context, Routes.socialHub,arguments: BangumiPrivateHubType.values[_])
+                        
                       },
                     )
                   )

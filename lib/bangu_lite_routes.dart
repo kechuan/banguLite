@@ -39,7 +39,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiBlogPage : [ReviewModel(required) reviewModel, int(required) selectedBlogIndex, Color? themeColor]
+  /// BangumiBlogPage : [ReviewModel(required) reviewModel, ReviewInfo(required) reviewInfo, Color? themeColor]
   static const String blog = '/Blog';
 
   /// '/Groups'
@@ -153,7 +153,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiTopicPage : [TopicModel(required) topicModel, int(required) index, Color? themeColor]
+  /// BangumiTopicPage : [TopicModel(required) topicModel, TopicInfo(required) topicInfo, Color? themeColor]
   static const String subjectTopic = '/subjectTopic';
 
   /// '/webview'

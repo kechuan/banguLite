@@ -5,6 +5,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/extension.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/max_number_input_formatter.dart';
@@ -560,16 +561,16 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
 												},
 													child: GridTile(
 													footer: Center(
-														child: ScalableText(
-															'[${BBCodeTag.values[index].name}]',
-														),
+														child: ScalableText('[${BBCodeTag.values[index].name}]',),
 													),
 													child: Center(
 														child: BBCodeText(
 															data: '[${BBCodeTag.values[index].name}]${BBCodeTag.values[index].tagName}[/${BBCodeTag.values[index].name}]',
 															
 															stylesheet: BBStylesheet(
-																tags: allEffectTag,
+																tags: allEffectTag.getRange(0, allEffectTag.length-1).toList().also(
+                                  (it)=> it.add(CodeTag(tagName: 'codeExample'))
+                                ),
 																defaultText: TextStyle(
 																	fontFamily: 'MiSansFont',
 																	color: judgeDarknessMode(context) ? Colors.white : Colors.black,

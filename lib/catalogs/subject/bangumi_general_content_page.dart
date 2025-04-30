@@ -108,10 +108,11 @@ abstract class BangumiContentPageState<
                             children: [
                               
                               SliverSafeArea(
+                                bottom: false,
                                 sliver: SliverPinnedHeader(
                                   child: BangumiContentAppbar(
                                     contentID: getSubContentID() ?? contentInfo.id,
-                                    titleText: contentInfo.contentTitle,
+                                    titleText: contentDetailData.contentTitle ?? contentInfo.contentTitle,
                                     webUrl: getWebUrl(getSubContentID() ?? contentInfo.id),
                                     postCommentType: getPostCommentType(),
                                     surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
@@ -188,64 +189,73 @@ abstract class BangumiContentPageState<
                         
                             if(contentCommentIndex == 0){
 
-                              return ListView(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
+                              return Column(
+                                spacing: 12,
                                 children: [
 
                                   //Topic的楼主内容 也会放入到 contentRepliedComment 里面。。
 
                                   Builder(builder: (_){
+
+                                    //return EpCommentView(
+                                    //  postCommentType: getPostCommentType(),
+                                    //  epCommentData: EpCommentDetails()
+                                    //    ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
+                                    //    ..commentID = getSubContentID() ?? contentInfo.id
+                                    //    ..comment = '[url=https://bangumi.tv/blog/331712]blog 331712[/url]'
+                                    //    ..commentTimeStamp = contentDetail?.createdTime ?? contentInfo.createdTime
+                                    //    ..commentReactions = contentDetail?.contentReactions
+                                    //);
+
+
                                     if(
                                       getPostCommentType() == PostCommentType.replyTopic ||
                                       getPostCommentType() == PostCommentType.replyGroupTopic
                                     ){
                                       return EpCommentView(
                                         postCommentType: getPostCommentType(),
-                                        epCommentData: contentDetail!.contentRepliedComment?[contentCommentIndex] ?? EpCommentDetails()
+                                        epCommentData: contentDetail!.contentRepliedComment?[0] ?? EpCommentDetails()
                                       );
                                     }
                                     
                                     return EpCommentView(
                                       postCommentType: getPostCommentType(),
                                       epCommentData: EpCommentDetails()
-                                        ..userInformation = contentInfo.userInformation
+                                        ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
                                         ..commentID = getSubContentID() ?? contentInfo.id
                                         ..comment = contentDetail?.content
-                                        ..commentTimeStamp = contentInfo.createdTime
+                                        ..commentTimeStamp = contentDetail?.createdTime ?? contentInfo.createdTime
                                         ..commentReactions = contentDetail?.contentReactions
                                     );
                                     
                         
                                   }),
-                                  
-                                    ...List.generate(
-                                      getTrailingPhotosUri()?.length ?? 0,
-                                      (index) {
-                                        return Padding(
-                                          padding: Padding12,
-                                          child: CachedNetworkImage(
-                                            imageUrl: getTrailingPhotosUri()![index],
-                                            //photoViewStatus: true,
-                                          ),
-                                        );
-                                      }
-                                    ),
+
+
+                                  ...List.generate(
+                                    getTrailingPhotosUri()?.length ?? 0,
+                                    (index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                                        child: CachedNetworkImage(
+                                          imageUrl: getTrailingPhotosUri()![index],
+                                          //photoViewStatus: true,
+                                        ),
+                                      );
+                                    }
+                                  ),
                                 
-                                  Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Row(
-                                      spacing: 12,
-                                      children: [
-                                        const ScalableText("回复",style: TextStyle(fontSize: 24)),
-                                
-                                        ScalableText("${max(0,commentListCount-1) + userCommentMap.length}",style: const TextStyle(color: Colors.grey)),
-                                      ],
-                                    ),
+                                  Row(
+                                    spacing: 12,
+                                    children: [
+                                      const ScalableText("回复",style: TextStyle(fontSize: 24)),
+                                                                  
+                                      ScalableText("${max(0,commentListCount-1) + userCommentMap.length}",style: const TextStyle(color: Colors.grey)),
+                                    ],
                                   ),
                                 
                                   //无评论的显示状态
-                                  if(commentListCount == 1 && userCommentMap.isEmpty)
+                                  if(commentListCount == 0 && userCommentMap.isEmpty)
                                     const SizedBox(
                                       height: 64,
                                       child: Center(
@@ -267,7 +277,7 @@ abstract class BangumiContentPageState<
                               }
 
                               final currentEpCommentDetails =  EpCommentDetails()
-                                ..userInformation = context.read<AccountModel>().loginedUserInformations.userInformation
+                                ..userInformation = AccountModel.loginedUserInformations.userInformation
                                 //..userInformation = 
                                 //(
                                 //  UserInformation()..userName = "august3416"
@@ -313,10 +323,6 @@ abstract class BangumiContentPageState<
                                           //新增项目暂不处理
                                         }
                                                       
-                                        
-                                
-                                
-                                                      
                                       },
                                       epCommentData: currentEpCommentDetails
                                     ),
@@ -327,61 +333,65 @@ abstract class BangumiContentPageState<
                                         
                               );
                             }
-							
 
                             return Column(
                             	children: [
-                            					
-                            	Builder(
-                            	  builder: (_) {
 
-									                final ValueNotifier<int> commentUpdateFlag = ValueNotifier(0);	
+                                Builder(
+                                  builder: (_) {
 
-                            	    return ValueListenableBuilder(
-                                    valueListenable: commentUpdateFlag,
-                                    builder: (_,__,child){
+                                    final ValueNotifier<int> commentUpdateFlag = ValueNotifier(0);	
 
-                                      final currentEpCommentDetails = contentDetail!.contentRepliedComment?[contentCommentIndex] ?? EpCommentDetails();
+                                    return ValueListenableBuilder(
+                                      valueListenable: commentUpdateFlag,
+                                      builder: (_,__,child){
 
-                                      if(userCommentMap[contentCommentIndex] != null){
-                                        currentEpCommentDetails.comment = userCommentMap[contentCommentIndex];
-                                      }
+                                        final currentEpCommentDetails = contentDetail!.contentRepliedComment?[contentCommentIndex] ?? EpCommentDetails();
+
+                                        if(userCommentMap[contentCommentIndex] != null){
+                                          currentEpCommentDetails.comment = userCommentMap[contentCommentIndex];
+                                        }
 
 
-                                      return EpCommentView(
-                                        postCommentType: getPostCommentType(),
-                                        onUpdateComment: (content) {
+                                        return EpCommentView(
+                                          postCommentType: getPostCommentType(),
+                                          onUpdateComment: (content) {
+                                          
+                                            if(content == null){
+                                              SliverAnimatedList.of(animatedContext).removeItem(
+                                                contentCommentIndex,
+                                                duration: const Duration(milliseconds: 300),
+                                                (_,animation)=> fadeSizeTransition(
+                                                  animation: animation,
+                                                  child: EpCommentView(epCommentData: currentEpCommentDetails),
+                                                )
+                                                
+                                              );
+                                            }
+                        
+                                            else{
+                                              userCommentMap[contentCommentIndex] = content;
+                                              commentUpdateFlag.value += 1;
+                                            }
+                                          
+                                          },
+                                          epCommentData: currentEpCommentDetails,
+                                          authorID: 
+                                           (getPostCommentType() == PostCommentType.replyTopic || getPostCommentType() == PostCommentType.replyGroupTopic) ? 
+                                           (contentDetail.contentRepliedComment?[0].userInformation?.userID) : 
+                                           contentDetail.userInformation?.userID ?? contentInfo.userInformation?.userID
+                                           ,
+                                                                    
+                                        );
+                                      },
+                                      
+                                    );
+                                  }
+                                ),
                                         
-                                          if(content == null){
-                                            SliverAnimatedList.of(animatedContext).removeItem(
-                                              contentCommentIndex,
-                                              duration: const Duration(milliseconds: 300),
-                                              (_,animation)=> fadeSizeTransition(
-                                                animation: animation,
-                                                child: EpCommentView(epCommentData: currentEpCommentDetails),
-                                              )
-                                              
-                                            );
-                                          }
-                      
-                                          else{
-                                            userCommentMap[contentCommentIndex] = content;
-                                            commentUpdateFlag.value += 1;
-                                          }
-                                        
-                                        },
-                                        epCommentData: currentEpCommentDetails
-                                                                  
-                                      );
-                                    },
-                                    
-                                  );
-                            	  }
-                            	),
-                            					
-                            	if(contentCommentIndex < commentListCount - 1)
-                            		const Divider()
-                            ],
+                                if(contentCommentIndex < commentListCount - 1)
+                                  const Divider()
+                              ],
                             );
                               
                               
