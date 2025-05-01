@@ -43,7 +43,7 @@ class NewUpdateDialog extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const ScalableText("New Version"),
-                ScalableText("Tag v${GithubRepository.version} => v${latestRelease.tagName}"),
+                ScalableText("Tag v${APPInformationRepository.version} => v${latestRelease.tagName}"),
               ],
             ),
         
@@ -198,7 +198,7 @@ class NewUpdateDialog extends StatelessWidget {
               spacing: 12,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(onPressed: ()=>launchUrlString(GithubRepository.link), child: const ScalableText("浏览器打开")),
+                TextButton(onPressed: ()=>launchUrlString(APPInformationRepository.link), child: const ScalableText("浏览器打开")),
                 TextButton(onPressed: ()=>Navigator.of(context).maybePop(), child: const ScalableText("下次再说"))
               ],
             ),

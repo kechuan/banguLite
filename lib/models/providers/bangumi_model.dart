@@ -19,11 +19,13 @@ class BangumiModel extends ChangeNotifier {
   Color? bangumiThemeColor;
   Color? imageColor;
 
-  Future<void> loadDetails({bool? refresh}) async {
+  //BangumiAPIUrls.userSubjectComment()
+
+  Future<void> loadDetails({bool? isRefresh}) async {
 
     if(subjectID==0) return;
 
-    if(bangumiDetails != null && refresh != true) return;
+    if(bangumiDetails != null && isRefresh != true) return;
 
     final detailInformation = await HttpApiClient.client.get("${BangumiAPIUrls.subject}/$subjectID");
 
@@ -40,7 +42,7 @@ class BangumiModel extends ChangeNotifier {
 
     bangumiThemeColor = null;
     
-    if(!BangumiThemeColor.values.any((currentTheme) => currentTheme.color == imageProviderColor)){
+    if(!AppThemeColor.values.any((currentTheme) => currentTheme.color == imageProviderColor)){
       imageColor ??= imageProviderColor;
     }
     

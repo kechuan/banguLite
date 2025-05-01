@@ -92,8 +92,12 @@ class WarpSeasonDialog extends StatelessWidget {
                       child: const ScalableText("取消")
                     ),
                     TextButton(
-                      //onPressed: ()=>Navigator.of(context).pop({yearNotifier.value:seasonTypeNotifier.value}), 
-                      onPressed: ()=>Navigator.of(context).pop(DateTime(yearNotifier.value,seasonTypeNotifier.value.month)), 
+                      onPressed: (){
+
+                        debugPrint("season:${seasonTypeNotifier.value}");
+
+                        Navigator.of(context).pop(DateTime(yearNotifier.value,seasonTypeNotifier.value.month));
+                      },
                       child: const ScalableText("确认")
                     )
                   ],
@@ -128,49 +132,51 @@ class SelectSeasonLandscape extends StatelessWidget {
 		height: 50,
 		width: 300,
 		child: DefaultTabController(
-		//tabbar 无法透过 rebuild 刷新 initialIndex.
-		initialIndex: convertPassedSeason(selectedYear,seasonTypeNotifier.value.month)-1,
+		//initialIndex 无法透过 rebuild 重建index 除非是彻头彻尾的 build 才可以.
+    initialIndex: seasonTypeNotifier.value.index,
 		length: SeasonType.values.length,
 		child: TabBar(
-			labelPadding: const EdgeInsets.all(0),
-			dividerColor: Colors.transparent,
-			indicatorSize: TabBarIndicatorSize.label,
-			onTap: (seasonTypeIndex) {
-				if(seasonTypeIndex < convertPassedSeason(yearNotifier.value,currentMonth)){
-					seasonTypeNotifier.value = SeasonType.values[seasonTypeIndex];
-				}
-			},
-			tabs: List.generate(
-				SeasonType.values.length,
-				(seasonTypeIndex){
-					return ValueListenableBuilder(
-					valueListenable: yearNotifier,
-					builder: (_,year,child) {
+		  labelPadding: const EdgeInsets.all(0),
+		  dividerColor: Colors.transparent,
+		  indicatorSize: TabBarIndicatorSize.label,
+		  onTap: (seasonTypeIndex) {
+        if(seasonTypeIndex <= convertPassedSeason(yearNotifier.value,currentMonth)){
+          seasonTypeNotifier.value = SeasonType.values[seasonTypeIndex];
+        }
 
-						if(convertPassedSeason(year,currentMonth) < seasonTypeNotifier.value.index){
-							seasonTypeNotifier.value = SeasonType.values[convertPassedSeason(year,currentMonth)-1];
-						}
-						
-						return DecoratedBox(
-							decoration: BoxDecoration(
-								borderRadius: BorderRadius.horizontal(
-									left: seasonTypeIndex == 0 ? const Radius.circular(16) : Radius.zero,
-									right: seasonTypeIndex == SeasonType.values.length-1 ? const Radius.circular(16) : Radius.zero,
-								),
-								
-							),
-							child: AnimatedContainer(
-								duration: const Duration(milliseconds: 300),
-								color: convertPassedSeason(year, currentMonth)-1 < seasonTypeIndex ? Colors.grey : BangumiThemeColor.values[seasonTypeIndex].color , //unable will be grey.,,
-								child: SizedBox(child: Center(child: Text(SeasonType.values[seasonTypeIndex].seasonText))),
-							)
-						);
-					}
-					);
-				}
-				)
-				
-			),
+        //debugPrint("value :${seasonTypeNotifier.value}");
+		  },
+		  tabs: List.generate(
+		    SeasonType.values.length,
+		    (seasonTypeIndex){
+		      return ValueListenableBuilder(
+		      valueListenable: yearNotifier,
+		      builder: (_,year,child) {
+		
+		        if(convertPassedSeason(year,currentMonth) < seasonTypeNotifier.value.index){
+		          seasonTypeNotifier.value = SeasonType.values[convertPassedSeason(year,currentMonth)];
+		        }
+		        
+		        return DecoratedBox(
+		          decoration: BoxDecoration(
+		            borderRadius: BorderRadius.horizontal(
+		              left: seasonTypeIndex == 0 ? const Radius.circular(16) : Radius.zero,
+		              right: seasonTypeIndex == SeasonType.values.length-1 ? const Radius.circular(16) : Radius.zero,
+		            ),
+		            
+		          ),
+		          child: AnimatedContainer(
+		            duration: const Duration(milliseconds: 300),
+		            color: convertPassedSeason(year, currentMonth) < seasonTypeIndex ? Colors.grey : AppThemeColor.values[seasonTypeIndex].color , //unable will be grey.,,
+		            child: SizedBox(child: Center(child: Text(SeasonType.values[seasonTypeIndex].seasonText))),
+		          )
+		        );
+		      }
+		      );
+		    }
+		    )
+		    
+		  ),
 		),
 	);
   }
@@ -201,17 +207,17 @@ class SelectSeasonPortrait extends StatelessWidget {
 			builder: (_,year,child) {
 
 				if(convertPassedSeason(year,currentMonth) < seasonTypeNotifier.value.index){
-					seasonTypeNotifier.value = SeasonType.values[convertPassedSeason(year,currentMonth)-1];
+					seasonTypeNotifier.value = SeasonType.values[convertPassedSeason(year,currentMonth)];
 				}
 				
 				return Wrap(
 					
 					children: List.generate(
-						4,
+						SeasonType.values.length,
 						(seasonTypeIndex){
 							return UnVisibleResponse(
 								onTap: (){
-									if(seasonTypeIndex < convertPassedSeason(yearNotifier.value,currentMonth)){
+									if(seasonTypeIndex <= convertPassedSeason(yearNotifier.value,currentMonth)){
 										seasonTypeNotifier.value = SeasonType.values[seasonTypeIndex];
 									}
 								},
@@ -221,15 +227,23 @@ class SelectSeasonPortrait extends StatelessWidget {
 										duration: const Duration(milliseconds: 300),
 										decoration: BoxDecoration(
 											borderRadius: BorderRadius.only(
-												topLeft: seasonTypeIndex == 0 ? const Radius.circular(16) : Radius.zero,
-												topRight: seasonTypeIndex == 1 ? const Radius.circular(16) : Radius.zero,
-												bottomLeft: seasonTypeIndex == 2 ? const Radius.circular(16) : Radius.zero,
-												bottomRight: seasonTypeIndex == 3 ? const Radius.circular(16) : Radius.zero,
+												topLeft: seasonTypeIndex == SeasonType.winter.index ? const Radius.circular(16) : Radius.zero,
+												topRight: seasonTypeIndex == SeasonType.spring.index ? const Radius.circular(16) : Radius.zero,
+												bottomLeft: seasonTypeIndex == SeasonType.summer.index ? const Radius.circular(16) : Radius.zero,
+												bottomRight: seasonTypeIndex == SeasonType.autumn.index ? const Radius.circular(16) : Radius.zero,
 											),
-											color: convertPassedSeason(year, currentMonth)-1 < seasonTypeIndex ? Colors.grey : BangumiThemeColor.values[seasonTypeIndex].color , //unable will be grey.,,
+											color: convertPassedSeason(year, currentMonth) < seasonTypeIndex ? Colors.grey : AppThemeColor.values[seasonTypeIndex].color , //unable will be grey.,,
 										),
 										
-										child: SizedBox(width: 150/2,height: 100/2,child: Center(child: ScalableText(SeasonType.values[seasonTypeIndex].seasonText,style: const TextStyle(color: Colors.black),))),
+										child: SizedBox(
+                      width: 150/2,
+                      height: 100/2,
+                      child: Center(
+                        child: ScalableText(
+                          SeasonType.values[seasonTypeIndex].seasonText,style: const TextStyle(color: Colors.black)
+                          )
+                        )
+                      ),
 										),
 
 										Positioned(
@@ -281,7 +295,7 @@ void showSeasonDialog(BuildContext context,Future? calendarLoadFuture){
       context: context,
       pageBuilder: (_,inAnimation,outAnimation)=> WarpSeasonDialog(
         selectedYear: indexModel.selectedYear,
-        selectedSeasonType: judgeSeasonRange(indexModel.selectedSeason.month)
+        selectedSeasonType: indexModel.selectedSeason
       ),
       transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child),
       transitionDuration: const Duration(milliseconds: 300)
@@ -335,7 +349,7 @@ void showSeasonDialog(BuildContext context,Future? calendarLoadFuture){
       }
 
       indexModel.selectedYear = selectSeason.year;
-      indexModel.selectedSeason = judgeSeasonRange(selectSeason.month);
+      indexModel.selectedSeason = judgeSeasonRange(selectSeason.month,currentTime: true);
 
     });
 

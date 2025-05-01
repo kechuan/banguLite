@@ -8,6 +8,7 @@ class TopicModel extends BaseModel<TopicInfo, TopicDetails> {
   TopicModel({
     required super.subjectID
   }){
+    if(subjectID == 'topic') return;
     loadSubjectTopics();
   }
 
@@ -21,15 +22,15 @@ class TopicModel extends BaseModel<TopicInfo, TopicDetails> {
   Future<void> loadTopic(int topicID) async => await loadContentDetail(topicID);
 
   @override
-  List<TopicInfo> createEmptyInfoList() => [TopicInfo.empty()];
+  createEmptyInfoList() => [TopicInfo.empty()];
   @override
   TopicDetails createEmptyDetails() => TopicDetails.empty();
   @override
-  String getContentListUrl(int subjectID) => BangumiAPIUrls.topics(subjectID);
+  String getContentListUrl(dynamic subjectID) => BangumiAPIUrls.topic(subjectID);
   @override
   String getContentDetailUrl(int contentID) => BangumiAPIUrls.topicComment(contentID);
   @override
-  List<TopicInfo> convertResponseToList(Response subContentListResponseData) => loadTopicsInfo(subContentListResponseData);
+  convertResponseToList(Response subContentListResponseData) => loadTopicsInfo(subContentListResponseData.data["data"]);
   @override
   TopicDetails convertResponseToDetail(Map<String,dynamic> contentResponseData) => loadTopicDetails(contentResponseData);
 

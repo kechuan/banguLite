@@ -2,7 +2,10 @@
 import 'dart:async';
 import 'dart:math';
 
+
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/models/user_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -10,9 +13,7 @@ import 'package:bangu_lite/models/comment_details.dart';
 
 class CommentModel extends ChangeNotifier {
   
-  CommentModel({
-    required this.subjectID
-  });
+  CommentModel({required this.subjectID});
 
   final int subjectID;
 
@@ -37,6 +38,9 @@ class CommentModel extends ChangeNotifier {
   /// [...]状态时再被请求时 如没有 refresh Flag 类似的标识时 return.
   final Map<int,List<CommentDetails>> commentsData = {}; 
 
+  //APP用户自己发的评论
+  CommentDetails? userCommentDetails;
+
   int commentLength = 0;
   int currentPageIndex = 1;
 
@@ -47,8 +51,8 @@ class CommentModel extends ChangeNotifier {
 
   Future<void> getCommentLength(int subjectID) async {
     await HttpApiClient.client.get(
-      BangumiAPIUrls.comment(subjectID),
-      queryParameters: BangumiQuerys.commentQuery..["limit"] = 1
+      BangumiAPIUrls.subjectComment(subjectID),
+      queryParameters: BangumiQuerys.commentAccessQuery..["limit"] = 1
     ).then((response){
       if(response.data != null && response.data["total"] != null){
         commentLength = response.data["total"];
@@ -60,7 +64,63 @@ class CommentModel extends ChangeNotifier {
   ///
   ///请求到数据后会透过 [notifyListeners] 通知UI组件这个数据已准备好
   //Future<void> loadComments(int subjectID,{int pageIndex = 1,bool isReverse = false, int pageRange = 10}) async {
-  Future<void> loadComments({int pageIndex = 1,bool isReverse = false, int pageRange = 10}) async {
+
+  //筛选 用途?
+  Future<void> loadUserComment({
+    UserInformation? currentUserInformation,
+    Function(String)? fallbackAction
+  }) async {
+    if(subjectID == 0 || currentUserInformation == null) return;
+    if(userCommentDetails != null) return; 
+
+    //占位符
+    userCommentDetails = CommentDetails();
+
+    try{
+      final userStarInformation = await HttpApiClient.client.get(
+        BangumiAPIUrls.userSubjectComment(currentUserInformation.userName!,subjectID)
+      );
+
+      if(userStarInformation.data != null && userStarInformation.data["comment"] != null){
+        userCommentDetails = CommentDetails()
+          ..userInformation = currentUserInformation
+          ..commentTimeStamp = DateTime.parse(userStarInformation.data["updated_at"]).toLocal().millisecondsSinceEpoch
+          ..comment = userStarInformation.data["comment"]
+          ..rate = userStarInformation.data["rate"]
+          ..type = StarType.values.firstWhere(
+            (element) => element.starTypeIndex == userStarInformation.data["type"]
+          )
+        ;
+
+        notifyListeners();
+      }
+    
+    }
+
+    on DioException catch(e){
+      if(e.response?.statusCode == 404){
+        debugPrint("用户未收藏该条目: $subjectID");
+      }
+
+      else{
+        fallbackAction?.call("Request Error:${e.toString()}");
+        debugPrint("Request Error:${e.toString()}");
+      }
+        
+    }
+
+    
+  }
+  
+  Future<void> loadComments(
+    {
+      int pageIndex = 1,
+      bool isReverse = false,
+      int pageRange = 10,
+      bool isReloaded = false,
+      Function(String)? fallbackAction
+    }
+  ) async {
 
     if(subjectID == 0) return;
 
@@ -73,7 +133,7 @@ class CommentModel extends ChangeNotifier {
         debugPrint("comment subjectID $subjectID: was empty!");
 
         //因为 null/[] 已经被用来占用为 标志位了 无数据返回部分就以这种形式进行处理
-        commentsData.addAll({1:[CommentDetails()..userName = 0]});
+        commentsData.addAll({0:[CommentDetails.empty()]});
 
         notifyListeners();
         return;
@@ -93,6 +153,11 @@ class CommentModel extends ChangeNotifier {
     if((currentPageIndex).abs() - pageIndex.abs() >= 3 || (currentPageIndex).abs() - pageIndex.abs() <= -3 ){
       debugPrint("prevent rebuild conflict:${commentsData.keys}");
       return;
+    }
+
+    if(isReloaded){
+      debugPrint("$pageIndex: reloaded");
+      commentsData.remove(pageIndex);
     }
 
 
@@ -130,8 +195,8 @@ class CommentModel extends ChangeNotifier {
       int currentRequestRange = (pageRange)*(pageIndex - 1).abs();
 
       final detailInformation = await HttpApiClient.client.get(
-      BangumiAPIUrls.comment(subjectID),
-      queryParameters: BangumiQuerys.commentQuery
+      BangumiAPIUrls.subjectComment(subjectID),
+      queryParameters: BangumiQuerys.commentAccessQuery
 
       // 末数 比如 55-(10*(6-1)) => 5 这样就不会请求一整页的数据 而是请求残余页的条目数
       ..["limit"] = min(pageRange , (commentLength - currentRequestRange)) 
@@ -159,9 +224,8 @@ class CommentModel extends ChangeNotifier {
         debugPrint("wrong! server no response");
 
         commentsData.addAll({
-          pageIndex:[CommentDetails()..userName = 0],
+          pageIndex:[CommentDetails.empty()]
         });
-
       }
 
       
@@ -173,12 +237,14 @@ class CommentModel extends ChangeNotifier {
 
     on DioException catch(e){
       debugPrint("Request Error:${e.toString()}");
+      fallbackAction?.call("Request Error:${e.toString()}");
     }
 
   }
 
   @override
   void notifyListeners() {
+    //For exernal use with no warnning hint
     super.notifyListeners();
   }
 

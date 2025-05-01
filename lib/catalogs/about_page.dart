@@ -57,7 +57,7 @@ class AboutPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ScalableText('版本号'),
-                        ScalableText(GithubRepository.version,style:TextStyle(color: Colors.grey)),
+                        ScalableText(APPInformationRepository.version,style:TextStyle(color: Colors.grey)),
                       ],
                     ),
                   ),

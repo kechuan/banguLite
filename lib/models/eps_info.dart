@@ -8,12 +8,16 @@ class EpsInfo {
 
   String? description;
 
-  int? epIndex;
+  num? epIndex;
   num? sort; //同类条目的排序和集数
   int? epID;
   int? commentLength;
 
   int? type;
+
+  //上下ID的链表 kana?
+  int? nextEpID;
+  int? prevEpID;
 
 }
 
@@ -28,8 +32,8 @@ List<EpsInfo> loadEpsData(Response bangumiEpsInfoResponse){
 
     currentEpInfo
       ..airDate = currentEpInfoMap["airdate"]
-      ..name = currentEpInfoMap["name"]
-      ..nameCN = currentEpInfoMap["name_cn"]
+      ..name = convertAmpsSymbol(currentEpInfoMap["name"])
+      ..nameCN = convertAmpsSymbol(currentEpInfoMap["name_cn"])
       ..epID = currentEpInfoMap["id"]
       ..epIndex = currentEpInfoMap["ep"]
       ..sort = currentEpInfoMap["sort"]
@@ -49,7 +53,8 @@ List<EpsInfo> loadEpsData(Response bangumiEpsInfoResponse){
 String convertCollectionName(EpsInfo? currentInfo,int currentEpIndex){
   if(currentInfo==null) return "loading";
 
-  String currentEpType = convertEPInfoType(currentInfo.type);
+  String currentEpType =  convertEPInfoType(currentInfo.type);
+
   num currentIndex = currentInfo.sort ?? currentEpIndex;
   String currentEpText = currentInfo.nameCN ?? currentInfo.name ?? ""; 
 

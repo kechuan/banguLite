@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
@@ -129,7 +128,7 @@ class BangumiRankBox extends StatelessWidget {
                                     
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 300), 
-                              height: 150*currentRankRatio.clamp(0, 90).toDouble(), //理论上最大值应该是200 毕竟极端值 1:1 但不想顶到上方的Score区域
+                              height: (150*currentRankRatio).clamp(0, 90).toDouble(), //理论上最大值应该是200 毕竟极端值 1:1 但不想顶到上方的Score区域
                               color:Theme.of(context).scaffoldBackgroundColor,
                             ),
                                     

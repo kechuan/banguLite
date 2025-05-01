@@ -1,42 +1,67 @@
 
+import 'package:bangu_lite/internal/callback.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/extension.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/widgets/fragments/comment_image_panel.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 import 'package:bbob_dart/bbob_dart.dart' as bbob;
-import 'package:flutter_bbcode/src/util/color_util.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
+BBStylesheet appDefaultStyleSheet(BuildContext context,{bool selectableText = false}){
+  return BBStylesheet(
+    tags: allEffectTag,
+    selectableText: selectableText,
+    defaultText: TextStyle(
+      overflow: TextOverflow.ellipsis,
+      fontSize: 16,
+      fontFamily: 'MiSansFont',
+      color: judgeDarknessMode(context) ? Colors.white : Colors.black,
+    )
+  );
+}
+
 
 final allEffectTag = [
 	BoldTag(),
 	ItalicTag(),
 	UnderlineTag(),
 	StrikeThroughTag(),
-	//ColorTag(),
   PatchColorTag(),
 	SizeTag(),
-	//ImgTag(),
-	LateLoadImgTag(),
-  LateLoadImgTag(tagName: "photo"),
-	UrlTag(
-    onTap: (link) async => 
-      await canLaunchUrlString(link).then((launchable)=>bus.emit('AppRoute', link))
-  ),
-	//QuoteTag(),
+  
   AdapterQuoteTag(),
 	LeftAlignTag(),
 	CenterAlignTag(),
 	RightAlignTag(),
 	MaskTag(),
-  //SpoilerTag()
-	BangumiStickerTag()
+	BangumiStickerTag(),
+
+  //RichTag
+  LateLoadImgTag(),
+  LateLoadImgTag(tagName: "photo"),
+	UrlTag(
+    onTap: (link) async => 
+      await canLaunchUrlString(link).then(
+      (launchable){
+        if(launchable){
+          bus.emit('AppRoute', link);	
+        }
+        
+      }
+    )
+  ),
   
+  CodeTag(),
 ];
+
 
 class MaskDisplay extends StatelessWidget {
   final String maskText;
@@ -71,10 +96,10 @@ class MaskDisplay extends StatelessWidget {
               builder: (_,activedStatus,__) {
                 return DecoratedBox(
                   decoration: BoxDecoration(
-                    color: isDarkMode ? BangumiThemeColor.macha.color :Colors.black,
+                    color: isDarkMode ? AppThemeColor.macha.color :Colors.black,
                     boxShadow: [
                       BoxShadow(
-                        color: isDarkMode ? BangumiThemeColor.macha.color :Colors.black,
+                        color: isDarkMode ? AppThemeColor.macha.color :Colors.black,
                         blurRadius: 2,
                         spreadRadius: 1
                       )
@@ -83,8 +108,8 @@ class MaskDisplay extends StatelessWidget {
                   child: TweenAnimationBuilder<Color?>(
                     duration: const Duration(milliseconds: 300),
                     tween: ColorTween(
-                      begin: isDarkMode ? BangumiThemeColor.macha.color :Colors.black,
-                      end: isDarkMode ? (activedStatus ? Colors.black : BangumiThemeColor.macha.color) : (activedStatus ? Colors.white : Colors.black),
+                      begin: isDarkMode ? AppThemeColor.macha.color :Colors.black,
+                      end: isDarkMode ? (activedStatus ? Colors.black : AppThemeColor.macha.color) : (activedStatus ? Colors.white : Colors.black),
                     ),
                           
                     builder: (_,color,__){
@@ -152,7 +177,7 @@ class AdapterQuoteDisplay extends StatelessWidget{
                         //color: Colors.white,
                         border:Border(bottom: BorderSide(color: Colors.grey, width: 1))
                       ),
-                    child: ScalableText("$author said:", style: headerTextStyle),
+                    child: ScalableText("$author 说:", style: headerTextStyle),
                     
                   ),
                 Builder(
@@ -162,15 +187,23 @@ class AdapterQuoteDisplay extends StatelessWidget{
                       (currentSpan){
                         return TextSpan(
                           text: currentSpan.toPlainText(),
-                          style: currentSpan.style!.merge(TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
+                          style: currentSpan.style?.merge(TextStyle(color: isDarkMode ? Colors.white : Colors.black)),
                         );
                       }
                     ).toList();
 
-                    return Container(
+                    return UnVisibleResponse(
+                      onTap: () => Clipboard.setData(
+                        ClipboardData(
+                          text: content.last.toPlainText().split('说:').last.trim()
+                        )
+                      ),
+                      child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                        child: RichText(text: TextSpan(children: newInlineSpan)));
+                        padding: const EdgeInsets.all(5),
+                        child: RichText(text: TextSpan(children: newInlineSpan))
+                      ),
+                    );
                   }
                 )
               ],
@@ -180,6 +213,84 @@ class AdapterQuoteDisplay extends StatelessWidget{
   }
 
 
+
+}
+
+class CodeTag extends AdvancedTag{
+
+  //同种名称的 不同功能 or 不同名称 同种功能
+  /// CodeTag({this.tagName = 'code'}) : super("code");
+  /// CodeTag({this.tagName = 'code'}) : super(tagName ?? "code");
+  CodeTag({this.tagName = 'code'}) : super("code");
+
+  final String? tagName;
+
+  @override
+  List<InlineSpan> parse(FlutterRenderer renderer, bbob.Element element) {
+
+    if (element.children.isEmpty) return [TextSpan(text: "[$tag]")];
+
+    String codeText = element.children.first.textContent;
+
+    return [
+      WidgetSpan(
+        child: Padding(
+          padding: Padding16,
+          child: Builder(
+            builder: (context) {
+              return Container(
+                color: Colors.grey.withValues(alpha: 0.1),
+                child: Column(
+                  children: [
+                    
+                    if(tagName != 'codeExample')
+                      Padding(
+                        padding: PaddingH6,
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                                        
+                              const ScalableText("Code",style: TextStyle(fontSize: 14,color: Colors.grey)),
+                                        
+                                        
+                              IconButton(
+                                onPressed: ()=> copyClipboardCallback(context, codeText),
+                                icon: const Icon(Icons.copy),
+                                iconSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ],
+                          ),
+                      ),
+                
+                    UnVisibleResponse(
+                      onTap: ()=> copyClipboardCallback(context, codeText),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius:BorderRadius.circular(6),
+                          color: Colors.white,
+                        ),
+                        
+                        child: ScalableText(
+                          codeText,
+                          selectable: true,
+                        ),
+                      ),
+                    ),
+                
+                  
+                
+                
+                  ],
+                ),
+              );
+            }
+          ),
+        ),
+        
+      )
+    ];
+  }
 
 }
 
@@ -225,7 +336,7 @@ class BangumiStickerTag extends AdvancedTag{
 
     final image = Image.asset(
       imageUrl,
-      scale: imageUrl.contains(RegExp(r'(124)|(125)')) ? 1.6 : 0.8,
+      scale: 0.8,
       errorBuilder: (context, error, stack) => ScalableText("[$tag]")
 	  );
 
@@ -252,7 +363,7 @@ class LateLoadImgTag extends AdvancedTag {
     String imageUrl = element.children.first.textContent;
 
     if(tagName == "photo"){
-      imageUrl = BangumiAPIUrls.imgur(imageUrl);
+      imageUrl = BangumiAPIUrls.imgurl(imageUrl);
     }
 
     //debugPrint("lateLoad textContent:${imageUrl}");
@@ -337,3 +448,22 @@ class PatchColorTag extends StyleTag {
 
 }
 
+
+extension HexColor on Color {
+  // Source: https://stackoverflow.com/questions/50081213/how-do-i-use-hexadecimal-color-strings-in-flutter
+
+  /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
+  static Color fromHex(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
+  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+      '${(a*256).round().toRadixString(16).padLeft(2, '0')}'
+      '${(r*256).round().toRadixString(16).padLeft(2, '0')}'
+      '${(g*256).round().toRadixString(16).padLeft(2, '0')}'
+      '${(b*256).round().toRadixString(16).padLeft(2, '0')}';
+}

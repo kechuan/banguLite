@@ -1,24 +1,37 @@
+import 'dart:async';
+
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/eps_info.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/user_details.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class EpModel extends ChangeNotifier{
   
   EpModel({
-    required this.subjectID,
-    required this.selectedEp,
+    this.subjectID = 0,
+    this.selectedEp = 0,
+    //this.episodesID,
   }){
+    //遇到直接需要加载Ep Page 的页面话 需要做 Completer 处理
     getEpsInformation();
   }
+
+  //final int? episodesID; //一旦提供 则只能是固定数据
+
+  Completer? getEpsInformationCompleter;
 
   int subjectID;
   int selectedEp;
   
-  final Map<int,EpsInfo> epsData = {};
-  final Map<int,List<EpCommentDetails>> epCommentData = {}; 
+  final Map<num,EpsInfo> epsData = {};
+  final Map<num,List<EpCommentDetails>> epCommentData = {}; 
+
+  //double => 浮点 #3 / #3-1 etc
+  final Map<int,Map<num,int>> userCommentLikeData = {}; 
 
   void updateSelectedEp(int newEp){
     if(newEp == selectedEp) return;
@@ -26,10 +39,121 @@ class EpModel extends ChangeNotifier{
     selectedEp = newEp;
     notifyListeners();
 
-	  if(epCommentData[selectedEp] == null) loadEp();
+	  if(epCommentData[selectedEp] == null) loadEpComment();
+  }
+
+  bool? updateUserEpCommentDataLike(
+    int commentID,
+    int dataLikeIndex,
+    {
+      int? commentIndex,
+      int? replyCommentIndex,
+    }){
+
+      if(epCommentData[selectedEp] == null || commentIndex == null) return null;
+
+      	bool isExist = true;
+
+		if(userCommentLikeData[selectedEp] == null){
+
+			userCommentLikeData[selectedEp] = {
+			double.parse('$commentIndex.${replyCommentIndex ?? 0}') : dataLikeIndex
+			};
+		}
+
+		else{
+
+			if(userCommentLikeData[selectedEp]![double.parse('$commentIndex.${replyCommentIndex ?? 0}')] == dataLikeIndex){
+				userCommentLikeData[selectedEp]![double.parse('$commentIndex.${replyCommentIndex ?? 0}')] = -1;
+				isExist = false;
+			}
+
+			else{
+				userCommentLikeData[selectedEp]![double.parse('$commentIndex.${replyCommentIndex ?? 0}')] = dataLikeIndex;
+			}
+
+
+		}
+
+		WidgetsBinding.instance.addPostFrameCallback((_) {
+			notifyListeners();
+		});
+
+		return isExist;
+
+
+  }
+
+  void updateEpCommentDataLike(
+    BuildContext context,
+    int dataLikeIndex,
+    {
+      int? commentIndex,
+      int? replyCommentIndex,
+    }
+  ){
+
+    if(epCommentData[selectedEp] == null || commentIndex == null) return;
+
+    final accountModel = context.read<AccountModel>();
+
+    epCommentData.update(
+      selectedEp, 
+      (epCommentDetailsList){
+
+        if(replyCommentIndex != null){
+          epCommentDetailsList[commentIndex-1].repliedComment![replyCommentIndex-1].commentReactions!.update(
+            dataLikeIndex, 
+            (commentReactionData){
+              commentReactionData.add(
+                AccountModel.loginedUserInformations.userInformation!.getName()
+              );
+              return commentReactionData;
+            }, 
+            ifAbsent: (){
+              return { 
+                AccountModel.loginedUserInformations.userInformation!.getName()
+              };
+            }
+          );
+
+
+        }
+
+        else{
+
+          epCommentDetailsList[commentIndex-1].commentReactions!.update(
+            dataLikeIndex, 
+            (commentReactionData){
+              commentReactionData.add(
+                AccountModel.loginedUserInformations.userInformation!.getName()
+              );
+              return commentReactionData;
+            }, 
+            ifAbsent: (){
+              return { 
+                AccountModel.loginedUserInformations.userInformation!.getName()
+              };
+            }
+          );
+
+
+        }
+
+        return epCommentDetailsList;
+
+      }
+    );
+
+    notifyListeners();
   }
 
 	Future<void> getEpsInformation({int? offset}) async {
+
+    if(getEpsInformationCompleter != null) return;
+
+    getEpsInformationCompleter ??= Completer();
+
 
     int requestOffset = (offset ?? 0)*100;
     int requestLimit = 100;
@@ -53,7 +177,7 @@ class EpModel extends ChangeNotifier{
         
     }
 
-    if(epsData[requestOffset+1]!= null){
+    if(epsData[requestOffset+1] != null){
       debugPrint("loading Info ${requestOffset+1}~${requestOffset+100}");
       return;
     }
@@ -61,9 +185,6 @@ class EpModel extends ChangeNotifier{
     //get Start. 占位符
     epsData[requestOffset+1] = EpsInfo();
 
-    
-   
-  
 		await HttpApiClient.client.get(
       BangumiAPIUrls.eps,
       queryParameters: 
@@ -74,11 +195,11 @@ class EpModel extends ChangeNotifier{
           
     ).then((response){
 
-        if(response.data != null && response.data["data"] != null){
+        if(response.data["data"] != null){
         
           List<EpsInfo> currentRangeEpsData = loadEpsData(response);
 
-          int? epOffset = currentRangeEpsData.isEmpty ? 0 : currentRangeEpsData[0].epIndex;
+          num? epOffset = currentRangeEpsData.isEmpty ? 0 : currentRangeEpsData[0].epIndex;
 
           if(epOffset!=null){
             for(int epInfoIndex = 0; epInfoIndex < currentRangeEpsData.length; epInfoIndex++){
@@ -90,47 +211,63 @@ class EpModel extends ChangeNotifier{
 
           debugPrint("currentEpsData Length:${epsData.length}");
 
+          getEpsInformationCompleter?.complete();
+
           notifyListeners(); //完成
 
         }
 
+        else{
+          debugPrint("getEpsInformation Error: ${response.statusCode} ${response.statusMessage}");
+          getEpsInformationCompleter?.complete();
+        }
+
+
+
     });
+
+    return getEpsInformationCompleter?.future;
 
 	}
 
-	Future<void> loadEp() async{
+	Future<void> loadEpComment() async{
 
-		if(epsData.isEmpty){
-			await getEpsInformation();
-			if(epsData.isEmpty) return;
-		}
-
-    else{
-      if(epsData[selectedEp] == null){
-        await getEpsInformation(offset: convertSegement(selectedEp,100));
+      //TODO 加载顺序有问题
+      if(epsData.isEmpty){
+        await getEpsInformationCompleter?.future ?? await getEpsInformation();
+        
         if(epsData.isEmpty) return;
       }
-    }
 
+      else{
+        if(epsData[selectedEp] == null){
+
+          await getEpsInformationCompleter?.future ?? await getEpsInformation(offset: convertSegement(selectedEp,100));
+          if(epsData.isEmpty) return;
+        }
+      }
+
+      if(epCommentData[selectedEp] != null){
+
+        if(epCommentData[selectedEp]!.isEmpty){
+          debugPrint("$selectedEp in Progress");
+        }
+
+        debugPrint("$selectedEp already loaded");
+        
+        return;
+      }
     
 
-		if(epCommentData[selectedEp] != null){
 
-			if(epCommentData[selectedEp]!.isEmpty){
-				debugPrint("$selectedEp in Progress");
-				return;
-			}
-
-			debugPrint("$selectedEp already loaded");
-			
-			return;
-		}
+    int requestID = epsData[selectedEp]?.epID ?? 0;
+    if(requestID == 0) return;
 
 		//初始化占位
 		epCommentData[selectedEp] = [];
 		
 		await HttpApiClient.client.get(
-			BangumiAPIUrls.epComment(epsData[selectedEp]!.epID!),
+			BangumiAPIUrls.epComment(requestID),
 		).then((response){
 			if(response.data != null){
 
@@ -141,7 +278,7 @@ class EpModel extends ChangeNotifier{
 				epCommentData[selectedEp] = [
           EpCommentDetails()
             ..userInformation = (
-              UserDetails()..userID = 0
+              UserInformation()..userID = 0
             )
             
         ];

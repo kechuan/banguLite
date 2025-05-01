@@ -4,13 +4,16 @@ import 'package:hive_ce/hive.dart';
 import 'package:bangu_lite/internal/const.dart';
 
 class AppConfig extends HiveObject{
-  BangumiThemeColor? currentThemeColor = BangumiThemeColor.sea;
+  
+  AppThemeColor? currentThemeColor = AppThemeColor.sea;
   ScaleType? fontScale = ScaleType.medium;
   ThemeMode? themeMode = ThemeMode.system;
   Color? customColor;
   bool? isSelectedCustomColor = false;
   bool? isFollowThemeColor = false;
   bool? isManuallyImageLoad = true;
+  //登入凭证
+  
 
   @override
   String toString() {

@@ -78,10 +78,7 @@ SeasonType judgeSeasonRange(int currentMonth,{bool? currentTime}){
 
   });
 
-  if(currentTime == true){
-    if(currentSeasonType == SeasonType.winter) return currentSeasonType;
-    currentSeasonType = SeasonType.values.elementAt(currentSeasonType.index - 1);
-  }
+
 
   return currentSeasonType;
 }

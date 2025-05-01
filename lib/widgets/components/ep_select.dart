@@ -18,7 +18,7 @@ class EpSelect extends StatefulWidget {
     required this.airedEps,
     this.name,
     this.portialMode,
-	this.bangumiThemeColor
+	  this.bangumiThemeColor
   });
 
   final int totalEps;
@@ -45,7 +45,6 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
 
     final epModel = context.read<EpModel>();
-    //final bangumiModel = context.read<BangumiModel>();
 
     int segements = convertSegement(widget.totalEps,100);
 
@@ -61,11 +60,11 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
           return Column(
             children: [
           
-          			segements >= 2 ?
-          				//Tabbar
-          				Theme(
-          					data: ThemeData(
-          						scrollbarTheme: const ScrollbarThemeData(
+                segements >= 2 ?
+                  //Tabbar
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      scrollbarTheme: const ScrollbarThemeData(
                         thickness: WidgetStatePropertyAll(0.0) //it work
                       )
                     ),
@@ -92,7 +91,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                       ),
                     ),
                   ):
-
+      
                   widget.portialMode == true ? 
                     Center(
                       child: Padding(
@@ -102,22 +101,21 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                     ):
                   const SizedBox.shrink(),
           
-          			//TabView
-          			SizedBox(
-                  height: widget.portialMode == true ? constraint.maxHeight -60 : 250,
-                  //height: 250,
+                //TabView
+                SizedBox(
+                  height: widget.portialMode == true ? constraint.maxHeight - 80 : MediaQuery.sizeOf(context).width/6,
                   child: ValueListenableBuilder(
                   valueListenable: epSegementsIndexNotifier,
                   builder: (_,currentSegment,child) {
                         
                     int currentSegementRange = (currentSegment)*100; //范围 区域300 这个意思
                     int currentSegmentEps = min(100,widget.totalEps - (currentSegementRange)).abs();
-
+                      
                     //context.read区域	
                     return FutureBuilder(
                       future: epsInformationFuture, //通知器 并不传递信息
                       builder: (_,snapshot) {
-
+                      
                         //epModel => context.watch区域
                         return Selector<EpModel,bool>(
                           selector: (_, epModel)=> epModel.epsData[(currentSegementRange)+1]?.epID == null,
@@ -143,24 +141,25 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                   
                               Color currentEpsColor = Colors.grey ; //默认灰 未放送
                               int currentEpIndex = (currentSegementRange)+(index)+1;
-
+                          
                               EpsInfo? currentInfo = epModel.epsData[currentEpIndex];
-
+                          
                               //对于时间跨度很大的番剧。像海贼王这种的 我处理方式就是最简单的 air_date 判断了 
                               //不可能做到百分百准确 但没办法 已经没有更好的思路了
-
+                          
                               DateTime? currentEpAirDate = DateTime.tryParse(currentInfo?.airDate ?? "");
-
+                          
                               if(currentEpAirDate!=null){
                                 currentTime.difference(currentEpAirDate) > const Duration(hours: 1) ?
                                 currentEpsColor = Theme.of(context).scaffoldBackgroundColor: //已放送
+                                //currentEpsColor = Colors.indigo: //已放送
                                 null ;
                               }
-
+                          
                               if(widget.airedEps < widget.totalEps){ //如果还有未放送的
-                                if(widget.airedEps == currentEpIndex) currentEpsColor = BangumiThemeColor.macha.color; //标注当前放送中最新的一集
+                                if(widget.airedEps == currentEpIndex) currentEpsColor = AppThemeColor.macha.color; //标注当前放送中最新的一集
                               }
-
+                          
                               return SizedBox(
                                 height: 60,
                                 child: Container(

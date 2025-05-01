@@ -23,9 +23,9 @@ class CachedImageLoader extends StatelessWidget {
     return DecoratedBox(
       decoration: borderDecoration ?? BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-          border: Border.all(width: 1)
-        ),
-        child: Builder(
+        border: Border.all(width: 1)
+      ),
+      child: Builder(
           builder: (_){
 
             if(imageUrl!=null){
@@ -55,7 +55,6 @@ class CachedImageLoader extends StatelessWidget {
                   if(DateTime.now().millisecondsSinceEpoch - loadStartTime.millisecondsSinceEpoch > 5000){
                      showProgressIndicator = true;
                   }
-                  //debugPrint("url: $url , progress:${progress}");
               
                   return DecoratedBox(                              
                     decoration: BoxDecoration(
@@ -67,10 +66,11 @@ class CachedImageLoader extends StatelessWidget {
                       child: ScalableText("loading... ${showProgressIndicator ? "${((progress.progress ?? 0.0)*100).toStringAsFixed(2)}%" : ""}"), //loading
                     ),
                   );
+                  
                 },
               );
             }
-        
+
             else{
               return const ImageNotAvailable(reason: "empty Url"); //null 
             }
@@ -99,6 +99,7 @@ class ImageNotAvailable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),

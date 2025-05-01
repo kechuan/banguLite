@@ -1,7 +1,15 @@
 import 'dart:io';
 
+import 'package:bangu_lite/catalogs/index/bangumi_index_page.dart';
+import 'package:bangu_lite/catalogs/surf/bangumi_login_auth_page.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/internal/platforms/register_windows_applink.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/groups_model.dart';
+import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
+import 'package:bangu_lite/models/providers/user_model.dart';
+import 'package:bangu_lite/models/providers/webview_model.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +22,15 @@ import 'package:provider/provider.dart';
 
 void main() async {
 
+  String? listenLink;
+
   if (kReleaseMode) {
     debugPrint = (String? message, {int? wrapWidth}) {};
   }
 
   // path_provider 初始化需要
   WidgetsFlutterBinding.ensureInitialized();
+  listenLink = await listenAPPLink();
 
   HttpApiClient.init();
   await MyHive.init();
@@ -37,18 +48,30 @@ void main() async {
 	);
   }
 
-  runApp(const MainApp());
+  runApp(MainApp(initialLink: listenLink));
 
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  const MainApp({
+    super.key,
+    this.initialLink,
+  });
+
+  final String? initialLink;
 
   @override
   Widget build(BuildContext context) {
 
-    return ChangeNotifierProvider(
-      create: (_) => IndexModel(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<IndexModel>(create: (_) => IndexModel()),
+        ChangeNotifierProvider<TimelineFlowModel>(create: (_) => TimelineFlowModel()),
+        ChangeNotifierProvider<AccountModel>(create: (_) => AccountModel()),
+        ChangeNotifierProvider<UserModel>(create: (_) => UserModel()),
+        ChangeNotifierProvider<WebViewModel>(create: (_) => WebViewModel()),
+      ],
+     
       child: Builder(
         builder: (context) {
           return Selector<IndexModel,Color>(
@@ -62,6 +85,7 @@ class MainApp extends StatelessWidget {
             shouldRebuild: (previous, next) => previous!=next,
             builder: (_, currentColor, child){
               return MaterialApp(
+                //debugShowCheckedModeBanner: false,
                 theme: ThemeData(
                   colorScheme: ColorScheme.fromSeed(seedColor: currentColor),
                   fontFamily: 'MiSansFont',
@@ -89,7 +113,27 @@ class MainApp extends StatelessWidget {
                     settings: settings,
                     getRouteSettings: getRouteSettings,
                   );
-                }
+                },
+                onGenerateInitialRoutes: (String initialRoute) {
+                  
+                  if (initialLink != null && initialLink!.isNotEmpty) {
+                    // 深链接存在，跳过默认路由匹配，直接跳转到目标页面
+                    return [
+                      MaterialPageRoute(
+                        settings: const RouteSettings(name: Routes.loginAuth),
+                        builder: (context) => const BangumiAuthPage(key: Key('loginAuth')),
+                      ),
+                    ];
+                  }
+
+                  // 没有深链接，进入正常首页
+                  return [
+                    MaterialPageRoute(
+                      settings: const RouteSettings(name: Routes.index),
+                      builder: (context) => const BangumiIndexPage(key: Key('index')),
+                    ),
+                  ];
+                },
               );
             }
             

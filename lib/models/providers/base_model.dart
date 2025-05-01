@@ -1,42 +1,82 @@
+import 'dart:async';
+
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/base_details.dart';
 import 'package:bangu_lite/models/base_info.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+
+
 
 /// 抽象的内容模型基类
 /// [I] => Info / 入口
 /// [D] => Detail / 详情
 /// 有些数据 并不存在后续的内容 因此 [D] 允许为 nullable
-abstract class BaseModel<I extends BaseInfo, D extends BaseDetails?> extends ChangeNotifier {
+abstract class BaseModel
+<
+  I extends BaseInfo,
+  D extends BaseDetails?
+> extends ChangeNotifier {
+
   BaseModel({
     required this.subjectID,
   });
 
-  final int subjectID;
+  final dynamic subjectID;
   final List<I> contentListData = [];
-  final Map<int, D> contentDetailData = {};
 
-  Future<void> loadSubjectSubContentList({Map<String, dynamic>? queryParameters}) async {
+  /// group 将 groupName 作为属性 一己之力将 int 属性更改为 dynamic
+  final Map<dynamic, D> contentDetailData = {};
 
-    if (subjectID == 0) return;
+  Future<bool> loadSubjectSubContentList({
+    Map<String, dynamic> queryParameters = const {},
+    bool isReloaded = false
+  }) async {
 
-    if (contentListData.isNotEmpty) {
-      debugPrint("topics already loaded");
-      return;
+    Completer<bool> completer = Completer();
+
+    if (subjectID == 0) return false;
+
+    if (isReloaded) {
+      contentListData.clear();
+      contentDetailData.clear();
     }
 
-    try {
-      await HttpApiClient.client.get(
+    if (contentListData.isNotEmpty && queryParameters.isEmpty) {
+      debugPrint("contentList is already loaded");
+      return false;
+    }
+
+
+    await HttpApiClient.client.get(
         getContentListUrl(subjectID),
-        queryParameters: queryParameters
+        queryParameters: queryParameters,
+        options: Options(
+          headers: BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken)
+        )
       ).then((response) {
-        subContentListResponseDataCallback(response);
+        if(response.statusCode == 200){
+          subContentListResponseDataCallback(response);
+          completer.complete(true);
+        }
+
+        else{
+          completer.complete(false);
+        }
+        
       });
 
-    } on DioException catch (e) {
-      debugPrint("Request Error: ${e.toString()}");
-    }
+    //try {
+      
+
+    //} 
+    
+    //on DioException catch (e) {
+    //  debugPrint("Request Error: ${e.toString()}");
+    //}
+
+    return completer.future;
   }
 
   void subContentListResponseDataCallback(Response subContentListResponseData){
@@ -54,7 +94,7 @@ abstract class BaseModel<I extends BaseInfo, D extends BaseDetails?> extends Cha
   }
     
   // 抽象方法：加载特定内容详情
-  Future<dynamic> loadContentDetail(int contentID,{Map<String, dynamic>? queryParameters}) async {
+  Future<void> loadContentDetail(int contentID,{Map<String, dynamic>? queryParameters}) async {
 
     if(getContentDetailUrl(contentID) == null) return;
 
@@ -70,7 +110,10 @@ abstract class BaseModel<I extends BaseInfo, D extends BaseDetails?> extends Cha
     try {
       await HttpApiClient.client.get(
         getContentDetailUrl(contentID)!,
-        queryParameters: queryParameters
+        queryParameters: queryParameters,
+        options: Options(
+          headers: BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken)
+        )
       ).then((response) {
         if (response.data != null) {
           contentDetailData[contentID] = convertResponseToDetail(response.data) as D;
@@ -84,7 +127,7 @@ abstract class BaseModel<I extends BaseInfo, D extends BaseDetails?> extends Cha
   }
 
   // 抽象方法：获取API URL
-  String getContentListUrl(int subjectID);
+  String getContentListUrl(dynamic subjectID);
   
   // 抽象方法：获取详情API URL
   String? getContentDetailUrl(int contentID) => null;

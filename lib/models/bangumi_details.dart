@@ -3,15 +3,21 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/star_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+
+const excludeTagsList = [
+  "日本","TV","WEB"
+];
 
 ///打开 subjectID 之后对应的details信息返回
 class BangumiDetails {
 
 	int? id;
   int? type;
+  
 	String? coverUrl;
 	String? name;
 
@@ -112,8 +118,19 @@ List<BangumiDetails> loadSearchData(Map<String,dynamic> bangumiData,{bool? anima
       bangumiDetail.name = currentBangumi["name_cn"].isEmpty ? currentBangumi["name"] : currentBangumi["name_cn"];
       bangumiDetail.id = currentBangumi["id"];
       bangumiDetail.coverUrl = currentBangumi["image"];
+
+      //仅用于 搜索页面 的 tag 展现 
+      for(String currentTagName in currentBangumi["meta_tags"]){
+        if(!excludeTagsList.contains(currentTagName)){
+          bangumiDetail.tagsList.addAll({
+            currentTagName : 0
+          });
+        }
+      }
+
       bangumiDetail.informationList = {
-        "air_date": currentBangumi["date"]
+        "air_date": currentBangumi["date"],
+        "eps": currentBangumi["eps"]
       };
 
       bangumiDetail.ratingList = {
@@ -196,7 +213,8 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
 
    if(detailFlag){
       bangumiDetails.informationList = {
-        "eps":bangumiData["eps"] == 0 ? bangumiData["total_episodes"] : bangumiData["eps"],
+        //"eps":bangumiData["eps"] == 0 ? bangumiData["total_episodes"] : bangumiData["eps"],
+        "eps":bangumiData["total_episodes"],
         "alias":bangumiData["name_cn"].isNotEmpty ? bangumiData["name"] : "",
         "air_date": bangumiData["date"].toString()
       };
@@ -262,6 +280,32 @@ BangumiDetails loadRelationsData(Map<String,dynamic> bangumiData){
   return bangumiDetails;
 }
 
+BangumiDetails loadStarDetailsData(StarBangumiDetails starBangumiData){
+  final BangumiDetails bangumiDetails = BangumiDetails();
+
+    bangumiDetails
+      ..id = starBangumiData.bangumiID
+      ..name = starBangumiData.name
+      ..coverUrl = starBangumiData.coverUrl
+      
+    ;
+
+    bangumiDetails.ratingList = {
+      "total": 0,
+      "score": starBangumiData.score,
+      "rank": starBangumiData.rank,
+      "count": 0
+    };
+
+    bangumiDetails.informationList = {
+      "eps":starBangumiData.eps,
+      "air_date": starBangumiData.airDate
+    };
+
+  return bangumiDetails;
+}
+
+
 bool animationFliter(Map currentBangumi){
   //一刀切
   if(currentBangumi["name_cn"].isEmpty) {
@@ -281,7 +325,7 @@ bool animationFliter(Map currentBangumi){
   
 }
 
-//获取 收藏 番剧的信息
+//获取 收藏 番剧的信息 以后可能需要分批次请求。。 以免出现429错误
 Future<List<Map<String,num>>> loadStarsDetail(List<int> starsIDList) async {
 
   Completer<List<Map<String,num>>> starUpdateCompleter = Completer();
@@ -313,23 +357,3 @@ Future<List<Map<String,num>>> loadStarsDetail(List<int> starsIDList) async {
 
 }
 
-enum SubjectType {
-  book(1,Icons.book_outlined), // 书籍
-  anime(2,Icons.live_tv_rounded), // 动画
-  music(3,Icons.music_note), // 音乐
-  game(4,Icons.games_outlined), // 游戏
-  real(6,Icons.movie), // 电视剧/电影
-  all(7,Icons.select_all)
-  ;
-
-  final int subjectType;
-  final IconData iconData;
-
-  const SubjectType(this.subjectType,this.iconData);
-}
-
-extension SubjectTypeExtension on SubjectType {
-  static List<int> get subjectTypes {
-    return SubjectType.values.map((e) => e.subjectType).toList();
-  }
-}

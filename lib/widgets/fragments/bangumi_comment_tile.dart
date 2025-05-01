@@ -1,29 +1,33 @@
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
-import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
+import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/models/comment_details.dart';
-import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 class BangumiCommentTile extends StatelessWidget {
   const BangumiCommentTile({
     super.key,
     required this.commentData,
-    this.themeColor
+    this.themeColor,
   });
 
   final CommentDetails commentData;
   final Color? themeColor;
 
+
   @override
   Widget build(BuildContext context) {
 
-    int ratingScore = commentData.rate ?? 0;
-
+    final int ratingScore = commentData.rate ?? 0;
     DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(commentData.commentTimeStamp!*1000);
+
+    //debugPrint("${commentData.comment}:${commentData.type}");
 
     return ListTile(
       title: Padding(
@@ -32,45 +36,45 @@ class BangumiCommentTile extends StatelessWidget {
           spacing: 12,
           children: [
             
-            Builder(builder: (_){
-              if(commentData.avatarUrl==null) return Image.asset("assets/icons/icon.png",height: 50,width: 50,);
+            Builder(
+              builder: (_){
+                if(commentData.userInformation?.avatarUrl==null) return Image.asset("assets/icons/icon.png",height: 50,width: 50,);
 
-              return SizedBox(
-                height: 50,
-                width: 50,
-                child: CachedImageLoader(imageUrl: commentData.avatarUrl!,photoViewStatus: true,)
-              );
+                return BangumiUserAvatar(
+                  size: 50,
+                  userInformation: commentData.userInformation,
+                );
 
-            }),
+              }
+            ),
 
-            ScalableText(commentData.nickName ?? "nameID",style: TextStyle(color: themeColor)),
 
-            const Spacer(),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ScalableText(
+                    commentData.userInformation?.nickName ?? "nameID",
+                    style: TextStyle(color: themeColor),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis
+                  ),
+
+                  ScalableText(
+                    '${commentData.type?.starTypeName}',
+                    style: const TextStyle(color: Colors.grey,fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
 
             //因为tile的title给的交叉轴也是unbounded的 所以需要约束
+            
             SizedBox(
               height: 30,
-              child: ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                scrollDirection: Axis.horizontal,
-                itemExtent: 25,
-                shrinkWrap: true,
-                itemCount: ratingScore != 0 ? 5 : 0,
-                
-                itemBuilder: (_,score){
-                  if(ratingScore >= (score+1)*2){
-                    return Icon(Icons.star,color: themeColor);
-                  }
-
-                  else if(ratingScore == (score*2)+1){
-                    return Icon(Icons.star_half,color: themeColor);
-                  }
-
-                  else{
-                    return Icon(Icons.star_outline,color: themeColor);
-                  }
-
-                },
+              child: StarScoreList(
+                ratingScore: ratingScore,
+                themeColor: themeColor,
               ),
             )
 
@@ -88,11 +92,7 @@ class BangumiCommentTile extends StatelessWidget {
             behavior: ScrollConfiguration.of(context).copyWith(physics: const NeverScrollableScrollPhysics()),
             child: BBCodeText(
               data: convertBangumiCommentSticker(commentData.comment ?? "comment"),
-              stylesheet: BBStylesheet(
-                tags: allEffectTag,
-                selectableText: true,
-                defaultText: TextStyle(fontFamily: 'MiSansFont',fontSize: AppFontSize.s16)
-              ),
+              stylesheet: appDefaultStyleSheet(context,selectableText:true)
             ),
           ),
 
@@ -103,13 +103,29 @@ class BangumiCommentTile extends StatelessWidget {
                 //那么只能在内部插入松约束 Align 来调节方位
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: CommentReaction(commentReactions: commentData.commentReactions),
+                  child: CommentReaction(
+                    commentID: commentData.commentID,
+                    postCommentType: PostCommentType.subjectComment,
+                    commentReactions: commentData.commentReactions,
+                    themeColor: themeColor,
+                  ),
                 ),
               ),
             ],
           ),
 
-          ScalableText("${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}")
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ScalableText("${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"),
+
+              BangumiCommentActionButton(
+                postCommentType: PostCommentType.subjectComment,
+                commentData: commentData,
+              )
+
+            ],
+          )
 
         ],
       ),

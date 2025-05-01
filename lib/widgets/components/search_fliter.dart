@@ -108,7 +108,7 @@ class _SearchfliterState extends State<Searchfliter> {
               Row(
                 children: [
               
-                  const ScalableText("rankRange:"),
+                  const ScalableText("排名范围:"),
               
                   Row(
                     children: [
@@ -153,7 +153,7 @@ class _SearchfliterState extends State<Searchfliter> {
               Row(
                 children: [
                   
-                  const ScalableText("tagInput:"),
+                  const ScalableText("标签:"),
                     
                   Padding(
                     padding: const EdgeInsets.only(left: 12),
@@ -198,7 +198,7 @@ class _SearchfliterState extends State<Searchfliter> {
               Row(
                 children: [
                   
-                  const ScalableText("ratingRange:"),
+                  const ScalableText("评分范围:"),
               
                   ScalableText("${ratingRange.start*10}"),
         
@@ -310,7 +310,7 @@ class _SearchfliterState extends State<Searchfliter> {
                 ),
               ),
               
-              kDebugMode ? ScalableText("AllData:${searchFliter.toString()}") : const SizedBox.shrink(),
+              //kDebugMode ? ScalableText("AllData:${searchFliter.toString()}") : const SizedBox.shrink(),
         
               //Submit
               Row(
@@ -348,8 +348,8 @@ class _SearchfliterState extends State<Searchfliter> {
                               "<${ratingRange.end*10}"
                             ],
                             "air_date": [ //服务器倒是会自动屏蔽无效的air_date 帮大忙了倒是
-                                                        ">=${yearEditingControllerStart.text}-${ monthSelect[0]!= null ? convertDigitNumString(monthSelect.values.first) : '01'}-01",
-                            "<=${yearEditingControllerEnd.text}-${monthSelect[0]!= null ? convertDigitNumString(monthSelect.values.last) : '12'}-01",
+                              ">=${yearEditingControllerStart.text}-${ monthSelect[0]!= null ? convertDigitNumString(monthSelect.values.first) : '01'}-01",
+                              "<=${yearEditingControllerEnd.text}-${monthSelect[0]!= null ? convertDigitNumString(monthSelect.values.last) : '12'}-01",
                             ],
                             "tag": tagsList
                           };

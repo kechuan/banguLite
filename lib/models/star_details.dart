@@ -29,3 +29,4 @@ Map<String,dynamic> starConfigtoMap(StarBangumiDetails starDetails){
     "rank":starDetails.rank
   };
 }
+

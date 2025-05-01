@@ -12,19 +12,25 @@ abstract class BaseInfo {
 abstract class ContentInfo extends BaseInfo {
   ContentInfo({
     super.id,
-	this.contentTitle
+	  this.contentTitle
   });
-  
+
+  //Blog/Topic 应需求
+  int? sourceID;
+  //String? sourceTitle;
+
   //title
   String? contentTitle;
 
   int? createdTime;
+  int? updatedTime;
+  
   int? repliesCount;
   String? lastRepliedNickName;
   int? lastRepliedTime;
 
   //user
-  UserDetails? userInformation;
+  UserInformation? userInformation;
 
 
   // 工厂方法，创建空对象

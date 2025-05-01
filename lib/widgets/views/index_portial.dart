@@ -1,11 +1,13 @@
+import 'dart:math';
+
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/catalogs/bangumi_star_page.dart';
+import 'package:bangu_lite/catalogs/index/bangumi_star_page.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/components/app_drawer.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
-import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/catalogs/bangumi_calendar_page.dart';
-import 'package:bangu_lite/catalogs/bangumi_sort_page.dart';
+import 'package:bangu_lite/catalogs/index/bangumi_calendar_page.dart';
+import 'package:bangu_lite/catalogs/index/bangumi_sort_page.dart';
 import 'package:bangu_lite/delegates/search_delegates.dart';
 import 'package:provider/provider.dart';
 
@@ -27,9 +29,17 @@ class IndexPortial extends StatelessWidget {
       builder: (_,currentPageIndex,railLeading) {
 
         return Scaffold(
+          drawerEnableOpenDragGesture: true,
           appBar: AppBar(
-            leading: const ToggleThemeModeButton(),
-            //leadingWidth: 0,
+            //leading: const ToggleThemeModeButton(),
+            leading:  Builder(
+              builder: (context) {
+                return IconButton(
+                  onPressed: ()=>Scaffold.of(context).openDrawer(),
+                  icon: const Icon(Icons.menu)
+                );
+              }
+            ),
             flexibleSpace: const Column(
               children: [
                  Spacer(),
@@ -62,6 +72,10 @@ class IndexPortial extends StatelessWidget {
               )
             ],
           ),
+          drawer: Drawer(
+            width: min(350, MediaQuery.sizeOf(context).width*3/4),
+            child: const AppDrawer()
+          ),
           body: IndexedStack(
             index: currentPageIndex,
             children: const [
@@ -76,7 +90,7 @@ class IndexPortial extends StatelessWidget {
               NavigationDestination(
                 icon: Icon(Icons.local_fire_department_outlined),
                 selectedIcon: Icon(Icons.local_fire_department_rounded),
-                label: '资讯',
+                label: '番剧',
               ),
       
               NavigationDestination(

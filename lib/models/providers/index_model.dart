@@ -19,11 +19,14 @@ class IndexModel extends ChangeNotifier {
   DateTime dataTime = DateTime.now();
   int selectedYear = DateTime.now().year;
   int selectedWeekDay = DateTime.now().weekday;
-  SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month,currentTime: true);
-
-  static Completer? loadFuture; //适用作用目标只有一个的对象里
+  SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month);
 
   int starUpdateFlag = 0;
+
+  Completer? loadFuture; //适用作用目标只有一个的对象里
+
+  
+  
 
   //除了 星期一-日之外 还有一个 最热门 的属性存放评分7.0+的番剧
   Map<String, List<BangumiDetails>> calendarBangumis = {
@@ -42,6 +45,13 @@ class IndexModel extends ChangeNotifier {
 
   List<Map<String,num>> starsUpdateRating = [];
 
+  //int 此处为 ID 为了方便 不再设立 各种的 topic/episode 这种的ID
+  //毕竟 bgm也有作防冲突处理
+
+  // 草稿箱 [标题:内容]
+  // 当然标题不一定会存在 如果不存在直接置为空就好
+  final Map<int,Map<String,String>> draftContent = {};
+
   void initModel() async {
     loadConfigData();
     await updateStarDetail();
@@ -54,12 +64,10 @@ class IndexModel extends ChangeNotifier {
   void updateThemeMode(ThemeMode mode,{bool? config}) {
     userConfig.themeMode = mode;
     notifyListeners();
-    if(config == true) updateConfig();
-    
+    if(config == true) updateConfig();    
   }
 
-
-  void updateThemeColor(BangumiThemeColor themeColor){
+  void updateThemeColor(AppThemeColor themeColor){
     userConfig.currentThemeColor = themeColor;
 	  userConfig.isSelectedCustomColor = false;
     updateConfig();

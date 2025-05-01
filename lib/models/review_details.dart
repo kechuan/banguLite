@@ -35,7 +35,7 @@ List<ReviewInfo> loadReviewsDetails(Response bangumiReviewsResponse){
 		currentReviewDetail
       
       ..reviewID = subejctReviewsMap["id"]
-      ..userInformation = loadUserDetails(subejctReviewsMap["user"])
+      ..userInformation = loadUserInformations(subejctReviewsMap["user"])
 
       ..blogID = subejctReviewsMap["entry"]["id"]
       ..reviewTitle = subejctReviewsMap["entry"]["title"]

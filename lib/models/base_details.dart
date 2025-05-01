@@ -1,10 +1,11 @@
-import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/user_details.dart';
 
 abstract class BaseDetails {
 
   BaseDetails({this.detailID});
 
-  int? detailID; // 通用ID字段
+  final int? detailID; // 通用ID字段
   
   // 工厂方法，创建空对象
   factory BaseDetails.empty() {
@@ -19,6 +20,7 @@ class ContentDetails extends BaseDetails {
     this.contentTitle,
     this.content,
     this.createdTime,
+    this.updatedTime,
     this.state,
     this.contentReactions,
     this.contentRepliedComment,
@@ -27,7 +29,11 @@ class ContentDetails extends BaseDetails {
   String? contentTitle;
   String? content;
   int? createdTime;
+  int? updatedTime;
   int? state;
+
+  UserInformation? userInformation;
+
   Map<int,Set<String>>? contentReactions;
   List<EpCommentDetails>? contentRepliedComment;
 

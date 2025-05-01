@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:bangu_lite/internal/bus_register_method.dart';
-import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -177,29 +175,19 @@ mixin RouteLifecycleMixin<T extends StatefulWidget> on LifecycleRouteState<T> {
   // 而且需要多个State 都能被统一封装
   // 那就只能是 mixin 引入了
 
-  bool isActived = true;
+  //bool isActived = true;
 
-  @override
-  void initState() {
-    super.initState();
-    bus.on('AppRoute', (link) {
-      if (!isActived) return;
-      if (!mounted) return;
-      appRouteMethod(context, link);
-    });
-  }
+  //@override
+  //void initState() {
+  //  bus.on('AppRoute', (link) {
+  //    if (!isActived) return;
+  //    if (!mounted) return;
+  //    appRouteMethodListener(context, link);
+  //  });
+  //  super.initState();
+  //}
 
-  @override
-  void onPause() {
-    isActived = false;
-    super.onPause();
-  }
-
-  @override
-  void onResume() {
-    isActived = true;
-    super.onResume();
-  }
+ 
 
 }
 

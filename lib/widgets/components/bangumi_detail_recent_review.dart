@@ -29,7 +29,6 @@ class BangumiDetailRecentReview extends StatelessWidget {
 
     final ValueNotifier<bool> reviewCollapseStatusNotifier = ValueNotifier(true);
 
-
     return Padding(
       padding: Padding16,
       child: Consumer<ReviewModel>(
@@ -126,12 +125,9 @@ class BangumiDetailRecentReview extends StatelessWidget {
                                 spacing: 16,
                                 children: [
 
-                                  SizedBox(
-                                    width: 150,
-                                    child: BuildReviewAvatar(
-                                      avatarUri: reviewModel.contentListData[index].userInformation?.avatarUrl,
-                                      userName: reviewModel.contentListData[index].userInformation?.nickName,
-                                    ),
+                                  BuildReviewAvatar(
+                                    avatarUri: reviewModel.contentListData[index].userInformation?.avatarUrl,
+                                    userName: reviewModel.contentListData[index].userInformation?.nickName,
                                   ),
 
 
@@ -140,10 +136,15 @@ class BangumiDetailRecentReview extends StatelessWidget {
                                       spacing: 6,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        ScalableText("${reviewModel.contentListData[index].reviewTitle}"),
+                                        ScalableText("${reviewModel.contentListData[index].reviewTitle}",style: const TextStyle(fontWeight: FontWeight.bold),),
 
 										                    //summary 被api限制在最大 120 长度之中
-                                        ScalableText("${reviewModel.contentListData[index].summary}${reviewModel.contentListData[index].summary?.length == 120 ? "..." : null} "),
+                                        ScalableText(
+                                          "${reviewModel.contentListData[index].summary}",
+                                          style: const TextStyle(fontSize: 14),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 6, //兼顾移动端
+                                        ),
 
                                         Align(
                                           alignment: Alignment.centerRight,
@@ -159,14 +160,18 @@ class BangumiDetailRecentReview extends StatelessWidget {
                               
                               onTap: () {
 
-                                reviewModel.selectedBlogID = reviewModel.contentListData[index].blogID ?? 0;
+
+
+                                //reviewModel.selectedBlogID = reviewModel.contentListData[index].blogID ?? 0;
 
                                 Navigator.pushNamed(
                                   context,
                                   Routes.blog,
-                                  arguments: {
-                                    "reviewInfo":reviewModel.contentListData[index],
-                                    "reviewModel":reviewModel
+                                   arguments: {
+                                    "reviewModel":reviewModel,
+                                    //"selectedBlogIndex": index,
+                                    "reviewInfo": reviewModel.contentListData[index],
+                                    //"themeColor": judgeDetailRenderColor(context,bangumiThemeColor),
                                   }
                                 );
  
@@ -214,8 +219,8 @@ class BuildReviewAvatar extends StatelessWidget {
       children: [
     
         SizedBox(
-          width: 100,
-          height: 100,
+          width: judgeLandscapeMode(context) ? 100 : 75,
+          height: judgeLandscapeMode(context) ? 100 : 75,
           child: CachedImageLoader(
             imageUrl: avatarUri,
             borderDecoration: BoxDecoration(
@@ -224,10 +229,14 @@ class BuildReviewAvatar extends StatelessWidget {
           ),
         ),
     
-        ScalableText(
-          "$userName",
-          style:const TextStyle(decoration: TextDecoration.underline),
-          textAlign: TextAlign.center,
+        SizedBox(
+          width: 100,
+          
+          child: ScalableText(
+            "$userName",
+            style:const TextStyle(decoration: TextDecoration.underline),
+            textAlign: TextAlign.center,
+          ),
         )
     
       ],

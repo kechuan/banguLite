@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -33,7 +34,6 @@ class CustomSearchDelegate extends SearchDelegate<String>{
             valueListenable: searchTypesNotifier,
              builder: (_,currentSortType,child) {
 
-
                return SizedBox(
                 width: 60,
                  child: PopupMenuButton<SubjectType>(
@@ -49,7 +49,7 @@ class CustomSearchDelegate extends SearchDelegate<String>{
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Icon(SubjectType.values[index].iconData),
-                            Text(SubjectType.values[index].name)
+                            Text(SubjectType.values[index].subjectName)
                           ],),
                       ),
                     );
@@ -246,8 +246,8 @@ class CustomSearchDelegate extends SearchDelegate<String>{
 
                       return BangumiListTile(
                         imageSize: const Size(100, 150),
-                        bangumiTitle: searchData[index].name!,
-                        imageUrl: searchData[index].coverUrl,
+                        bangumiDetails: searchData[index],
+                        
 
                         onTap: () {
                           Navigator.popAndPushNamed(

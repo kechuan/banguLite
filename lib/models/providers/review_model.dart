@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/blog_details.dart';
-import 'package:bangu_lite/models/ep_details.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/models/review_details.dart';
 import 'package:dio/dio.dart';
@@ -15,11 +15,9 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
   ReviewModel({
     required super.subjectID
   }){
+    if(subjectID == "blog") return;
     loadSubjectReviews();
   }
-
-  //给blog访问准备的
-  int selectedBlogID = 0;
 
   Future<void> loadSubjectReviews({int? offset = 0}) async {
     await loadSubjectSubContentList(
@@ -28,7 +26,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
     );
   }
 
-  Future<void> loadBlog() async {
+  Future<void> loadBlog(int selectedBlogID) async {
 
     if(selectedBlogID == 0) return;
 
@@ -37,14 +35,19 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
     await Future.wait(
       [
         loadContentDetail(selectedBlogID),
-        loadBlogComment(selectedBlogID)
+        loadBlogComment(selectedBlogID),
+        loadBlogPhotos(selectedBlogID),
+        
       ]
     ).then((responseList){
       final commentResponse = responseList[1] as Response;
+      final photoResponse = responseList[2] as Response;
 
-      if (commentResponse.data != null) {
-        contentDetailData[selectedBlogID]?.blogReplies = loadEpCommentDetails(commentResponse.data);
+      if (commentResponse.data != null && photoResponse.data != null) {
         debugPrint("blog: $selectedBlogID load blogComment done");
+        contentDetailData[selectedBlogID]?.blogReplies = loadEpCommentDetails(commentResponse.data);
+        contentDetailData[selectedBlogID]?.trailingPhotosUri = loadBlogPhotoDetails(photoResponse.data);
+        
         blogFullContentCompleter.complete();
         notifyListeners();
       }
@@ -63,15 +66,24 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
     );
   }
 
+  Future<Response> loadBlogPhotos(int blogID) async {
+    if(blogID == 0) return Response(requestOptions: RequestOptions());
+
+    return await HttpApiClient.client.get(
+      BangumiAPIUrls.blogPhotos(blogID),
+    );
+  }
+
 
   @override
   List<ReviewInfo> createEmptyInfoList() => [ReviewInfo.empty()];
   @override
   BlogDetails createEmptyDetails() => BlogDetails.empty();
   @override
-  String getContentListUrl(int subjectID) => BangumiAPIUrls.reviews(subjectID);
+  String getContentListUrl(dynamic subjectID) => BangumiAPIUrls.reviews(subjectID);
   @override
-  String getContentDetailUrl(int contentID) => BangumiAPIUrls.blog(selectedBlogID);
+  //String getContentDetailUrl(int contentID) => BangumiAPIUrls.userBlog(selectedBlogID);
+  String getContentDetailUrl(int contentID) => BangumiAPIUrls.userBlog(contentID);
   @override
   List<ReviewInfo> convertResponseToList(Response subContentListResponseData) => loadReviewsDetails(subContentListResponseData);
   @override

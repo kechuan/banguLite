@@ -32,17 +32,15 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
   Future? commentFuture; //better than in stateless.
 
-
   @override
   Widget build(BuildContext context) {
 
       if(widget.id == 0) return const SizedBox.shrink();
 
-      //final indexModel = context.read<IndexModel>();
       final bangumiModel = context.read<BangumiModel>();
-
-      //commentFuture ??= context.read<CommentModel>().loadComments(widget.id);
-      commentFuture ??= context.read<CommentModel>().loadComments();
+      final commentModel = context.read<CommentModel>();
+      
+      commentFuture ??= commentModel.loadComments();
 
         return Padding(
           padding: const EdgeInsets.all(12),
@@ -68,20 +66,10 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
         
               return FutureBuilder(
                 future: commentFuture,
-
-                  //以后学聪明点 要不就直接写进initState 然后刷新携带flag 
-                  //要不然就是返回Completer 然后从Models里导入数据 
-                  //真的该好好想想 就为了节省这Model里多存放一份的数据有必要像这次这样
-                  //写一大堆反rebuild的措施吗？ 这从头到尾起码也有三四天的时间去折腾这里了
-
                 builder: (_,__){
-        
-                  //Selector虽然不rebuild 但不代表不会真不需要layout. 
-                  //所以如果size改变的时候 这里的builder流程还是会触发. 但如果你使用的是selector提供的值 这里的值会尽量保持的像静态child!处理的一样
-        
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    
                     children: [
                       
                       child!,
@@ -91,7 +79,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                         child: Padding(
                           padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
                           child: ListView.separated(
-                            physics: const ScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemCount: commentListData.isEmpty ? 3 : commentListData.length,
                             separatorBuilder: (_, index) => const Divider(height: 2),
@@ -106,7 +94,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                               }
                               
                               //无评论的显示状态
-                              if(commentListData.length == 1 && commentListData[0].userName == 0){
+                              if(commentListData.length == 1 && commentListData[0].userInformation?.userID == 0){
                                 return const Center(
                                   child: ScalableText("该番剧暂无人评论..."),
                                 );
@@ -151,9 +139,10 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
                               onPressed: (){
 
-                                final commentModel = context.read<CommentModel>();
-
-                                if(commentModel.commentsData.values.first.length == 1 && commentModel.commentsData.values.first[0].userName == 0){
+                                if(
+                                  commentModel.commentsData.values.first.length == 1 && 
+                                  commentModel.commentsData.values.first[0].commentID == 0
+                                ){
                                   debugPrint("no comment");
                                   return;
                                 }
@@ -162,7 +151,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                                   context,
                                   Routes.subjectComment,
                                   arguments: {
-                                    "commentModel":context.read<CommentModel>(),
+                                    "commentModel":commentModel,
                                     "subjectID":widget.id,
                                     "name":widget.name,
                                     "bangumiThemeColor":bangumiModel.bangumiThemeColor
@@ -184,27 +173,25 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                             hoverColor: Colors.transparent,
                             onTap: (){
                               debugPrint("change timeSort way");                              
-                                  
-                              final commentModel = context.read<CommentModel>();
                           
                               isOldCommentSort.value = !isOldCommentSort.value;
                           
                               if(
                                 commentModel.commentsData.keys.contains(
                                   convertTotalCommentPage(
-                                    context.read<CommentModel>().commentLength, 
+                                    commentModel.commentLength, 
                                     10
                                 ))
                               ){
-                                context.read<CommentModel>().notifyListeners();
+                                commentModel.notifyListeners();
                               }
                                   
                               else{
                                 
                                 commentModel.currentPageIndex = isOldCommentSort.value ? convertTotalCommentPage(commentModel.commentLength,10) : 1;
                                 
-                                //context.read<CommentModel>().loadComments(widget.id,isReverse: isOldCommentSort.value).then((_){
-                                context.read<CommentModel>().loadComments(isReverse: isOldCommentSort.value).then((_){
+                                //commentModel.loadComments(widget.id,isReverse: isOldCommentSort.value).then((_){
+                                commentModel.loadComments(isReverse: isOldCommentSort.value).then((_){
                                   commentModel.changePage(commentModel.currentPageIndex);
                                 });
                               }

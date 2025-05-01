@@ -17,7 +17,7 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return AppConfig()
-      ..currentThemeColor = fields[0] as BangumiThemeColor?
+      ..currentThemeColor = fields[0] as AppThemeColor?
       ..fontScale = fields[1] as ScaleType?
       ..themeMode = fields[2] as ThemeMode?
       ..customColor = fields[3] as Color?
@@ -57,36 +57,36 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
           typeId == other.typeId;
 }
 
-class BangumiThemeColorAdapter extends TypeAdapter<BangumiThemeColor> {
+class AppThemeColorAdapter extends TypeAdapter<AppThemeColor> {
   @override
   final int typeId = 1;
 
   @override
-  BangumiThemeColor read(BinaryReader reader) {
+  AppThemeColor read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return BangumiThemeColor.sea;
+        return AppThemeColor.sea;
       case 1:
-        return BangumiThemeColor.macha;
+        return AppThemeColor.macha;
       case 2:
-        return BangumiThemeColor.ruby;
+        return AppThemeColor.ruby;
       case 3:
-        return BangumiThemeColor.ice;
+        return AppThemeColor.ice;
       default:
-        return BangumiThemeColor.sea;
+        return AppThemeColor.sea;
     }
   }
 
   @override
-  void write(BinaryWriter writer, BangumiThemeColor obj) {
+  void write(BinaryWriter writer, AppThemeColor obj) {
     switch (obj) {
-      case BangumiThemeColor.sea:
+      case AppThemeColor.sea:
         writer.writeByte(0);
-      case BangumiThemeColor.macha:
+      case AppThemeColor.macha:
         writer.writeByte(1);
-      case BangumiThemeColor.ruby:
+      case AppThemeColor.ruby:
         writer.writeByte(2);
-      case BangumiThemeColor.ice:
+      case AppThemeColor.ice:
         writer.writeByte(3);
     }
   }
@@ -97,7 +97,7 @@ class BangumiThemeColorAdapter extends TypeAdapter<BangumiThemeColor> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is BangumiThemeColorAdapter &&
+      other is AppThemeColorAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -282,6 +282,104 @@ class StarBangumiDetailsAdapter extends TypeAdapter<StarBangumiDetails> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is StarBangumiDetailsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class LoginedUserInformationsAdapter
+    extends TypeAdapter<LoginedUserInformations> {
+  @override
+  final int typeId = 7;
+
+  @override
+  LoginedUserInformations read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return LoginedUserInformations()
+      ..accessToken = fields[0] as String?
+      ..expiredTime = (fields[9] as num?)?.toInt()
+      ..refreshToken = fields[10] as String?
+      ..userInformation = fields[12] as UserInformation?
+      ..turnsTileToken = fields[13] as String?;
+  }
+
+  @override
+  void write(BinaryWriter writer, LoginedUserInformations obj) {
+    writer
+      ..writeByte(5)
+      ..writeByte(0)
+      ..write(obj.accessToken)
+      ..writeByte(9)
+      ..write(obj.expiredTime)
+      ..writeByte(10)
+      ..write(obj.refreshToken)
+      ..writeByte(12)
+      ..write(obj.userInformation)
+      ..writeByte(13)
+      ..write(obj.turnsTileToken);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LoginedUserInformationsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class UserInformationAdapter extends TypeAdapter<UserInformation> {
+  @override
+  final int typeId = 8;
+
+  @override
+  UserInformation read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return UserInformation(
+      userID: (fields[0] as num?)?.toInt(),
+    )
+      ..userName = fields[1] as String?
+      ..nickName = fields[2] as String?
+      ..avatarUrl = fields[3] as String?
+      ..sign = fields[4] as String?
+      ..joinedAtTimeStamp = (fields[5] as num?)?.toInt()
+      ..group = (fields[6] as num?)?.toInt();
+  }
+
+  @override
+  void write(BinaryWriter writer, UserInformation obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.userID)
+      ..writeByte(1)
+      ..write(obj.userName)
+      ..writeByte(2)
+      ..write(obj.nickName)
+      ..writeByte(3)
+      ..write(obj.avatarUrl)
+      ..writeByte(4)
+      ..write(obj.sign)
+      ..writeByte(5)
+      ..write(obj.joinedAtTimeStamp)
+      ..writeByte(6)
+      ..write(obj.group);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserInformationAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -3,6 +3,7 @@
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_eps.dart';
@@ -46,27 +47,22 @@ class IntroPortrait extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Column(
+      spacing: 12,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-
+    
           children: [
-
+    
             //Pic
             Expanded(
               flex: 2,
-              child: Column(
-                children: [
-                  FittedBox(
-                    child: BuildDetailImages(
-                      detailImageUrl: bangumiDetails.coverUrl,
-                      imageID: bangumiDetails.id
-                    )
-                  ),
-              
-                  const Padding(padding: PaddingV6)
-                ]
+              child: FittedBox(
+                child: BuildDetailImages(
+                  detailImageUrl: bangumiDetails.coverUrl,
+                  imageID: bangumiDetails.id
+                )
               )
             ),
     
@@ -83,63 +79,67 @@ class IntroPortrait extends StatelessWidget {
                     
                     Row(
                       children: [
-
+    
                         Expanded(
                           child: ListTile(
                             onTap: () {
                               Clipboard.setData(ClipboardData(text: '${bangumiDetails.name}'));
                               //showToast("标题已复制,长按复制alias",context:context);
-                              fadeToaster(context: context,message: "标题已复制,长按复制alias");
+                              fadeToaster(context: context,message: "标题已复制,长按复制别称");
                             },
                             onLongPress: () {
                               Clipboard.setData(ClipboardData(text: '${bangumiDetails.informationList["alias"] ?? ""}'));
-                              fadeToaster(context:context,message:"alias已复制");
+                              fadeToaster(context:context,message: "别称已复制");
                             },
-                            title: ScalableText("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
-                            subtitle: ScalableText(bangumiDetails.informationList["alias"] ?? "")
+                            title: ScalableText(
+                              "${bangumiDetails.name}",
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                            subtitle: ScalableText(
+                              bangumiDetails.informationList["alias"] ?? "",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            )
                           )
                         ),
-
-                        StarButton(bangumiDetails: bangumiDetails)
+    
                         
-
+                        
+    
                       ]
                     ),
                     
                     BuildInfoBox(informationList: bangumiDetails.informationList,type: bangumiDetails.type)
                 
-
-					
-
-
+    
+    
+    
                   ]
                 )
               )
             )
-
+    
             
           ]
         ),
 
+        StarButton(bangumiDetails: bangumiDetails),
+    
         LayoutBuilder(
-          builder: (_,constraint){
+          builder: (_,constraint) {
             return BangumiRankBox(
               constraint: constraint,
               bangumiDetails: bangumiDetails
             );
           }
         ),
-
-
-        const Padding(padding: PaddingV6),
-
-         //Entry for Portial
-          
+    
+        //Entry for Portial          
         InkResponse(
           onTap: () {
-
-            //final EpModel epModel = context.read<EpModel>();
+    
             showModalBottomSheet(
+              backgroundColor: judgeDetailRenderColor(context,context.read<BangumiModel>().bangumiThemeColor).withValues(alpha: 0.8),
               constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
               context: context,
               
@@ -147,29 +147,27 @@ class IntroPortrait extends StatelessWidget {
                 //因为showDialog/showModalBottomSheet 使用的context是独立在整个体系之外的
                 //在 layout inspector 里能看到 此时它的层级关系是和 其他的Page一样直接属于materialApp的分支之下
                 //因此只能直接这样处理了
-                return ChangeNotifierProvider.value(
-                  value: context.watch<BangumiModel>(),
-                  builder: (_,__) {
-                    return ChangeNotifierProvider.value(
-                      value: context.watch<EpModel>(),
-                      builder: (_,__) {
-                        return EasyRefresh(
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: BuildEps(
-                                subjectID: bangumiDetails.id!, 
-                                informationList: bangumiDetails.informationList,
-                                portialMode: true,
-                              )
-                            )
-                          )
-                      
-                        );
-                      }
-                    );
-                  }
+                return MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider.value(value: context.read<BangumiModel>()),
+                    ChangeNotifierProvider.value(value: context.read<EpModel>())
+                  ],
+                  child: EasyRefresh(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: BuildEps(
+                          subjectID: bangumiDetails.id!, 
+                          subjectName: bangumiDetails.name,
+                          informationList: bangumiDetails.informationList,
+                          portialMode: true,
+                        )
+                      )
+                    )
+                
+                  ),
                 );
+    
               }
             );
           },
@@ -191,14 +189,14 @@ class IntroPortrait extends StatelessWidget {
                     Row(
                       
                       children: [
-
+    
                         Builder(
                           builder: (_){
-
+    
                             final epModel = context.read<EpModel>();
-
+    
                             int airedEps = 0;
-
+    
                             if (
                               bangumiDetails.informationList["air_weekday"] == null || 
                               convertAiredEps(bangumiDetails.informationList["air_date"]) >= bangumiDetails.informationList["eps"] ||
@@ -206,30 +204,29 @@ class IntroPortrait extends StatelessWidget {
                             ){
                               return ScalableText("共${bangumiDetails.informationList["eps"]}集");
                             }
-
+    
                             if(bangumiDetails.informationList["eps"] != 0){
                               
                               if(epModel.epsData[epModel.epsData.length]?.airDate != null){
                                 epModel.epsData.values.any((currentEpInfo){
                                   
                                   //debugPrint("airedEps:$airedEps");
-
+    
                                   bool overlapAirDate = convertDateTime(currentEpInfo.airDate).difference(DateTime.now()) >= Duration.zero;
                                   overlapAirDate ? null : airedEps+=1;
-
+    
                                   return overlapAirDate;
-
+    
                                 });
-
+    
                               }
                             }
-
+    
                             return ScalableText("$airedEps/${bangumiDetails.informationList["eps"]}");
-                            //return ScalableText("${convertAiredEps(bangumiDetails.informationList["air_date"])}/${bangumiDetails.informationList["eps"]}");
                           }
                         ),
-
-
+    
+    
                         const Padding(
                           padding: EdgeInsets.only(left: 6),
                           child: Icon(Icons.arrow_forward_ios,size: 16)
@@ -244,7 +241,6 @@ class IntroPortrait extends StatelessWidget {
           )
         ),
           
-
         ConstrainedBox(
           constraints: const BoxConstraints.tightFor(width: double.infinity),
           child: Padding(
@@ -252,7 +248,7 @@ class IntroPortrait extends StatelessWidget {
             child: BuildTags(tagsList: bangumiDetails.tagsList)
           )
         )
-
+    
       ]
     );
       
@@ -271,29 +267,41 @@ class IntroLandscape extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return Row(
+    
+
+    return Column(
+      spacing: 12,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
-        Expanded(child: FittedBox(child: BuildDetailImages(detailImageUrl: bangumiDetails.coverUrl,imageID: bangumiDetails.id))),
+        Row(
+          spacing: 6,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
         
-        //Info
-        Expanded(
-          flex: 3,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Expanded(
+              child: FittedBox(
+                child: BuildDetailImages(
+                  detailImageUrl: bangumiDetails.coverUrl,
+                  imageID: bangumiDetails.id
+                )
+              )
+            ),
             
-              //detail——rating
-              children: [
-    
-                Padding(
-                  padding: PaddingH6,
-                    child: ListTile(
+            //Info
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  spacing: 12,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                
+                  //detail——rating
+                  children: [
+                        
+                    ListTile(
                       onTap: () {
                         Clipboard.setData(ClipboardData(text: '${bangumiDetails.name}'));
-                        //showToast("标题已复制,长按复制alias",context:context);
                         fadeToaster(context: context,message: "标题已复制,长按复制alias");
                       },
                       onLongPress: () {
@@ -302,44 +310,51 @@ class IntroLandscape extends StatelessWidget {
                       },
                       title: ScalableText("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
                       subtitle: ScalableText(bangumiDetails.informationList["alias"] ?? ""),
-                      trailing: StarButton(bangumiDetails: bangumiDetails)
-                    )
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      BuildInfoBox(informationList: bangumiDetails.informationList,type: bangumiDetails.type),
-                  
-                      const Spacer(),
-                  
-                      BangumiRankBox(bangumiDetails: bangumiDetails, constraint: const BoxConstraints(minWidth: 300,maxWidth: 400))
-                    ]
-                  )
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: BuildEps(
-                    subjectID: bangumiDetails.id ?? 0,
-                    informationList: bangumiDetails.informationList
-                  )
-                ),
-
-                //tags
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: BuildTags(tagsList: bangumiDetails.tagsList)
+                      trailing: SizedBox(
+                        width: 120,
+                        child: StarButton(
+                          bangumiDetails: bangumiDetails,
+                        )
+                      )
+                    ),
+                        
+                    Row(
+                      children: [
+                        BuildInfoBox(informationList: bangumiDetails.informationList,type: bangumiDetails.type),
+                    
+                        const Spacer(),
+                    
+                        BangumiRankBox(bangumiDetails: bangumiDetails, constraint: const BoxConstraints(minWidth: 300,maxWidth: 400))
+                      ]
+                    ),
+                        
+                    BuildEps(
+                      subjectID: bangumiDetails.id ?? 0,
+                      subjectName: bangumiDetails.name,
+                      informationList: bangumiDetails.informationList
+                    ),
+                        
+                  ]
                 )
-                
-
-              ]
+              )
             )
-          )
-        )
+        
+            ]
+        ),
+
+        const Padding(
+          padding: PaddingH12,
+          child: ScalableText("标签",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
+        ),
     
-        ]
+        //tags
+        Padding(
+          padding: PaddingH12,
+          child: BuildTags(tagsList: bangumiDetails.tagsList)
+        )
+      ],
+    
+      
     );
 
   }
