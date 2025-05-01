@@ -1,3 +1,4 @@
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -263,8 +264,8 @@ class BangumiAuthPage extends StatelessWidget {
                     ),
                     onPressed: (){
         
-                      if(loginData.isLogining == false && loginData.loginedStatus){
-                        Navigator.pop(context);
+                      if(loginData.loginedStatus){
+                        Navigator.popAndPushNamed(context,Routes.index);
                       }
         
                       else{

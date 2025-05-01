@@ -357,11 +357,10 @@ FFRouteSettings getRouteSettings({
         ),
       );
     default:
-    
       return FFRouteSettings(
         name: FFRoute.notFoundName,
         routeName: FFRoute.notFoundRouteName,
-        builder: notFoundPageBuilder ?? () => const BangumiAuthPage(),
+        builder: notFoundPageBuilder ?? () => const BangumiAuthPage(key: Key('loginAuth')),
       );
   }
 }

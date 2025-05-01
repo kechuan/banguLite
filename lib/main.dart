@@ -85,7 +85,7 @@ class MainApp extends StatelessWidget {
             shouldRebuild: (previous, next) => previous!=next,
             builder: (_, currentColor, child){
               return MaterialApp(
-                debugShowCheckedModeBanner: false,
+                //debugShowCheckedModeBanner: false,
                 theme: ThemeData(
                   colorScheme: ColorScheme.fromSeed(seedColor: currentColor),
                   fontFamily: 'MiSansFont',
@@ -115,6 +115,7 @@ class MainApp extends StatelessWidget {
                   );
                 },
                 onGenerateInitialRoutes: (String initialRoute) {
+                  
                   if (initialLink != null && initialLink!.isNotEmpty) {
                     // 深链接存在，跳过默认路由匹配，直接跳转到目标页面
                     return [
