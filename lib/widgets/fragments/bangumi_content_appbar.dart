@@ -60,9 +60,9 @@ class BangumiContentAppbar extends StatelessWidget {
           //  onPressed: (){
           //    final userModel = context.read<UserModel>();
               
-          //    fadeToaster(context: context, message: "删除user august3416信息");
+          //    fadeToaster(context: context, message: "删除user信息");
 
-          //    userModel.userData.remove('august3416');
+          //    userModel.userData.remove('user');
           //  }, 
           //  icon: const Icon(Icons.abc)
           //),

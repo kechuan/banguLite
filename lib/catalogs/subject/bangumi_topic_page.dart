@@ -63,7 +63,7 @@ class _BangumiTopicPageState extends BangumiContentPageState
   String getWebUrl(int? topicID) => BangumiWebUrls.subjectTopic(topicID ?? 0);
 
   @override
-  Future<void> loadContent(int topicID) => getContentModel().loadContentDetail(topicID);
+  Future<void> loadContent(int topicID,{bool isRefresh = false}) => getContentModel().loadContentDetail(topicID,isRefresh:isRefresh);
 
   
 }

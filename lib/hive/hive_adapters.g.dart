@@ -383,3 +383,249 @@ class UserInformationAdapter extends TypeAdapter<UserInformation> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class SurfTimelineDetailsAdapter extends TypeAdapter<SurfTimelineDetails> {
+  @override
+  final int typeId = 10;
+
+  @override
+  SurfTimelineDetails read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return SurfTimelineDetails(
+      detailID: (fields[7] as num?)?.toInt(),
+    )
+      ..commentDetails = fields[0] as CommentDetails?
+      ..title = fields[1] as String?
+      ..bangumiTimelineType = fields[2] as BangumiTimelineType?
+      ..sourceTitle = fields[3] as String?
+      ..sourceID = fields[4] as dynamic
+      ..replies = (fields[5] as num?)?.toInt()
+      ..updatedAt = (fields[6] as num?)?.toInt();
+  }
+
+  @override
+  void write(BinaryWriter writer, SurfTimelineDetails obj) {
+    writer
+      ..writeByte(8)
+      ..writeByte(0)
+      ..write(obj.commentDetails)
+      ..writeByte(1)
+      ..write(obj.title)
+      ..writeByte(2)
+      ..write(obj.bangumiTimelineType)
+      ..writeByte(3)
+      ..write(obj.sourceTitle)
+      ..writeByte(4)
+      ..write(obj.sourceID)
+      ..writeByte(5)
+      ..write(obj.replies)
+      ..writeByte(6)
+      ..write(obj.updatedAt)
+      ..writeByte(7)
+      ..write(obj.detailID);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SurfTimelineDetailsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class CommentDetailsAdapter extends TypeAdapter<CommentDetails> {
+  @override
+  final int typeId = 11;
+
+  @override
+  CommentDetails read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return CommentDetails(
+      commentID: (fields[3] as num?)?.toInt(),
+    )
+      ..rate = (fields[0] as num?)?.toInt()
+      ..type = fields[1] as StarType?
+      ..contentID = (fields[2] as num?)?.toInt()
+      ..userInformation = fields[4] as UserInformation?
+      ..comment = fields[5] as String?
+      ..commentTimeStamp = (fields[6] as num?)?.toInt()
+      ..commentReactions = (fields[7] as Map?)?.map((dynamic k, dynamic v) =>
+          MapEntry((k as num).toInt(), (v as Set).cast<String>()));
+  }
+
+  @override
+  void write(BinaryWriter writer, CommentDetails obj) {
+    writer
+      ..writeByte(8)
+      ..writeByte(0)
+      ..write(obj.rate)
+      ..writeByte(1)
+      ..write(obj.type)
+      ..writeByte(2)
+      ..write(obj.contentID)
+      ..writeByte(3)
+      ..write(obj.commentID)
+      ..writeByte(4)
+      ..write(obj.userInformation)
+      ..writeByte(5)
+      ..write(obj.comment)
+      ..writeByte(6)
+      ..write(obj.commentTimeStamp)
+      ..writeByte(7)
+      ..write(obj.commentReactions);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CommentDetailsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class BangumiTimelineTypeAdapter extends TypeAdapter<BangumiTimelineType> {
+  @override
+  final int typeId = 12;
+
+  @override
+  BangumiTimelineType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return BangumiTimelineType.all;
+      case 1:
+        return BangumiTimelineType.subject;
+      case 2:
+        return BangumiTimelineType.group;
+      case 3:
+        return BangumiTimelineType.timeline;
+      default:
+        return BangumiTimelineType.all;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, BangumiTimelineType obj) {
+    switch (obj) {
+      case BangumiTimelineType.all:
+        writer.writeByte(0);
+      case BangumiTimelineType.subject:
+        writer.writeByte(1);
+      case BangumiTimelineType.group:
+        writer.writeByte(2);
+      case BangumiTimelineType.timeline:
+        writer.writeByte(3);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BangumiTimelineTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class StarTypeAdapter extends TypeAdapter<StarType> {
+  @override
+  final int typeId = 13;
+
+  @override
+  StarType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return StarType.want;
+      case 1:
+        return StarType.watched;
+      case 2:
+        return StarType.watching;
+      case 3:
+        return StarType.delay;
+      case 4:
+        return StarType.deprecated;
+      case 5:
+        return StarType.none;
+      default:
+        return StarType.want;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, StarType obj) {
+    switch (obj) {
+      case StarType.want:
+        writer.writeByte(0);
+      case StarType.watched:
+        writer.writeByte(1);
+      case StarType.watching:
+        writer.writeByte(2);
+      case StarType.delay:
+        writer.writeByte(3);
+      case StarType.deprecated:
+        writer.writeByte(4);
+      case StarType.none:
+        writer.writeByte(5);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StarTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class SurfRecordDetailsAdapter extends TypeAdapter<SurfRecordDetails> {
+  @override
+  final int typeId = 14;
+
+  @override
+  SurfRecordDetails read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return SurfRecordDetails(
+      recordTimeStamp: (fields[0] as num?)?.toInt(),
+      detailID: (fields[1] as num?)?.toInt(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, SurfRecordDetails obj) {
+    writer
+      ..writeByte(2)
+      ..writeByte(0)
+      ..write(obj.recordTimeStamp)
+      ..writeByte(1)
+      ..write(obj.detailID);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SurfRecordDetailsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

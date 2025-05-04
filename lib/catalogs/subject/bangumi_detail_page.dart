@@ -1,7 +1,13 @@
 
+import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
+import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/relation_model.dart';
 import 'package:bangu_lite/models/providers/review_model.dart';
+import 'package:bangu_lite/models/surf_timeline_details.dart';
+import 'package:bangu_lite/models/user_details.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_recent_review.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_relations.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +79,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
     				brightness: Theme.of(context).brightness,
     				primaryColor: judgeDetailRenderColor(context,linearColor),
     				scaffoldBackgroundColor: judgeDetailRenderColor(context,linearColor),
-    				fontFamily: 'MiSansFont',
+    				fontFamilyFallback: convertSystemFontFamily(),
     			  ),
     			  child:detailScaffold!,
     			);
@@ -84,7 +90,6 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
               //因为sliver的原因 commentModel 的 loadComments 会直到我触发了 HotComment 区域才开始加载。
               //因此无法把用户评论获取放到那个页面 里 那么久只能直接放进这里了
               
-              final accountModel = context.read<AccountModel>();
               final bangumiModel = context.read<BangumiModel>();
               final commentModel = context.read<CommentModel>();
 
@@ -169,7 +174,28 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                       builder: (_,snapshot){
         
                         if(snapshot.connectionState == ConnectionState.done){
-                        debugPrint("parse ${widget.subjectID} done ,builderStamp: ${DateTime.now()}");
+                          debugPrint("parse ${widget.subjectID} done ,builderStamp: ${DateTime.now()}");
+
+                          MyHive.historySurfDataBase.put(
+                            widget.subjectID,
+                            SurfTimelineDetails(
+                              detailID: widget.subjectID
+                            )
+                              ..updatedAt = DateTime.now().millisecondsSinceEpoch
+                              ..title = bangumiModel.bangumiDetails?.name ?? ""
+                              ..bangumiTimelineType = BangumiTimelineType.subject
+                              ..sourceTitle = null
+                              ..commentDetails = (
+                                CommentDetails()
+                                  ..userInformation = (
+                                    UserInformation()
+                                      ..avatarUrl = bangumiModel.bangumiDetails?.coverUrl
+                                  )
+                              )
+                              
+                          );
+
+
                         }
         
                         BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails; //dependenc

@@ -1,7 +1,7 @@
 
 import 'package:bangu_lite/internal/callback.dart';
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/extension.dart';
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -15,14 +15,19 @@ import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:bbob_dart/bbob_dart.dart' as bbob;
 import 'package:url_launcher/url_launcher_string.dart';
 
-BBStylesheet appDefaultStyleSheet(BuildContext context,{bool selectableText = false}){
+BBStylesheet appDefaultStyleSheet(
+  BuildContext context,{
+    bool selectableText = false,
+    bool richless = false,
+  }
+){
   return BBStylesheet(
-    tags: allEffectTag,
+    tags: richless ? richlessEffectTag : allEffectTag ,
     selectableText: selectableText,
     defaultText: TextStyle(
       overflow: TextOverflow.ellipsis,
       fontSize: 16,
-      fontFamily: 'MiSansFont',
+      fontFamilyFallback: convertSystemFontFamily(),
       color: judgeDarknessMode(context) ? Colors.white : Colors.black,
     )
   );
@@ -61,6 +66,8 @@ final allEffectTag = [
   
   CodeTag(),
 ];
+
+final richlessEffectTag = allEffectTag.getRange(0, allEffectTag.length - 4);
 
 
 class MaskDisplay extends StatelessWidget {
@@ -193,11 +200,14 @@ class AdapterQuoteDisplay extends StatelessWidget{
                     ).toList();
 
                     return UnVisibleResponse(
-                      onTap: () => Clipboard.setData(
-                        ClipboardData(
-                          text: content.last.toPlainText().split('说:').last.trim()
-                        )
-                      ),
+                      onTap: (){
+						if(content.isEmpty) return;
+						Clipboard.setData(
+							ClipboardData(
+							text: content.last.toPlainText().split('说:').last.trim()
+							)
+						);
+					  },
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(5),
@@ -230,7 +240,8 @@ class CodeTag extends AdvancedTag{
 
     if (element.children.isEmpty) return [TextSpan(text: "[$tag]")];
 
-    String codeText = element.children.first.textContent;
+    //String codeText = element.children.first.textContent;
+	String codeText = element.children.map((currentNode) => currentNode.textContent).join();
 
     return [
       WidgetSpan(
@@ -263,7 +274,7 @@ class CodeTag extends AdvancedTag{
                           ),
                       ),
                 
-                    UnVisibleResponse(
+					  UnVisibleResponse(
                       onTap: ()=> copyClipboardCallback(context, codeText),
                       child: DecoratedBox(
                         decoration: BoxDecoration(
@@ -278,9 +289,6 @@ class CodeTag extends AdvancedTag{
                       ),
                     ),
                 
-                  
-                
-                
                   ],
                 ),
               );
@@ -291,6 +299,8 @@ class CodeTag extends AdvancedTag{
       )
     ];
   }
+  
+  
 
 }
 

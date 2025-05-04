@@ -143,3 +143,22 @@ class RankSortStrategy implements SortStrategy {
   @override
   SortType currentSort = SortType.rank;
 }
+
+// 收藏时间排序策略
+class SurfTimeSortStrategy implements SortStrategy {
+	@override
+	int getSort(StarBangumiDetails details) => 
+		convertDateTime(details.joinDate).millisecondsSinceEpoch;
+
+	@override
+	String generateHeaderText(num joinms) {
+
+		final DateTime convertTime = DateTime.fromMillisecondsSinceEpoch(joinms.toInt());
+
+    return '${convertTime.year}-${convertTime.month}-${convertTime.day}';
+
+	}
+
+  @override
+  SortType currentSort = SortType.joinTime;
+}

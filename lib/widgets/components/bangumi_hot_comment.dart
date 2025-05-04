@@ -94,7 +94,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                               }
                               
                               //无评论的显示状态
-                              if(commentListData.length == 1 && commentListData[0].userInformation?.userID == 0){
+                              if(commentListData.length == 1 && commentListData[0].commentID == 0){
                                 return const Center(
                                   child: ScalableText("该番剧暂无人评论..."),
                                 );

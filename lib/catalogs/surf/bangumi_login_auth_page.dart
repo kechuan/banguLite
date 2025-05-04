@@ -1,5 +1,6 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -106,7 +107,7 @@ class BangumiAuthPage extends StatelessWidget {
                       tags: allEffectTag,
                       defaultText: TextStyle(
                         height:2,
-                        fontFamily: 'MiSansFont',
+                        fontFamilyFallback: convertSystemFontFamily(),
                         fontSize: 16,
                         color: judgeDarknessMode(context) ? Colors.white : Colors.black,
                       )

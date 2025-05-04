@@ -25,9 +25,6 @@ class IndexModel extends ChangeNotifier {
 
   Completer? loadFuture; //适用作用目标只有一个的对象里
 
-  
-  
-
   //除了 星期一-日之外 还有一个 最热门 的属性存放评分7.0+的番剧
   Map<String, List<BangumiDetails>> calendarBangumis = {
     "星期一":[],
@@ -41,16 +38,16 @@ class IndexModel extends ChangeNotifier {
   }; 
 
   AppConfig userConfig = defaultAPPConfig();
-  int cachedImageSize = 0;
+  
 
-  List<Map<String,num>> starsUpdateRating = [];
-
-  //int 此处为 ID 为了方便 不再设立 各种的 topic/episode 这种的ID
-  //毕竟 bgm也有作防冲突处理
+//  List<Map<String,num>> starsUpdateRating = [];
+  Map<int,Map<String,num>> starsUpdateRating = {};
 
   // 草稿箱 [标题:内容]
   // 当然标题不一定会存在 如果不存在直接置为空就好
   final Map<int,Map<String,String>> draftContent = {};
+
+  int cachedImageSize = 0;
 
   void initModel() async {
     loadConfigData();
@@ -59,6 +56,10 @@ class IndexModel extends ChangeNotifier {
 
   void loadConfigData(){
     userConfig = MyHive.appConfigDataBase.get("currentTheme") ?? defaultAPPConfig();
+  }
+
+  void loadHistoryData(){
+
   }
 
   void updateThemeMode(ThemeMode mode,{bool? config}) {
@@ -97,6 +98,8 @@ class IndexModel extends ChangeNotifier {
 
   Future<void> updateStarDetail() async {
     List<int> starsList = [];
+
+	if(MyHive.starBangumisDataBase.keys.isEmpty) return;
     
     for(dynamic bangumiID in MyHive.starBangumisDataBase.keys){
       starsList.add(bangumiID);
@@ -174,7 +177,7 @@ class IndexModel extends ChangeNotifier {
 
   void updateSelectedWeekDay(int newWeekDay){
     selectedWeekDay = newWeekDay;
-    updateConfig();
+    notifyListeners();
   }
 
   void updateStar(){

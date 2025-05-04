@@ -201,7 +201,9 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                       child: ScalableText(
                                         convertCollectionName(currentInfo,currentEpIndex),
                                         style: const TextStyle(color: Colors.black),
-                                        textAlign: TextAlign.center
+                                        textAlign: TextAlign.center,
+                                        maxLines: 2 ,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ) 
                                   ),

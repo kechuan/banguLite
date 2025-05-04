@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -77,7 +78,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
               data: ThemeData(
                 brightness: Theme.of(context).brightness,
                 colorSchemeSeed: judgeDetailRenderColor(context,widget.bangumiThemeColor),
-                fontFamily: 'MiSansFont',
+                fontFamilyFallback: convertSystemFontFamily(),
               ),
               child: Scaffold( //Listview need materialDesign
               
@@ -116,12 +117,15 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                           children: [
                                                                           
                                             SliverPinnedHeader(
-                                              child: BangumiContentAppbar(
-                                                contentID: epModel.epsData[selectedEp]?.epID,
-                                                titleText: convertCollectionName(epModel.epsData[max(1,selectedEp)], max(1,selectedEp)),
-                                                webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]?.epID ?? 0),
-                                                postCommentType: PostCommentType.replyEpComment,
-                                                surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
+                                              child: SafeArea(
+                                                bottom: false,
+                                                child: BangumiContentAppbar(
+                                                  contentID: epModel.epsData[selectedEp]?.epID,
+                                                  titleText: convertCollectionName(epModel.epsData[max(1,selectedEp)], max(1,selectedEp)),
+                                                  webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]?.epID ?? 0),
+                                                  postCommentType: PostCommentType.replyEpComment,
+                                                  surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
+                                                ),
                                               ),
                                             ),
                                             
@@ -144,27 +148,27 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                           child: ValueListenableBuilder(
                                             valueListenable: offsetNotifier,
                                             builder: (_,offset,child) {
-                              
+                                                              
                                               WidgetsBinding.instance.addPostFrameCallback((timeStamp){
-              
+                                              
                                                 //epInfo范围的总高度 => [120: Appbar+epPanel 高度]
                                                 sliverViewStartOffset = (epInfoKey.currentContext?.size!.height ?? 300)+(2*kToolbarHeight); //120
-              
+                                              
                                                 //越过epInfo时开始激活
                                                 opacityDegree = min(0.8,offset/sliverViewStartOffset);
-              
+                                              
                                                 //剔除 sliverViewStartOffset 的高度进行计算 
                                                 commentProgress = ((offset-sliverViewStartOffset)/(scrollViewController.position.maxScrollExtent - sliverViewStartOffset)).clamp(0, 1);
                                                 //debugPrint("opacity: $offset / $sliverViewStartOffset");
                                               });
-                              
+                                                              
                                               
                                               return FutureBuilder(
                                                 future: epsInformationFuture,
                                                 builder: (_,snapshot){
-              
+                                              
                                                   final indexModel = context.read<IndexModel>();
-              
+                                              
                                                   return Padding(
                                                     padding: EdgeInsets.only(top:MediaQuery.paddingOf(context).top),
                                                     child: AnimatedContainer(

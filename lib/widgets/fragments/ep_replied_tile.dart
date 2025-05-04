@@ -76,14 +76,25 @@ class EpRepliedTile extends ListTile {
                                 child: Builder(
                                   builder: (_) {
 
-                                    if(epCommentData.repliedComment?[index].comment?.isEmpty ?? false){
-                                      return const ScalableText("发言已隐藏",style: TextStyle(fontStyle: FontStyle.italic));
-                                    }
+                                    //if(epCommentData.repliedComment?[index].comment?.isEmpty ?? false){
+                                    //  return const ScalableText("发言已隐藏",style: TextStyle(fontStyle: FontStyle.italic));
+                                    //}
+
+                                    //final currentComment = epCommentData.repliedComment![index].comment;
+
+                                    
+
+                                    //return BBCodeText(
+                                    //  data: 
+                                    //  "${currentComment?.substring(0,min(60,currentComment.length))}"
+                                    //  '${(currentComment?.length ?? 0) > 60 ? "..." : ""}',
+                                    //  stylesheet: appDefaultStyleSheet(context,richless: true),
+                                    //);
 
                                     
 
                                     return ScalableText(
-                                      "${epCommentData.repliedComment![index].comment}",
+                                      "${epCommentData.repliedComment![index].comment?.replaceAll(bbcodeRegexp, '')}",
                                       maxLines: 3,
                                       style: const TextStyle(overflow: TextOverflow.ellipsis,),
                                       

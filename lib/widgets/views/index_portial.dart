@@ -76,13 +76,25 @@ class IndexPortial extends StatelessWidget {
             width: min(350, MediaQuery.sizeOf(context).width*3/4),
             child: const AppDrawer()
           ),
-          body: IndexedStack(
-            index: currentPageIndex,
-            children: const [
-              BangumiCalendarPage(),
-              BangumiSortPage(),
-              BangumiStarPage()
-            ],
+          body: Builder(
+            builder: (context) {
+              return PopScope(
+                onPopInvokedWithResult: (didPop, result) {
+                  if(Scaffold.of(context).isDrawerOpen){
+                    Scaffold.of(context).closeDrawer();
+                    return;
+                  }
+                },
+                child: IndexedStack(
+                  index: currentPageIndex,
+                  children: const [
+                    BangumiCalendarPage(),
+                    BangumiSortPage(),
+                    BangumiStarPage()
+                  ],
+                ),
+              );
+            }
           ),
           bottomNavigationBar: NavigationBar(
             selectedIndex: currentPageIndex,
@@ -108,6 +120,8 @@ class IndexPortial extends StatelessWidget {
             //onDestinationSelected: (newIndex)=> selectedPageIndexNotifier.value = newIndex,
             onDestinationSelected: (newIndex){
               FocusScope.of(context).unfocus();
+
+              
               selectedPageIndexNotifier.value = newIndex;
             },
           ),

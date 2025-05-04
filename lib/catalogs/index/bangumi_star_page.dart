@@ -125,7 +125,11 @@ class BangumiStarPage extends StatelessWidget {
                 context,
                 title: "重置确认",
                 content: "要清空所有的订阅信息吗?",
-                cancelAction: ()=>debugPrint("stars List: ${MyHive.starBangumisDataBase.keys.length}"),
+                cancelAction: (){
+                  //debugPrint("stars one: ${MyHive.starBangumisDataBase.values}");
+                  //debugPrint("appConfigDataBase List: ${MyHive.appConfigDataBase.keys}");
+                  //debugPrint("loginUserDataBase List: ${MyHive.loginUserDataBase.keys}");
+                },
                 confirmAction: (){
                   MyHive.starBangumisDataBase.clear();
                   indexModel.starsUpdateRating.clear();
@@ -159,20 +163,19 @@ class BangumiStarPage extends StatelessWidget {
                     
                     switch(sortType){
                       case SortType.airDate: {currentStrategy = AirDateSortStrategy(); break;}
-                			case SortType.joinTime: {currentStrategy = JoinTimeSortStrategy(); break;}
+                      case SortType.joinTime: {currentStrategy = JoinTimeSortStrategy(); break;}
                       case SortType.updateTime: {currentStrategy = UpdateTimeSortStrategy(); break;}
                       case SortType.rank: {currentStrategy = RankSortStrategy(); break;}
                       case SortType.score: {currentStrategy = ScoreSortStrategy(); break;}
                       
                       default: {}
-                
+					
                     }
                 
                     return CustomScrollView(
                       slivers: seasonTypeSort(
                         context:context,
                         sortStrategy: currentStrategy,
-                        sortType: sortType,
                         isReversed: reversedStatus
                       )
                     );
@@ -197,34 +200,48 @@ class BangumiStarPage extends StatelessWidget {
 List<Widget> seasonTypeSort({
   required BuildContext context,
   required SortStrategy sortStrategy,
-  required SortType sortType,
+  
   bool? isReversed
 }) {
-  	final indexModel = context.read<IndexModel>();
-  	List<StarBangumiDetails> dataSource = MyHive.starBangumisDataBase.values.toList();
+  final indexModel = context.read<IndexModel>();
+  List<StarBangumiDetails> dataSource = MyHive.starBangumisDataBase.values.toList();
 
 	if(
-		sortType == SortType.rank || 
-		sortType == SortType.score
+		sortStrategy.currentSort == SortType.rank || 
+		sortStrategy.currentSort == SortType.score
 	){
 		dataSource = List.generate(
 			dataSource.length,
 			(index){
-				//indexModel.starsUpdateRating[startIndex + index]["rank"]!.toInt()
 
-				return dataSource[index]
-					..rank = indexModel.starsUpdateRating[index]["rank"]!.toInt()
-					..score = indexModel.starsUpdateRating[index]["score"]!.toDouble()
-				;
+        int matchID = -1;
+        
+        indexModel.starsUpdateRating.keys.any((currentID){
+          if(dataSource[index].bangumiID == currentID){
+            matchID = currentID;
+            return true;
+          }
+          return false;
+        });
+
+        if(matchID == -1) return dataSource[index];
+
+        return dataSource[index]
+          ..rank = indexModel.starsUpdateRating[matchID]!["rank"]!.toInt()
+          ..score = indexModel.starsUpdateRating[matchID]!["score"]!.toDouble()
+        ;
+
 			}
 		);
 	}
 
-  // 使用策略进行排序
+  // 使用策略进行排序 本质是各种抽象的值划为比大小
   dataSource.sort((prev, next) => 
     sortStrategy.getSort(prev)
       .compareTo(sortStrategy.getSort(next))
   );
+
+  
 
   // 根据排序内容 生成的分组信息(headerText) 其记录着排序过后的 每个分组的起始下标
   final Map<String, int> groupIndices = {};
@@ -279,6 +296,7 @@ List<Widget> seasonTypeSort({
         ),
       ],
     );
+
   });
 }
 
@@ -356,7 +374,7 @@ Widget buildSectionList(
                     starsUpdateRating:indexModel.starsUpdateRating,
                     item:starBangumiDetail,
                     sortType:sortType,
-                    resultIndex:startIndex + index
+                    //resultIndex:startIndex + index
                   );
           
                   if(resultText.isEmpty){
@@ -398,13 +416,19 @@ Widget buildSectionList(
 
 String getUpdateText(
   {
-    required List<Map<String, num>> starsUpdateRating,
+    required Map<int,Map<String, num>> starsUpdateRating,
     required StarBangumiDetails item,
     required SortType sortType,
-    required int resultIndex,
+    //required int resultIndex,
   }
 ){
+
   String resultContent = "";
+  if(starsUpdateRating.isEmpty) return resultContent;
+
+  final currentStarBangumiDetails = MyHive.starBangumisDataBase.values.firstWhere((currentStarBangumiDetails){
+    return currentStarBangumiDetails.bangumiID == item.bangumiID;
+  });
 
   switch(sortType){
                     
@@ -412,9 +436,10 @@ String getUpdateText(
 
       //debugPrint("resultIndex:$resultIndex item: ${item.name}/${item.rank}/${item.score} => ${starsUpdateRating[resultIndex]} ");
 
-      int starRank = MyHive.starBangumisDataBase.values.elementAt(resultIndex).rank!;
+      int starRank = currentStarBangumiDetails.rank!;
+      
 
-      if(starsUpdateRating[resultIndex]["rank"] == item.rank){
+      if(starRank == item.rank){
         resultContent="${item.rank}";
       }
 
@@ -427,9 +452,10 @@ String getUpdateText(
 
     case SortType.score:{
 
-      double starScore = MyHive.starBangumisDataBase.values.elementAt(resultIndex).score!;
+      double starScore = currentStarBangumiDetails.score!;
       
-      if(starsUpdateRating[resultIndex]["score"] == item.score){
+      
+      if(starScore == item.score){
         resultContent="${item.score}";
       }
 

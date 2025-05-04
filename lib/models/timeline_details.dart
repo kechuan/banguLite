@@ -100,7 +100,7 @@ List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData){
           ..userInformation = loadUserInformations(bangumiTimelineData['user'])
           ..comment = resultFields['comment']
           ..commentReactions = resultFields['reactions']
-
+          ..rate = resultFields['rate']
       )
       ..catType = bangumiTimelineData['cat']
       ..catAction = bangumiTimelineData['type']
@@ -118,7 +118,13 @@ List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData){
   return timelineDetailsList;
 }
 
-String convertTimelineDescription(TimelineDetails currentTimeline, {bool? authorDeclared}){
+String convertTimelineDescription(
+  TimelineDetails currentTimeline, 
+  {
+    bool? authorDeclared,
+    bool isCommentDeclared = true
+  }
+){
 
   String leadingText = "";
   String undoActionText = "";
@@ -184,7 +190,7 @@ String convertTimelineDescription(TimelineDetails currentTimeline, {bool? author
   if(contentText.isEmpty && !(currentTimeline.catType == 1 || currentTimeline.catType == 5)) undoActionText += "撤销了一项 ";
 
   //时间线吐槽
-  if(currentTimeline.catType == 5 && currentTimeline.catAction == 1){
+  if(isCommentDeclared && currentTimeline.catType == 5 && currentTimeline.catAction == 1){
     actionText = "[url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}]${TimelineCatStatus.Comment.actionName}";
 
     //感觉以后可以做一个proxy 用于 增加时 额外添加一个 /s 字符。。
@@ -193,12 +199,14 @@ String convertTimelineDescription(TimelineDetails currentTimeline, {bool? author
     }
 
     actionText += '[/url]';
+
+    if(currentTimeline.commentDetails?.comment?.isEmpty == false){
+      suffixText = '[quote]${currentTimeline.commentDetails!.comment ?? ""}[/quote]';
+    }
     
   }
 
-  if(currentTimeline.commentDetails?.comment?.isEmpty == false){
-	  suffixText = '[quote]${currentTimeline.commentDetails!.comment ?? ""}[/quote]';
-  }
+  
 
   leadingText += undoActionText + actionText + contentText + suffixText;
 

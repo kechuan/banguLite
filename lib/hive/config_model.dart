@@ -5,7 +5,7 @@ import 'package:bangu_lite/internal/const.dart';
 
 class AppConfig extends HiveObject{
   
-  AppThemeColor? currentThemeColor = AppThemeColor.sea;
+  AppThemeColor? currentThemeColor = AppThemeColor.ruby;
   ScaleType? fontScale = ScaleType.medium;
   ThemeMode? themeMode = ThemeMode.system;
   Color? customColor;

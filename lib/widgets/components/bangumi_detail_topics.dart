@@ -103,7 +103,7 @@ class BangumiDetailTopics extends StatelessWidget {
             
                       return Theme(
                         data: ThemeData(
-                          fontFamily: 'MiSansFont',
+                          fontFamilyFallback: convertSystemFontFamily(),
                           brightness: judgeDarknessMode(context) ? Brightness.dark : null
                         ),
                         child: ListView.builder(

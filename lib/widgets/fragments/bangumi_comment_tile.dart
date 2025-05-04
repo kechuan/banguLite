@@ -25,7 +25,7 @@ class BangumiCommentTile extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final int ratingScore = commentData.rate ?? 0;
-    DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch(commentData.commentTimeStamp!*1000);
+    DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch((commentData.commentTimeStamp ?? 0)*1000);
 
     //debugPrint("${commentData.comment}:${commentData.type}");
 

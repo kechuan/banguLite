@@ -1,6 +1,11 @@
+import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/models/comment_details.dart';
 
 import 'package:bangu_lite/models/star_details.dart';
+import 'package:bangu_lite/models/surf_record_details.dart';
+import 'package:bangu_lite/models/surf_timeline_details.dart';
 import 'package:bangu_lite/models/user_details.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
@@ -18,7 +23,13 @@ part 'hive_adapters.g.dart';
     AdapterSpec<StarBangumiDetails>(),
     AdapterSpec<UserInformation>(),
     AdapterSpec<LoginedUserInformations>(),
-    //AdapterSpec<CommentDetails>(),
+    AdapterSpec<SurfTimelineDetails>(),
+    AdapterSpec<CommentDetails>(),
+    AdapterSpec<BangumiTimelineType>(),
+    AdapterSpec<StarType>(),
+    //AdapterSpec<SurfRecordDetails>()
+
+    
     //AdapterSpec<TimelineDetails>()
   ]    
 )

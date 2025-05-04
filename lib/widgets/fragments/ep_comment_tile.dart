@@ -63,7 +63,7 @@ class EpCommentTile extends StatelessWidget {
               ),
 
               //可压缩信息 Expanded
-              Flexible(
+              Expanded(
                 flex: 2,
                 child: Row(
                   spacing: 6,
@@ -91,12 +91,6 @@ class EpCommentTile extends StatelessWidget {
                   ],
                 ),
               ),
-
-             
-
-              
-
-              
 
               //优先完整实现 size约束盒
               ConstrainedBox(
@@ -170,7 +164,11 @@ class EpCommentTile extends StatelessWidget {
             [
                BBCodeText(
                 data: convertBangumiCommentSticker(epCommentData.comment ?? ""),
-                stylesheet: appDefaultStyleSheet(context,selectableText: true)
+                stylesheet: appDefaultStyleSheet(context,selectableText: true),
+                errorBuilder: (context, error, stackTrace) {
+                  return ScalableText("${epCommentData.comment}",
+                  );
+                },
               ) 
             
             ] : null,

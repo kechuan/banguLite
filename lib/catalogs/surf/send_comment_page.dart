@@ -572,7 +572,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                   (it)=> it.add(CodeTag(tagName: 'codeExample'))
                                 ),
 																defaultText: TextStyle(
-																	fontFamily: 'MiSansFont',
+																	fontFamilyFallback: convertSystemFontFamily(),
 																	color: judgeDarknessMode(context) ? Colors.white : Colors.black,
 																)
 															),
@@ -616,7 +616,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
 												data: '[url=]超链接[/url]',
 												stylesheet: BBStylesheet(
 													tags: allEffectTag,
-													defaultText: const TextStyle(fontFamily: 'MiSansFont')
+													defaultText: TextStyle(fontFamilyFallback: convertSystemFontFamily())
 												),
 												),
 											),

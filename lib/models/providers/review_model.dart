@@ -26,7 +26,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
     );
   }
 
-  Future<void> loadBlog(int selectedBlogID) async {
+  Future<void> loadBlog(int selectedBlogID,{bool isRefresh = false}) async {
 
     if(selectedBlogID == 0) return;
 
@@ -34,10 +34,9 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
 
     await Future.wait(
       [
-        loadContentDetail(selectedBlogID),
+        loadContentDetail(selectedBlogID,isRefresh: isRefresh),
         loadBlogComment(selectedBlogID),
         loadBlogPhotos(selectedBlogID),
-        
       ]
     ).then((responseList){
       final commentResponse = responseList[1] as Response;

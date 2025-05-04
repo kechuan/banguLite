@@ -13,6 +13,7 @@ const List<String> routeNames = <String>[
   '/Timeline',
   '/commentPreview',
   '/groupTopic',
+  '/history',
   '/index',
   '/loginAuth',
   '/moreReviews',
@@ -73,6 +74,11 @@ class Routes {
   ///
   /// BangumiGroupTopicPage : [GroupsModel(required) groupsModel, GroupTopicInfo(required) groupTopicInfo, Color? themeColor]
   static const String groupTopic = '/groupTopic';
+
+  /// '/history'
+  ///
+  /// [name] : '/history'
+  static const String history = '/history';
 
   /// '/index'
   ///

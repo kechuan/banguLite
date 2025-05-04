@@ -125,43 +125,43 @@ class StarSubjectDialog extends StatelessWidget {
                 ),
 
               	Expanded(
-					child: Center(
-						child: ValueListenableBuilder(
-							valueListenable: starTypeNotifier,
-								builder: (_,starType,child) {
-								return ExpansionTile(
-								controller: commentExpansionTileController,
-								enabled: starType != StarType.none,
-								onExpansionChanged: (value) => commentExpandedStatusNotifier.value = value,
-								initiallyExpanded: commentExpandedStatus,
-								title: const Text("展开评论与评分"),
-								children: [
-				
-									Center(
-										child: StarSliderPanel(
-											valueNotifier: commentRankNotifier,
-											onChanged: (value) => commentRankNotifier.value = value,
-											themeColor:themeColor
-										),
-									),
-				
-									const Padding(padding: PaddingV6),
-				
-									TextField(
-										controller: contentEditingController,
-										maxLines: 3,
-										decoration: const InputDecoration(
-											hintText: '写下吐槽...',
-											hintStyle: TextStyle(color: Colors.grey),
-											border: OutlineInputBorder(),
-										),
-									)
-								],
-								);
-							}
-							),
-					),
-				),
+                  child: Center(
+                    child: ValueListenableBuilder(
+                      valueListenable: starTypeNotifier,
+                        builder: (_,starType,child) {
+                        return ExpansionTile(
+                        controller: commentExpansionTileController,
+                        enabled: starType != StarType.none,
+                        onExpansionChanged: (value) => commentExpandedStatusNotifier.value = value,
+                        initiallyExpanded: commentExpandedStatus,
+                        title: const Text("展开评论与评分"),
+                        children: [
+                
+                          Center(
+                            child: StarSliderPanel(
+                              valueNotifier: commentRankNotifier,
+                              onChanged: (value) => commentRankNotifier.value = value,
+                              themeColor:themeColor
+                            ),
+                          ),
+                
+                          const Padding(padding: PaddingV6),
+                
+                          TextField(
+                            controller: contentEditingController,
+                            maxLines: 3,
+                            decoration: const InputDecoration(
+                              hintText: '写下吐槽...',
+                              hintStyle: TextStyle(color: Colors.grey),
+                              border: OutlineInputBorder(),
+                            ),
+                          )
+                        ],
+                        );
+                      }
+                      ),
+                  ),
+                ),
 
                 Row(
 				           mainAxisAlignment: MainAxisAlignment.end,
@@ -176,7 +176,7 @@ class StarSubjectDialog extends StatelessWidget {
                     ),
 
 
-					if(accountModel.isLogined())
+                  if(accountModel.isLogined())
                     	const Spacer(),
 
 					if(accountModel.isLogined())
@@ -210,12 +210,9 @@ class StarSubjectDialog extends StatelessWidget {
 										).then((status){
                       
                       status ? onUpdateBangumiStar?.call(message: "收藏成功",requestStatus:true) : null;
+                      status ? invokeAsyncPop(starTypeNotifier.value) : invokeAsyncPop(commentDetails?.type ?? StarType.none);
 										});
 
-		
-										invokeAsyncPop(starTypeNotifier.value);
-
-							
 									}, 
 									child: const ScalableText("确定")
 

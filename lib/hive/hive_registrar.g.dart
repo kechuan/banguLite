@@ -9,12 +9,16 @@ extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(AppConfigAdapter());
     registerAdapter(AppThemeColorAdapter());
+    registerAdapter(BangumiTimelineTypeAdapter());
     registerAdapter(ColorAdapter());
+    registerAdapter(CommentDetailsAdapter());
     registerAdapter(LoginedUserInformationsAdapter());
     registerAdapter(ScaleTypeAdapter());
     registerAdapter(StarBangumiDetailsAdapter());
+    registerAdapter(StarTypeAdapter());
+    registerAdapter(SurfRecordDetailsAdapter());
+    registerAdapter(SurfTimelineDetailsAdapter());
     registerAdapter(ThemeModeAdapter());
-    //registerAdapter(TimelineDetailsAdapter());
     registerAdapter(UserInformationAdapter());
   }
 }

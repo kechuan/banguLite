@@ -7,7 +7,23 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/eps_info.dart';
 
+List<String> convertSystemFontFamily() {
+    if (Platform.isAndroid) {
+      return ['sans-serif'];
+    } 
+    
+    else if (Platform.isIOS) {
+      return ['System'];
+    }
 
+    else if (Platform.isWindows) {
+      return ['MiSans','Microsoft YaHei'];
+    }
+    
+    else {
+      return ['Roboto'];
+    }
+  }
 
 String? convertAmpsSymbol(String? originalString){
   if(originalString?.contains("&amp;") ?? false){

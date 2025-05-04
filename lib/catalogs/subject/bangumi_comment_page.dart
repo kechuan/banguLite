@@ -37,7 +37,8 @@ class BangumiCommentPage extends StatelessWidget  {
       data: ThemeData(
         brightness: Theme.of(context).brightness,
         colorSchemeSeed: judgeDetailRenderColor(context,bangumiThemeColor),
-        fontFamily: 'MiSansFont',
+        
+        fontFamilyFallback: convertSystemFontFamily()
       ),
       child: ChangeNotifierProvider.value(
         value: commentModel,

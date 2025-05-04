@@ -114,15 +114,15 @@ class AppDrawer extends StatelessWidget {
                       ),
 
 
-                      if(loginedStatus)
-                        ...List.generate(
-                          BangumiPrivateHubType.values.length, 
-                          (index) => ListTile(
-                            leading: Icon(BangumiPrivateHubType.values[index].iconData),
-                            title: Text(BangumiPrivateHubType.values[index].typeName),
-                            onTap: ()=>fadeToaster(context: context, message: "暂未开放"),
-                          )
-                        )
+                      //if(loginedStatus)
+                      //  ...List.generate(
+                      //    BangumiPrivateHubType.values.length, 
+                      //    (index) => ListTile(
+                      //      leading: Icon(BangumiPrivateHubType.values[index].iconData),
+                      //      title: Text(BangumiPrivateHubType.values[index].typeName),
+                      //      onTap: ()=>fadeToaster(context: context, message: "暂未开放"),
+                      //    )
+                      //  )
 
                     ],
                   );
@@ -155,8 +155,9 @@ class AppDrawer extends StatelessWidget {
                           }
 
                           case BangumiSocialHubType.history:{
-                            debugPrint("暂未开放");
-                            //Navigator.pushNamed(context, Routes.timeline);
+                            //debugPrint("暂未开放");
+                            //fadeToaster(context: context, message: '暂未开放');
+                            Navigator.pushNamed(context, Routes.history);
                           }
                           
                            

@@ -132,24 +132,24 @@ class CommentReaction extends StatelessWidget {
                     debugPrint("postCommentType:$postCommentType, id: $commentID");
                               
                   },
-                  child: Tooltip(
-                    triggerMode: TooltipTriggerMode.tap,
-                    message: 
-                      "${commentReactions![dataLikeIndex]?.take(6).join("、")}等"
-                      "${(commentReactions![dataLikeIndex]?.length ?? 0)}人",
-                    textStyle: TextStyle(
-                      color: judgeDarknessMode(context) ? Colors.black : Colors.white
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                    
+                      Image.asset(
+                        "assets/bangumiSticker/bgm$stickerIndex.gif",
+                        scale: 0.8,
+                      ),
                       
-                        Image.asset(
-                          "assets/bangumiSticker/bgm$stickerIndex.gif",
-                          scale: 0.8,
-                        ),
-                        
-                        ScalableText("${(commentReactions![dataLikeIndex]?.length ?? 0) + (
+                      Tooltip(
+                         triggerMode: TooltipTriggerMode.tap,
+                          message: 
+                            "${commentReactions![dataLikeIndex]?.take(6).join("、")}等"
+                            "${(commentReactions![dataLikeIndex]?.length ?? 0)}人",
+                          textStyle: TextStyle(
+                            color: judgeDarknessMode(context) ? Colors.black : Colors.white
+                          ),
+                        child: ScalableText("${(commentReactions![dataLikeIndex]?.length ?? 0) + (
                             reactDataLike == dataLikeIndex ? 
                               (
                                 isServerDataContain ? 
@@ -159,8 +159,8 @@ class CommentReaction extends StatelessWidget {
                             reactDataLike == dataLikeIndex ? 1 : 0
                           )
                         }"),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                     
                 ),

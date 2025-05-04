@@ -40,7 +40,7 @@ abstract class BangumiGeneralMoreContentPageState<
         data: ThemeData(
           brightness: Theme.of(context).brightness,
           colorSchemeSeed: judgeDetailRenderColor(context,bangumiThemeColor),
-          fontFamily: 'MiSansFont',
+          fontFamilyFallback: convertSystemFontFamily(),
         ),
         child: Scaffold(
           appBar: AppBar(

@@ -42,53 +42,51 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<TimelineFlowModel>(
+      builder: (_,timelineFlowModel,__) {
+        return EasyRefresh(
+          controller: widget.topicListViewEasyRefreshController,
+          triggerAxis: Axis.vertical,
+          header: const MaterialHeader(),
+          footer: const MaterialFooter(),
+          refreshOnStart: timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]?.isEmpty ?? true,
+          onRefresh: () => loadTimelineContent(context),
+          onLoad: () => loadTimelineContent(context,isAppend: true),
+        
+          child: Column(
+            children: [
+              Expanded(
+                child: AnimatedList(
+                  controller: scrollController,
+                  key: animatedKey,
+                  initialItemCount: timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]?.length ?? 0,
+                  shrinkWrap: true,
+                  itemBuilder: (_,index,animation){
+                    
+                    //Animated Question
 
-      return Consumer<TimelineFlowModel>(
-        builder: (_,timelineFlowModel,__) {
-          return EasyRefresh(
-            controller: widget.topicListViewEasyRefreshController,
-            triggerAxis: Axis.vertical,
-            header: const MaterialHeader(),
-            footer: const MaterialFooter(),
-            refreshOnStart: true,
-            onRefresh: () => loadTimelineContent(context),
-            onLoad: () => loadTimelineContent(context,isAppend: true),
-          
-            child: Column(
-              children: [
-                Expanded(
-                  child: AnimatedList(
-                    controller: scrollController,
-                    key: animatedKey,
-                    initialItemCount: timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]?.length ?? 0,
-                    shrinkWrap: true,
-                    itemBuilder: (_,index,animation){
-                      
-                      //Animated Question
-
-                      if(index >= timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]!.length){
-                        return const SizedBox();
-                      }
-                      
-          
-                      return Container(
-                        padding: PaddingH12,
-                        color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
-                        child: BangumiTimelineTile(
-                          surfTimelineDetails: timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]![index],
-                        )
-                      );
-          
+                    if(index >= timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]!.length){
+                      return const SizedBox();
                     }
-                  ),
+                    
+        
+                    return Container(
+                      padding: PaddingH12,
+                      color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
+                      child: BangumiTimelineTile(
+                        surfTimelineDetails: timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]![index],
+                      )
+                    );
+        
+                  }
                 ),
-              ],
-            ),
-          
-          );
-    
-	     });
-
+              ),
+            ],
+          ),
+        
+        );
+      }
+    );
   }
 
   void loadTimelineContent(
@@ -103,9 +101,6 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
       final initData = timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]];
       int initalLength = initData?.length ?? 0;
 
-      if(widget.tabController.index == 0){
-        initalLength = timelineFlowModel.timelinesData.values.fold(0, (prev,current)=> prev + current.length);
-      }
 
       if(isAppend == true){
 
@@ -137,9 +132,7 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
 
         int receiveLength = max(0,currentTimelineData?.length ?? 0 - initalLength);
 
-        if(widget.tabController.index == 0){
-          receiveLength = timelineFlowModel.timelinesData.values.fold(0, (prev,current)=> prev + current.length) - initalLength;
-        }
+        
 
         animatedListAppendContentCallback(
           result,

@@ -79,40 +79,42 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 									pushPinnedChildren: true,
 									children: [
 							
-										SliverPinnedHeader(
-											
-											child: Container(
-											color: Theme.of(context).colorScheme.surface.withValues(alpha:0.8),
-											child: ExpansionTile(
-                        tilePadding: const EdgeInsets.all(6),
-												controller: expansionTileController,
-												title: Row(
-                          spacing: 6,
+										SliverSafeArea(
+                      bottom: false,
+                      sliver: SliverPinnedHeader(
+                        child: Container(
+                        color: Theme.of(context).colorScheme.surface.withValues(alpha:0.8),
+                        child: ExpansionTile(
+                          tilePadding: const EdgeInsets.all(6),
+                          controller: expansionTileController,
+                          title: Row(
+                            spacing: 6,
+                            children: [
+                              IconButton(onPressed: ()=> Navigator.of(context).pop(), icon: const Icon(Icons.arrow_back)),
+                            
+                              ValueListenableBuilder(
+                                valueListenable: groupTitleNotifier,
+                                builder: (_, groupTitle, __)=> ScalableText(groupTitle ?? "小组话题列表")
+                              ),
+  
+                            ],
+                          ),
                           children: [
-                            IconButton(onPressed: ()=> Navigator.of(context).pop(), icon: const Icon(Icons.arrow_back)),
+                                                GroupsSelectView(
+                                                  sliverAnimatedListKey:sliverAnimatedListKey, 
+                                                  expansionTileController: expansionTileController, 
+                                                  groupTitleNotifier: groupTitleNotifier,
+                                                  loadGroupTopicCallback: (context){
+                                                    expansionTileController.collapse();
+                                                    loadGroupTopics(context);
+                                                  },
+                                                )
                           
-                            ValueListenableBuilder(
-                              valueListenable: groupTitleNotifier,
-                              builder: (_, groupTitle, __)=> ScalableText(groupTitle ?? "小组话题列表")
-                            ),
-
                           ],
-												),
-												children: [
-                          GroupsSelectView(
-                            sliverAnimatedListKey:sliverAnimatedListKey, 
-                            expansionTileController: expansionTileController, 
-                            groupTitleNotifier: groupTitleNotifier,
-                            loadGroupTopicCallback: (context){
-                              expansionTileController.collapse();
-                              loadGroupTopics(context);
-                            },
-                          )
-												
-												],
-											),
-											),
-										),
+                        ),
+                        ),
+                      ),
+                    ),
 								
 										SliverPadding(
 											padding: Padding16,
@@ -138,16 +140,19 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 														// AnimatedList 奇怪的问题.. selectedGroupData 指向的好像不是同一个?? 这是怎么回事??
 														if(index >= selectedGroupData.length) return const SizedBox.shrink();
 																										
-														return BangumiTimelineTile(
-															surfTimelineDetails: selectedGroupData[index],
-															//timelineType: BangumiTimelineType.group,
-															
-															groupTopicInfo: 
-																groupsModel.contentListData.isEmpty ?
-																GroupTopicInfo.fromSurfTimeline(selectedGroupData[index]) :
-																groupsModel.contentListData[index],
-
-														);
+														return Container(
+                              color: index % 2 == 0 ? Colors.grey.withValues(alpha: 0.2) : null,
+                              child: BangumiTimelineTile(
+                                surfTimelineDetails: selectedGroupData[index],
+                                //timelineType: BangumiTimelineType.group,
+                                
+                                //groupTopicInfo: 
+                                //  groupsModel.contentListData.isEmpty ?
+                                //  GroupTopicInfo.fromSurfTimeline(selectedGroupData[index]) :
+                                //  groupsModel.contentListData[index],
+                              
+                              ),
+                            );
 													}
 											    );
 											  }

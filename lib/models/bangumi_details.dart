@@ -326,15 +326,20 @@ bool animationFliter(Map currentBangumi){
 }
 
 //获取 收藏 番剧的信息 以后可能需要分批次请求。。 以免出现429错误
-Future<List<Map<String,num>>> loadStarsDetail(List<int> starsIDList) async {
+Future<Map<int,Map<String,num>>> loadStarsDetail(List<int> starsIDList) async {
 
-  Completer<List<Map<String,num>>> starUpdateCompleter = Completer();
+  Completer<Map<int,Map<String,num>>> starUpdateCompleter = Completer();
 
   int completeFlag = starsIDList.length;
 
-  final resultRating = List.generate(
-    starsIDList.length, (_)=>{"score": 0.0,"rank": 0}
-  );
+  final resultRating = {
+    for(int bangumiID in starsIDList)
+      bangumiID:{
+        "score":0.0,
+        "rank":0
+      }
+  };
+
 
   await Future.wait(
     List.generate(
@@ -343,8 +348,8 @@ Future<List<Map<String,num>>> loadStarsDetail(List<int> starsIDList) async {
         await HttpApiClient.client.get("${BangumiAPIUrls.subject}/${starsIDList[index]}").then((response){
           final ratingList = loadDetailsData(response.data).ratingList;
 
-          resultRating[index]["score"] = ratingList["score"];
-          resultRating[index]["rank"] = ratingList["rank"];
+          resultRating.values.elementAt(index)["score"] = ratingList["score"];
+          resultRating.values.elementAt(index)["rank"] = ratingList["rank"];
 
           completeFlag -= 1;
           if(completeFlag==0) starUpdateCompleter.complete(resultRating);

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 const stickerDataLike = [0,79,54,140,62,122,104,80,141,88,85,90];
 
+final bbcodeRegexp = RegExp(r'\[/?[a-z]+(?:=[^\]]+)?\]');
+
 enum WeekDay{
 
   mon("一",1),

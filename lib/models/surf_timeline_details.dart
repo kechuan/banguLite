@@ -25,8 +25,9 @@ class SurfTimelineDetails extends BaseDetails {
   int? replies;
   int? updatedAt;
 
-}
+  
 
+}
 
 
 List<SurfTimelineDetails> loadSurfTimelineDetails(
@@ -118,7 +119,7 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
         )
           ..bangumiTimelineType = bangumiTimelineType
             //筛选时间线是否吐槽 则会以 commentDetails 是否含有 comment && bangumiTimelineType 判断
-          ..title = convertTimelineDescription(timelineDataList[index])
+          ..title = convertTimelineDescription(timelineDataList[index],isCommentDeclared: false)
           ..commentDetails = timelineDataList[index].commentDetails
           ..replies = surfTimelineListData[index]["replies"]
           ..updatedAt = surfTimelineListData[index]["createdAt"]

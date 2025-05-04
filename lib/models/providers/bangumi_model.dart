@@ -31,6 +31,7 @@ class BangumiModel extends ChangeNotifier {
 
     if(detailInformation.data!=null){
       bangumiDetails = loadDetailsData(detailInformation.data,detailFlag:true);
+      
     }
 
     WidgetsBinding.instance.addPostFrameCallback((timestamp){

@@ -130,10 +130,8 @@ class CustomSearchDelegate extends SearchDelegate<String>{
                   SubjectTypeExtension.subjectTypes :
                   [searchTypesNotifier.value.subjectType]
                 ,
-                
-
               ).then((result){
-                debugPrint("done: search query: $query, result: $result");
+                //debugPrint("done: search query: $query, result: $result");
                 return result;
               }),
               builder: (_,searchSnapshot){
@@ -200,85 +198,90 @@ class CustomSearchDelegate extends SearchDelegate<String>{
 
     debugPrint("search results build");
 
-    return FutureBuilder( //requsetAPI
-      future: sortSearchHandler(
-        keyword:query,
-        subjectType: 
-          searchTypesNotifier.value == SubjectType.all ? 
-          SubjectTypeExtension.subjectTypes :
-          [searchTypesNotifier.value.subjectType]
-        ,
-      ),
-      builder: (_,searchSnapshot){
-
-        switch(searchSnapshot.connectionState){
-
-          case ConnectionState.done:{
-
-            if(searchSnapshot.hasData){
-
-              List<BangumiDetails> searchData = loadSearchData(searchSnapshot.data!.data);
-
-              ValueNotifier<bool> isLoading = ValueNotifier<bool>(true);
-
-              debugPrint("search result data:$searchData");
-
-              return EasyRefresh(
-                child: ValueListenableBuilder(
-                  valueListenable: isLoading,
-                  builder: (_,isLoading,child) {
-
-                    return Skeletonizer(
-                      enabled: isLoading,
-                      child: child!,
-                    );
-                  
-                  },
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    
-                    itemCount: searchData.length,
-                    itemBuilder: (_, index) {
-
-                      WidgetsBinding.instance.addPostFrameCallback((timestamp){
-                        isLoading.value = false;
-                      });
-
-                      return BangumiListTile(
-                        imageSize: const Size(100, 150),
-                        bangumiDetails: searchData[index],
-                        
-
-                        onTap: () {
-                          Navigator.popAndPushNamed(
-                            context,
-                            Routes.subjectDetail,
-                            arguments: {"subjectID":searchData[index].id}
-                          );
-                          
-                        },
-                        
-                      );
-                    },
-
-                    separatorBuilder: (_, __) => const Divider(height: 2)
-                    
-                    
-                  ),
-                    
-                ),
-              );
-            }
-
-            return const Center(child: ScalableText("暂无信息"));
-
-          }
-
-          case ConnectionState.waiting: return const Center(child: CircularProgressIndicator());
-
-          default: return const Center(child: CircularProgressIndicator());
-        }
+    return ValueListenableBuilder(
+      valueListenable: searchTypesNotifier,
+      builder: (_,searchTypes,child) {
+        return FutureBuilder( //requsetAPI
+          future: sortSearchHandler(
+            keyword:query,
+            subjectType: 
+              searchTypes == SubjectType.all ? 
+              SubjectTypeExtension.subjectTypes :
+              [searchTypes.subjectType]
+            ,
+          ),
+          builder: (_,searchSnapshot){
         
+            switch(searchSnapshot.connectionState){
+        
+              case ConnectionState.done:{
+        
+                if(searchSnapshot.hasData){
+        
+                  List<BangumiDetails> searchData = loadSearchData(searchSnapshot.data!.data);
+        
+                  ValueNotifier<bool> isLoading = ValueNotifier<bool>(true);
+        
+                  debugPrint("search result data:$searchData");
+        
+                  return EasyRefresh(
+                    child: ValueListenableBuilder(
+                      valueListenable: isLoading,
+                      builder: (_,isLoading,child) {
+        
+                        return Skeletonizer(
+                          enabled: isLoading,
+                          child: child!,
+                        );
+                      
+                      },
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        
+                        itemCount: searchData.length,
+                        itemBuilder: (_, index) {
+        
+                          WidgetsBinding.instance.addPostFrameCallback((timestamp){
+                            isLoading.value = false;
+                          });
+        
+                          return BangumiListTile(
+                            imageSize: const Size(100, 150),
+                            bangumiDetails: searchData[index],
+                            
+        
+                            onTap: () {
+                              Navigator.popAndPushNamed(
+                                context,
+                                Routes.subjectDetail,
+                                arguments: {"subjectID":searchData[index].id}
+                              );
+                              
+                            },
+                            
+                          );
+                        },
+        
+                        separatorBuilder: (_, __) => const Divider(height: 2)
+                        
+                        
+                      ),
+                        
+                    ),
+                  );
+                }
+        
+                return const Center(child: ScalableText("暂无信息"));
+        
+              }
+        
+              case ConnectionState.waiting: return const Center(child: CircularProgressIndicator());
+        
+              default: return const Center(child: CircularProgressIndicator());
+            }
+            
+          }
+        );
       }
     );
 

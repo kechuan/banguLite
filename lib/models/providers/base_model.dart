@@ -52,9 +52,7 @@ abstract class BaseModel
     await HttpApiClient.client.get(
         getContentListUrl(subjectID),
         queryParameters: queryParameters,
-        options: Options(
-          headers: BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken)
-        )
+        options: BangumiAPIUrls.bangumiAccessOption
       ).then((response) {
         if(response.statusCode == 200){
           subContentListResponseDataCallback(response);
@@ -94,15 +92,23 @@ abstract class BaseModel
   }
     
   // 抽象方法：加载特定内容详情
-  Future<void> loadContentDetail(int contentID,{Map<String, dynamic>? queryParameters}) async {
+  Future<void> loadContentDetail(
+    int contentID,
+    {
+      Map<String, dynamic>? queryParameters,
+      bool isRefresh = false
+    }
+  ) async {
 
     if(getContentDetailUrl(contentID) == null) return;
 
     if (contentDetailData[contentID] != null) {
-      debugPrint("content: $contentID already loaded or in processing");
-      return;
+      if(!isRefresh){
+        debugPrint("content: $contentID already loaded or in processing");
+        return;
+      }
+      
     }
-
 
     //占位符
     contentDetailData[contentID] = createEmptyDetails() as D;
@@ -111,9 +117,7 @@ abstract class BaseModel
       await HttpApiClient.client.get(
         getContentDetailUrl(contentID)!,
         queryParameters: queryParameters,
-        options: Options(
-          headers: BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken)
-        )
+        options: BangumiAPIUrls.bangumiAccessOption
       ).then((response) {
         if (response.data != null) {
           contentDetailData[contentID] = convertResponseToDetail(response.data) as D;

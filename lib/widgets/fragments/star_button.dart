@@ -95,10 +95,13 @@ class _StarButtonState extends State<StarButton> {
             child: ValueListenableBuilder(
               valueListenable: starInformationNotifier,
               builder: (_,__,child){
-          
+                
+                //会出现 账号收藏 本地未收藏的状态...
                 final isStared = MyHive.starBangumisDataBase.containsKey(widget.bangumiDetails.id);
           
                 String starText = "已收藏";
+
+                if(!isStared){starText = "加入收藏";}
           
                 if(userCommentDetails != null){
                   starText = (localStarType ?? userCommentDetails.type ?? StarType.none).starTypeName;
@@ -110,7 +113,7 @@ class _StarButtonState extends State<StarButton> {
                   spacing: 6,
                   children: [
                     isStared ? const Icon(Icons.star) : const Icon(Icons.star_outline),
-                    isStared ? ScalableText(starText) : const ScalableText("加入收藏"),
+                    ScalableText(starText),
                   ],
                 );
               }
@@ -158,10 +161,14 @@ void updateLocalStaredBangumi(
         ..airWeekday = bangumiDetails.informationList["air_weekday"]
     );
 
-    indexModel.starsUpdateRating.add({
-      "score": bangumiDetails.ratingList["score"],
-      "rank": bangumiDetails.ratingList["rank"]
-    });
+    indexModel.starsUpdateRating.addAll(
+      {
+        bangumiDetails.id!: {
+          "score": bangumiDetails.ratingList["score"],
+          "rank": bangumiDetails.ratingList["rank"]
+        }
+      }
+    );
 
     
   }

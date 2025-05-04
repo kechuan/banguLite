@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:bangu_lite/catalogs/index/bangumi_index_page.dart';
 import 'package:bangu_lite/catalogs/surf/bangumi_login_auth_page.dart';
+import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/platforms/register_windows_applink.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
-import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/models/providers/user_model.dart';
 import 'package:bangu_lite/models/providers/webview_model.dart';
@@ -88,11 +88,14 @@ class MainApp extends StatelessWidget {
                 //debugShowCheckedModeBanner: false,
                 theme: ThemeData(
                   colorScheme: ColorScheme.fromSeed(seedColor: currentColor),
-                  fontFamily: 'MiSansFont',
+                  //fontFamilyFallback: convertSystemFontFamily(),
+                  fontFamilyFallback:convertSystemFontFamily()
+                  
                 ),
                 darkTheme: ThemeData( 
                   brightness: Brightness.dark,
-                  fontFamily: 'MiSansFont',
+                  //fontFamilyFallback: convertSystemFontFamily(),
+                  fontFamilyFallback:convertSystemFontFamily(),
                   
                   colorScheme: ColorScheme.dark(
                     primary: currentColor,
@@ -146,4 +149,7 @@ class MainApp extends StatelessWidget {
       ),
     );
   }
+
+  
+
 }

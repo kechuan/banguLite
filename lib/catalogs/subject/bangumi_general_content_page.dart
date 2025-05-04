@@ -36,7 +36,7 @@ abstract class BangumiContentPageState<
 
   String getWebUrl(int? contentID);
 
-  Future<void> loadContent(int contentID);
+  Future<void> loadContent(int contentID,{bool isRefresh = false});
 
   //blog 与 其他的 commentLoading 与 CommentCount 判定标注不一样 需要针对重写
   bool isContentLoading(int? contentID){
@@ -83,8 +83,12 @@ abstract class BangumiContentPageState<
         
         return EasyRefresh.builder(
           scrollController: scrollController,
+          //重新获取When...
+          header: const MaterialHeader(),
+          onRefresh: (){
+            contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0);
+          },
           childBuilder: (_, physics) {
-
             return Theme(
               data: Theme.of(context).copyWith(
                 scaffoldBackgroundColor: judgeDarknessMode(context) ? null : getcurrentSubjectThemeColor(),
@@ -92,7 +96,8 @@ abstract class BangumiContentPageState<
               child: Scaffold(
                 body: Selector<M, D>(
                   selector: (_, model) => (contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?) ?? createEmptyDetailData(),
-                  shouldRebuild: (previous, next) => previous.detailID != next.detailID,
+                  //shouldRebuild: (previous, next) => previous.detailID != next.detailID,
+                  shouldRebuild: (previous, next) => true,
                   builder: (_, contentDetailData, contentComment) {
 
                     return Scrollbar(
@@ -245,13 +250,16 @@ abstract class BangumiContentPageState<
                                     }
                                   ),
                                 
-                                  Row(
-                                    spacing: 12,
-                                    children: [
-                                      const ScalableText("回复",style: TextStyle(fontSize: 24)),
-                                                                  
-                                      ScalableText("${max(0,commentListCount-1) + userCommentMap.length}",style: const TextStyle(color: Colors.grey)),
-                                    ],
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                                    child: Row(
+                                      spacing: 12,
+                                      children: [
+                                        const ScalableText("回复",style: TextStyle(fontSize: 24)),
+                                                                    
+                                        ScalableText("${max(0,commentListCount-1) + userCommentMap.length}",style: const TextStyle(color: Colors.grey)),
+                                      ],
+                                    ),
                                   ),
                                 
                                   //无评论的显示状态

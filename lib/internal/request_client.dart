@@ -2,6 +2,7 @@
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -24,6 +25,9 @@ class HttpApiClient{
     HttpApiClient.clientOption.headers = HttpApiClient.broswerHeader;
     HttpApiClient.client.options = HttpApiClient.clientOption;
   }
+
+
+
 
 }
 
@@ -159,6 +163,13 @@ class BangumiAPIUrls {
       int height = 0,
     }
   ) => '$baseResourceUrl/r/${width}x$height/$imagePath';
+
+
+  static Options bangumiAccessOption = Options(
+    headers: AccountModel.loginedUserInformations.accessToken != null ?
+    BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken) :
+    null
+  );
 
 }
 
@@ -373,9 +384,7 @@ class APPInformationRepository{
                       author = "kechuan"
   ;
 
-  // only Debug : ac2BRVCwpDMtOGDPfcZlgZXTuoyzxe5RuoIVbIEe
-  
-  
+  //纯本地应用  
   static const String bangumiAPPID = 'bgm369067d8f39dea8d4';
   static const String bangumiAPPSecret = 'e34be838faee529cb7df1bad76a66db3';
 

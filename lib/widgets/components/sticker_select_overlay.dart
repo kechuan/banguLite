@@ -109,7 +109,7 @@ class StickerSelectOverlay{
                 width: min(250, MediaQuery.sizeOf(context).width),
                 child: CompositedTransformFollower(
                   showWhenUnlinked:true,
-                  offset: const Offset(-250,30),
+                  offset: const Offset(-250,-130),
                   link: buttonLayerLink!,
                   child: ClipRRect(
                     borderRadius:BorderRadius.circular(16),

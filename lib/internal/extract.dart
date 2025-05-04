@@ -33,10 +33,13 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
             //Group 特化 跳转id由 idList 提供 name 直接抛弃,
             //example : {"name": "zyzl","title": "自娱自乐",...}
 
+            //Unhandled Exception: type 'String' is not a subtype of type 'Iterable<dynamic>'
+
             // 因为API只接收 groupName 跳转 从而一己之力把 objectIDSet 的存储类型 从 int 更改为 dynamic
-            if(map['name'] !=null && map['title'] !=null){
+            if(map['name'] !=null && map['title'] !=null && map['icon'] != null){
               objectNameSet.add(map["title"]);
-              objectIDSet.addAll(map['name']);
+              objectIDSet.clear();
+              objectIDSet.add(map['name']);
               continue;
             }
 

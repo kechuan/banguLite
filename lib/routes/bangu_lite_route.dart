@@ -34,6 +34,7 @@ import '../catalogs/subject/bangumi_topic_page.dart';
 import '../catalogs/subject/more_reviews_page.dart';
 import '../catalogs/subject/more_topics_page.dart';
 import '../catalogs/surf/bangumi_groups_page.dart';
+import '../catalogs/surf/bangumi_history_page.dart';
 import '../catalogs/surf/bangumi_login_auth_page.dart';
 import '../catalogs/surf/bangumi_surf_timeline_page.dart';
 import '../catalogs/surf/banumi_user_page.dart';
@@ -120,6 +121,16 @@ FFRouteSettings getRouteSettings({
           )!,
           themeColor: asT<Color?>(
             safeArguments['themeColor'],
+          ),
+        ),
+      );
+    case '/history':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => BangumiHistoryPage(
+          key: asT<Key?>(
+            safeArguments['key'],
           ),
         ),
       );
@@ -360,7 +371,7 @@ FFRouteSettings getRouteSettings({
       return FFRouteSettings(
         name: FFRoute.notFoundName,
         routeName: FFRoute.notFoundRouteName,
-        builder: notFoundPageBuilder ?? () => const BangumiAuthPage(key: Key('loginAuth')),
+        builder: notFoundPageBuilder ?? () => Container(),
       );
   }
 }

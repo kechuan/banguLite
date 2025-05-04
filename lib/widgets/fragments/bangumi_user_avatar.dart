@@ -18,6 +18,7 @@ class BangumiUserAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return UnVisibleResponse(
       onTap: () {
+        if(userInformation?.userName == null) return;
         showUserInfomationDialog(context, userInformation);
       },
       child: SizedBox(

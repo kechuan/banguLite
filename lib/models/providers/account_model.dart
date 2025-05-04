@@ -1,6 +1,7 @@
 
 
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/response_status_code.dart';
@@ -21,7 +22,7 @@ class AccountModel extends ChangeNotifier {
 
 	static LoginedUserInformations loginedUserInformations = getDefaultLoginedUserInformations();
 
-  HeadlessInAppWebView? headlessWebView;
+  	HeadlessInAppWebView? headlessWebView;
 
 	void initModel(){
 		loadUserDetail();
@@ -33,10 +34,11 @@ class AccountModel extends ChangeNotifier {
       debugPrint("expired at:${loginedUserInformations.expiredTime}" );
 
       loginedUserInformations.expiredTime?.let((it) {
-        //3天后执行刷新
+        //效果还剩3天时自动刷新令牌
         final differenceTime = DateTime.fromMillisecondsSinceEpoch(it!*1000).difference(DateTime.now());
-        if(differenceTime > const Duration(days: 3) && differenceTime < const Duration(days: 7)){
+        if(differenceTime < const Duration(days: 3)){
           updateAccessToken(loginedUserInformations.refreshToken);
+          //debugPrint("${DateTime.fromMillisecondsSinceEpoch(it*1000).difference(DateTime.now()).inDays}");
         }
 
       });
@@ -65,9 +67,6 @@ class AccountModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  
-
-
 
 	void loadUserDetail(){
 		loginedUserInformations = MyHive.loginUserDataBase.get('loginUserInformations') ?? getDefaultLoginedUserInformations();
@@ -86,38 +85,40 @@ class AccountModel extends ChangeNotifier {
 		Completer<bool> verifyCompleter = Completer();
 
 		if(accessToken==null){
-      debugPrint("账号未登录");
+			debugPrint("账号未登录");
 
-      if(fallbackAction!=null){
-        fallbackAction(BangumiResponseStatusCode.unauthorized);
-      }
+			if(fallbackAction!=null){
+				fallbackAction(BangumiResponseStatusCode.unauthorized);
+			}
 
-      verifyCompleter.complete(false);
+			verifyCompleter.complete(false);
 		}
 
 		else{
-		try{
-			await HttpApiClient.client.get(
-			BangumiAPIUrls.me,
-			options: Options(
-				headers: BangumiQuerys.bearerTokenAccessQuery(accessToken),
-			),
-		
-			).then((response) {
-        if(response.statusCode == 200){
-          debugPrint("accessToken: Valid, ${DateTime.now().millisecondsSinceEpoch~/1000} / ${loginedUserInformations.expiredTime}");
-          loginedUserInformations.userInformation = loadUserInformations(response.data);
-          verifyCompleter.complete(true);
-        }
-        });
+			try{
+				await HttpApiClient.client.get(
+				BangumiAPIUrls.me,
+				options: Options(
+					headers: BangumiQuerys.bearerTokenAccessQuery(accessToken),
+				),
+			
+				).then((response) {
+					if(response.statusCode == 200){
+					debugPrint("accessToken: Valid, ${DateTime.now().millisecondsSinceEpoch~/1000} / ${loginedUserInformations.expiredTime}");
+					loginedUserInformations.userInformation = loadUserInformations(response.data);
+					verifyCompleter.complete(true);
+					}
+				});
 			}
 
 			on DioException catch(e){
 				debugPrint(" ${e.response?.statusCode} verifySessionValidity:${e.message}");
 
-        fallbackAction?.call(e.response?.statusCode);
+				fallbackAction?.call(e.response?.statusCode);
+				loginedUserInformations = getDefaultLoginedUserInformations();
 
 				verifyCompleter.complete(false);
+				
 			}
 
 		}
@@ -192,7 +193,7 @@ class AccountModel extends ChangeNotifier {
 			debugPrint(
         "update succ, ${DateTime.fromMillisecondsSinceEpoch((loginedUserInformations.expiredTime ?? 0)*1000)} =>"
         "${DateTime.now().add(Duration(seconds: response.data["expires_in"]))} \n"
-        "token:${loginedUserInformations.accessToken}"
+        //"token:${loginedUserInformations.accessToken}"
       );
 
 			loginedUserInformations
@@ -205,14 +206,14 @@ class AccountModel extends ChangeNotifier {
 			}
 
 			else{
-			debugPrint("update fail. token may already expired");
-			launchUrlString(BangumiWebUrls.webAuthPage());
+        debugPrint("update fail. token may already expired");
+        launchUrlString(BangumiWebUrls.webAuthPage());
 			}
 		});
 		}
 
 		on DioException catch(e){
-		debugPrint(" ${e.response?.statusCode} error:${e.message}");
+		  debugPrint(" ${e.response?.statusCode} error:${e.message}");
 		}
 	}
 
@@ -286,13 +287,63 @@ class AccountModel extends ChangeNotifier {
   }){
     Completer<bool> getTrunsTileTokenCompleter = Completer();
 
+    Timer? timeoutTimer;
+
+    
+
     headlessWebView = HeadlessInAppWebView(
+      initialUserScripts: UnmodifiableListView(
+        //类似油猴
+        [
+          UserScript(
+            source: """
+              console.log('Turnstile jsp trigged');
+
+              (function() {
+                  window.onloadTurnstileCallback = function() {
+                      console.log('Turnstile loaded successfully');
+                      // 可在此处添加自动提交逻辑或触发下一步操作
+                  };
+              })();
+            """,
+           injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START
+          )
+        ]
+      ),
       initialUrlRequest: URLRequest(url: WebUri(BangumiWebUrls.trunstileAuth())),
-      initialSettings: InAppWebViewSettings(isInspectable: kDebugMode),
-      onWebViewCreated: (controller) {
+      initialSettings: InAppWebViewSettings(
+        isInspectable: kDebugMode,
+        userAgent: HttpApiClient.broswerHeader["User-Agent"]
+      ),
+      onWebViewCreated: (controller) async {
         debugPrint("webview created");
+
+        //await controller.evaluateJavascript(source: """
+
+        //  console.log('Turnstile jsp trigged');
+
+        //  (function() {
+        //      window.onloadTurnstileCallback = function() {
+        //          console.log('Turnstile loaded successfully');
+        //          // 可在此处添加自动提交逻辑或触发下一步操作
+        //      };
+        //  })();
+          
+        //""");
+
+
       },
-      onLoadStart: (controller, url){
+
+      onLoadStart: (controller, url) async {
+
+
+        timeoutTimer ??= Timer(const Duration(seconds: 10), (){
+          getTrunsTileTokenCompleter.complete(false);
+          fallbackAction?.call("timeout or can't pass Turnstile challenge");
+          headlessWebView?.dispose();
+        });
+
+
         if(url.toString().contains(APPInformationRepository.bangumiTurnstileCallbackUri.toString())){
           if(url?.queryParameters["token"] != null){
             loginedUserInformations.turnsTileToken = url?.queryParameters["token"];
@@ -364,7 +415,12 @@ class AccountModel extends ChangeNotifier {
 			contentCompleter.complete(false);
 		}
 
-    await getTrunsTileToken();
+    bool postPermission = await getTrunsTileToken(
+      fallbackAction: fallbackAction
+    );
+
+    if(!postPermission) return false;
+
 
 		switch(actionType){
 
@@ -444,9 +500,6 @@ class AccountModel extends ChangeNotifier {
 		}
 
 
-
-    
-
 		switch(postCommentType){
 
       case PostCommentType.replyEpComment:{
@@ -498,7 +551,12 @@ class AccountModel extends ChangeNotifier {
 
 		switch(actionType){
 			case UserContentActionType.post:{
-        await getTrunsTileToken();
+
+        bool postPermission = await getTrunsTileToken(
+          fallbackAction: fallbackAction
+        );
+
+        if(!postPermission) return false;
 
 				commentFuture = () => HttpApiClient.client.post(
 					requestUrl,

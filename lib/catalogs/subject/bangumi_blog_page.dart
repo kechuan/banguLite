@@ -84,6 +84,6 @@ class _BangumiBlogPageState extends BangumiContentPageState
   String getWebUrl(int? blogID)=> BangumiWebUrls.userBlog(blogID ?? 0);
 
   @override
-  Future<void> loadContent(int blogID) => getContentModel().loadBlog(blogID);
+  Future<void> loadContent(int blogID,{bool isRefresh = false}) => getContentModel().loadBlog(blogID,isRefresh: isRefresh);
 
 }

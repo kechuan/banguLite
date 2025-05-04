@@ -16,7 +16,6 @@ class BangumiListTile extends ListTile {
     super.subtitle,
     super.onTap,
 
-
   });
 
   final BangumiDetails? bangumiDetails;
@@ -90,7 +89,7 @@ class BangumiListTile extends ListTile {
                         Builder(
                           builder: (_) {
 
-                            int totalEps = bangumiDetails?.informationList["eps"];
+                            int totalEps = bangumiDetails?.informationList["eps"] ?? 0;
                             int airedEps = currentBangumiTime != null ? convertAiredEps(currentBangumiTime.toString()) : 0;
 
                             return ScalableText(
@@ -105,7 +104,7 @@ class BangumiListTile extends ListTile {
                           builder: (_) {
                   
                             return ScalableText(
-                              "评分 ${convertDecimalDigitNumString(bangumiDetails?.ratingList["score"])}"
+                              "评分 ${convertDecimalDigitNumString(bangumiDetails?.ratingList["score"] ?? 0.0)}"
                               "${bangumiDetails?.ratingList["rank"] == 0 ? "" : " #${bangumiDetails?.ratingList["rank"]}"}"
                               ,
                               style: const TextStyle(fontSize: 12),

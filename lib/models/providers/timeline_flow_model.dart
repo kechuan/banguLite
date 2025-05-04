@@ -29,8 +29,8 @@ class TimelineFlowModel extends ChangeNotifier {
 
   ) async {
 
-    if(timelineType == BangumiTimelineType.all){
-      timelinesData[BangumiTimelineType.all] = [];
+    if(isAppend != true){
+      timelinesData[timelineType] = [];
     }
 
     Completer<bool> requestTimelineCompleter = Completer();

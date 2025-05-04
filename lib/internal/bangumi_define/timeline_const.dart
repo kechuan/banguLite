@@ -19,6 +19,7 @@ const detectPropList = [
   'epsUpdate',
   'sort',
   'comment',
+  'rate',
   'tsukkomi', //吐槽
   'reactions',
 ];
