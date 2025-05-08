@@ -329,9 +329,6 @@ FFRouteSettings getRouteSettings({
           title: asT<String?>(
             safeArguments['title'],
           ),
-          targetUrl: asT<String?>(
-            safeArguments['targetUrl'],
-          ),
           onTargetUrlReached: asT<Function(String?)?>(
             safeArguments['onTargetUrlReached'],
           ),
@@ -371,7 +368,7 @@ FFRouteSettings getRouteSettings({
       return FFRouteSettings(
         name: FFRoute.notFoundName,
         routeName: FFRoute.notFoundRouteName,
-        builder: notFoundPageBuilder ?? () => Container(),
+        builder: notFoundPageBuilder ?? () => const BangumiAuthPage(key: Key('loginAuth')),
       );
   }
 }

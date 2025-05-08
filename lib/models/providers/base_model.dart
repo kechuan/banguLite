@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/base_details.dart';
 import 'package:bangu_lite/models/base_info.dart';
-import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -52,7 +51,7 @@ abstract class BaseModel
     await HttpApiClient.client.get(
         getContentListUrl(subjectID),
         queryParameters: queryParameters,
-        options: BangumiAPIUrls.bangumiAccessOption
+        options: BangumiAPIUrls.bangumiAccessOption,
       ).then((response) {
         if(response.statusCode == 200){
           subContentListResponseDataCallback(response);
@@ -117,7 +116,7 @@ abstract class BaseModel
       await HttpApiClient.client.get(
         getContentDetailUrl(contentID)!,
         queryParameters: queryParameters,
-        options: BangumiAPIUrls.bangumiAccessOption
+        options: BangumiAPIUrls.bangumiAccessOption,
       ).then((response) {
         if (response.data != null) {
           contentDetailData[contentID] = convertResponseToDetail(response.data) as D;

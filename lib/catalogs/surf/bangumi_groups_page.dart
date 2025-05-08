@@ -5,7 +5,6 @@ import 'package:bangu_lite/internal/callback.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/group_topic_info.dart';
 
 import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';

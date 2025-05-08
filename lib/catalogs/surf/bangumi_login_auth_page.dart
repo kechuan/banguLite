@@ -15,7 +15,9 @@ import 'package:provider/provider.dart';
 
 @FFRoute(name: '/loginAuth')
 class BangumiAuthPage extends StatelessWidget {
-  const BangumiAuthPage({super.key});
+  const BangumiAuthPage({
+    super.key = const Key('loginAuth')
+  });
 
   @override
   Widget build(BuildContext context) {

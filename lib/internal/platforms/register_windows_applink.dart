@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:app_links/app_links.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:win32_registry/win32_registry.dart';
 
@@ -52,6 +53,7 @@ Future<String> listenAPPLink() async{
 
   debugPrint("listenAPPLink");
 
+
   AppLinks().uriLinkStream.listen((uri) async {
     listenUri = uri.toString();
     handleLink(uri); //开启监听
@@ -75,6 +77,13 @@ bool handleLink(Uri uri) {
       return true;
     }
 
+  }
+
+  if(
+    uri.scheme == "bangulite" &&
+    uri.host.startsWith('turnstile')
+  ){
+    AccountModel.loginedUserInformations.turnsTileToken = uri.queryParameters["token"];
   }
 
   return false;

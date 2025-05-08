@@ -1,5 +1,6 @@
 
 
+import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/convert.dart';
@@ -240,7 +241,7 @@ class _SearchfliterState extends State<Searchfliter> {
                           key: animatedTagsListKey,
                           scrollDirection: Axis.horizontal,
                           initialItemCount: tagsList.length,
-                          separatorBuilder: (_,index,animation) => const Padding(padding: EdgeInsets.symmetric(horizontal: 12)),
+                          separatorBuilder: (_,index,animation) => const Padding(padding: PaddingH12),
                           removedSeparatorBuilder: (_, index, animation) => const SizedBox.shrink(),
                           itemBuilder: (listContext,index,animation){
                             

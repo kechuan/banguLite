@@ -112,9 +112,9 @@ abstract class BangumiContentPageState<
                           MultiSliver(
                             children: [
                               
-                              SliverSafeArea(
-                                bottom: false,
-                                sliver: SliverPinnedHeader(
+                              SliverPinnedHeader(
+                                child: SafeArea(
+                                  bottom: false,
                                   child: BangumiContentAppbar(
                                     contentID: getSubContentID() ?? contentInfo.id,
                                     titleText: contentDetailData.contentTitle ?? contentInfo.contentTitle,
@@ -125,15 +125,15 @@ abstract class BangumiContentPageState<
                                                   
                                       final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
                                       final int commentListCount = getCommentCount(contentDetail, false) ?? 0;
-                                
+                                                                
                                       int resultCommentCount = 
                                         getPostCommentType() == PostCommentType.replyTopic ?
                                         commentListCount :
                                         commentListCount+1
                                       ;
-                                
+                                                                
                                       resultCommentCount += userCommentMap.length;
-                                
+                                                                
                                       userCommentMap.addAll({resultCommentCount:content});
                                       
                                       WidgetsBinding.instance.addPostFrameCallback((_){
@@ -141,8 +141,8 @@ abstract class BangumiContentPageState<
                                       });
                                                              
                                     },
-                                  )
-                                ),
+                                  ),
+                                )
                               ),
                                     
                               contentComment!
@@ -286,9 +286,10 @@ abstract class BangumiContentPageState<
 
                               final currentEpCommentDetails =  EpCommentDetails()
                                 ..userInformation = AccountModel.loginedUserInformations.userInformation
+
                                 //..userInformation = 
                                 //(
-                                //  UserInformation()..userName = "august3416"
+                                //  UserInformation()..userName = "1000000"
                                 //)
 
 								                //刚刚评论的ID理应无法被Action操作

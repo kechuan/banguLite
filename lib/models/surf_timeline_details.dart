@@ -20,12 +20,22 @@ class SurfTimelineDetails extends BaseDetails {
   BangumiTimelineType? bangumiTimelineType;
   String? sourceTitle; // Subject&Group
   dynamic sourceID;
-  //int? sourceID;
   
   int? replies;
   int? updatedAt;
 
-  
+  SurfTimelineDetails copyWithUpdateAt(SurfTimelineDetails surfTimelineDetails) {
+    return SurfTimelineDetails(
+      detailID: surfTimelineDetails.detailID,
+    )
+      ..commentDetails = surfTimelineDetails.commentDetails
+      ..title = surfTimelineDetails.title
+      ..bangumiTimelineType = surfTimelineDetails.bangumiTimelineType
+      ..sourceTitle = surfTimelineDetails.sourceTitle
+      ..sourceID = surfTimelineDetails.sourceID
+      ..replies = surfTimelineDetails.replies
+      ..updatedAt = DateTime.now().millisecondsSinceEpoch;
+  }
 
 }
 

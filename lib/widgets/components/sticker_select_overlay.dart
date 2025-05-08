@@ -7,6 +7,7 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
@@ -19,14 +20,15 @@ class StickerSelectOverlay{
     {
       required this.context,
       this.buttonLayerLink,
-      this.postCommentType
+      this.postCommentType,
+      this.onStick,
     }
   );
-
 
   final BuildContext context;
   final LayerLink? buttonLayerLink;
   final PostCommentType? postCommentType;
+  final Function(int)? onStick;
 
   final opacityListenable = ValueNotifier<double>(0.0);
 
@@ -44,7 +46,7 @@ class StickerSelectOverlay{
 
     else{
       OverlayState overlayState = Overlay.of(context); //refresh OverlayState?
-      OverlayEntry stickerSelectOverlay = createOverlay(context,commentID,postCommentType);
+      OverlayEntry stickerSelectOverlay = createOverlay(context,commentID);
       overlayState.insert(stickerSelectOverlay);
       isOverlayActived = true;
     }
@@ -63,8 +65,7 @@ class StickerSelectOverlay{
 
   OverlayEntry createOverlay(
     BuildContext context,
-    int commentID,
-    PostCommentType? postCommentType
+    int commentID
   ){
     return currentEntry = OverlayEntry(
       
@@ -151,15 +152,40 @@ class StickerSelectOverlay{
                                     return GridTile(
                                       child: InkResponse(
                                         onTap: () {
+
+                                          invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
+                                            context,
+                                            message: message,
+                                            requestStatus: requestStatus,
+                                          );
+
                                           final accountModel = context.read<AccountModel>();
                         
-                                          debugPrint("postCommentType:$postCommentType");
+                                          debugPrint("dataIndex:${stickerDataLike[index]}, postCommentType:$postCommentType, subject:$commentID");
+
+                                          invokeRequestSnackBar();
+
+                                          //onStick?.call(stickerDataLike[index]);
                                   
                                           accountModel.toggleCommentLike(
                                             commentID, 
                                             stickerDataLike[index],
                                             postCommentType,
-                                          );
+                                            fallbackAction: (message){
+                                              invokeRequestSnackBar(message: message,requestStatus: false);
+                                            }
+                                          ).then((result){
+                                            //这里就没办法联动了。。毕竟是overlay
+                                            if(result){
+
+                                              onStick?.call(stickerDataLike[index]);
+
+                                              invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
+
+
+                                            }
+                                            
+                                          });
                         
                                           opacityListenable.value = 0.0;
                         

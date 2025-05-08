@@ -8,7 +8,7 @@ class StarSliderPanel extends StatelessWidget {
     super.key,
     required this.valueNotifier,
     required this.onChanged,
-	this.themeColor,
+	  this.themeColor,
   });
   
 
@@ -23,6 +23,13 @@ class StarSliderPanel extends StatelessWidget {
       valueListenable: valueNotifier,
       builder: (_, score, child){
 
+        if(score~/1 > 1){
+          WidgetsBinding.instance.addPostFrameCallback((_){
+            valueNotifier.value = score/10;
+          });
+          
+        }
+
         return Column(
           children: [
 
@@ -36,7 +43,7 @@ class StarSliderPanel extends StatelessWidget {
                       ratingScore: score*10~/1,
                       showEmpty: true,
                       itemExtent: 30,
-					  themeColor: themeColor,
+					            themeColor: themeColor,
                     ),
                   ),
 
@@ -60,7 +67,7 @@ class StarSliderPanel extends StatelessWidget {
             ScalableText("${score*10~/1}  ${convertScoreRank((score*10~/1).toDouble())}"),
 
             Offstage(
-              offstage: score*10~/1 >= 1,
+              offstage: score~/1 >= 1,
               child: const ScalableText("(在星星栏滑动以进行评分)"),
             )
 

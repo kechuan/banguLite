@@ -19,9 +19,9 @@ android {
 	//- sqflite requires Android NDK 27.0.12077973
 	//- url_launcher_android requires Android NDK 27.0.12077973
     namespace = "io.flutter.banguLite"
-    compileSdk = flutter.compileSdkVersion
-    //ndkVersion = flutter.ndkVersion
+    compileSdk = flutter.compileSdkVersion    //ndkVersion = flutter.ndkVersion
 	ndkVersion = "27.0.12077973"
+	//newest LTS ndkVersion "27.2.12479018"
 
 	compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

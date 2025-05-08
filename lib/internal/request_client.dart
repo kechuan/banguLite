@@ -15,9 +15,12 @@ class HttpApiClient{
   static BaseOptions clientOption = Dio().options;
 
   static Map<String,String> broswerHeader = {
-    //"referer": 'https://www.bilibili.com',
-    "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
+    "User-Agent":'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0'
 
+  };
+
+  static Map<String,String> nonWebviewHeader = {
+    "User-Agent":'Mozilla/5.0 (Linux; Android 13; 23049RAD8C Build/TKQ1.221114.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/128.0.6613.146 Mobile Safari/537.36'
   };
 
   static void init(){
@@ -380,7 +383,7 @@ class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.7.0",
+                      version = "0.8.0",
                       author = "kechuan"
   ;
 

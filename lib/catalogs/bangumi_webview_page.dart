@@ -1,5 +1,10 @@
+import 'dart:convert';
+
+import 'package:bangu_lite/internal/extract.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/webview_model.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/foundation.dart';
@@ -7,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 //预计用途: 查看外部图片之类的
 @FFRoute(name: '/webview')
@@ -16,13 +20,15 @@ class BangumiWebviewPage extends StatefulWidget {
     super.key,
     required this.url,
     this.title,
-    this.targetUrl,
+    this.injectHTML,
     this.onTargetUrlReached,
   });
 
   final String url;
   final String? title;
-  final String? targetUrl;
+
+  final String? injectHTML;
+  
   final Function(String?)? onTargetUrlReached;
 
   @override
@@ -38,6 +44,8 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage> w
   ValueNotifier<double> progressNotifier = ValueNotifier(0.0);
   ValueNotifier<String> currentSurfingUrlNotifier = ValueNotifier("");
   ValueNotifier<String> currentSurfingTitleNotifier = ValueNotifier("");
+
+  int wrongRedirectCount = 0;
   
   @override
   void initState() {
@@ -46,28 +54,37 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage> w
     currentSurfingTitleNotifier.value = widget.title ?? "";
   }
 
+
+
   @override
   Widget build(BuildContext context) {
-	final webviewModel = context.read<WebViewModel>();
+	  final webviewModel = context.read<WebViewModel>();
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: (){
+            Navigator.of(context).pop();
+          }, icon: const Icon(Icons.arrow_back)
+        ),
         title: ValueListenableBuilder(
           valueListenable: currentSurfingTitleNotifier,
           builder: (_,title,__) {
             return Text(title,style: const TextStyle(fontSize: 16));
           }
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.cookie),
-            onPressed: () {
-              //取样=>验证
+        //actions: [
+
+        //  IconButton(
+        //    icon: const Icon(Icons.cookie),
+        //    onPressed: () {
+        //      //取样=>验证
 
 
-            },
-          ),
-        ],
+        //    },
+        //  ),
+          
+        //],
       ),
       body: SafeArea(
           child: Column(
@@ -146,7 +163,11 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage> w
                 InAppWebView(
                   webViewEnvironment: webviewModel.webViewEnvironment,
                   initialUrlRequest: URLRequest(url: WebUri(currentSurfingUrlNotifier.value)),
-                  initialSettings: webviewModel.settings,
+                  initialSettings: InAppWebViewSettings(
+                    isInspectable: kDebugMode,
+                    userAgent: HttpApiClient.broswerHeader["User-Agent"],
+                    useShouldInterceptRequest: true,
+                  ),
                   pullToRefreshController: pullToRefreshController,
                   
                   onTitleChanged: (controller, title) {
@@ -158,40 +179,75 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage> w
                   onLoadStart: (controller, url){
                     currentSurfingUrlNotifier.value = url.toString();
                   },
+                  shouldInterceptRequest: (controller,request){
+                    
+                    if (request.url.toString().contains(BangumiWebUrls.trunstileAuth())) {
+                      debugPrint("shouldInterceptRequest inject succ");
+                      return Future.value(WebResourceResponse(data: utf8.encode(widget.injectHTML!)));
+                    }
+                    
+                    return Future.value(null); // 其他请求正常处理
+                  },
                   onPermissionRequest: (controller, request) async {
                     return PermissionResponse(
                       resources: request.resources,
                       action: PermissionResponseAction.GRANT);
                   },
-                  shouldOverrideUrlLoading: (controller, navigationAction) async {
-                    var uri = navigationAction.request.url!;
-
-                    if (!["http","https","file"].contains(uri.scheme)) {
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri);
-                        return NavigationActionPolicy.CANCEL;
-                      }
-                    }
-
-                    return NavigationActionPolicy.ALLOW;
+                  onConsoleMessage:(controller, consoleMessage) {
+                    debugPrint("Console message: ${consoleMessage.message}");
                   },
-                  onLoadStop: (controller, url) async {
-                    pullToRefreshController?.endRefreshing();
+                  //shouldOverrideUrlLoading: (controller, navigationAction) async {
 
-                    if(widget.targetUrl!=null){
-                      if(url.toString().contains(widget.targetUrl!)){
-                        if(widget.onTargetUrlReached != null){
-                          await getCookie(widget.targetUrl).then((cookieValue){
-                            widget.onTargetUrlReached!(cookieValue);
-                          });
+
+                  //  var uri = navigationAction.request.url!;
+
+                  //  if (!["http","https","file"].contains(uri.scheme)) {
+                  //    if (await canLaunchUrl(uri)) {
+                  //      await launchUrl(uri);
+                  //      return NavigationActionPolicy.CANCEL;
+                  //    }
+                  //  }
+
+                  //  return NavigationActionPolicy.ALLOW;
+                  //},
+
+                  onReceivedError: (controller, request, error) {
+                    //fallbackAction may deal with Indicates that the connection was stopped.
+
+                    if(widget.url.contains(BangumiWebUrls.trunstileAuth())){
+                      debugPrint("error:${error.description}");
+
+                      invokePop() => Navigator.of(context).pop();
+
+                      Future.delayed(const Duration(seconds: 5), (){
+
+                        extractFallbackToken(controller).then((result){
+                          if(result != null){
+                            AccountModel.loginedUserInformations.turnsTileToken = result;
+                            invokePop();
+                            controller.dispose();
+                            
+                          }
+
+                          else{
+                            if(wrongRedirectCount == 3){ 
+                              invokePop();
+                              controller.dispose();
+                            }
+
+                            controller.reload();
+                            wrongRedirectCount+=1;
+                          }
                           
-                        }
-                      }
-                    }
+                            
+                        });
 
+                          
+
+                      });
+                    }
                     
                   },
-                  onReceivedError: (controller, request, error) => pullToRefreshController?.endRefreshing(),
                   onProgressChanged: (controller, progress) {
                     if (progress == 100) {
                       pullToRefreshController?.endRefreshing();
@@ -199,11 +255,7 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage> w
                     progressNotifier.value = progress / 100;
 
                   },
-                  onConsoleMessage: (controller, consoleMessage) {
-                    if (kDebugMode) {
-                    print(consoleMessage);
-                    }
-                  },
+
                 ),
 
                 ValueListenableBuilder(
@@ -226,30 +278,32 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage> w
   }
 }
 
-Future<String?> getCookie(String? targetUrl,{String? cookiesName = 'chii_sec_id'}) async {
+//Future<String?> getCookie(String? targetUrl,{String? cookiesName = 'chii_sec_id'}) async {
 
-	String? cookieValue;
+//	String? cookieValue;
 
-	if(targetUrl == null || cookiesName == null) return '';
+//	if(targetUrl == null || cookiesName == null) return '';
 
-	final cookieManager = CookieManager.instance();
+//	final cookieManager = CookieManager.instance();
 
-	await cookieManager.getCookies(url: WebUri(targetUrl)).then((cookiesList) {
-		cookiesList.any(
-			(currentCookie){
-				if(currentCookie.name == cookiesName){
-					debugPrint("$cookiesName:${currentCookie.value}");
-					cookieValue = currentCookie.value;
-					return true;
-				}
+//	await cookieManager.getCookies(url: WebUri(targetUrl)).then((cookiesList) {
+//		cookiesList.any(
+//			(currentCookie){
+//				if(currentCookie.name == cookiesName){
+//					debugPrint("$cookiesName:${currentCookie.value}");
+//					cookieValue = currentCookie.value;
+//					return true;
+//				}
 
-				return false;
+//				return false;
 				
-			}
-		);
+//			}
+//		);
 
-	});
+//	});
 
-	return cookieValue;
+//	return cookieValue;
 						
-}
+//}
+
+

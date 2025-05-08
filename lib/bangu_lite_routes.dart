@@ -168,7 +168,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiWebviewPage : [String(required) url, String? title, String? targetUrl,  Function(String?)? onTargetUrlReached]
+  /// BangumiWebviewPage : [String(required) url, String? title,  Function(String?)? onTargetUrlReached]
   static const String webview = '/webview';
 
   /// 'about'

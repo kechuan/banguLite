@@ -9,7 +9,7 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CommentReaction extends StatelessWidget {
+class CommentReaction extends StatefulWidget {
   const CommentReaction({
     super.key,
     this.commentID,
@@ -18,7 +18,9 @@ class CommentReaction extends StatelessWidget {
     this.replyIndex,
     this.postCommentType,
 
-    this.themeColor
+    this.themeColor,
+
+    this.animatedReactionsListKey
   });
 
   final int? commentID;
@@ -32,19 +34,39 @@ class CommentReaction extends StatelessWidget {
 
   final Color? themeColor;
 
+  final GlobalKey<AnimatedListState>? animatedReactionsListKey;
+
+  @override
+  State<CommentReaction> createState() => _CommentReactionState();
+}
+
+class _CommentReactionState extends State<CommentReaction> {
+
+  ValueNotifier<int> reactDataLikeNotifier = ValueNotifier(-1);
+
+  late final Map<int, Set<String>> localCommentReactions;
+
+  @override
+  void initState() {
+    localCommentReactions = widget.commentReactions ?? {};
+    
+    //reactDataLikeNotifier
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
 
-    ValueNotifier<int> reactDataLikeNotifier = ValueNotifier(-1);
+    
 
     final accountModel = context.read<AccountModel>();
-    bool isReactAble = accountModel.isLogined() && commentID != null;
+    bool isReactAble = accountModel.isLogined() && widget.commentID != null;
 
-    if(commentReactions == null || commentReactions!.isEmpty){
+    if(localCommentReactions.isEmpty){
       return const SizedBox.shrink();
     }
 
-    bool isServerDataContain = commentReactions!.entries.any((userList){
+    bool isServerDataContain = localCommentReactions.entries.any((userList){
       if(userList.value.contains(AccountModel.loginedUserInformations.userInformation?.getName())){
         reactDataLikeNotifier.value = userList.key;
         return true;
@@ -60,115 +82,134 @@ class CommentReaction extends StatelessWidget {
       child: ValueListenableBuilder(
         valueListenable: reactDataLikeNotifier,
         builder: (_,reactDataLike,child){
-          return ListView.separated(
+          //AnimatedList 策略 只增不删 允许显示出 0 
+          return AnimatedList.separated(
+            key: widget.animatedReactionsListKey,
             shrinkWrap: true,
             scrollDirection: Axis.horizontal,
             physics: const ClampingScrollPhysics(),
-            itemCount: commentReactions!.length,
-            itemBuilder: (_, index) {
+            initialItemCount: localCommentReactions.length,
+            separatorBuilder: (_, index_,animation) => const Padding(padding: PaddingH6),
+            removedSeparatorBuilder:  (_, index, animation) => const SizedBox.shrink(),
+            itemBuilder: (_, index,animation) {
+
+              if(localCommentReactions.isEmpty && reactDataLikeNotifier.value == -1) return const SizedBox.shrink();
           
               //恐怕 需要变成 reactDataLikeNotifier 驱动了
               
-              int dataLikeIndex = commentReactions!.keys.elementAt(index);
+              int dataLikeIndex = localCommentReactions.keys.elementAt(index);
               int stickerIndex = convertStickerDatalike(dataLikeIndex);
 
               Color? buttonColor = 
                 isReactAble ? 
-                (reactDataLike == dataLikeIndex ? themeColor?.withValues(alpha: 0.8) : themeColor?.withValues(alpha: 0.3)) : 
+                (reactDataLike == dataLikeIndex ? widget.themeColor?.withValues(alpha: 0.8) : widget.themeColor?.withValues(alpha: 0.3)) : 
                 Colors.grey.withValues(alpha: 0.8)
               ;
 
-              return Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: judgeDarknessMode(context) ? Colors.white : buttonColor ?? Colors.grey.withValues(alpha: 0.8),
-                  ),
-                  borderRadius: BorderRadius.circular(20)
-                ),
-                width: 80,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(buttonColor),
-                    padding: const WidgetStatePropertyAll(PaddingH6),
-                  ),
-                  onPressed:  () {
+              return SlideTransition(
+                position: animation.drive(Tween<Offset>(begin: const Offset(-1, 0),end: Offset.zero)),
+                child: FadeTransition(
+                  opacity: animation,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: judgeDarknessMode(context) ? Colors.white : buttonColor ?? Colors.grey.withValues(alpha: 0.8),
+                      ),
+                      borderRadius: BorderRadius.circular(20)
+                    ),
+                    width: 80,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(buttonColor),
+                        padding: const WidgetStatePropertyAll(PaddingH6),
+                      ),
+                      onPressed:  () {
+                  
+                        if(!isReactAble) return;
+                  
+                        invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
+                          context,
+                          message: message,
+                          requestStatus: requestStatus,
+                        );
+                  
+                        debugPrint("reactDataLike:$reactDataLike, dataLikeIndex:$dataLikeIndex, subject:${widget.commentID}");
+                  
+                       
+                  
+                        //invokeRequestSnackBar(message: "UI贴条成功",requestStatus: true);
+                  
+                        invokeRequestSnackBar();
+                  
+                          accountModel.toggleCommentLike(
+                            widget.commentID,
+                            dataLikeIndex,
+                            widget.postCommentType,
+                            actionType: reactDataLike == dataLikeIndex ? UserContentActionType.delete : UserContentActionType.post,
+                            fallbackAction: (message){
+                              invokeRequestSnackBar(message: message,requestStatus: false);
+                            }
+                          ).then((result){
+                            if(result){
+                  
+                              if(reactDataLike == dataLikeIndex){
+                                reactDataLikeNotifier.value = -1;
+                              }
+                  
+                              else{
+                                reactDataLikeNotifier.value = dataLikeIndex;
+                              }
+                  
+                              invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
 
-                    if(!isReactAble) return;
-
-                    invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
-                      context,
-                      message: message,
-                      requestStatus: requestStatus,
-                    );
-
-                    debugPrint("reactDataLike:$reactDataLike, dataLikeIndex:$dataLikeIndex, subject:$commentID");
-
-                    invokeRequestSnackBar();
-
-                      accountModel.toggleCommentLike(
-                        commentID,
-                        dataLikeIndex,
-                        postCommentType,
-                        actionType: reactDataLike == dataLikeIndex ? UserContentActionType.delete : UserContentActionType.post,
-                      ).then((result){
-                        if(result){
-
-                          if(reactDataLike == dataLikeIndex){
-                            reactDataLikeNotifier.value = -1;
-                          }
-
-                          else{
-                            reactDataLikeNotifier.value = dataLikeIndex;
-                          }
-
-                          invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
-                          
-                        }
-
+                            }
+                  
+                  
+                          });
+                  
+                                  
+                        debugPrint("postCommentType:${widget.postCommentType}, id: ${widget.commentID}");
+                                  
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
                         
-                      });
-
-                              
-                    debugPrint("postCommentType:$postCommentType, id: $commentID");
-                              
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                    
-                      Image.asset(
-                        "assets/bangumiSticker/bgm$stickerIndex.gif",
-                        scale: 0.8,
-                      ),
-                      
-                      Tooltip(
-                         triggerMode: TooltipTriggerMode.tap,
-                          message: 
-                            "${commentReactions![dataLikeIndex]?.take(6).join("、")}等"
-                            "${(commentReactions![dataLikeIndex]?.length ?? 0)}人",
-                          textStyle: TextStyle(
-                            color: judgeDarknessMode(context) ? Colors.black : Colors.white
+                          Image.asset(
+                            "assets/bangumiSticker/bgm$stickerIndex.gif",
+                            scale: 0.8,
                           ),
-                        child: ScalableText("${(commentReactions![dataLikeIndex]?.length ?? 0) + (
-                            reactDataLike == dataLikeIndex ? 
-                              (
-                                isServerDataContain ? 
-                                reactDataLike != dataLikeIndex ? -1 : 0 :
-                                reactDataLike == dataLikeIndex ? 1 : 0
-                              ) :
-                            reactDataLike == dataLikeIndex ? 1 : 0
-                          )
-                        }"),
+                          
+                          Tooltip(
+                             triggerMode: TooltipTriggerMode.tap,
+                              message: 
+                                "${localCommentReactions[dataLikeIndex]?.take(6).join("、")}等"
+                                "${(localCommentReactions[dataLikeIndex]?.length ?? 0)}人",
+                              textStyle: TextStyle(
+                                color: judgeDarknessMode(context) ? Colors.black : Colors.white
+                              ),
+                              child: ScalableText("${(localCommentReactions[dataLikeIndex]?.length ?? 0) + (
+                                  reactDataLike == dataLikeIndex ? 
+                                    (
+                                      isServerDataContain ? 
+                                      reactDataLike != dataLikeIndex ? -1 : 0 :
+                                      reactDataLike == dataLikeIndex ? 1 : 0
+                                    ) :
+                                  reactDataLike == dataLikeIndex ? 1 : 0
+                                )
+                            }"),
+                          ),
+                        ],
                       ),
-                    ],
+                        
+                    ),
                   ),
-                    
                 ),
               );
           
             },
           
-            separatorBuilder: (_, index) => const Padding(padding: PaddingH6)
+            
           );
         },
         

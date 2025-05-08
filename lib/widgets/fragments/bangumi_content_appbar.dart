@@ -56,16 +56,16 @@ class BangumiContentAppbar extends StatelessWidget {
             ),
           ),
 
-          //IconButton(
-          //  onPressed: (){
-          //    final userModel = context.read<UserModel>();
+        //  IconButton(
+        //    onPressed: (){
+        //      final userModel = context.read<UserModel>();
               
-          //    fadeToaster(context: context, message: "删除user信息");
+        //      fadeToaster(context: context, message: "删除user信息");
 
-          //    userModel.userData.remove('user');
-          //  }, 
-          //  icon: const Icon(Icons.abc)
-          //),
+        //      userModel.userData.remove('1000000');
+        //    }, 
+        //    icon: const Icon(Icons.abc)
+        //  ),
             
           IconButton(
             onPressed: (){
@@ -106,6 +106,10 @@ class BangumiContentAppbar extends StatelessWidget {
                                       
                   //invokeRequestSnackBar(message: "UI回帖成功",requestStatus: true);
                   //onSendMessage?.call(content);
+
+                //  await accountModel.getTrunsTileToken().then((result){
+                //    debugPrint("$result");
+                //  });
                     
 
                   invokeRequestSnackBar();

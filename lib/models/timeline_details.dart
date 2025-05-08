@@ -189,20 +189,47 @@ String convertTimelineDescription(
 
   if(contentText.isEmpty && !(currentTimeline.catType == 1 || currentTimeline.catType == 5)) undoActionText += "撤销了一项 ";
 
-  //时间线吐槽
-  if(isCommentDeclared && currentTimeline.catType == 5 && currentTimeline.catAction == 1){
-    actionText = "[url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}]${TimelineCatStatus.Comment.actionName}";
+  ////时间线吐槽
+  //if(isCommentDeclared && currentTimeline.catType == 5 && currentTimeline.catAction == 1){
+  //  actionText = "[url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}]${TimelineCatStatus.Comment.actionName}";
 
-    //感觉以后可以做一个proxy 用于 增加时 额外添加一个 /s 字符。。
-    if(currentTimeline.replies != 0){
-      actionText += ' (${currentTimeline.replies}条评论)';
-    }
+  //  //感觉以后可以做一个proxy 用于 增加时 额外添加一个 /s 字符。。
+  //  if(currentTimeline.replies != 0){
+  //    actionText += ' (${currentTimeline.replies}条评论)';
+  //  }
 
-    actionText += '[/url]';
+  //  actionText += '[/url]';
 
-    if(currentTimeline.commentDetails?.comment?.isEmpty == false){
+  //  if(currentTimeline.commentDetails?.comment?.isEmpty == false){
+  //    suffixText = '[quote]${currentTimeline.commentDetails!.comment ?? ""}[/quote]';
+  //  }
+    
+  //}
+
+  //时间线行为
+  if(isCommentDeclared && currentTimeline.catType == 5){
+
+    if(
+      currentTimeline.catAction == TimelineCatStatus.UpdateSignature.value
+    ){
       suffixText = '[quote]${currentTimeline.commentDetails!.comment ?? ""}[/quote]';
     }
+
+    else if(currentTimeline.catAction == TimelineCatStatus.Comment.value){
+      actionText = "[url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}]${TimelineCatStatus.Comment.actionName}";
+
+      //感觉以后可以做一个proxy 用于 增加时 额外添加一个 /s 字符。。
+      if(currentTimeline.replies != 0){
+        actionText += ' (${currentTimeline.replies}条评论)';
+      }
+
+      actionText += '[/url]';
+
+      if(currentTimeline.commentDetails?.comment?.isEmpty == false){
+        suffixText = '[quote]${currentTimeline.commentDetails!.comment ?? ""}[/quote]';
+      }
+    }
+    
     
   }
 
@@ -306,7 +333,9 @@ String convertDefaultTimeline(
 
     }
 
-    //case 5: 时间线吐槽由外部进行处理 非内部 
+    /// 因为 comment 与 影响的对象 不止是 contentText 还有 suffix 
+    /// 因此在对于 TimelineCatStatus 的内容处理 将由外部进行处理 而非内部 
+    case 5:{}
 
     case 6:{
       //timeline的日志不携带 源id信息 所以无法追踪到 源subject

@@ -1,9 +1,13 @@
+import 'dart:math';
+
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/internal/extension.dart';
 import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
@@ -11,7 +15,7 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
-class EpCommentTile extends StatelessWidget {
+class EpCommentTile extends StatefulWidget {
   const EpCommentTile({
     super.key,
     required this.epCommentData,
@@ -29,21 +33,32 @@ class EpCommentTile extends StatelessWidget {
   final Function(String?)? onUpdateComment;
 
   @override
+  State<EpCommentTile> createState() => _EpCommentTileState();
+}
+
+class _EpCommentTileState extends State<EpCommentTile> {
+
+  final GlobalKey<AnimatedListState> animatedTagsListKey = GlobalKey<AnimatedListState>();
+
+
+  @override
   Widget build(BuildContext context) {
 
     bool commentBlockStatus = false;
 
+    
+
     if(
-      epCommentData.state != null &&
-      ( epCommentData.state == CommentState.adminCloseTopic.index ||
-        epCommentData.state == CommentState.userDelete.index ||
-        epCommentData.state == CommentState.adminDelete.index
+      widget.epCommentData.state != null &&
+      ( widget.epCommentData.state == CommentState.adminCloseTopic.index ||
+        widget.epCommentData.state == CommentState.userDelete.index ||
+        widget.epCommentData.state == CommentState.adminDelete.index
       )
     ){
       commentBlockStatus = true;
     }
 
-    DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch((epCommentData.commentTimeStamp ?? 0)*1000);
+    DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch((widget.epCommentData.commentTimeStamp ?? 0)*1000);
 
 
     return ListTile(
@@ -59,7 +74,7 @@ class EpCommentTile extends StatelessWidget {
 
               BangumiUserAvatar(
                 size: 50,
-                userInformation: epCommentData.userInformation,
+                userInformation: widget.epCommentData.userInformation,
               ),
 
               //可压缩信息 Expanded
@@ -71,8 +86,8 @@ class EpCommentTile extends StatelessWidget {
 
                     Expanded(
                       child: ScalableText(
-                        epCommentData.userInformation?.nickName ?? epCommentData.userInformation?.userName ?? "no data"
-                        "${authorType?.typeName}",
+                        widget.epCommentData.userInformation?.nickName ?? widget.epCommentData.userInformation?.userName ?? "no data"
+                        "${widget.authorType?.typeName}",
                           style: const TextStyle(color: Colors.blue),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -80,7 +95,7 @@ class EpCommentTile extends StatelessWidget {
                     ),
 
                     ScalableText(
-                      authorType?.typeName == null ? "" : "(${authorType?.typeName})",
+                      widget.authorType?.typeName == null ? "" : "(${widget.authorType?.typeName})",
                       style: const TextStyle(
                         color: Colors.grey,
                         fontWeight: FontWeight.bold
@@ -103,7 +118,7 @@ class EpCommentTile extends StatelessWidget {
                   alignment: WrapAlignment.end,
                   children: [
                           
-                    ScalableText(epCommentData.epCommentIndex== null ? "" : "#${epCommentData.epCommentIndex}"),
+                    ScalableText(widget.epCommentData.epCommentIndex== null ? "" : "#${widget.epCommentData.epCommentIndex}"),
                           
                     ScalableText(
                       "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)}"
@@ -118,22 +133,76 @@ class EpCommentTile extends StatelessWidget {
               ),
 
               BangumiCommentActionButton(
-                commentData: epCommentData,
+                commentData: widget.epCommentData,
                 commentBlockStatus: commentBlockStatus,
-                postCommentType: postCommentType,
-                onUpdateComment: onUpdateComment,
+                postCommentType: widget.postCommentType,
+                onUpdateComment: widget.onUpdateComment,
+                onSticker: (datalikeIndex){
+
+                  int repeatIndex = -1;
+
+                  widget.epCommentData.commentReactions?.let((commentReactions){
+
+                    bool isReactionExist = commentReactions!.keys.every(
+                      (currentDataLike) => currentDataLike == datalikeIndex
+                    );
+        
+                    if(!isReactionExist){
+
+                      commentReactions.entries.any((userList){
+                        if(
+                          userList.value.first == (AccountModel.loginedUserInformations.userInformation?.getName() ?? "")
+                        ){
+                          repeatIndex = userList.key;
+                          return true;
+                        }
+
+                        return false;
+                      });
+
+                      if(repeatIndex != -1){
+                        commentReactions.remove(repeatIndex);
+
+                        animatedTagsListKey.currentState?.removeItem(
+                          repeatIndex == -1 ? max(0,commentReactions.length-1) : 0,
+                          (_,animation)=> FadeTransition(opacity: animation,child: const SizedBox.shrink())
+                        );
+                      }
+
+
+                    }
+
+                    commentReactions[datalikeIndex] = {
+                      AccountModel.loginedUserInformations.userInformation?.getName() ?? ""
+                    };
+
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      
+                      //无法理解。。。
+                      animatedTagsListKey.currentState?.insertItem(
+                        repeatIndex == -1 ? max(0,commentReactions.length-1) : 0,
+                        duration: const Duration(milliseconds: 300)
+                      );
+
+                      
+                    });
+
+
+                  });
+
+                },
               ),
               
             ],
           ),
 
           Builder(builder: (_){
-            if(epCommentData.userInformation?.sign == null || epCommentData.userInformation!.sign!.isEmpty){
+            if(widget.epCommentData.userInformation?.sign == null || widget.epCommentData.userInformation!.sign!.isEmpty){
                 return const SizedBox.shrink();
             }
             return Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: ScalableText("(${epCommentData.userInformation?.sign})",style:const TextStyle(color: Colors.grey)),
+              child: ScalableText("(${widget.epCommentData.userInformation?.sign})",style:const TextStyle(color: Colors.grey)),
             );
           }),
 
@@ -154,19 +223,19 @@ class EpCommentTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const ScalableText("发言已隐藏"),
-                  ScalableText("原因: ${CommentState.values[epCommentData.state!].reason}")
+                  ScalableText("原因: ${CommentState.values[widget.epCommentData.state!].reason}")
                 ],
               )
             ] : null,
 
 
-            ...?(!commentBlockStatus && epCommentData.comment?.isNotEmpty == true) ? 
+            ...?(!commentBlockStatus && widget.epCommentData.comment?.isNotEmpty == true) ? 
             [
                BBCodeText(
-                data: convertBangumiCommentSticker(epCommentData.comment ?? ""),
+                data: convertBangumiCommentSticker(widget.epCommentData.comment ?? ""),
                 stylesheet: appDefaultStyleSheet(context,selectableText: true),
                 errorBuilder: (context, error, stackTrace) {
-                  return ScalableText("${epCommentData.comment}",
+                  return ScalableText("${widget.epCommentData.comment}",
                   );
                 },
               ) 
@@ -174,32 +243,27 @@ class EpCommentTile extends StatelessWidget {
             ] : null,
             
             //commentReaction Area
-            Row(
-              //mainAxisAlignment: MainAxisAlignment.end, 不生效 因为主轴已经被 Expanded 占满
-              children: [
-                Expanded(
-                  //那么只能在内部插入松约束 Align 来调节方位
-                  child: Builder(
-                    builder: (_) {
+  
 
-                      int? commentIndex = int.tryParse(epCommentData.epCommentIndex?.split('-').first ?? '');
-                      int? replyIndex = int.tryParse(epCommentData.epCommentIndex?.split('-').length == 1 ? '' : epCommentData.epCommentIndex?.split('-').last ?? '');
-
-                      return Align(
-                        alignment: Alignment.centerRight,
-                        child: CommentReaction(
-                          themeColor: themeColor,
-                          postCommentType: postCommentType,
-                          commentID: epCommentData.commentID,
-                          commentIndex: commentIndex,
-                          replyIndex: replyIndex,
-                          commentReactions: epCommentData.commentReactions
-                        ),
-                      );
-                    }
+            Builder(
+              builder: (_) {
+                        
+                int? commentIndex = int.tryParse(widget.epCommentData.epCommentIndex?.split('-').first ?? '');
+                int? replyIndex = int.tryParse(widget.epCommentData.epCommentIndex?.split('-').length == 1 ? '' : widget.epCommentData.epCommentIndex?.split('-').last ?? '');
+                        
+                return Align(
+                  alignment: Alignment.centerRight,
+                  child: CommentReaction(
+                    animatedReactionsListKey: animatedTagsListKey,
+                    themeColor: widget.themeColor,
+                    postCommentType: widget.postCommentType,
+                    commentID: widget.epCommentData.commentID,
+                    commentIndex: commentIndex,
+                    replyIndex: replyIndex,
+                    commentReactions: widget.epCommentData.commentReactions
                   ),
-                ),
-              ],
+                );
+              }
             ),
         
             //commentAction Area
@@ -208,7 +272,7 @@ class EpCommentTile extends StatelessWidget {
             // 楼主: null 
             // 层主: 3
             // 回帖: 3-1(详情界面特供)
-            ...?epCommentData.epCommentIndex?.contains("-") ?? false ? 
+            ...?widget.epCommentData.epCommentIndex?.contains("-") ?? false ? 
             [const Divider()] :
             null,
         

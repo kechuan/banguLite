@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:bangu_lite/internal/bangumi_define/timeline_const.dart';
 import 'package:bangu_lite/models/comment_details.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 String extractNameCNData(Map datafield){
   if(datafield["nameCN"] == null) return datafield["name"];
@@ -77,7 +81,7 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
 
         switch (key) {
 
-          case 'comment' || 'tsukkomi':{
+          case 'comment' || 'tsukkomi' || 'sign':{
             // [subject]"comment": 56, & "comment":"real user Comment"
             if(value is String && value.isNotEmpty){
               resultFields['comment'] = value;
@@ -120,4 +124,46 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
 
   recursiveExtract(data);
   return resultFields;
+}
+
+Future<String?> extractFallbackToken(InAppWebViewController webViewController) async {
+
+  Completer<String?> tokenCompleter = Completer();
+
+  debugPrint('>>> Attempting to read token from DOM...');
+    
+    try {
+      // Execute JavaScript to get the value of the hidden input
+      // Use getElementsByName as the name is consistent
+      // [0] gets the first element if multiple exist with the same name
+      var token = await webViewController.evaluateJavascript(source: """
+        (function() {
+          var inputElement = document.getElementsByName('cf-turnstile-response')[0];
+          if (inputElement && inputElement.value) {
+            return inputElement.value;
+          } else {
+            return null; // Return null if element not found or value is empty
+          }
+        })();
+      """);
+
+      if (token != null && token.isNotEmpty) {
+        debugPrint('>>> Successfully read token from DOM: $token');
+        tokenCompleter.complete(token);
+      } 
+      
+      else {
+        debugPrint('>>> Token input element not found or value is empty in DOM.');
+      }
+    } 
+    
+    catch (e) {
+      debugPrint('>>> Error reading token from DOM: $e');
+      tokenCompleter.complete();
+
+    }
+
+    return tokenCompleter.future;
+
+
 }

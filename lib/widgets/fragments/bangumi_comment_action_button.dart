@@ -40,8 +40,8 @@ class BangumiCommentActionButton extends StatefulWidget {
   /// reportType,Reason?
   final Function(int,String?)? onReportComment;
 
-  /// dataLikeIndex,commentID
-  final Function(int?,int?)? onSticker;
+  /// isExist in default reactionList?
+  final Function(int)? onSticker;
 
   @override
   State<BangumiCommentActionButton> createState() => _BangumiCommentActionButtonState();
@@ -58,6 +58,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
       context: context,
       buttonLayerLink: stickerLayerLink,
       postCommentType: widget.postCommentType,
+      onStick: widget.onSticker
     );
     super.initState();
   }

@@ -2,7 +2,6 @@
 
 
 
-
 const detectIDList = [
   'id',
   'subjectID',
@@ -15,13 +14,19 @@ const detectNameList = [
   'nickname'
 ];
 
+//因为Dart 的语言特性 跨行字符串是可被拼接的 
+//因此注意 千万不要漏加逗号
 const detectPropList = [
   'epsUpdate',
   'sort',
   'comment',
   'rate',
-  'tsukkomi', //吐槽
+  //吐槽
+  'tsukkomi', 
+   //个性签名
+  'sign',
   'reactions',
+  
 ];
 
 const List<dynamic> timelineEnums = [

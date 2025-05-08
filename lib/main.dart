@@ -124,7 +124,7 @@ class MainApp extends StatelessWidget {
                     return [
                       MaterialPageRoute(
                         settings: const RouteSettings(name: Routes.loginAuth),
-                        builder: (context) => const BangumiAuthPage(key: Key('loginAuth')),
+                        builder: (context) => const BangumiAuthPage(),
                       ),
                     ];
                   }
@@ -133,7 +133,7 @@ class MainApp extends StatelessWidget {
                   return [
                     MaterialPageRoute(
                       settings: const RouteSettings(name: Routes.index),
-                      builder: (context) => const BangumiIndexPage(key: Key('index')),
+                      builder: (context) => const BangumiIndexPage(),
                     ),
                   ];
                 },

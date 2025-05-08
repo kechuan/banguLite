@@ -41,34 +41,44 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
 
     Completer<bool> requestGroupsCompleter = Completer();
 
-    await HttpApiClient.client.get(
-      BangumiAPIUrls.groups(),
-      queryParameters: BangumiQuerys.groupsQuery(
-        modeName: mode == BangumiSurfGroupType.created ? "managed" : mode.name,
-        limit: limit,
-        offset: offset,
-      ),
-      options: Options(headers: accessQuery),
-    ).then((response){
-      if(response.statusCode == 200){
+    try {
+      await HttpApiClient.client.get(
+        BangumiAPIUrls.groups(),
+        queryParameters: BangumiQuerys.groupsQuery(
+          modeName: mode == BangumiSurfGroupType.created ? "managed" : mode.name,
+          limit: limit,
+          offset: offset,
+        ),
+        options: Options(headers: accessQuery),
+      ).then((response){
+        if(response.statusCode == 200){
 
-        if(offset == 0){
-          groupsData[mode] = loadGroupsInfo(response.data["data"]);  
+          if(offset == 0){
+            groupsData[mode] = loadGroupsInfo(response.data["data"]);  
+          }
+
+          else{
+            groupsData[mode]!.addAll(loadGroupsInfo(response.data["data"]));
+          }
+
+          requestGroupsCompleter.complete(true);
+          notifyListeners();
         }
 
         else{
-          groupsData[mode]!.addAll(loadGroupsInfo(response.data["data"]));
+          requestGroupsCompleter.complete(false);
+          fallbackAction?.call(message:'${response.statusCode} ${response.data["message"]}');
         }
 
-        requestGroupsCompleter.complete(true);
-        notifyListeners();
-      }
 
-      else{
-        requestGroupsCompleter.complete(false);
-        fallbackAction?.call(message:'${response.statusCode} ${response.data["message"]}');
-      }
-    });
+      });
+    }
+
+    on DioException catch  (e){
+      fallbackAction?.call(message:'${e.response?.statusCode} ${e.response?.data["message"]}');
+    }
+
+    
 
     return requestGroupsCompleter.future;
     

@@ -10,8 +10,6 @@ import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/group_details.dart';
-import 'package:bangu_lite/models/group_topic_info.dart';
-import 'package:bangu_lite/models/surf_record_details.dart';
 import 'package:bangu_lite/models/surf_timeline_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -61,9 +59,10 @@ class BangumiTimelineTile extends StatelessWidget {
           }
 
           else{
+
             MyHive.historySurfDataBase.put(
               surfTimelineDetails.detailID,
-              SurfTimelineDetails() = surfTimelineDetails..updatedAt = DateTime.now().millisecondsSinceEpoch
+              surfTimelineDetails.copyWithUpdateAt(surfTimelineDetails)
             );
 
             bus.emit(
@@ -77,9 +76,11 @@ class BangumiTimelineTile extends StatelessWidget {
 				}
 					
 				case BangumiTimelineType.group:{
+
+
           MyHive.historySurfDataBase.put(
             surfTimelineDetails.detailID,
-            surfTimelineDetails..updatedAt = DateTime.now().millisecondsSinceEpoch
+            surfTimelineDetails.copyWithUpdateAt(surfTimelineDetails)
           );
 
 					bus.emit(
@@ -89,6 +90,8 @@ class BangumiTimelineTile extends StatelessWidget {
         }
 
         case BangumiTimelineType.timeline:{
+
+          //TODO  0.8.* 实现
           //bus.emit(
           //  "AppRoute",
           //  BangumiWebUrls.timelineTopic(surfTimelineDetails.detailID ?? 0)
@@ -273,7 +276,7 @@ class BangumiTimelineTile extends StatelessWidget {
                 Flexible(
                   child: ScalableText(
                   surfTimelineDetails.commentDetails?.userInformation?.nickName ?? "",
-                  style: TextStyle(fontSize: 12,color: Colors.grey.shade700)
+                  style: const TextStyle(fontSize: 12,color: Colors.grey)
                   ),
                 ),
 
@@ -281,7 +284,7 @@ class BangumiTimelineTile extends StatelessWidget {
                 if(isRecordMode != true)
                   ScalableText(
                     covertPastDifferentTime(surfTimelineDetails.updatedAt),
-                    style: TextStyle(fontSize: 12,color: Colors.grey.shade700)
+                    style: const TextStyle(fontSize: 12,color: Colors.grey)
                   ),
 
             ],

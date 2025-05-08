@@ -1,20 +1,14 @@
 import 'package:bangu_lite/delegates/star_sort_strategy.dart';
-import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/hive.dart';
-import 'package:bangu_lite/models/comment_details.dart';
-import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/models/star_details.dart';
 import 'package:bangu_lite/models/surf_timeline_details.dart';
-import 'package:bangu_lite/models/user_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 //Map<DateTime, SurfTimelineDetails> testMap = {
@@ -97,6 +91,7 @@ class _BangumiHistoryPageState extends State<BangumiHistoryPage> {
       ),
       body: EasyRefresh(
         onRefresh: () => setState(() {}),
+        header: const MaterialHeader(),
         child: CustomScrollView(
           slivers: buildSection(context)
         ),
@@ -116,17 +111,23 @@ List<Widget> buildSection(
   List<SurfTimelineDetails> dataSource = 
     MyHive.historySurfDataBase.values.toList();
 
+  dataSource.sort((prev, next) => next.updatedAt!.compareTo(prev.updatedAt!));
+
+  
+
   for (int starIndex = 0; starIndex < dataSource.length; starIndex++) {
 
     String headerText = "";
 
     headerText = SurfTimeSortStrategy().generateHeaderText(
+      //sortStrategy.getSort(dataSource[starIndex].updatedAt ?? 0)
       dataSource[starIndex].updatedAt ?? 0
     );
 
     groupIndices[headerText] ??= starIndex;
 
   }
+
 
   final List<int> groupCounts = calculateGroupCounts(groupIndices, dataSource.length);
 
@@ -136,10 +137,7 @@ List<Widget> buildSection(
     int startIndex = 0;
     int itemCount = 0;
 
-    //历史记录要取相反顺序
-    //headerText = groupIndices.keys.elementAt(((groupIndices.length-1) - index)); //当前所属组别
-    //startIndex = groupIndices.values.elementAt(((groupIndices.length-1) - index)); //dataSource的起始下标
-    //itemCount = groupCounts[((groupIndices.length-1) - index)]; //这个组别一共有多少个
+    
 
     headerText = groupIndices.keys.elementAt(index); //当前所属组别
     startIndex = groupIndices.values.elementAt(index); //dataSource的起始下标
@@ -159,6 +157,7 @@ List<Widget> buildSection(
       ],
     );
   });
+
 }
 
 
@@ -194,7 +193,7 @@ Widget buildSectionList(
   DateTime recordTime = DateTime(0);
 
   List<SurfTimelineDetails> rangeData = data.sublist(startIndex, startIndex + itemCount);
-  rangeData.sort((a, b) => b.updatedAt!.compareTo(a.updatedAt!));
+  //rangeData.sort((a, b) => b.updatedAt!.compareTo(a.updatedAt!));
 
   return Padding(
     padding: PaddingH6V12,
@@ -224,6 +223,7 @@ Widget buildSectionList(
                   
                   return ScalableText(
                     '${convertDigitNumString(currentTime.hour)}:${convertDigitNumString(currentTime.minute)}',
+                    //'${currentTime}',
                     style:  TextStyle(
                       color: recordTime == currentTime ?Colors.grey : Colors.transparent,
                       //color: Colors.grey,

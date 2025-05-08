@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/surf_timeline_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +46,7 @@ class TimelineFlowModel extends ChangeNotifier {
             ),
             HttpApiClient.client.get(
               BangumiAPIUrls.latestGroupTopics(),
-              options: Options(headers: BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken!)),
+              options: BangumiAPIUrls.bangumiAccessOption,
               queryParameters: BangumiQuerys.groupsTopicsQuery(),
             ),
             HttpApiClient.client.get(
@@ -77,9 +76,7 @@ class TimelineFlowModel extends ChangeNotifier {
           final response = await HttpApiClient.client.get(
             BangumiAPIUrls.latestGroupTopics(),
             queryParameters: queryParameters ?? BangumiQuerys.groupsTopicsQuery(),
-            options: Options(
-              headers: BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken!),
-            ),
+            options: BangumiAPIUrls.bangumiAccessOption,
           );
 
           return [response];
