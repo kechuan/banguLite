@@ -15,7 +15,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';

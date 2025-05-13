@@ -1,7 +1,6 @@
 import 'dart:io';
 
-import 'package:bangu_lite/catalogs/index/bangumi_index_page.dart';
-import 'package:bangu_lite/catalogs/surf/bangumi_login_auth_page.dart';
+
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
@@ -22,7 +21,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
 
-  String? listenLink;
+  
 
   if (kReleaseMode) {
     debugPrint = (String? message, {int? wrapWidth}) {};
@@ -30,7 +29,7 @@ void main() async {
 
   // path_provider 初始化需要
   WidgetsFlutterBinding.ensureInitialized();
-  listenLink = await listenAPPLink();
+  await listenAPPLink();
 
   HttpApiClient.init();
   await MyHive.init();
@@ -48,17 +47,15 @@ void main() async {
 	);
   }
 
-  runApp(MainApp(initialLink: listenLink));
+  runApp(const MainApp());
 
 }
 
 class MainApp extends StatelessWidget {
   const MainApp({
-    super.key,
-    this.initialLink,
+    super.key
   });
 
-  final String? initialLink;
 
   @override
   Widget build(BuildContext context) {
@@ -109,34 +106,23 @@ class MainApp extends StatelessWidget {
                 themeMode: context.watch<IndexModel>().userConfig.themeMode,
                   
                 initialRoute: Routes.index,
-                //navigatorObservers: [],
                 navigatorObservers: [Lifecycle.lifecycleRouteObserver],
-                onGenerateRoute: (RouteSettings settings) {
+                onGenerateRoute: (RouteSettings settings)  {
+
+                  // 深链接auth访问时 跳过默认路由匹配，直接跳转到目标页面
+                  if (
+                    settings.name?.contains("bgm_login") == true ||
+                    settings.name?.contains("turnstile") == true
+                  ) {
+                    return null;
+                  }
+
                   return onGenerateRoute(
                     settings: settings,
                     getRouteSettings: getRouteSettings,
                   );
-                },
-                onGenerateInitialRoutes: (String initialRoute) {
-                  
-                  if (initialLink != null && initialLink!.isNotEmpty) {
-                    // 深链接存在，跳过默认路由匹配，直接跳转到目标页面
-                    return [
-                      MaterialPageRoute(
-                        settings: const RouteSettings(name: Routes.loginAuth),
-                        builder: (context) => const BangumiAuthPage(),
-                      ),
-                    ];
-                  }
-
-                  // 没有深链接，进入正常首页
-                  return [
-                    MaterialPageRoute(
-                      settings: const RouteSettings(name: Routes.index),
-                      builder: (context) => const BangumiIndexPage(),
-                    ),
-                  ];
-                },
+                }
+               
               );
             }
             

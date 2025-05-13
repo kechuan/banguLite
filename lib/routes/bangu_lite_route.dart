@@ -8,15 +8,16 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables,unused_local_variable,unused_import,unnecessary_import,unused_shown_name,implementation_imports,duplicate_import,library_private_types_in_public_api
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/models/group_details.dart';
-import 'package:bangu_lite/models/group_topic_info.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
+import 'package:bangu_lite/models/informations/subjects/review_details.dart';
+import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/models/providers/review_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
-import 'package:bangu_lite/models/review_details.dart';
-import 'package:bangu_lite/models/topic_info.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/widgets.dart';
 
@@ -37,6 +38,7 @@ import '../catalogs/surf/bangumi_groups_page.dart';
 import '../catalogs/surf/bangumi_history_page.dart';
 import '../catalogs/surf/bangumi_login_auth_page.dart';
 import '../catalogs/surf/bangumi_surf_timeline_page.dart';
+import '../catalogs/surf/bangumi_timeline_chat_page.dart';
 import '../catalogs/surf/banumi_user_page.dart';
 import '../catalogs/surf/send_comment_page.dart';
 import '../catalogs/surf/send_comment_preview_page.dart';
@@ -90,6 +92,22 @@ FFRouteSettings getRouteSettings({
           key: asT<Key?>(
             safeArguments['key'],
           ),
+        ),
+      );
+    case '/TimelineChat':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => BangumiTimelineChatPage(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
+          timelineID: asT<int>(
+            safeArguments['timelineID'],
+          )!,
+          comment: asT<String>(
+            safeArguments['comment'],
+          )!,
         ),
       );
     case '/commentPreview':
@@ -234,7 +252,7 @@ FFRouteSettings getRouteSettings({
           onSendMessage: asT<Function(String)?>(
             safeArguments['onSendMessage'],
           ),
-          preservationContent: asT<String?>(
+          preservationContent: asT<(String, String)?>(
             safeArguments['preservationContent'],
           ),
           themeColor: asT<Color?>(
@@ -329,6 +347,9 @@ FFRouteSettings getRouteSettings({
           title: asT<String?>(
             safeArguments['title'],
           ),
+          injectHTML: asT<String?>(
+            safeArguments['injectHTML'],
+          ),
           onTargetUrlReached: asT<Function(String?)?>(
             safeArguments['onTargetUrlReached'],
           ),
@@ -368,7 +389,7 @@ FFRouteSettings getRouteSettings({
       return FFRouteSettings(
         name: FFRoute.notFoundName,
         routeName: FFRoute.notFoundRouteName,
-        builder: notFoundPageBuilder ?? () => const BangumiAuthPage(key: Key('loginAuth')),
+        builder: notFoundPageBuilder ?? () => Container(),
       );
   }
 }

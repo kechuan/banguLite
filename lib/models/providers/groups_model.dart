@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/group_details.dart';
-import 'package:bangu_lite/models/group_topic_details.dart';
-import 'package:bangu_lite/models/group_topic_info.dart';
+import 'package:bangu_lite/models/informations/subjects/group_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_topic_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:dio/dio.dart';
 

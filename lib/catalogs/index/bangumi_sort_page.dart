@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/search_handler.dart';
-import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/widgets/components/search_fliter.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_sort_selector.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';

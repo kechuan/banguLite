@@ -15,7 +15,7 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_button.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 

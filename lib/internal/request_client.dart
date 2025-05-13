@@ -186,11 +186,17 @@ class BangumiWebUrls{
 
   static String subject(int subjectID) => '$baseUrl/subject/$subjectID';
   static String subjectComment(int subjectID) => '$baseUrl/subject/$subjectID/comments';
+  static String subjectReviews(int subjectID) => '${subject(subjectID)}/reviews';
+  static String subjectTopics(int subjectID) => '${subject(subjectID)}/board';
+
   static String subjectTopic(int topicID) => '$baseUrl/subject/topic/$topicID';
+  
 
   static String ep(int epID) => '$baseUrl/ep/$epID';
   static String user(String username) => '$baseUrl/user/$username';
   static String userTimeline(String username) => '${user(username)}/timeline';
+
+  static String timelineReplies(String relationsUser,int timelineID) => '${userTimeline(relationsUser)}/timeline/status/$timelineID';
 
   //接受数字ID 与 name 作为参数
   static String group(dynamic groupName) => '$baseUrl/group/$groupName';
@@ -200,12 +206,14 @@ class BangumiWebUrls{
 
   static String relativeSubject(int subjectID) => '$relativeUrl/subject/$subjectID';
   static String relativeSubjectComment(int subjectID) => '$relativeUrl/subject/$subjectID/comments';
+  static String relativeSubjectReviews(int subjectID) => '${relativeSubject(subjectID)}/reviews';
   static String relativeSubjectTopic(int topicID) => '$relativeUrl/subject/topic/$topicID';
+
   static String relativeEp(int epID) => '$relativeUrl/ep/$epID';
   static String relativeGroupTopic(int postID) => '$relativeUrl/group/topic/$postID';
+
   static String relativeBlog(int blogID) => '$relativeUrl/blog/$blogID';
   static String relativeGroup(dynamic groupName) => '$relativeUrl/group/$groupName';
-  
 
   static String person(int personID) => '$baseUrl/person/$personID';
   static String character(int characterID) => '$baseUrl/character/$characterID';
@@ -355,7 +363,7 @@ class BangumiQuerys {
                           reviewsQuery = {"limit":20,"offset":0},
                           groupTopicQuery = {"limit":20,"offset":0},
                           //until字段 timelineID count Down
-                          timelineQuery = {"limit":20,}
+                          timelineQuery = {"limit":20}
   ;
                              
 

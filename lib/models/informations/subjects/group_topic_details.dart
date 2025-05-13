@@ -1,8 +1,8 @@
 
-import 'package:bangu_lite/models/base_details.dart';
-import 'package:bangu_lite/models/comment_details.dart';
-import 'package:bangu_lite/models/group_details.dart';
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/subjects/base_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 
 class GroupTopicDetails extends ContentDetails {
   GroupTopicDetails({

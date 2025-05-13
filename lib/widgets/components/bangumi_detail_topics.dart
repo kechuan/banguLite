@@ -6,7 +6,7 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
-import 'package:bangu_lite/models/topic_info.dart';
+import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:flutter/material.dart';

@@ -50,7 +50,7 @@ List<EpsInfo> loadEpsData(Response bangumiEpsInfoResponse){
         
 }
 
-String convertCollectionName(EpsInfo? currentInfo,int currentEpIndex){
+String convertCollectionName(EpsInfo? currentInfo,num currentEpIndex){
   if(currentInfo==null) return "loading";
 
   String currentEpType =  convertEPInfoType(currentInfo.type);

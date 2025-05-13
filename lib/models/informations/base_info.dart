@@ -1,4 +1,4 @@
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 
 abstract class BaseInfo {
   BaseInfo({this.id});

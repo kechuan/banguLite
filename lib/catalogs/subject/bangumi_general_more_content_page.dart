@@ -1,11 +1,13 @@
 import 'dart:math';
 
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
-import 'package:bangu_lite/models/base_info.dart';
+import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
+import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -23,13 +25,16 @@ abstract class BangumiGeneralMoreContentPageState<
     Future<void> loadSubjectTopics({int? offset});
 
     String? title;
-
+    PostCommentType? postCommentType;
     Color? bangumiThemeColor;
 
-    Function(int)? onTap;
+    String? webUrl;
 
     GlobalKey<AnimatedListState> animatedListKey = GlobalKey();
     ScrollController scrollController = ScrollController();
+
+    Function(int)? onTap;
+    Function((String title,String message))? onPostContent;
 
     @override
     Widget build(BuildContext context) {
@@ -44,8 +49,19 @@ abstract class BangumiGeneralMoreContentPageState<
         ),
         child: Scaffold(
           appBar: AppBar(
-            title: ScalableText("$title"),
+            leadingWidth: 0,
+            leading: const SizedBox.shrink(),
+            title: BangumiContentAppbar(
+              titleText: "$title",
+              contentID: contentModel.subjectID,
+              postCommentType: postCommentType,
+              webUrl: webUrl,
+              onSendMessage: (content) {
+                onPostContent?.call(content as (String,String));
+              },
+            ),
           ),
+          
           body: EasyRefresh(
             scrollController: scrollController,
             footer: const MaterialFooter(),
@@ -103,23 +119,19 @@ abstract class BangumiGeneralMoreContentPageState<
                         builder: (_,contentListDataLength,child) {
                       
                           final List<ContentInfo> contentList = contentModel.contentListData as List<I>;
-                      
+
                           return AnimatedList(
                             controller:scrollController,
                             key: animatedListKey,
                             shrinkWrap: true,
                             initialItemCount: contentListDataLength,
                             itemBuilder: (_,index,animation){
-                              
+
+                              if(contentList.first.id == 0) return const SizedBox.shrink();
                               return Card(
                                 color: judgeDetailRenderColor(context,bangumiThemeColor),
                                 child: ListTile(
-                                  onTap: (){
-                                    //不能直接写成 onTap: ()=> onTap?.call(index) 否则不知道为何 会被 直接执行!
-                                    onTap?.call(index);
-                                    
-                                  },
-                                  //onTap: onTap?.call(index),
+                                  onTap: (){onTap?.call(index);},
                                   title: ScalableText("${contentList[index].contentTitle}",maxLines: 2,overflow: TextOverflow.ellipsis,),
                                   subtitle: Padding(
                                     padding: const EdgeInsets.only(top: 6),

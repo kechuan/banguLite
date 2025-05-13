@@ -2,12 +2,12 @@
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/hive.dart';
-import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/relation_model.dart';
 import 'package:bangu_lite/models/providers/review_model.dart';
-import 'package:bangu_lite/models/surf_timeline_details.dart';
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_recent_review.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_relations.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +29,7 @@ import 'package:bangu_lite/models/providers/topic_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_topics.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
-import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_intro.dart';
 import 'package:bangu_lite/widgets/components/bangumi_hot_comment.dart';
@@ -232,8 +232,8 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
                                     colors: [
-                                    judgeDarknessMode(context) ? Colors.black : Colors.white,
-                                    linearColor!,
+                                      judgeDarknessMode(context) ? Colors.black : Colors.white,
+                                      linearColor!.withValues(alpha: 0.8),
                                     ]
                                   )
                                   ),

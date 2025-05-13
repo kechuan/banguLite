@@ -4,9 +4,9 @@ import 'dart:math';
 import 'package:bangu_lite/internal/extract.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/bangumi_define/timeline_const.dart';
-import 'package:bangu_lite/models/base_details.dart';
-import 'package:bangu_lite/models/comment_details.dart';
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/subjects/base_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 
 // 广场timeline 与 用户timeline需求数据
 
@@ -189,34 +189,27 @@ String convertTimelineDescription(
 
   if(contentText.isEmpty && !(currentTimeline.catType == 1 || currentTimeline.catType == 5)) undoActionText += "撤销了一项 ";
 
-  ////时间线吐槽
-  //if(isCommentDeclared && currentTimeline.catType == 5 && currentTimeline.catAction == 1){
-  //  actionText = "[url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}]${TimelineCatStatus.Comment.actionName}";
-
-  //  //感觉以后可以做一个proxy 用于 增加时 额外添加一个 /s 字符。。
-  //  if(currentTimeline.replies != 0){
-  //    actionText += ' (${currentTimeline.replies}条评论)';
-  //  }
-
-  //  actionText += '[/url]';
-
-  //  if(currentTimeline.commentDetails?.comment?.isEmpty == false){
-  //    suffixText = '[quote]${currentTimeline.commentDetails!.comment ?? ""}[/quote]';
-  //  }
-    
-  //}
-
   //时间线行为
   if(isCommentDeclared && currentTimeline.catType == 5){
 
     if(
       currentTimeline.catAction == TimelineCatStatus.UpdateSignature.value
     ){
-      suffixText = '[quote]${currentTimeline.commentDetails!.comment ?? ""}[/quote]';
+      suffixText = '[quote]${currentTimeline.commentDetails?.comment ?? ""}[/quote]';
     }
 
     else if(currentTimeline.catAction == TimelineCatStatus.Comment.value){
-      actionText = "[url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}]${TimelineCatStatus.Comment.actionName}";
+      actionText = 
+        "["
+        "url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}"
+        "?timelineID=${currentTimeline.timelineID}"
+        //这个操作实际上非常危险.. 毕竟params理论上只最大支持4k 字符 要是原本的正常编码自然什么问题没有
+        //但一旦需求通过Uri体系就需要转译 转译的字符数可能会超过4k
+        //唉 暂时先这样吧 毕竟一般情况下没人往时间线吐槽1000字 
+        "&comment=${Uri.encodeComponent(currentTimeline.commentDetails!.comment!)}"
+        "]"
+        "${TimelineCatStatus.Comment.actionName}"
+      ;
 
       //感觉以后可以做一个proxy 用于 增加时 额外添加一个 /s 字符。。
       if(currentTimeline.replies != 0){
@@ -226,18 +219,18 @@ String convertTimelineDescription(
       actionText += '[/url]';
 
       if(currentTimeline.commentDetails?.comment?.isEmpty == false){
-        suffixText = '[quote]${currentTimeline.commentDetails!.comment ?? ""}[/quote]';
+        suffixText = '[quote]${currentTimeline.commentDetails?.comment ?? ""}[/quote]';
       }
+
     }
-    
     
   }
 
-  
 
   leadingText += undoActionText + actionText + contentText + suffixText;
 
   return leadingText;
+  
 }
 
 String convertSubjectTimeline(

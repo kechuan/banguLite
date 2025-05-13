@@ -1,8 +1,8 @@
 import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/topic_details.dart';
-import 'package:bangu_lite/models/topic_info.dart';
+import 'package:bangu_lite/models/informations/subjects/topic_details.dart';
+import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 

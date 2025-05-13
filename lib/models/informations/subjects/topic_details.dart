@@ -1,6 +1,6 @@
 
-import 'package:bangu_lite/models/base_details.dart';
-import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/base_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 
 class TopicDetails extends ContentDetails{
 

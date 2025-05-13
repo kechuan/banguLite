@@ -1,12 +1,12 @@
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 
-import 'package:bangu_lite/models/star_details.dart';
-import 'package:bangu_lite/models/surf_record_details.dart';
-import 'package:bangu_lite/models/surf_timeline_details.dart';
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/local/star_details.dart';
+import 'package:bangu_lite/models/informations/surf/surf_record_details.dart';
+import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
 import 'config_model.dart';

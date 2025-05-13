@@ -1,5 +1,5 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
 import 'package:flutter/material.dart';
 

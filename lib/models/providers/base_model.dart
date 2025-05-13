@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/base_details.dart';
-import 'package:bangu_lite/models/base_info.dart';
+import 'package:bangu_lite/models/informations/subjects/base_details.dart';
+import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 

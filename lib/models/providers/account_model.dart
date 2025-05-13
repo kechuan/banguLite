@@ -8,7 +8,7 @@ import 'package:bangu_lite/internal/extension.dart';
 import 'package:bangu_lite/internal/extract.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -291,11 +291,26 @@ class AccountModel extends ChangeNotifier {
             initialSettings: InAppWebViewSettings(
                 isInspectable: kDebugMode,
                 userAgent: HttpApiClient.broswerHeader["User-Agent"],
-                //useShouldInterceptRequest: true,
             ),
 
             onWebViewCreated: (controller) async {
                 debugPrint("webview created");
+            },
+
+            shouldOverrideUrlLoading: (controller, navigationAction) async {
+
+                //似乎对Android 生效 对window难以拦截? window似乎并不会触发这个拦截
+                debugPrint("shouldOverrideUrlLoading url:${navigationAction.request.url}");
+
+                if (navigationAction.request.url.toString().startsWith(APPInformationRepository.bangumiTurnstileCallbackUri.toString())) {
+                    navigationAction.request.url?.queryParameters["token"] != null ? 
+                        AccountModel.loginedUserInformations.turnsTileToken = navigationAction.request.url?.queryParameters["token"] : 
+                        null;
+
+                    return NavigationActionPolicy.CANCEL;
+                }
+                return NavigationActionPolicy.ALLOW;
+
             },
 
             onLoadStart: (controller, url) async {
@@ -320,8 +335,7 @@ class AccountModel extends ChangeNotifier {
                                     controller.dispose();
                                     getTrunsTileTokenCompleter.complete(false);
                                     fallbackAction?.call("无法自动通过验证 发帖失败");
-                                }
-                            );
+                                });
                         }
 
                         else {
@@ -338,36 +352,14 @@ class AccountModel extends ChangeNotifier {
 
             },
 
-            //shouldInterceptRequest: (controller,request){
-
-            //	if (request.url.toString().contains(BangumiWebUrls.trunstileAuth())) {
-            //		debugPrint("shouldInterceptRequest inject succ");
-            //		return Future.value(WebResourceResponse(data: utf8.encode(turnsTileHTML)));
-            //	}
-
-            //	return Future.value(null); // 其他请求正常处理
-            //},
-
             onReceivedError: (controller, request, error) {
-                //fallbackAction may deal with Indicates that the connection was stopped.
-                debugPrint("error:${error.description}");
-
-                Future.delayed(const Duration(seconds: 5), () {
-
-                        if (timeoutTimer?.isActive != false) {
-                            extractFallbackToken(controller).then((result) {
-                                    if (result != null) {
-                                        AccountModel.loginedUserInformations.turnsTileToken = result;
-                                        getTrunsTileTokenCompleter.complete(true);
-                                        controller.dispose();
-                                    }
-                                }
-                            );
-
-                        }
-
-                    }
-                );
+                if (request.url.toString().contains(APPInformationRepository.bangumiTurnstileCallbackUri.toString())) {
+                    extractFallbackToken(controller).then((result) {
+                            if (result != null) {
+                                AccountModel.loginedUserInformations.turnsTileToken = result;
+                            }
+                        });
+                }
 
             },
 
@@ -379,10 +371,10 @@ class AccountModel extends ChangeNotifier {
     }
 
     Future<bool> postContent({
-        String? subjectID,
+        dynamic subjectID,
         String? title,
         String? content,
-        PostCommentType? postcontentType,
+        PostCommentType? postContentType,
         UserContentActionType actionType = UserContentActionType.post,
         Map<String, dynamic>? subjectCommentQuery,
         Function(String message)? fallbackAction
@@ -399,10 +391,10 @@ class AccountModel extends ChangeNotifier {
             contentCompleter.complete(false);
         }
 
-        switch (postcontentType){
+        switch (postContentType){
 
-            case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.actionSubjectComment(int.parse(subjectID!));
-            case PostCommentType.postTopic: requestUrl = BangumiAPIUrls.postTopic(int.parse(subjectID!));
+            case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.actionSubjectComment(subjectID);
+            case PostCommentType.postTopic: requestUrl = BangumiAPIUrls.postTopic(subjectID);
             case PostCommentType.postBlog:{
                 //缺失中
             }
@@ -415,10 +407,10 @@ class AccountModel extends ChangeNotifier {
 
         }
 
-        if (postcontentType == null || requestUrl.isEmpty) {
+        if (postContentType == null || requestUrl.isEmpty) {
             debugPrint(
                 "content空数据错误:"
-                "postcontentType:$postcontentType/subjectID:$subjectID/requestUrl:$requestUrl"
+                "postContentType:$postContentType/subjectID:$subjectID/requestUrl:$requestUrl"
             );
             contentCompleter.complete(false);
         }
@@ -522,7 +514,6 @@ class AccountModel extends ChangeNotifier {
             }
 
             case PostCommentType.replyBlog:{
-
                 requestUrl = actionType == UserContentActionType.post ?
                     BangumiAPIUrls.postBlogComment(contentID!) :
                     BangumiAPIUrls.actionBlogComment(commentID!);
@@ -530,11 +521,10 @@ class AccountModel extends ChangeNotifier {
             }
 
             case PostCommentType.replyTimeline:{
-                requestUrl = BangumiAPIUrls.postTimelineComment(commentID!);
+                requestUrl = BangumiAPIUrls.timelineReply(contentID!);
             }
 
-            default:{
-            }
+            default:{}
 
         }
 

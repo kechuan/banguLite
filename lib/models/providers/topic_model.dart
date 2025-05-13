@@ -1,7 +1,7 @@
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
-import 'package:bangu_lite/models/topic_details.dart';
-import 'package:bangu_lite/models/topic_info.dart';
+import 'package:bangu_lite/models/informations/subjects/topic_details.dart';
+import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:dio/dio.dart';
 
 class TopicModel extends BaseModel<TopicInfo, TopicDetails> {

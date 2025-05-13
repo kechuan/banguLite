@@ -1,5 +1,5 @@
-import 'package:bangu_lite/models/comment_details.dart';
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 
 abstract class BaseDetails {
 

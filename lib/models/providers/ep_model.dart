@@ -2,12 +2,11 @@ import 'dart:async';
 
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/comment_details.dart';
-import 'package:bangu_lite/models/eps_info.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class EpModel extends ChangeNotifier{
   
@@ -25,15 +24,15 @@ class EpModel extends ChangeNotifier{
   Completer? getEpsInformationCompleter;
 
   int subjectID;
-  int selectedEp;
+  num selectedEp;
   
   final Map<num,EpsInfo> epsData = {};
   final Map<num,List<EpCommentDetails>> epCommentData = {}; 
 
   //double => 浮点 #3 / #3-1 etc
-  final Map<int,Map<num,int>> userCommentLikeData = {}; 
+  final Map<num,Map<num,int>> userCommentLikeData = {}; 
 
-  void updateSelectedEp(int newEp){
+  void updateSelectedEp(num newEp){
     if(newEp == selectedEp) return;
 
     selectedEp = newEp;
@@ -57,7 +56,7 @@ class EpModel extends ChangeNotifier{
 		if(userCommentLikeData[selectedEp] == null){
 
 			userCommentLikeData[selectedEp] = {
-			double.parse('$commentIndex.${replyCommentIndex ?? 0}') : dataLikeIndex
+			  double.parse('$commentIndex.${replyCommentIndex ?? 0}') : dataLikeIndex
 			};
 		}
 
@@ -94,8 +93,6 @@ class EpModel extends ChangeNotifier{
   ){
 
     if(epCommentData[selectedEp] == null || commentIndex == null) return;
-
-    final accountModel = context.read<AccountModel>();
 
     epCommentData.update(
       selectedEp, 
@@ -232,7 +229,6 @@ class EpModel extends ChangeNotifier{
 
 	Future<void> loadEpComment() async{
 
-      //TODO 加载顺序有问题
       if(epsData.isEmpty){
         await getEpsInformationCompleter?.future ?? await getEpsInformation();
         
@@ -242,7 +238,7 @@ class EpModel extends ChangeNotifier{
       else{
         if(epsData[selectedEp] == null){
 
-          await getEpsInformationCompleter?.future ?? await getEpsInformation(offset: convertSegement(selectedEp,100));
+          await getEpsInformationCompleter?.future ?? await getEpsInformation(offset: convertSegement(selectedEp.toInt(),100));
           if(epsData.isEmpty) return;
         }
       }

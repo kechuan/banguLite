@@ -13,10 +13,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:provider/provider.dart';
 
+
 @FFRoute(name: '/loginAuth')
 class BangumiAuthPage extends StatelessWidget {
   const BangumiAuthPage({
-    super.key = const Key('loginAuth')
+    super.key
   });
 
   @override

@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
-import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 
@@ -112,7 +112,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                   'postCommentType':widget.postCommentType,
                   'title': '回复 ${widget.commentData.userInformation?.nickName ?? widget.commentData.userInformation?.userName}',
                   'referenceObject': '${widget.commentData.comment}',
-                  'preservationContent': indexModel.draftContent[widget.commentData.commentID]?.values.first
+                  'preservationContent': indexModel.draftContent[widget.commentData.commentID]
                 }
               ).then((content) async{
 

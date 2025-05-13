@@ -3,7 +3,7 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/request_client.dart';
 
 
-import 'package:bangu_lite/models/group_topic_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_topic_details.dart';
 
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:bangu_lite/models/providers/groups_model.dart';
 
 @FFAutoImport()
-import 'package:bangu_lite/models/group_topic_info.dart';
+import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
 
 @FFRoute(name: '/groupTopic')
 class BangumiGroupTopicPage extends StatefulWidget {

@@ -3,7 +3,7 @@ import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/models/star_details.dart';
+import 'package:bangu_lite/models/informations/local/star_details.dart';
 
 abstract class SortStrategy {
   num getSort(StarBangumiDetails details);

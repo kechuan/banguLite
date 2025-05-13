@@ -1,4 +1,4 @@
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';

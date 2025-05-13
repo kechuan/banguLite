@@ -1,7 +1,7 @@
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/base_details.dart';
-import 'package:bangu_lite/models/comment_details.dart';
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/subjects/base_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 
 // 严格意义来说 整个 Blog数据源 唯一有用的数据 只有。。content
 // 因为实际上大部分数据 都依靠 review 提供
@@ -20,7 +20,7 @@ class BlogDetails extends ContentDetails{
   String? get blogContent => content;
 
   
-  UserInformation? userInfo;
+  //UserInformation? userInformation;
 
   //尾部图片
   List<String> trailingPhotosUri = [];

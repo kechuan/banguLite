@@ -5,11 +5,11 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/convert.dart';
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 
 class CommentModel extends ChangeNotifier {
   

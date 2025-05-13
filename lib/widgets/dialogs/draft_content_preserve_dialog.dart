@@ -27,7 +27,7 @@ void showDraftContentPreserveDialog(
     confirmAction: () {
       
       indexModel.draftContent.addAll({
-        contentID :{title ?? "":content ?? ""}
+        contentID : (title ?? "",content ?? "")
       });
 
       Navigator.of(context).pop();

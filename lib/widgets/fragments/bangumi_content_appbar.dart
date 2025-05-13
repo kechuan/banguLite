@@ -1,4 +1,6 @@
 
+import 'dart:math';
+
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
@@ -28,7 +30,7 @@ class BangumiContentAppbar extends StatelessWidget {
   final PostCommentType? postCommentType;
   final Color? surfaceColor;
 
-  final Function(String)? onSendMessage;
+  final Function(Object)? onSendMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +72,11 @@ class BangumiContentAppbar extends StatelessWidget {
           IconButton(
             onPressed: (){
 
+              if(postCommentType == PostCommentType.postBlog){
+                fadeToaster(context: context, message: '暂不支持发送长评');
+                return;
+              }
+
               invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
                 context,
                 message: message,
@@ -80,6 +87,15 @@ class BangumiContentAppbar extends StatelessWidget {
                 contentID: contentID,
                 commentContent: message,
                 postCommentType: postCommentType,
+                actionType : UserContentActionType.post,
+                fallbackAction: (errorMessage)=> invokeRequestSnackBar(message: errorMessage,requestStatus: false)
+              );
+
+              invokePostContent((String,String) content) => accountModel.postContent(
+                subjectID: contentID,
+                title: content.$1,
+                content: content.$2,
+                postContentType: postCommentType,
                 actionType : UserContentActionType.post,
                 fallbackAction: (errorMessage)=> invokeRequestSnackBar(message: errorMessage,requestStatus: false)
               );
@@ -95,27 +111,39 @@ class BangumiContentAppbar extends StatelessWidget {
                   'contentID':contentID,
                   'postCommentType':postCommentType,
                   'title': titleText,
-                  'preservationContent': indexModel.draftContent[contentID]?.values.first
+                  'preservationContent': indexModel.draftContent[contentID]
                 }
               ).then((content) async {
 
                 debugPrint("[PostContent] id:$contentID/$postCommentType");
 
+				//invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
+				//onSendMessage?.call(content as String);
+
                 if(content is String){
 
-                                      
                   //invokeRequestSnackBar(message: "UI回帖成功",requestStatus: true);
                   //onSendMessage?.call(content);
 
-                //  await accountModel.getTrunsTileToken().then((result){
-                //    debugPrint("$result");
-                //  });
-                    
-
-                  invokeRequestSnackBar();
-
                   //网络层 Callback
                   await invokeSendComment(content).then((result){
+                    debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
+                    //UI层 Callback
+                    if(result){
+                      invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
+                      onSendMessage?.call(content);
+                    }
+                    
+                  });
+
+                }
+
+                if(content is (String,String)){
+
+                  //invokeRequestSnackBar(message: "UI回帖成功",requestStatus: true);
+                  //onSendMessage?.call(content);
+
+                  await invokePostContent(content).then((result){
                     debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
                     //UI层 Callback
                     if(result){
@@ -131,18 +159,20 @@ class BangumiContentAppbar extends StatelessWidget {
             },
             icon: Icon(Icons.edit_document,color: accountModel.isLogined() ? null : Colors.grey)
           ),
-      
-          IconButton(
-            onPressed: () async {
-              if(await canLaunchUrlString(webUrl ?? '')){
-                await launchUrlString(webUrl ?? '');
-              }
-            },
-            icon: Transform.rotate(
-              angle: 45,
-              child: const Icon(Icons.link),
-            )
-          ),
+
+          if(webUrl != null)
+            IconButton(
+              onPressed: () async {
+                if(await canLaunchUrlString(webUrl ?? '')){
+                  await launchUrlString(webUrl ?? '');
+                }
+              },
+              icon: Transform.rotate(
+                angle: -45 * pi / 180,
+                child: const Icon(Icons.link),
+              )
+            ),
+
         ],
       ),
     );

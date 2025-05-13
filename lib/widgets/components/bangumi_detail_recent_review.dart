@@ -34,11 +34,6 @@ class BangumiDetailRecentReview extends StatelessWidget {
       child: Consumer<ReviewModel>(
         builder: (_,reviewModel,child) {
 
-          bool isReviewEmpty =  
-            reviewModel.contentListData.isEmpty ||
-            reviewModel.contentListData.first.reviewID == 0
-          ;
-
             return ExpansionTile(
               initiallyExpanded: true,
               tilePadding: const EdgeInsets.all(0),
@@ -70,7 +65,7 @@ class BangumiDetailRecentReview extends StatelessWidget {
 
                         final bangumiModel = context.read<BangumiModel>();
 
-                        if(reviewModel.contentListData.first.reviewID == 0) return;
+                        //if(reviewModel.contentListData.first.reviewID == 0) return;
 
 
                         Navigator.pushNamed(
@@ -84,12 +79,9 @@ class BangumiDetailRecentReview extends StatelessWidget {
                         );
 
                       },
-                      child: ScalableText(
+                      child: const ScalableText(
                         "更多长评 >",
-                        style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: isReviewEmpty ? Colors.grey : null
-                        )
+                        style: TextStyle(decoration: TextDecoration.underline)
                       ),  
                     )
                   )

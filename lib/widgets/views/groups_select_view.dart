@@ -99,8 +99,8 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
                 builder: (_, groupsModel, child) {
                  //GridView 与 PageView 冲突 
                  // 滑动的时候无法 滑动到外界的 PageView
-                 //TODO NestedScrollView 验证 When...
-                  
+                 
+                  //EasyRefresh 配合 滚动 onPageChanged 冲突 
                   return EasyRefresh(
                     footer: const MaterialFooter(),
                     onLoad: () => loadGroupsContent(context, tabController.index,isAppend: true),

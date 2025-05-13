@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/blog_details.dart';
-import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/blog_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
-import 'package:bangu_lite/models/review_details.dart';
+import 'package:bangu_lite/models/informations/subjects/review_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 
@@ -28,7 +28,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
 
   Future<void> loadBlog(int selectedBlogID,{bool isRefresh = false}) async {
 
-    if(selectedBlogID == 0) return;
+    if(selectedBlogID == 0 || selectedBlogID == -1) return;
 
     Completer blogFullContentCompleter = Completer();
 

@@ -68,13 +68,31 @@ SeasonType judgeSeasonRange(int currentMonth,{bool? currentTime}){
 
   SeasonType currentSeasonType = SeasonType.winter;
 
+  // 5
+  // 1 4 7 10
+
   SeasonType.values.any((currentSeason){
-    if(currentMonth > currentSeason.month){
-      return false;
+
+    if(currentTime == true){
+      if(currentMonth >= currentSeason.month){
+        currentSeasonType = currentSeason;
+        return false;
+      }
+
+      return true;
+    }
+    
+    else{
+      if(currentMonth > currentSeason.month){
+        return false;
+      }
+
+      currentSeasonType = currentSeason;
+      return true;
+
     }
 
-    currentSeasonType = currentSeason;
-    return true;
+    
 
   });
 

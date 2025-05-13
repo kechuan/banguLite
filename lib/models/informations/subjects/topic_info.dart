@@ -1,5 +1,5 @@
-import 'package:bangu_lite/models/base_info.dart';
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/subjects/base_info.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 
 
 class TopicInfo extends ContentInfo {

@@ -9,7 +9,7 @@ import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 
 class IndexModel extends ChangeNotifier {
   IndexModel(){
@@ -19,7 +19,7 @@ class IndexModel extends ChangeNotifier {
   DateTime dataTime = DateTime.now();
   int selectedYear = DateTime.now().year;
   int selectedWeekDay = DateTime.now().weekday;
-  SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month);
+  SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month,currentTime:true);
 
   int starUpdateFlag = 0;
 
@@ -45,7 +45,12 @@ class IndexModel extends ChangeNotifier {
 
   // 草稿箱 [标题:内容]
   // 当然标题不一定会存在 如果不存在直接置为空就好
-  final Map<int,Map<String,String>> draftContent = {};
+
+  
+  //理论上这样做的话 会有发布内容会被互相覆盖的问题
+  //但我不应该响应这种情况 毕竟是DAU没两位数的项目
+  //试试Record吧。。
+  final Map<int,(String,String)> draftContent = {};
 
   int cachedImageSize = 0;
 

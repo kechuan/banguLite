@@ -6,8 +6,8 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/bangumi_details.dart';
-import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -199,7 +199,7 @@ class StarSubjectDialog extends StatelessWidget {
 
 										accountModel.postContent(
 											subjectID:subjectID.toString(),
-											postcontentType:PostCommentType.subjectComment,
+											postContentType:PostCommentType.subjectComment,
 											actionType: UserContentActionType.edit,
 											subjectCommentQuery:BangumiQuerys.subjectCommentQuery(
 												content: contentEditingController.text,

@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:bangu_lite/hive/config_model.dart';
-import 'package:bangu_lite/models/star_details.dart';
-import 'package:bangu_lite/models/surf_timeline_details.dart';
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/local/star_details.dart';
+import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:bangu_lite/hive/hive_registrar.g.dart';

@@ -164,8 +164,6 @@ class StickerSelectOverlay{
                                           debugPrint("dataIndex:${stickerDataLike[index]}, postCommentType:$postCommentType, subject:$commentID");
 
                                           invokeRequestSnackBar();
-
-                                          //onStick?.call(stickerDataLike[index]);
                                   
                                           accountModel.toggleCommentLike(
                                             commentID, 
@@ -181,7 +179,6 @@ class StickerSelectOverlay{
                                               onStick?.call(stickerDataLike[index]);
 
                                               invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
-
 
                                             }
                                             

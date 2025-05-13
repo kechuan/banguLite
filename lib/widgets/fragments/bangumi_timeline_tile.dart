@@ -9,8 +9,8 @@ import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/group_details.dart';
-import 'package:bangu_lite/models/surf_timeline_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_details.dart';
+import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
@@ -40,13 +40,7 @@ class BangumiTimelineTile extends StatelessWidget {
 
 			debugPrint("timeline DetailID:${surfTimelineDetails.detailID} timelineType:${surfTimelineDetails.bangumiTimelineType}");
 
-      //MyHive.historySurfDataBase.put(SurfRecordDetails(recordTimeStamp: DateTime.now().millisecondsSinceEpoch, detailID: surfTimelineDetails.detailID), surfTimelineDetails);
-
-      //历史记录的updatedAt 与 展示用的 updatedAt 效果不一致
-     
-
-      //debugPrint("historySurfDataBase: ${MyHive.historySurfDataBase.keys}");
-
+      ///历史记录的updatedAt 与 展示用的 updatedAt 效果不一致
 			switch(surfTimelineDetails.bangumiTimelineType){
 				case BangumiTimelineType.subject:{
 
@@ -89,19 +83,7 @@ class BangumiTimelineTile extends StatelessWidget {
           );
         }
 
-        case BangumiTimelineType.timeline:{
-
-          //TODO  0.8.* 实现
-          //bus.emit(
-          //  "AppRoute",
-          //  BangumiWebUrls.timelineTopic(surfTimelineDetails.detailID ?? 0)
-          //);
-        }
-					
-
-				default:{
-          
-        }
+				default:{}
 			}
 
 

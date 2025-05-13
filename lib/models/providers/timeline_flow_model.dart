@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/surf_timeline_details.dart';
+import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 

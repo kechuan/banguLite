@@ -20,8 +20,11 @@ class CommentReaction extends StatefulWidget {
 
     this.themeColor,
 
-    this.animatedReactionsListKey
+    this.animatedReactionsListKey,
+    required this.reactDataLikeNotifier,
   });
+
+  final ValueNotifier<int> reactDataLikeNotifier;
 
   final int? commentID;
   final Map<int, Set<String>>? commentReactions;
@@ -35,6 +38,7 @@ class CommentReaction extends StatefulWidget {
   final Color? themeColor;
 
   final GlobalKey<AnimatedListState>? animatedReactionsListKey;
+  
 
   @override
   State<CommentReaction> createState() => _CommentReactionState();
@@ -42,22 +46,38 @@ class CommentReaction extends StatefulWidget {
 
 class _CommentReactionState extends State<CommentReaction> {
 
-  ValueNotifier<int> reactDataLikeNotifier = ValueNotifier(-1);
+  //late final ValueNotifier<int> reactDataLikeNotifier;
 
   late final Map<int, Set<String>> localCommentReactions;
+
+  bool isServerDataContain = false;
 
   @override
   void initState() {
     localCommentReactions = widget.commentReactions ?? {};
     
-    //reactDataLikeNotifier
+
+    isServerDataContain = localCommentReactions.entries.any((userList){
+      if(userList.value.contains(AccountModel.loginedUserInformations.userInformation?.getName())){
+        widget.reactDataLikeNotifier.value = userList.key;
+        return true;
+      }
+
+      return false;
+    });
+
+    widget.reactDataLikeNotifier.addListener((){
+      //很蠢 但是有用 initState 监听到变化了 但却无法响应 ValueListenableBuilder
+      //debugPrint("[Listener] value change: ${widget.reactDataLikeNotifier.value}");
+      setState(() {});
+    });
+    
+    //reactDataLikeNotifiers
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    
 
     final accountModel = context.read<AccountModel>();
     bool isReactAble = accountModel.isLogined() && widget.commentID != null;
@@ -66,22 +86,14 @@ class _CommentReactionState extends State<CommentReaction> {
       return const SizedBox.shrink();
     }
 
-    bool isServerDataContain = localCommentReactions.entries.any((userList){
-      if(userList.value.contains(AccountModel.loginedUserInformations.userInformation?.getName())){
-        reactDataLikeNotifier.value = userList.key;
-        return true;
-      }
-
-      return false;
-    });
-
-
-
     return SizedBox(
       height: 40,
       child: ValueListenableBuilder(
-        valueListenable: reactDataLikeNotifier,
+        valueListenable: widget.reactDataLikeNotifier,
         builder: (_,reactDataLike,child){
+
+          //debugPrint("[Rebuild] value change: ${widget.reactDataLikeNotifier.value}");
+
           //AnimatedList 策略 只增不删 允许显示出 0 
           return AnimatedList.separated(
             key: widget.animatedReactionsListKey,
@@ -93,7 +105,10 @@ class _CommentReactionState extends State<CommentReaction> {
             removedSeparatorBuilder:  (_, index, animation) => const SizedBox.shrink(),
             itemBuilder: (_, index,animation) {
 
-              if(localCommentReactions.isEmpty && reactDataLikeNotifier.value == -1) return const SizedBox.shrink();
+              //AnimatedList 策略
+              if(localCommentReactions.isEmpty && reactDataLike == -1) return const SizedBox.shrink();
+              //个人的改变最多会+1 绝对不会再多
+              if(index >= localCommentReactions.length ) return const SizedBox.shrink();
           
               //恐怕 需要变成 reactDataLikeNotifier 驱动了
               
@@ -153,11 +168,11 @@ class _CommentReactionState extends State<CommentReaction> {
                             if(result){
                   
                               if(reactDataLike == dataLikeIndex){
-                                reactDataLikeNotifier.value = -1;
+                                widget.reactDataLikeNotifier.value = -1;
                               }
                   
                               else{
-                                reactDataLikeNotifier.value = dataLikeIndex;
+                                widget.reactDataLikeNotifier.value = dataLikeIndex;
                               }
                   
                               invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
@@ -188,16 +203,8 @@ class _CommentReactionState extends State<CommentReaction> {
                               textStyle: TextStyle(
                                 color: judgeDarknessMode(context) ? Colors.black : Colors.white
                               ),
-                              child: ScalableText("${(localCommentReactions[dataLikeIndex]?.length ?? 0) + (
-                                  reactDataLike == dataLikeIndex ? 
-                                    (
-                                      isServerDataContain ? 
-                                      reactDataLike != dataLikeIndex ? -1 : 0 :
-                                      reactDataLike == dataLikeIndex ? 1 : 0
-                                    ) :
-                                  reactDataLike == dataLikeIndex ? 1 : 0
-                                )
-                            }"),
+
+                              child: ScalableText("${localCommentReactions[dataLikeIndex]?.length ?? 0}")
                           ),
                         ],
                       ),

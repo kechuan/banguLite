@@ -1,14 +1,17 @@
 import 'dart:math';
 
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/callback.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 
 import 'package:bangu_lite/models/providers/groups_model.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
-import 'package:bangu_lite/models/surf_timeline_details.dart';
+import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/views/groups_select_view.dart';
@@ -19,7 +22,7 @@ import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 @FFAutoImport()
-import 'package:bangu_lite/models/group_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 
 
 @FFRoute(name: '/Groups')
@@ -59,8 +62,35 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 		//prevent Pass 0 return;
 		create: (_) => GroupsModel(subjectID: 'groupsTopic',selectedGroupInfo: widget.selectedGroupInfo),
 		child: Scaffold(
-		
-			body: Builder(
+		floatingActionButton: 
+			FloatingActionButton(
+				onPressed: () {
+
+					final indexModel = context.read<IndexModel>();
+
+					if(groupTitleNotifier.value == null){
+						fadeToaster(context: context, message: "请先选择对应的小组");
+					}
+
+					else{
+						Navigator.pushNamed(
+							context,
+							Routes.sendComment,
+							arguments: {
+								'contentID':widget.selectedGroupInfo?.groupID,
+								'postCommentType':PostCommentType.postGroupTopic,
+								'title': '在 ${groupTitleNotifier.value} 发布帖子',
+								'preservationContent': indexModel.draftContent[widget.selectedGroupInfo?.groupID]
+							}
+						);
+					}
+
+
+						
+				},
+				child: const Icon(Icons.edit,color: Colors.black),
+		),
+		body: Builder(
 				builder: (context) {
 
 					return EasyRefresh(
@@ -98,16 +128,17 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
   
                             ],
                           ),
+
                           children: [
-                                                GroupsSelectView(
-                                                  sliverAnimatedListKey:sliverAnimatedListKey, 
-                                                  expansionTileController: expansionTileController, 
-                                                  groupTitleNotifier: groupTitleNotifier,
-                                                  loadGroupTopicCallback: (context){
-                                                    expansionTileController.collapse();
-                                                    loadGroupTopics(context);
-                                                  },
-                                                )
+                            GroupsSelectView(
+                              sliverAnimatedListKey:sliverAnimatedListKey, 
+                              expansionTileController: expansionTileController, 
+                              groupTitleNotifier: groupTitleNotifier,
+                              loadGroupTopicCallback: (context){
+                                expansionTileController.collapse();
+                                loadGroupTopics(context);
+                              },
+                            )
                           
                           ],
                         ),

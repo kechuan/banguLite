@@ -5,9 +5,9 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 
 import 'package:bangu_lite/internal/lifecycle.dart';
-import 'package:bangu_lite/models/base_details.dart';
-import 'package:bangu_lite/models/base_info.dart';
-import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/base_details.dart';
+import 'package:bangu_lite/models/informations/subjects/base_info.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
@@ -122,7 +122,8 @@ abstract class BangumiContentPageState<
                                     postCommentType: getPostCommentType(),
                                     surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
                                     onSendMessage: (content) {
-                                                  
+
+
                                       final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
                                       final int commentListCount = getCommentCount(contentDetail, false) ?? 0;
                                                                 
@@ -134,7 +135,7 @@ abstract class BangumiContentPageState<
                                                                 
                                       resultCommentCount += userCommentMap.length;
                                                                 
-                                      userCommentMap.addAll({resultCommentCount:content});
+                                      userCommentMap.addAll({resultCommentCount:content as String});
                                       
                                       WidgetsBinding.instance.addPostFrameCallback((_){
                                         animatedSliverListKey.currentState?.insertItem(0);
@@ -156,14 +157,14 @@ abstract class BangumiContentPageState<
                     future: contentFuture,
                     builder: (_, snapshot) {
                   
-						          final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id);
+						          final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
 						          final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
 						          final int commentListCount = (getCommentCount(contentDetail, isCommentLoading) ?? 0);
 
-                      	int resultCommentCount = getPostCommentType() == PostCommentType.replyTopic ?
-						            commentListCount :
-						            commentListCount+1
-						            ;
+                      int resultCommentCount = getPostCommentType() == PostCommentType.replyTopic ?
+                      commentListCount :
+                      commentListCount+1
+                      ;
 
                       if(isCommentLoading){
                         return Skeletonizer.sliver(
@@ -201,17 +202,6 @@ abstract class BangumiContentPageState<
                                   //Topic的楼主内容 也会放入到 contentRepliedComment 里面。。
 
                                   Builder(builder: (_){
-
-                                    //return EpCommentView(
-                                    //  postCommentType: getPostCommentType(),
-                                    //  epCommentData: EpCommentDetails()
-                                    //    ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
-                                    //    ..commentID = getSubContentID() ?? contentInfo.id
-                                    //    ..comment = '[url=https://bangumi.tv/blog/331712]blog 331712[/url]'
-                                    //    ..commentTimeStamp = contentDetail?.createdTime ?? contentInfo.createdTime
-                                    //    ..commentReactions = contentDetail?.contentReactions
-                                    //);
-
 
                                     if(
                                       getPostCommentType() == PostCommentType.replyTopic ||
@@ -289,7 +279,7 @@ abstract class BangumiContentPageState<
 
                                 //..userInformation = 
                                 //(
-                                //  UserInformation()..userName = "1000000"
+                                //  AccountModel.loginedUserInformations.userInformation?..userName = "shironegi"
                                 //)
 
 								                //刚刚评论的ID理应无法被Action操作

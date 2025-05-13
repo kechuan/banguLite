@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/timeline_details.dart';
-import 'package:bangu_lite/models/user_details.dart';
+import 'package:bangu_lite/models/informations/surf/timeline_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 
 class UserModel extends ChangeNotifier{
@@ -10,7 +11,10 @@ class UserModel extends ChangeNotifier{
   //userID: UserInformation
   Map<String,UserDetails> userData = {};
 
-  Future<void> loadUserInfomation(String? userName,UserInformation? currentUserInformation) async {
+  Future<void> loadUserInfomation(
+    String? userName,
+    UserInformation? currentUserInformation
+  ) async {
 
     Completer userInfomationCompleter = Completer();
 
@@ -22,10 +26,7 @@ class UserModel extends ChangeNotifier{
 
     await Future.wait([
       HttpApiClient.client.get(BangumiAPIUrls.user(userName)),
-      HttpApiClient.client.get(
-        BangumiAPIUrls.userTimeline(userName),
-        queryParameters: BangumiQuerys.timelineQuery
-      )
+      loadUserTimeline(userName)
     ]).then((responseList){
 
       if(responseList[0].data != null && responseList[1].data != null){
@@ -61,4 +62,19 @@ class UserModel extends ChangeNotifier{
     return userInfomationCompleter.future;
 
   }
+
+  Future<Response> loadUserTimeline(
+    String userName,
+    {
+      Map<String, dynamic>? queryParameters
+    }
+  ){
+    return HttpApiClient.client.get(
+      BangumiAPIUrls.userTimeline(userName),
+      queryParameters: queryParameters ?? BangumiQuerys.timelineQuery
+    );
+  }
+
+
+
 }

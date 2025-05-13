@@ -6,7 +6,7 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/extension.dart';
-import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
@@ -39,6 +39,8 @@ class EpCommentTile extends StatefulWidget {
 class _EpCommentTileState extends State<EpCommentTile> {
 
   final GlobalKey<AnimatedListState> animatedTagsListKey = GlobalKey<AnimatedListState>();
+
+  final ValueNotifier<int> reactDataLikeNotifier = ValueNotifier(-1);
 
 
   @override
@@ -169,14 +171,17 @@ class _EpCommentTileState extends State<EpCommentTile> {
                         );
                       }
 
-
                     }
+
+                    reactDataLikeNotifier.value = datalikeIndex;
 
                     commentReactions[datalikeIndex] = {
                       AccountModel.loginedUserInformations.userInformation?.getName() ?? ""
                     };
 
                     WidgetsBinding.instance.addPostFrameCallback((_) {
+
+                      
                       
                       //无法理解。。。
                       animatedTagsListKey.currentState?.insertItem(
@@ -260,7 +265,8 @@ class _EpCommentTileState extends State<EpCommentTile> {
                     commentID: widget.epCommentData.commentID,
                     commentIndex: commentIndex,
                     replyIndex: replyIndex,
-                    commentReactions: widget.epCommentData.commentReactions
+                    commentReactions: widget.epCommentData.commentReactions,
+                    reactDataLikeNotifier: reactDataLikeNotifier
                   ),
                 );
               }

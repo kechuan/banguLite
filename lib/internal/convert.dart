@@ -5,7 +5,7 @@ import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/models/eps_info.dart';
+import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 
 List<String> convertSystemFontFamily() {
     if (Platform.isAndroid) {
@@ -189,8 +189,7 @@ int convertPassedSeason(int year,int month){
   else if(year > currentTime.year) {return 0;}
 
   else{
-    
-    return judgeSeasonRange(month).index;
+    return judgeSeasonRange(month,currentTime: true).index;
   }
 
 }

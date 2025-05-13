@@ -6,7 +6,7 @@ import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/eps_info.dart';
+import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 
 @FFAutoImport()
 import 'package:bangu_lite/models/providers/ep_model.dart';
@@ -87,7 +87,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                     WidgetsBinding.instance.addPostFrameCallback((_)=>offsetNotifier.value = notification.metrics.pixels);
                     return false;
                   },
-                  child: Selector<EpModel,int>(
+                  child: Selector<EpModel,num>(
                       selector: (_, epModel) => epModel.selectedEp,
                       shouldRebuild: (previous, next) => previous != next,
                       builder: (_,selectedEp,commentDetailchild){
@@ -152,7 +152,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                               WidgetsBinding.instance.addPostFrameCallback((timeStamp){
                                               
                                                 //epInfo范围的总高度 => [120: Appbar+epPanel 高度]
-                                                sliverViewStartOffset = (epInfoKey.currentContext?.size!.height ?? 300)+(2*kToolbarHeight); //120
+                                                sliverViewStartOffset = (epInfoKey.currentContext?.size?.height ?? 300)+(2*kToolbarHeight); //120
                                               
                                                 //越过epInfo时开始激活
                                                 opacityDegree = min(0.8,offset/sliverViewStartOffset);
@@ -285,7 +285,7 @@ class EpInfo extends StatelessWidget {
   });
 
   final Map<num,EpsInfo> epsInfo;
-  final int selectedEp;
+  final num selectedEp;
 
 
   @override
@@ -345,7 +345,7 @@ class EpCommentPageDetails extends StatelessWidget {
 					builder: (_,snapshot) {
 
 						final epModel = context.read<EpModel>();
-						int currentEp = epModel.selectedEp;
+						num currentEp = epModel.selectedEp;
 				
 						debugPrint("currentEp:$currentEp");
 

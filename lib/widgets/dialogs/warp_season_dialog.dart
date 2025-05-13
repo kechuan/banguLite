@@ -309,12 +309,11 @@ void showSeasonDialog(
       DateTime currentTime = DateTime.now();
 
       if(selectSeason==null) return;
-
       if(selectSeason is! DateTime) return;
       
       if(
         selectSeason.year == currentTime.year &&
-        selectSeason.month == currentTime.month
+        judgeSeasonRange(selectSeason.month) == judgeSeasonRange(currentTime.month)
       ){
         calendarLoadFuture = indexModel.reloadCalendar();
       }

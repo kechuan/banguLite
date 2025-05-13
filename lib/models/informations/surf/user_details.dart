@@ -1,6 +1,6 @@
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
-import 'package:bangu_lite/models/social_details.dart';
-import 'package:bangu_lite/models/timeline_details.dart';
+import 'package:bangu_lite/models/informations/surf/social_details.dart';
+import 'package:bangu_lite/models/informations/surf/timeline_details.dart';
 
 class UserInformation {
 

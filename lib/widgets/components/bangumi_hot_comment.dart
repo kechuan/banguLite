@@ -7,7 +7,7 @@ import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 
-import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_tile.dart';
 import 'package:provider/provider.dart';

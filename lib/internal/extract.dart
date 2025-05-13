@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:bangu_lite/internal/bangumi_define/timeline_const.dart';
-import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -148,7 +148,7 @@ Future<String?> extractFallbackToken(InAppWebViewController webViewController) a
       """);
 
       if (token != null && token.isNotEmpty) {
-        debugPrint('>>> Successfully read token from DOM: $token');
+        debugPrint('>>> Successfully read token from DOM');
         tokenCompleter.complete(token);
       } 
       

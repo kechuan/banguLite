@@ -7,7 +7,7 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/convert.dart';
-import 'package:bangu_lite/models/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 class BangumiCommentTile extends StatelessWidget {
@@ -23,6 +23,8 @@ class BangumiCommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final ValueNotifier<int> reactDataLikeNotifier = ValueNotifier(-1);
 
     final int ratingScore = commentData.rate ?? 0;
     DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch((commentData.commentTimeStamp ?? 0)*1000);
@@ -108,6 +110,7 @@ class BangumiCommentTile extends StatelessWidget {
                     postCommentType: PostCommentType.subjectComment,
                     commentReactions: commentData.commentReactions,
                     themeColor: themeColor,
+                    reactDataLikeNotifier: reactDataLikeNotifier
                   ),
                 ),
               ),

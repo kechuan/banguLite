@@ -11,6 +11,7 @@ const List<String> routeNames = <String>[
   '/Blog',
   '/Groups',
   '/Timeline',
+  '/TimelineChat',
   '/commentPreview',
   '/groupTopic',
   '/history',
@@ -56,6 +57,15 @@ class Routes {
   ///
   /// [name] : '/Timeline'
   static const String timeline = '/Timeline';
+
+  /// '/TimelineChat'
+  ///
+  /// [name] : '/TimelineChat'
+  ///
+  /// [constructors] :
+  ///
+  /// BangumiTimelineChatPage : [int(required) timelineID, String(required) comment]
+  static const String timelineChat = '/TimelineChat';
 
   /// '/commentPreview'
   ///
@@ -123,7 +133,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// SendCommentPage : [int? contentID, int? replyID, String? title, PostCommentType? postCommentType, UserContentActionType? actionType, String? referenceObject,  Function(String)? onSendMessage, String? preservationContent, Color? themeColor]
+  /// SendCommentPage : [int? contentID, int? replyID, String? title, PostCommentType? postCommentType, UserContentActionType? actionType, String? referenceObject,  Function(String)? onSendMessage, (String, String)? preservationContent, Color? themeColor]
   static const String sendComment = '/sendComment';
 
   /// '/subjectComment'
@@ -168,7 +178,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiWebviewPage : [String(required) url, String? title,  Function(String?)? onTargetUrlReached]
+  /// BangumiWebviewPage : [String(required) url, String? title, String? injectHTML,  Function(String?)? onTargetUrlReached]
   static const String webview = '/webview';
 
   /// 'about'

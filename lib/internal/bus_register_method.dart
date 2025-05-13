@@ -1,14 +1,14 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/group_details.dart';
-import 'package:bangu_lite/models/group_topic_info.dart';
+import 'package:bangu_lite/models/informations/subjects/group_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/models/providers/review_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
-import 'package:bangu_lite/models/review_details.dart';
-import 'package:bangu_lite/models/topic_info.dart';
+import 'package:bangu_lite/models/informations/subjects/review_details.dart';
+import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -21,10 +21,11 @@ void appRouteMethodListener(BuildContext context,String link){
 
   if(
     link.startsWith(BangumiWebUrls.baseUrl) || 
-    link.startsWith(BangumiWebUrls.relativeUrl)
+    link.startsWith(BangumiWebUrls.relativeUrl) ||
+    link.startsWith(BangumiAPIUrls.newUrl)
   ){
 
-    debugPrint("detected BangumiWebUrls: $link");
+    debugPrint("detected BangumiUrls: $link");
 
     //example: https://bangumi.tv/ep/1471078?subjectID=1471078&selectedEp=2
     String? matchLink = pathRegExp.firstMatch(link)?.group(0);
@@ -60,9 +61,9 @@ void appRouteMethodListener(BuildContext context,String link){
           arguments: {
             //暂定 随后会自动获取totalEp信息
             'totalEps': 13,
-            "epModel": EpModel(
+            'epModel': EpModel(
               subjectID: int.parse(appRouteUri.queryParameters['subjectID']!),
-              selectedEp: int.parse(appRouteUri.queryParameters['selectedEp']!)
+              selectedEp: num.parse(appRouteUri.queryParameters['selectedEp']!)
             ),
           }
         );
@@ -123,39 +124,55 @@ void appRouteMethodListener(BuildContext context,String link){
     ){
       if(context.mounted){
         Navigator.pushNamed(
-			context,
-			Routes.blog,
-            arguments: {
-				"reviewModel":ReviewModel(subjectID: "blog"),
-				"reviewInfo": ReviewInfo(id: resID),
-         	}
-        );
+        context,
+        Routes.blog,
+        arguments: {
+          "reviewModel":ReviewModel(subjectID: "blog"),
+          "reviewInfo": ReviewInfo(id: resID),
+        }
+      );
       }
     }
 
 	else if(
-      link.startsWith(BangumiWebUrls.group(resID)) ||
-      link.startsWith(BangumiWebUrls.relativeGroup(resID)) 
-    ){
+    link.startsWith(BangumiWebUrls.group(resID)) ||
+    link.startsWith(BangumiWebUrls.relativeGroup(resID)) 
+  ){
 
-		debugPrint("group link: $link, ${matchLink?.split(RegExp('/')).last}");
+    debugPrint("group link: $link, ${matchLink?.split(RegExp('/')).last}");
 
 
-		if(context.mounted){
+    if(context.mounted){
 
-			Navigator.pushNamed(
-				context,
-				Routes.groups,
-				arguments: {
-					"selectedGroupInfo": GroupInfo(id: 0)..groupName = "${matchLink?.split(RegExp('/')).last}",
-				}
-			);
-		}
+      Navigator.pushNamed(
+        context,
+        Routes.groups,
+        arguments: {
+          "selectedGroupInfo": GroupInfo(id: 0)..groupName = "${matchLink?.split(RegExp('/')).last}",
+        }
+      );
     }
+  }
 
-    else{
-      launchUrlString(link);
+  else if(
+    //特殊状况
+    link.startsWith(BangumiAPIUrls.timelineReply(int.parse(appRouteUri.queryParameters['timelineID']!)))
+  ){
+
+    if(context.mounted){
+
+      //stupid way. but general...
+      Navigator.pushNamed(
+        context,
+        Routes.timelineChat,
+        arguments: {
+          'timelineID':appRouteUri.queryParameters['timelineID'],
+          'comment':appRouteUri.queryParameters['comment'],
+        }
+      );
+
     }
+  }
 
 
   }

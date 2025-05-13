@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:dio/dio.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/bangumi_details.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 
 //@Deprecated
 Future<List<BangumiDetails>> searchHandler(String query) async {

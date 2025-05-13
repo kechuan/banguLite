@@ -53,18 +53,16 @@ final allEffectTag = [
     LateLoadImgTag(),
     LateLoadImgTag(tagName: "photo"),
     UrlTag(
-        onTap: (link) async => 
+      onTap: (link) async => 
         await canLaunchUrlString(link).then(
-            (launchable) {
-                if (launchable) {
-                    bus.emit('AppRoute', link);	
-                }
-
-            }
+          (launchable) {
+              if (launchable) bus.emit('AppRoute', link);	
+          }
         )
     ),
 
     CodeTag(),
+	UserTag()
 ];
 
 final richlessEffectTag = allEffectTag.getRange(0, allEffectTag.length - 4);
@@ -307,57 +305,48 @@ class CodeTag extends AdvancedTag{
 
 }
 
+class UserTag extends WrappedStyleTag {
+
+  UserTag(): super("user");
+  
+    //同种名称的 不同功能 or 不同名称 同种功能
+    /// CodeTag({this.tagName = 'code'}) : super("code");
+    /// CodeTag({this.tagName = 'code'}) : super(tagName ?? "code");
+
+	@override
+	List<InlineSpan> wrap(FlutterRenderer renderer, bbob.Element element, List<InlineSpan> spans) {
+		return [ 
+			TextSpan(
+				text: spans.isEmpty ? "" : '@${spans.first.toPlainText()}'
+			),
+		];
+	}
+
+    
+}
+
 class MaskTag extends WrappedStyleTag {
     MaskTag() : super("mask");
 
-    //@override
-    //List<InlineSpan> wrap(FlutterRenderer renderer, bbob.Element element, List<InlineSpan> spans) {
-    //    late String text;
-    //    if (element.attributes.isNotEmpty) {
-    //        text = "mask: ${element.attributes.values.join(' ')}";
-    //    } 
-
-    //    else {
-    //        text = "mask";
-    //    }
-
-    //    return [
-    //        WidgetSpan(
-    //            child: MaskDisplay(
-    //                maskText: text,
-    //                content: spans,
-    //                selectable: renderer.stylesheet.selectableText,
-    //            )
-    //        )
-    //    ];
-
-    //}
-
     @override
     List<InlineSpan> wrap(
-        FlutterRenderer renderer, bbob.Element element, List<InlineSpan> spans) {
-        //String? author =
-        //    element.attributes.isNotEmpty ? element.attributes.values.first : null;
+      FlutterRenderer renderer, 
+      bbob.Element element, 
+      List<InlineSpan> spans
+    ) {
 
-          String? text = element.attributes.isNotEmpty ?
-          element.attributes.values.first :
-          null
-          ;
-            //if (element.attributes.isNotEmpty) {
-            //    text = "mask: ${element.attributes.values.join(' ')}";
-            //} 
-
-            //else {
-            //    text = "mask";
-            //}
+        String? text = element.attributes.isNotEmpty ?
+        element.attributes.values.first :
+        null
+        ;
 
         return [
             WidgetSpan(
-                child: MaskDisplay(
-                    maskText: text ?? "mask",
-                    content: spans,
-                    selectable: renderer.stylesheet.selectableText,
-                )
+              child: MaskDisplay(
+                maskText: text ?? "mask",
+                content: spans,
+                selectable: renderer.stylesheet.selectableText,
+              )
             ),
         ];
     }

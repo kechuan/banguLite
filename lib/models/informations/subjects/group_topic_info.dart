@@ -1,10 +1,10 @@
 
 
-import 'package:bangu_lite/models/base_info.dart';
-import 'package:bangu_lite/models/group_details.dart';
-import 'package:bangu_lite/models/surf_timeline_details.dart';
+import 'package:bangu_lite/models/informations/subjects/base_info.dart';
+import 'package:bangu_lite/models/informations/subjects/group_details.dart';
+import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 
-import 'package:bangu_lite/models/topic_info.dart';
+import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 
 class GroupTopicInfo extends ContentInfo {
   GroupTopicInfo({super.id});

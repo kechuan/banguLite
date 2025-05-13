@@ -1,6 +1,6 @@
 import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/models/blog_details.dart';
+import 'package:bangu_lite/models/informations/subjects/blog_details.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/providers/review_model.dart';
 @FFAutoImport()
-import 'package:bangu_lite/models/review_details.dart';
+import 'package:bangu_lite/models/informations/subjects/review_details.dart';
 
 @FFRoute(name: '/Blog')
 class BangumiBlogPage extends StatefulWidget {
@@ -72,9 +72,9 @@ class _BangumiBlogPageState extends BangumiContentPageState
 
   @override
   int? getCommentCount(BlogDetails? blogDetails, bool isLoading){
+    if(isLoading) return null;
+    return blogDetails!.blogReplies?.length ?? 0;
 
-	if(isLoading) return null;
-	  return blogDetails!.blogReplies!.isEmpty ? 0 : blogDetails.blogReplies!.length;
   }
 	
   @override

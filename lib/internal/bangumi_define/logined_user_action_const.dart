@@ -14,7 +14,7 @@ enum PostCommentType{
 
   //特殊
   timeline("时间线"),
-  replyTimeline("时间线"),
+  replyTimeline("回复时间线"),
   ;
 
   final String commentTypeString;
