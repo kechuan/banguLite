@@ -10,12 +10,15 @@ import 'package:flutter/material.dart';
 class EpCommentView extends StatelessWidget {
   const EpCommentView({
     super.key, 
+    required this.contentID,
     required this.epCommentData,
     this.postCommentType,
     this.onUpdateComment, 
-    this.authorID,
+    this.authorID, 
     
   });
+
+  final int contentID;
   
   final EpCommentDetails epCommentData;
   final PostCommentType? postCommentType;
@@ -40,15 +43,10 @@ class EpCommentView extends StatelessWidget {
       authorType = BangumiCommentAuthorType.author;
     }
 
-    //if(authorID == (epCommentData.userInformation?.userID)){
-    //  authorType = BangumiCommentAuthorType.levelAuthor;
-    //}
-
-
-
     return ListTile(
       contentPadding: const EdgeInsets.all(0),
       title: EpCommentTile(
+        contentID: contentID,
         epCommentData: epCommentData,
         postCommentType:postCommentType,
         themeColor: Theme.of(context).scaffoldBackgroundColor,
@@ -56,6 +54,7 @@ class EpCommentView extends StatelessWidget {
         authorType: authorType,
       ),
       subtitle: EpRepliedTile(
+        contentID: contentID,
         epCommentData: epCommentData,
         postCommentType:postCommentType,
         themeColor: Theme.of(context).scaffoldBackgroundColor,

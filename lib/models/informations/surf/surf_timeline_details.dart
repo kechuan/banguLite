@@ -98,19 +98,19 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
       for(int index = 0; index < groupDataList.length; index++){
         SurfTimelineDetails surfTimelineDetails = SurfTimelineDetails(
           //groupTopicID
-          detailID: groupDataList[index].topicInfo?.topicID,
+          detailID: groupDataList[index].topicID,
         )
           ..bangumiTimelineType = bangumiTimelineType
-          ..title = groupDataList[index].topicInfo?.topicTitle
+          ..title = groupDataList[index].topicTitle
           ..sourceTitle = groupDataList[index].groupInfo?.groupTitle
           //groupID
           ..sourceID = groupDataList[index].groupInfo?.groupName
           ..commentDetails = (
             CommentDetails()
-              ..userInformation = groupDataList[index].topicInfo?.userInformation
+              ..userInformation = groupDataList[index].userInformation
           )
-          ..replies = groupDataList[index].topicInfo?.repliesCount
-          ..updatedAt = groupDataList[index].topicInfo?.lastRepliedTime
+          ..replies = groupDataList[index].repliesCount
+          ..updatedAt = groupDataList[index].lastRepliedTime
 
         ;
 

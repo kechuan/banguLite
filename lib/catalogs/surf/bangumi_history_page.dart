@@ -11,25 +11,6 @@ import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
-//Map<DateTime, SurfTimelineDetails> testMap = {
-//  ...Map.fromIterables(
-//    List.generate(30, (index) => DateTime.now().add(Duration(hours: -index*2))),
-//    List.generate(30, (index) => SurfTimelineDetails(
-//      detailID: (485936+index).toInt()  
-//    ) 
-//      ..commentDetails = (
-//          CommentDetails()..userInformation = (
-//            UserInformation(userID: 0)..nickName = 'NPC $index'
-//          )
-//        )
-//      ..bangumiTimelineType = BangumiTimelineType.subject
-//    )
-   
-//  )
-
-//};
-
-
 @FFRoute(name: '/history')
 
 /// 默认最多只加载前50项
@@ -47,7 +28,6 @@ import 'package:sliver_tools/sliver_tools.dart';
 /// 这是一般性的磁盘思维 。。 否则恐怕需要使用 indexModel 进行内存内的记录 但这种恐怕更麻烦
 /// 
 /// 直接写入 [detailID] 对大家都好...
-
 
 class BangumiHistoryPage extends StatefulWidget {
   const BangumiHistoryPage({super.key});
@@ -67,26 +47,11 @@ class _BangumiHistoryPageState extends State<BangumiHistoryPage> {
           IconButton(
             onPressed: () {
               MyHive.historySurfDataBase.clear();
-              setState(() {
-                
-              });
-              //indexModel.surfHistory.clear();
+              setState(() {});
             },
             icon: const Icon(Icons.delete),
           ),
 
-          IconButton(
-            onPressed: () {
-
-              //debugPrint("last:${testMap.values.last.detailID}");
-              //context.read<IndexModel>().updateStarDetail();
-              //setState(() {
-              //  testMap = Map.of(testMap);
-              //  debugPrint("last:${testMap.values.last.detailID}");
-              //});
-            },
-            icon: const Icon(Icons.refresh),
-          ),
         ],
       ),
       body: EasyRefresh(

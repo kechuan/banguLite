@@ -101,6 +101,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                               }
                                 
                               return BangumiCommentTile(
+                                contentID: commentListData[index].contentID ?? 0,
                                 commentData: commentListData[index],
                                 themeColor:judgeDetailRenderColor(context,bangumiModel.imageColor)
                               );

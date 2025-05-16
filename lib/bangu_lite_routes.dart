@@ -19,6 +19,7 @@ const List<String> routeNames = <String>[
   '/loginAuth',
   '/moreReviews',
   '/moreTopics',
+  '/notificationsPage',
   '/photoView',
   '/sendComment',
   '/subjectComment',
@@ -64,7 +65,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiTimelineChatPage : [int(required) timelineID, String(required) comment]
+  /// BangumiTimelineChatPage : [int(required) timelineID, String(required) comment,  Function(int)? onDeleteAction]
   static const String timelineChat = '/TimelineChat';
 
   /// '/commentPreview'
@@ -118,6 +119,11 @@ class Routes {
   /// MoreTopicsPage : [TopicModel(required) topicModel, Color? bangumiThemeColor, String? title]
   static const String moreTopics = '/moreTopics';
 
+  /// '/notificationsPage'
+  ///
+  /// [name] : '/notificationsPage'
+  static const String notificationsPage = '/notificationsPage';
+
   /// '/photoView'
   ///
   /// [name] : '/photoView'
@@ -133,7 +139,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// SendCommentPage : [int? contentID, int? replyID, String? title, PostCommentType? postCommentType, UserContentActionType? actionType, String? referenceObject,  Function(String)? onSendMessage, (String, String)? preservationContent, Color? themeColor]
+  /// SendCommentPage : [dynamic contentID, int? replyID, String? title, PostCommentType? postCommentType, UserContentActionType? actionType, String? referenceObject,  Function(String)? onSendMessage, (String, String)? preservationContent, Color? themeColor]
   static const String sendComment = '/sendComment';
 
   /// '/subjectComment'

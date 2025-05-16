@@ -41,7 +41,7 @@ class ScalableText extends Text {
           AppFontSize.getScaledSize(originalSize) : 
           AppFontSize.getScaledSize(AppFontSize.s16)
       ),
-      textAlign:textAlign,
+      textAlign: textAlign,
       maxLines: maxLines,
       overflow: overflow,
     );

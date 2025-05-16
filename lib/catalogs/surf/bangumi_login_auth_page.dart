@@ -152,7 +152,7 @@ class BangumiAuthPage extends StatelessWidget {
                           ScalableText('${AccountModel.loginedUserInformations.userInformation?.nickName}'),
         
                           ElevatedButton(
-                            onPressed: ()=> accountModel.resetLoginStatus(),
+                            onPressed: ()=> accountModel.logout(),
                             child: const Row(
                               children: [
                                 Icon(Icons.logout),
@@ -200,7 +200,7 @@ class BangumiAuthPage extends StatelessWidget {
                           ScalableText('${AccountModel.loginedUserInformations.userInformation?.nickName} 已验证成功'),
         
                           ElevatedButton(
-                            onPressed: ()=> accountModel.resetLoginStatus(),
+                            onPressed: ()=> accountModel.logout(),
                             child: const Row(
                               children: [
                                 Icon(Icons.logout),

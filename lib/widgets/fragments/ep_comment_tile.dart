@@ -6,6 +6,7 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/extension.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
@@ -18,12 +19,15 @@ import 'package:flutter_bbcode/flutter_bbcode.dart';
 class EpCommentTile extends StatefulWidget {
   const EpCommentTile({
     super.key,
+    required this.contentID,
     required this.epCommentData,
 	  this.postCommentType,
     this.themeColor, 
     this.onUpdateComment,
     this.authorType
   });
+
+  final int contentID;
   
   final EpCommentDetails epCommentData;
   final PostCommentType? postCommentType;
@@ -90,7 +94,12 @@ class _EpCommentTileState extends State<EpCommentTile> {
                       child: ScalableText(
                         widget.epCommentData.userInformation?.nickName ?? widget.epCommentData.userInformation?.userName ?? "no data"
                         "${widget.authorType?.typeName}",
-                          style: const TextStyle(color: Colors.blue),
+                          style: TextStyle(
+                            color: widget.epCommentData.userInformation?.getName() == AccountModel.loginedUserInformations.userInformation?.getName()
+                              ? judgeCurrentThemeColor(context)
+                              :Colors.blue,
+                            
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                       ),
@@ -135,6 +144,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
               ),
 
               BangumiCommentActionButton(
+                contentID: widget.contentID,
                 commentData: widget.epCommentData,
                 commentBlockStatus: commentBlockStatus,
                 postCommentType: widget.postCommentType,

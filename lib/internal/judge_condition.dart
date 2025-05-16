@@ -101,5 +101,5 @@ SeasonType judgeSeasonRange(int currentMonth,{bool? currentTime}){
   return currentSeasonType;
 }
 
-bool judgeDarknessMode(BuildContext context)=> Theme.of(context).brightness == Brightness.dark ? true : false;
+bool judgeDarknessMode(BuildContext context) => Theme.of(context).brightness == Brightness.dark ? true : false;
 bool judgeLandscapeMode(BuildContext context) => MediaQuery.orientationOf(context) == Orientation.landscape ? true : false;

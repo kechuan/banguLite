@@ -13,7 +13,8 @@ enum BangumiCommentAuthorType{
 
 enum BangumiPrivateHubType{
 
-//  user("个人中心",Icons.account_circle_outlined),
+  trend("个人动态",Icons.trending_up_outlined),
+  //user("个人中心",Icons.account_circle_outlined),
   email("消息提醒",Icons.email_outlined),
   ;
 

@@ -37,6 +37,7 @@ import '../catalogs/subject/more_topics_page.dart';
 import '../catalogs/surf/bangumi_groups_page.dart';
 import '../catalogs/surf/bangumi_history_page.dart';
 import '../catalogs/surf/bangumi_login_auth_page.dart';
+import '../catalogs/surf/bangumi_notifications_page.dart';
 import '../catalogs/surf/bangumi_surf_timeline_page.dart';
 import '../catalogs/surf/bangumi_timeline_chat_page.dart';
 import '../catalogs/surf/banumi_user_page.dart';
@@ -108,6 +109,9 @@ FFRouteSettings getRouteSettings({
           comment: asT<String>(
             safeArguments['comment'],
           )!,
+          onDeleteAction: asT<Function(int)?>(
+            safeArguments['onDeleteAction'],
+          ),
         ),
       );
     case '/commentPreview':
@@ -210,6 +214,16 @@ FFRouteSettings getRouteSettings({
           ),
         ),
       );
+    case '/notificationsPage':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => BangumiNotificationsPage(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
+        ),
+      );
     case '/photoView':
       return FFRouteSettings(
         name: name,
@@ -231,9 +245,9 @@ FFRouteSettings getRouteSettings({
           key: asT<Key?>(
             safeArguments['key'],
           ),
-          contentID: asT<int?>(
+          contentID: asT<dynamic>(
             safeArguments['contentID'],
-          ),
+          )!,
           replyID: asT<int?>(
             safeArguments['replyID'],
           ),

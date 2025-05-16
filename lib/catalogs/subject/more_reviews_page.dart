@@ -68,6 +68,8 @@ class MoreReviewsPageState extends BangumiGeneralMoreContentPageState
   @override
   Function((String,String))? get onPostContent => (message){
 
+    //添加获取用户 发布信息 .
+
     getContentModel().contentListData.add(
       ReviewInfo(
         id: -1,

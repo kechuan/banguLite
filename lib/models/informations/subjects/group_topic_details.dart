@@ -26,9 +26,8 @@ class GroupTopicDetails extends ContentDetails {
 GroupTopicDetails loadGroupTopicDetails(Map<String,dynamic> bangumiGroupTopicData){
 
   GroupTopicDetails currentGroupTopicDetails = GroupTopicDetails(
-      detailID: bangumiGroupTopicData['id'],
-    );
-
+    detailID: bangumiGroupTopicData['id'],
+  );
     currentGroupTopicDetails
       ..groupInfo = loadGroupsInfo([bangumiGroupTopicData["group"]]).first
       ..userInformation = loadUserInformations(bangumiGroupTopicData['creator'])

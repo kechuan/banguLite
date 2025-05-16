@@ -2,8 +2,10 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/app_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
@@ -97,7 +99,7 @@ class AppDrawer extends StatelessWidget {
     
                             if(loginedStatus)
                               ElevatedButton(
-                                onPressed: ()=> accountModel.resetLoginStatus(),
+                                onPressed: ()=> accountModel.logout(),
                                 child: const Row(
                                   children: [
                                     Icon(Icons.logout),
@@ -113,15 +115,29 @@ class AppDrawer extends StatelessWidget {
                       ),
 
 
-                      //if(loginedStatus)
-                      //  ...List.generate(
-                      //    BangumiPrivateHubType.values.length, 
-                      //    (index) => ListTile(
-                      //      leading: Icon(BangumiPrivateHubType.values[index].iconData),
-                      //      title: Text(BangumiPrivateHubType.values[index].typeName),
-                      //      onTap: ()=>fadeToaster(context: context, message: "暂未开放"),
-                      //    )
-                      //  )
+                      if(loginedStatus)
+                        ...List.generate(
+                          BangumiPrivateHubType.values.length, 
+                          (index) => ListTile(
+                            leading: Icon(BangumiPrivateHubType.values[index].iconData),
+                            title: Text(BangumiPrivateHubType.values[index].typeName),
+                            onTap: (){
+                              if(index == BangumiPrivateHubType.trend.index){
+                                showUserInfomationDialog(context, AccountModel.loginedUserInformations.userInformation);
+                              }
+
+                              else{
+                                Navigator.pushNamed(
+                                  context,
+                                  Routes.notificationsPage,
+                                );   
+                                
+                              }
+                              
+                              
+                            }
+                          )
+                        )
 
                     ],
                   );

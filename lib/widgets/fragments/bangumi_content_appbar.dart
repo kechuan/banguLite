@@ -129,7 +129,7 @@ class BangumiContentAppbar extends StatelessWidget {
                   await invokeSendComment(content).then((result){
                     debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
                     //UI层 Callback
-                    if(result){
+                    if(result != 0){
                       invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
                       onSendMessage?.call(content);
                     }
@@ -146,7 +146,7 @@ class BangumiContentAppbar extends StatelessWidget {
                   await invokePostContent(content).then((result){
                     debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
                     //UI层 Callback
-                    if(result){
+                    if(result != 0){
                       invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
                       onSendMessage?.call(content);
                     }

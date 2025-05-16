@@ -16,6 +16,7 @@ class IndexModel extends ChangeNotifier {
     initModel();
   }
 
+
   DateTime dataTime = DateTime.now();
   int selectedYear = DateTime.now().year;
   int selectedWeekDay = DateTime.now().weekday;
@@ -50,7 +51,7 @@ class IndexModel extends ChangeNotifier {
   //理论上这样做的话 会有发布内容会被互相覆盖的问题
   //但我不应该响应这种情况 毕竟是DAU没两位数的项目
   //试试Record吧。。
-  final Map<int,(String,String)> draftContent = {};
+  final Map<dynamic,(String,String)> draftContent = {};
 
   int cachedImageSize = 0;
 

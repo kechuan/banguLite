@@ -34,7 +34,7 @@ class BangumiTimelineTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-	return ListTile(
+	  return ListTile(
     contentPadding: const EdgeInsets.all(0),
 		onTap: () {
 
@@ -79,7 +79,7 @@ class BangumiTimelineTile extends StatelessWidget {
 
 					bus.emit(
             "AppRoute",
-            BangumiWebUrls.groupTopic(surfTimelineDetails.detailID ?? 0)
+            '${BangumiWebUrls.groupTopic(surfTimelineDetails.detailID ?? 0)}?groupTitle=${surfTimelineDetails.title}'
           );
         }
 
@@ -101,41 +101,41 @@ class BangumiTimelineTile extends StatelessWidget {
               userInformation: surfTimelineDetails.commentDetails?.userInformation,
             ),
 
-          Expanded(
-            child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              
-              BBCodeText(
-                data: '${surfTimelineDetails.title}',
-                stylesheet: appDefaultStyleSheet(context)
+            Expanded(
+              child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                
+                BBCodeText(
+                  data: '${surfTimelineDetails.title}',
+                  stylesheet: appDefaultStyleSheet(context)
+                ),
+                
+
+                if(
+                  surfTimelineDetails.commentDetails?.rate != null &&
+                  surfTimelineDetails.commentDetails?.rate != 0
+                )
+                  SizedBox(
+                    height: 50,
+                    child: StarScoreList(
+                      ratingScore: surfTimelineDetails.commentDetails?.rate ?? 0,
+                      themeColor: judgeCurrentThemeColor(context),
+                    )
+                  )
+              ],
+              ),
+            ),
+
+
+            if(surfTimelineDetails.replies != null)
+              Row(
+                children: [
+                  Icon(MdiIcons.chat,size: 16,color: Colors.grey.shade700),
+                  ScalableText("${surfTimelineDetails.replies}",style: TextStyle(fontSize: 14,color: Colors.grey.shade700)),
+                ],
               ),
               
-
-              if(
-                surfTimelineDetails.commentDetails?.rate != null &&
-                surfTimelineDetails.commentDetails?.rate != 0
-              )
-                SizedBox(
-                  height: 50,
-                  child: StarScoreList(
-                    ratingScore: surfTimelineDetails.commentDetails?.rate ?? 0,
-                    themeColor: judgeCurrentThemeColor(context),
-                  )
-                )
-            ],
-            ),
-          ),
-
-
-          if(surfTimelineDetails.replies != null)
-            Row(
-              children: [
-                Icon(MdiIcons.chat,size: 16,color: Colors.grey.shade700),
-                ScalableText("${surfTimelineDetails.replies}",style: TextStyle(fontSize: 14,color: Colors.grey.shade700)),
-              ],
-            ),
-            
           ],
         ),
 

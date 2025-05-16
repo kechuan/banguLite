@@ -119,9 +119,10 @@ class UserInformationDialog extends StatelessWidget {
     									  if(AccountModel.loginedUserInformations.accessToken == null) return;
                         fadeToaster(context: context, message: "暂未开放");
     								  },
-    								  child: Icon(
+    								  child: const Icon(
                         Icons.email_outlined,
-                        color: AccountModel.loginedUserInformations.accessToken == null ? Colors.grey : null,
+                        //color: AccountModel.loginedUserInformations.accessToken == null ? Colors.grey : null,
+                        color: Colors.grey,
     								  )
     								  
     								),

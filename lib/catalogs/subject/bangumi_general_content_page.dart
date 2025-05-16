@@ -86,7 +86,7 @@ abstract class BangumiContentPageState<
           //重新获取When...
           header: const MaterialHeader(),
           onRefresh: (){
-            contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0);
+            contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0,isRefresh: true);
           },
           childBuilder: (_, physics) {
             return Theme(
@@ -208,12 +208,14 @@ abstract class BangumiContentPageState<
                                       getPostCommentType() == PostCommentType.replyGroupTopic
                                     ){
                                       return EpCommentView(
+                                        contentID: contentInfo.id ?? 0,
                                         postCommentType: getPostCommentType(),
                                         epCommentData: contentDetail!.contentRepliedComment?[0] ?? EpCommentDetails()
                                       );
                                     }
                                     
                                     return EpCommentView(
+                                      contentID: contentInfo.id ?? 0,
                                       postCommentType: getPostCommentType(),
                                       epCommentData: EpCommentDetails()
                                         ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
@@ -297,6 +299,7 @@ abstract class BangumiContentPageState<
                                     const Divider(),
                                 
                                     EpCommentView(
+                                      contentID: contentInfo.id ?? 0,
                                       postCommentType: getPostCommentType(),
                                       
                                       onUpdateComment: (content) {
@@ -311,7 +314,8 @@ abstract class BangumiContentPageState<
                                               return fadeSizeTransition(
                                                 animation: animation,
                                                 child: EpCommentView(
-                                                epCommentData: currentEpCommentDetails
+                                                  contentID: contentInfo.id ?? 0,
+                                                  epCommentData: currentEpCommentDetails
                                                 ),
                                               );
                                             }
@@ -353,6 +357,7 @@ abstract class BangumiContentPageState<
 
 
                                         return EpCommentView(
+                                          contentID: contentInfo.id ?? 0,
                                           postCommentType: getPostCommentType(),
                                           onUpdateComment: (content) {
                                           
@@ -362,7 +367,10 @@ abstract class BangumiContentPageState<
                                                 duration: const Duration(milliseconds: 300),
                                                 (_,animation)=> fadeSizeTransition(
                                                   animation: animation,
-                                                  child: EpCommentView(epCommentData: currentEpCommentDetails),
+                                                  child: EpCommentView(
+                                                    contentID: contentInfo.id ?? 0,
+                                                    epCommentData: currentEpCommentDetails
+                                                  ),
                                                 )
                                                 
                                               );

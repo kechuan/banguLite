@@ -1,4 +1,6 @@
 
+import 'dart:math';
+
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/delegates/star_sort_strategy.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
@@ -25,6 +27,8 @@ class BangumiStarPage extends StatelessWidget {
     final ValueNotifier<SortType> sortTypeNotifier = ValueNotifier<SortType>(SortType.joinTime);
     final ValueNotifier<bool> reversedSortNotifer = ValueNotifier<bool>(false);
 
+    //final ValueNotifier<StarNetworkType> starNetworkTypeNotifier = ValueNotifier(StarNetworkType.local);
+
     final indexModel = context.read<IndexModel>();
 
     return Scaffold(
@@ -38,6 +42,27 @@ class BangumiStarPage extends StatelessWidget {
         ),
         
         actions: [
+
+          //ValueListenableBuilder(
+          //  valueListenable: starNetworkTypeNotifier,
+          //  builder: (_,starNetworkType,child) {
+              
+          //    return SegmentedButton(
+          //      multiSelectionEnabled: false,
+          //      onSelectionChanged: (selection)=> starNetworkTypeNotifier.value = selection.first,
+          //      segments: List.generate(
+          //        StarNetworkType.values.length,
+          //          (index) => ButtonSegment(
+          //            value: StarNetworkType.values[index],
+          //            label: Text(StarNetworkType.values[index].typeName)
+          //          )
+          //        ),
+          //      selected: {starNetworkType},
+          //    );
+          //  }
+          //),
+
+          //const Padding(padding: PaddingH6),
 
           ValueListenableBuilder(
             valueListenable: sortTypeNotifier,
@@ -111,7 +136,13 @@ class BangumiStarPage extends StatelessWidget {
              builder: (_,reversedStatus,__) {
                return IconButton(
                 onPressed: ()=> reversedSortNotifer.value = !reversedSortNotifer.value,
-                icon: reversedStatus ? const Icon(Icons.history_outlined) : const Icon(Icons.history_outlined,color: Colors.grey,)
+                icon: 
+                  reversedStatus ? 
+                  const Icon(Icons.sort) : 
+                  Transform.rotate(
+                    angle: 180 * pi / 180,
+                    child: const Icon(Icons.sort,color: Colors.grey)
+                  )
               );
              }
            ),
@@ -206,34 +237,32 @@ List<Widget> seasonTypeSort({
   final indexModel = context.read<IndexModel>();
   List<StarBangumiDetails> dataSource = MyHive.starBangumisDataBase.values.toList();
 
-	if(
-		sortStrategy.currentSort == SortType.rank || 
-		sortStrategy.currentSort == SortType.score
-	){
-		dataSource = List.generate(
-			dataSource.length,
-			(index){
+  //重排新获得的分数
+  dataSource = List.generate(
+    dataSource.length,
+    (index){
 
-        int matchID = -1;
-        
-        indexModel.starsUpdateRating.keys.any((currentID){
-          if(dataSource[index].bangumiID == currentID){
-            matchID = currentID;
-            return true;
-          }
-          return false;
-        });
+      int matchID = -1;
+      
+      indexModel.starsUpdateRating.keys.any((currentID){
+        if(dataSource[index].bangumiID == currentID){
+          matchID = currentID;
+          return true;
+        }
+        return false;
+      });
 
-        if(matchID == -1) return dataSource[index];
+      if(matchID == -1) return dataSource[index];
 
-        return dataSource[index]
-          ..rank = indexModel.starsUpdateRating[matchID]!["rank"]!.toInt()
-          ..score = indexModel.starsUpdateRating[matchID]!["score"]!.toDouble()
-        ;
+      return dataSource[index]
+        ..rank = indexModel.starsUpdateRating[matchID]!["rank"]!.toInt()
+        ..score = indexModel.starsUpdateRating[matchID]!["score"]!.toDouble()
+      ;
 
-			}
-		);
-	}
+    }
+  );
+
+
 
   // 使用策略进行排序 本质是各种抽象的值划为比大小
   dataSource.sort((prev, next) => 

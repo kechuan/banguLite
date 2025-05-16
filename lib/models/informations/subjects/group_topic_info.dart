@@ -1,31 +1,27 @@
 
 
-import 'package:bangu_lite/models/informations/subjects/base_info.dart';
-import 'package:bangu_lite/models/informations/subjects/group_details.dart';
-import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_details.dart';import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 
-class GroupTopicInfo extends ContentInfo {
+class GroupTopicInfo extends TopicInfo {
   GroupTopicInfo({super.id});
-  
-  TopicInfo? topicInfo;
-  GroupInfo? groupInfo;
 
-  @override
-  String? get contentTitle => topicInfo?.topicTitle;
+  //TopicInfo? topicInfo;
+  GroupInfo? groupInfo;
 
   factory GroupTopicInfo.empty() => GroupTopicInfo(id: 0);
 
   factory GroupTopicInfo.fromSurfTimeline(SurfTimelineDetails surfTimelineData){
-    return GroupTopicInfo()
-     ..topicInfo = (
-      TopicInfo()
-        ..contentTitle = surfTimelineData.title
-        ..topicID = surfTimelineData.detailID
-        ..userInformation = surfTimelineData.commentDetails?.userInformation
-        ..repliesCount = surfTimelineData.replies
+    return GroupTopicInfo(
+      id: surfTimelineData.detailID
     )
+      ..topicTitle = surfTimelineData.title
+      ..topicID = surfTimelineData.detailID
+      ..sourceID = surfTimelineData.sourceID
+      ..userInformation = surfTimelineData.commentDetails?.userInformation
+      ..repliesCount = surfTimelineData.replies
+    
     ..groupInfo = (
       GroupInfo()
         ..groupTitle = surfTimelineData.sourceTitle
@@ -42,10 +38,19 @@ List<GroupTopicInfo> loadGroupTopicInfo(
   List<GroupTopicInfo> groupTopicInfoList = List.generate(
     bangumiGroupTopicsListData.length, 
     (index){
-      return GroupTopicInfo.empty()
-	  	..topicInfo = loadTopicsInfo([bangumiGroupTopicsListData[index]]).first
-      /// /p1/groups/{groupName}/topics 数据来源不存在 groupInfo
-      ..groupInfo = groupInfo ?? loadGroupsInfo([bangumiGroupTopicsListData[index]?["group"]]).first
+
+      final TopicInfo currentTopicInfo = loadTopicsInfo([bangumiGroupTopicsListData[index]]).first;
+
+      return GroupTopicInfo(
+        //id: currentTopicInfo.topicID
+      )
+        ..topicTitle = currentTopicInfo.topicTitle
+        ..topicID = currentTopicInfo.topicID
+        ..userInformation = currentTopicInfo.userInformation
+        ..repliesCount = currentTopicInfo.repliesCount
+
+        /// /p1/groups/{groupName}/topics 数据来源不存在 groupInfo
+        ..groupInfo = groupInfo ?? loadGroupsInfo([bangumiGroupTopicsListData[index]?["group"]]).first
 
       ;
     }

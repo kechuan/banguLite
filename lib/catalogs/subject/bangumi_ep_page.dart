@@ -396,6 +396,7 @@ class EpCommentPageDetails extends StatelessWidget {
                     }
 
                     return EpCommentView(
+                      contentID: epModel.subjectID,
                       postCommentType: PostCommentType.replyEpComment,
                       epCommentData: epModel.epCommentData[currentEp]![epCommentIndex-1]
                     );

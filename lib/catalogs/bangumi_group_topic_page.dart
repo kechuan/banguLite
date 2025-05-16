@@ -66,9 +66,6 @@ class _BangumiGroupTopicPageState extends BangumiContentPageState
   }
 
   @override
-  int? getSubContentID() => getContentInfo().topicInfo?.topicID;
-
-  @override
   String getWebUrl(int? groupTopicID) => BangumiWebUrls.groupTopic(groupTopicID ?? 0);
 
   @override

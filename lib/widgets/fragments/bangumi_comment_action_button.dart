@@ -8,6 +8,7 @@ import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 
 import 'package:bangu_lite/widgets/components/sticker_select_overlay.dart';
+import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,8 @@ import 'package:provider/provider.dart';
 class BangumiCommentActionButton extends StatefulWidget {
   const BangumiCommentActionButton({
     super.key,
+    // 有些 commentData 字段缺失 主ID 导致无法回帖
+    required this.contentID,
     required this.commentData,
     this.commentBlockStatus,
 
@@ -26,6 +29,8 @@ class BangumiCommentActionButton extends StatefulWidget {
     this.onSticker,
 
   });
+
+  final int contentID;
   
   final BaseComment commentData;
   final PostCommentType? postCommentType;
@@ -80,7 +85,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
       child: PopupMenuButton<CommentActionType>(
         onSelected: (commentAction){
 
-          debugPrint("contentID: ${widget.commentData.contentID}, reply:${widget.commentData.commentID}");
+          debugPrint("contentID: ${widget.contentID}, reply:${widget.commentData.commentID}");
 
           invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
             context,
@@ -89,7 +94,8 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
           );
 
           invokeSendComment(String message)=> accountModel.toggleComment(
-            contentID: widget.commentData.contentID,
+            /// widget.commentData.contentID 并不可靠 因为部分获取的字段并不包含它
+            contentID: widget.contentID,
             commentID: widget.commentData.commentID,
             commentContent: message,
             postCommentType: widget.postCommentType,
@@ -108,7 +114,8 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                 context,
                 Routes.sendComment,
                 arguments: {
-                  'contentID':widget.commentData.commentID,
+                  'contentID':widget.contentID,
+                  'replyID':widget.commentData.commentID,
                   'postCommentType':widget.postCommentType,
                   'title': '回复 ${widget.commentData.userInformation?.nickName ?? widget.commentData.userInformation?.userName}',
                   'referenceObject': '${widget.commentData.comment}',
@@ -121,17 +128,17 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                   invokeRequestSnackBar();
 
                   //网络层 Callback
-                  await invokeSendComment(content).then((result){
+                  await invokeSendComment(content).then((resultID){
 
-                    if(result){
-                      debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
+                    if(resultID != 0){
+                      debugPrint("[PostContent] sendMessageresultID:$resultID SendContent: $content");
                       //UI层 Callback
 
                       widget.onReplyComment?.call(widget.commentData.commentID!,content);
                     }
 
    
-                    invokeRequestSnackBar(requestStatus: result);
+                    invokeRequestSnackBar(requestStatus: resultID != 0);
                     
 
                   });
@@ -157,10 +164,6 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
               
             case CommentActionType.edit:{
 
-              debugPrint("edit");
-
-              
-
               Navigator.pushNamed(
                 context,
                 Routes.sendComment,
@@ -178,15 +181,15 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                   //widget.onUpdateComment?.call(content);
 
                   //网络层 Callback
-                  await invokeSendComment(content).then((result){
-                    if(result){
-                      debugPrint("[EditContent] sendMessageResult:$result SendContent: $content");
+                  await invokeSendComment(content).then((resultID){
+                    if(resultID != 0){
+                      debugPrint("[EditContent] sendMessageresultID:$resultID SendContent: $content");
                       //UI层 Callback
                       widget.onUpdateComment?.call(content);
                       //widget.onReplyComment?.call(widget.commentData.commentID!,content);
                     }
 
-                    invokeRequestSnackBar(requestStatus: result);
+                    invokeRequestSnackBar(requestStatus: resultID != 0);
                     
 
                   });
@@ -197,13 +200,22 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
             }
       
             case CommentActionType.delete:{
-              if(widget.onUpdateComment!=null){
-                widget.onUpdateComment!(null);
-              }
+
+              showTransitionAlertDialog(
+                context,
+                title: "删除内容确认",
+                content: "确认删除这条内容吗?",
+                confirmAction: () {
+                  widget.onUpdateComment?.call(null);
+                },
+              );
+
+
             }
               
               
           }
+        
         },
         itemBuilder: (_){
           return List.generate(
@@ -219,22 +231,42 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                   switch(currentCommentActionType){
 
                       case CommentActionType.reply:{
-                        if(widget.postCommentType == PostCommentType.subjectComment){
+                        if(
+                          [
+                            PostCommentType.subjectComment,
+                          ].contains(widget.postCommentType)
+                        ){
                           isActionAvaliable = false;
                         }
                       }
                         
                       case CommentActionType.sticker:{
                         if(
-                          widget.postCommentType == PostCommentType.replyBlog 
+                          [
+                            PostCommentType.replyBlog,
+                            PostCommentType.postTimeline,
+                            PostCommentType.replyTimeline,
+                          ].contains(widget.postCommentType)
                         ){
                           isActionAvaliable = false;
                         }
                       }
 
-                      case CommentActionType.edit:
+                      case CommentActionType.edit:{
+                        if(
+                          [
+                            PostCommentType.postTimeline,
+                            PostCommentType.replyTimeline,
+                          ].contains(widget.postCommentType)
+                        ){
+                          isActionAvaliable = false;
+                        }
+                      }
                       case CommentActionType.delete:{
-                        if(widget.postCommentType == PostCommentType.subjectComment){
+                        if(
+                          widget.postCommentType == PostCommentType.subjectComment ||
+                          widget.postCommentType == PostCommentType.replyTimeline
+                        ){
                           isActionAvaliable = false;
                         }
 
@@ -243,8 +275,9 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                         }
                       }
 
-                      default:{}
-
+                      case CommentActionType.report:{
+                        isActionAvaliable = false;
+                      }
 
                       
                   }

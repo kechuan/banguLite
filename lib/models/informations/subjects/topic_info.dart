@@ -7,7 +7,6 @@ class TopicInfo extends ContentInfo {
   TopicInfo({
     super.id,
     super.contentTitle,
-    
   });
 
   int? get topicID => id;

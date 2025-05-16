@@ -83,10 +83,8 @@ List<CommentDetails> loadCommentResponse(Response commentDetailResponse) {
       final CommentDetails commentDetails = CommentDetails();
       
         commentDetails
-          
           ..commentID = currentComment["id"]
           ..userInformation = loadUserInformations(currentComment["user"])
-          
           ..rate = currentComment["rate"]
           ..type = StarType.values.firstWhere(
             (element) => element.starTypeIndex == currentComment["type"]

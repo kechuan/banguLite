@@ -17,18 +17,18 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 BBStylesheet appDefaultStyleSheet(
     BuildContext context, {
-        bool selectableText = false,
-        bool richless = false,
+      bool selectableText = false,
+      bool richless = false,
     }
 ) {
     return BBStylesheet(
         tags: richless ? richlessEffectTag : allEffectTag,
         selectableText: selectableText,
         defaultText: TextStyle(
-            overflow: TextOverflow.ellipsis,
-            fontSize: 16,
-            fontFamilyFallback: convertSystemFontFamily(),
-            color: judgeDarknessMode(context) ? Colors.white : Colors.black,
+          overflow: TextOverflow.ellipsis,
+          fontSize: 16,
+          fontFamilyFallback: convertSystemFontFamily(),
+          color: judgeDarknessMode(context) ? Colors.white : Colors.black,
         )
     );
 }
@@ -258,8 +258,8 @@ class CodeTag extends AdvancedTag{
 
                                         if(tagName != 'codeExample')
                                         Padding(
-                                            padding: PaddingH6,
-                                            child: Row(
+                                          padding: PaddingH6,
+                                          child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
 
@@ -275,21 +275,7 @@ class CodeTag extends AdvancedTag{
                                             ),
                                         ),
 
-                                        UnVisibleResponse(
-                                            onTap: () => copyClipboardCallback(context, codeText),
-                                            child: DecoratedBox(
-                                                decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(6),
-                                                    color: Colors.white,
-                                                ),
-
-                                                child: ScalableText(
-                                                    codeText,
-                                                    selectable: true,
-                                                ),
-                                            ),
-                                        ),
-
+                                        ScalableText(codeText,selectable: true),
                                     ],
                                 ),
                             );

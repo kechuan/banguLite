@@ -13,7 +13,7 @@ enum PostCommentType{
   replyGroupTopic("回复小组帖子"),
 
   //特殊
-  timeline("时间线"),
+  postTimeline("时间线"),
   replyTimeline("回复时间线"),
   ;
 

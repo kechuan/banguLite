@@ -3,10 +3,8 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
-import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/models/providers/user_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/views/timeline_list_view.dart';
@@ -80,11 +78,11 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
                 title: const Text('浏览时间线'),
             ),
             floatingActionButton: 
-              FloatingActionButton(
+              FloatingActionButton.extended(
                 onPressed: () {
 
                   final accountModel = context.read<AccountModel>();
-                  final userModel = context.read<UserModel>();
+				          final indexModel = context.read<IndexModel>();
 
                   invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
                     context,
@@ -93,14 +91,13 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
                   );
 
                   invokeSendComment(String message) => accountModel.postContent(
-                    
                     content: message,
-                    postContentType: PostCommentType.timeline,
+                    postContentType: PostCommentType.postTimeline,
                     actionType : UserContentActionType.post,
                     fallbackAction: (errorMessage)=> invokeRequestSnackBar(message: errorMessage,requestStatus: false)
                   );
 
-                  onPostTimeline(int timelineID,String message) => Navigator.pushNamed(
+                  onPostContent(int timelineID,String message) => Navigator.pushNamed(
                     context,
                     Routes.timelineChat,
                     arguments: {
@@ -109,15 +106,12 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
                     }
                   );
 
-
-                  final indexModel = context.read<IndexModel>();
-
                   Navigator.pushNamed(
                     context,
                     Routes.sendComment,
                     arguments: {
                       'contentID':0, //时间线独有ID
-                      'postCommentType':PostCommentType.timeline,
+                      'postCommentType':PostCommentType.postTimeline,
                       'title': '发表时间线吐槽',
                       'preservationContent': indexModel.draftContent[0]
                     }
@@ -136,24 +130,10 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
                       invokeRequestSnackBar();
 
                       //网络层 Callback
-                      await invokeSendComment(content).then((result){
-                        debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
-                        //UI层 Callback
-                        //这里与其添加 不如直接Refresh一遍timeline更好
-                        if(result){
-
-                          //通过用户最新的时间线以确定获取的 timeline ID
-                          userModel.loadUserTimeline(
-                            AccountModel.loginedUserInformations.userInformation?.userName ?? "",
-                            queryParameters: BangumiQuerys.timelineQuery..["limit"] = 1
-                          ).then((response){
-                            if(response.data != null){
-                              final timelineID = response.data["data"].first["id"];
-                              onPostTimeline(timelineID,content);
-                              invokeRequestSnackBar(message: "发送时间线吐槽成功",requestStatus: true);
-                            }
-                            
-                          });
+                      await invokeSendComment(content).then((resultID){
+                        debugPrint("[PostContent] sendMessageresultID:$resultID SendContent: $content");
+                        if(resultID != 0){
+                          onPostContent(resultID,content);
                         }
                         
                       });
@@ -163,7 +143,13 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
                   });
 
                 },
-                child: const Icon(Icons.edit,color: Colors.black),
+                label: const Row(
+                  spacing: 6,
+                  children: [
+                    Icon(Icons.edit, color: Colors.black),
+                    ScalableText("发帖",style: TextStyle(color: Colors.black)),
+                  ],
+                ),
             ),
             
             body: Column(

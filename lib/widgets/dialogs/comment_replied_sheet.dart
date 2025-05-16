@@ -7,12 +7,15 @@ import 'package:flutter/material.dart';
 class EpRepliedCommentBottomSheet extends StatelessWidget {
   const EpRepliedCommentBottomSheet({
     super.key,
+    required this.contentID,
     required this.currentComment,
     this.commentIndex,
     this.postCommentType,
     this.themeColor,
 
   });
+
+  final int contentID;
   
   final EpCommentDetails currentComment;
   final int? commentIndex;
@@ -35,6 +38,7 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
             return Column(  
               children: [
                 EpCommentTile(
+                  contentID: contentID,
                   postCommentType: postCommentType,
                   epCommentData: currentComment,
                   themeColor:themeColor
@@ -46,6 +50,7 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
 
         if(currentComment.repliedComment!.isNotEmpty){
           return EpCommentTile(
+            contentID: contentID,
             postCommentType: postCommentType,
             epCommentData: currentComment.repliedComment![index-1],
             themeColor: themeColor,

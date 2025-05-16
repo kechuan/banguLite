@@ -149,7 +149,7 @@ class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepA
             
                 return BangumiCommentTile(
                   //commentData: currentPageComments[itemCount-1 - index]
-                  
+                  contentID: currentPageComments[index].contentID ?? 0,
                   commentData: currentPageComments[index],
                   themeColor: Theme.of(context).colorScheme.primary,
                 );

@@ -96,6 +96,9 @@ class BangumiAPIUrls {
   //user
   static String me = '$newUrl/me';
 
+  static String notify = '$newUrl/notify';
+  static String clearNotify = '$newUrl/clear-notify';
+
   static String user(String username) => '$newUrl/users/$username';
   static String userSubjectComment(String username,int subjectID) => '$baseUrl/v0/users/$username/collections/$subjectID';
 
@@ -354,6 +357,20 @@ class BangumiQuerys {
 		"content": content,
 	};
 
+  static Map<String,dynamic> notificationsQuery({
+		int? limit,
+		bool? unread,
+	}) => {
+		"limit": limit ?? 20,
+		"unread": unread ?? false
+	};
+
+  static Map<String,dynamic> clearNotificationsQuery({
+		List<int>? notificationIDList
+	}) => {
+		"id": notificationIDList ?? []
+	};
+
 
   static Map<String,int>  commentAccessQuery = {"limit":10,"offset":0},
                           sortQuery = {"limit":10,"offset":0},
@@ -362,7 +379,7 @@ class BangumiQuerys {
                           relationsQuery = {"type":2,"limit":20,"offset":0},
                           reviewsQuery = {"limit":20,"offset":0},
                           groupTopicQuery = {"limit":20,"offset":0},
-                          //until字段 timelineID count Down
+                          //until字段 timelineID count Down 如目标为 998 那么 就要从 999 开始搜寻
                           timelineQuery = {"limit":20}
   ;
                              

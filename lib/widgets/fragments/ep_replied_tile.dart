@@ -3,16 +3,19 @@ import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/comment_replied_sheet.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 class EpRepliedTile extends ListTile {
   const EpRepliedTile({
     super.key,
+    required this.contentID,
     required this.epCommentData,
     this.postCommentType,
     this.themeColor, 
@@ -22,6 +25,8 @@ class EpRepliedTile extends ListTile {
 
 
   });
+
+  final int contentID;
 
   final EpCommentDetails epCommentData;
   final PostCommentType? postCommentType;
@@ -57,6 +62,7 @@ class EpRepliedTile extends ListTile {
                     return Padding(
                       padding: PaddingV6,
                       child: ShowCommentTap(
+                        contentID: contentID,
                         postCommentType:postCommentType,
                         epCommentData: epCommentData,
                         commentIndex: index,
@@ -75,29 +81,14 @@ class EpRepliedTile extends ListTile {
                                 ),
                                 child: Builder(
                                   builder: (_) {
-
-                                    //if(epCommentData.repliedComment?[index].comment?.isEmpty ?? false){
-                                    //  return const ScalableText("发言已隐藏",style: TextStyle(fontStyle: FontStyle.italic));
-                                    //}
-
-                                    //final currentComment = epCommentData.repliedComment![index].comment;
-
-                                    
-
-                                    //return BBCodeText(
-                                    //  data: 
-                                    //  "${currentComment?.substring(0,min(60,currentComment.length))}"
-                                    //  '${(currentComment?.length ?? 0) > 60 ? "..." : ""}',
-                                    //  stylesheet: appDefaultStyleSheet(context,richless: true),
-                                    //);
-
-                                    
-
                                     return ScalableText(
-                                      "${epCommentData.repliedComment![index].comment?.replaceAll(bbcodeRegexp, '')}",
+                                      "${
+                                        epCommentData.repliedComment![index].comment
+                                        ?.replaceAll(quoteBBcodeRegexp, '"')
+                                        .replaceAll(bbcodeRegexp, '')
+                                      }",
                                       maxLines: 3,
-                                      style: const TextStyle(overflow: TextOverflow.ellipsis,),
-                                      
+                                      style: const TextStyle(overflow: TextOverflow.ellipsis),
                                     );
 
                                   }
@@ -116,6 +107,7 @@ class EpRepliedTile extends ListTile {
                   
                 if(epCommentData.repliedComment!.length > 3) 
                   ShowCommentTap(
+                    contentID: contentID,
                     themeColor: themeColor,
                     postCommentType: postCommentType,
                     epCommentData: epCommentData,
@@ -141,12 +133,15 @@ class ShowCommentTap extends InkResponse {
   const ShowCommentTap({
     super.key,
     super.child,
+    required this.contentID,
     required this.epCommentData,
     this.commentIndex,
     this.postCommentType,
     this.themeColor,
 
   });
+
+  final int contentID;
 
   final EpCommentDetails epCommentData;
   final int? commentIndex;
@@ -167,6 +162,7 @@ class ShowCommentTap extends InkResponse {
           context: context,
           builder: (_){
             return EpRepliedCommentBottomSheet(
+              contentID: contentID,
               currentComment: epCommentData,
               commentIndex: commentIndex,
               postCommentType: postCommentType,

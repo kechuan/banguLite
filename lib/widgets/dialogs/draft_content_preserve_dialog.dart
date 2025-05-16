@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 void showDraftContentPreserveDialog(
   BuildContext context,
-  int contentID,
+  dynamic contentID,
   {
     String? title,
     String? content,

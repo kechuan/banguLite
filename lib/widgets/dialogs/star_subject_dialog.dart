@@ -208,9 +208,9 @@ class StarSubjectDialog extends StatelessWidget {
 											),
 											fallbackAction: (errorMessage) => onUpdateBangumiStar?.call(message: errorMessage,requestStatus: false),
 										).then((status){
-                      
-                      status ? onUpdateBangumiStar?.call(message: "收藏成功",requestStatus:true) : null;
-                      status ? invokeAsyncPop(starTypeNotifier.value) : invokeAsyncPop(commentDetails?.type ?? StarType.none);
+
+                      status!= 0 ? onUpdateBangumiStar?.call(message: "收藏成功",requestStatus:true) : null;
+                      status!= 0 ? invokeAsyncPop(starTypeNotifier.value) : invokeAsyncPop(commentDetails?.type ?? StarType.none);
 										});
 
 									}, 

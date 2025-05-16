@@ -13,9 +13,12 @@ import 'package:flutter_bbcode/flutter_bbcode.dart';
 class BangumiCommentTile extends StatelessWidget {
   const BangumiCommentTile({
     super.key,
+    required this.contentID,
     required this.commentData,
     this.themeColor,
   });
+
+  final int contentID;
 
   final CommentDetails commentData;
   final Color? themeColor;
@@ -123,6 +126,7 @@ class BangumiCommentTile extends StatelessWidget {
               ScalableText("${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)} ${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}"),
 
               BangumiCommentActionButton(
+                contentID: contentID,
                 postCommentType: PostCommentType.subjectComment,
                 commentData: commentData,
               )

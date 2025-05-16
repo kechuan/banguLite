@@ -50,16 +50,17 @@ class _CommentReactionState extends State<CommentReaction> {
 
   late final Map<int, Set<String>> localCommentReactions;
 
-  bool isServerDataContain = false;
+  int selectedRecordDataLike = -1;
 
   @override
   void initState() {
     localCommentReactions = widget.commentReactions ?? {};
     
 
-    isServerDataContain = localCommentReactions.entries.any((userList){
+    localCommentReactions.entries.any((userList){
       if(userList.value.contains(AccountModel.loginedUserInformations.userInformation?.getName())){
         widget.reactDataLikeNotifier.value = userList.key;
+        selectedRecordDataLike = userList.key;
         return true;
       }
 
@@ -69,6 +70,38 @@ class _CommentReactionState extends State<CommentReaction> {
     widget.reactDataLikeNotifier.addListener((){
       //很蠢 但是有用 initState 监听到变化了 但却无法响应 ValueListenableBuilder
       //debugPrint("[Listener] value change: ${widget.reactDataLikeNotifier.value}");
+
+      if(selectedRecordDataLike == widget.reactDataLikeNotifier.value) return;
+
+      if(selectedRecordDataLike != -1){
+
+        localCommentReactions[selectedRecordDataLike]!.remove(
+          AccountModel.loginedUserInformations.userInformation!.getName()
+        );
+
+        if(widget.reactDataLikeNotifier.value != -1){
+          localCommentReactions[widget.reactDataLikeNotifier.value]!.add(
+            AccountModel.loginedUserInformations.userInformation!.getName()
+          );
+        }
+
+      }
+
+      else{
+
+        localCommentReactions[widget.reactDataLikeNotifier.value] ??= {};
+
+        localCommentReactions[widget.reactDataLikeNotifier.value]!.add(
+          AccountModel.loginedUserInformations.userInformation!.getName()
+        );
+      }
+
+
+
+      selectedRecordDataLike = widget.reactDataLikeNotifier.value;
+
+
+      
       setState(() {});
     });
     
@@ -105,6 +138,8 @@ class _CommentReactionState extends State<CommentReaction> {
             removedSeparatorBuilder:  (_, index, animation) => const SizedBox.shrink(),
             itemBuilder: (_, index,animation) {
 
+              
+
               //AnimatedList 策略
               if(localCommentReactions.isEmpty && reactDataLike == -1) return const SizedBox.shrink();
               //个人的改变最多会+1 绝对不会再多
@@ -114,6 +149,8 @@ class _CommentReactionState extends State<CommentReaction> {
               
               int dataLikeIndex = localCommentReactions.keys.elementAt(index);
               int stickerIndex = convertStickerDatalike(dataLikeIndex);
+
+              //localCommentReactions[dataLikeIndex]!.add(AccountModel.loginedUserInformations.userInformation!.getName()); 
 
               Color? buttonColor = 
                 isReactAble ? 
@@ -204,7 +241,12 @@ class _CommentReactionState extends State<CommentReaction> {
                                 color: judgeDarknessMode(context) ? Colors.black : Colors.white
                               ),
 
-                              child: ScalableText("${localCommentReactions[dataLikeIndex]?.length ?? 0}")
+                              child: ScalableText("${
+                                //以 reactDataLike 为本地标准
+
+                                (localCommentReactions[dataLikeIndex]?.length ?? 0)
+
+                              }")
                           ),
                         ],
                       ),

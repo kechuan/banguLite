@@ -55,7 +55,7 @@ class SendCommentPage extends StatefulWidget {
     final Function(String)? onSendMessage;
 
     //如果是 timeline 则应无需 id
-    final int? contentID;
+    final dynamic contentID;
     final int? replyID;
 
     final PostCommentType? postCommentType;
@@ -106,6 +106,8 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
     @override
     Widget build(BuildContext context) {
+
+        debugPrint("[Enter SendCommentPage] id:${widget.contentID} type:${widget.postCommentType} replyTo:${widget.replyID}");
 
         final webviewModel = context.read<WebViewModel>();
 

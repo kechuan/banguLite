@@ -89,7 +89,7 @@ class MainApp extends StatelessWidget {
                   fontFamilyFallback:convertSystemFontFamily()
                   
                 ),
-                darkTheme: ThemeData( 
+                darkTheme: ThemeData(
                   brightness: Brightness.dark,
                   //fontFamilyFallback: convertSystemFontFamily(),
                   fontFamilyFallback:convertSystemFontFamily(),
@@ -97,8 +97,9 @@ class MainApp extends StatelessWidget {
                   colorScheme: ColorScheme.dark(
                     primary: currentColor,
                     onPrimary: Colors.white, //unSelected颜色
-                    secondary: Colors.white,
-                    onSecondary:currentColor, //onSelected 的颜色
+                    secondary: currentColor.withValues(alpha: 0.8), // Selected 底色颜色(Button 一类)
+                    onSecondary:currentColor, //onSelected 的内部颜色(内部Widget/Text 一类)
+                    
                     surface: Colors.black,
                     outline: Colors.white,
                   )

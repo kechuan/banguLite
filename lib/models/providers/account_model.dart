@@ -9,6 +9,7 @@ import 'package:bangu_lite/internal/extract.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_notificaion_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -19,48 +20,53 @@ import 'package:url_launcher/url_launcher_string.dart';
 class AccountModel extends ChangeNotifier {
 
     AccountModel(){
-        initModel();
+      initModel();
     }
 
     static LoginedUserInformations loginedUserInformations = getDefaultLoginedUserInformations();
 
+    List<UserNotificaion> currentUserNotificaions = [];
+    
     HeadlessInAppWebView? headlessWebView;
 
     void initModel() {
         loadUserDetail();
+
         verifySessionValidity(
             loginedUserInformations.accessToken,
         ).then((status) {
-                    if (status) {
+            if (status) {
+              debugPrint("expired at:${loginedUserInformations.expiredTime}");
 
-                        debugPrint("expired at:${loginedUserInformations.expiredTime}");
-
-                        loginedUserInformations.expiredTime?.let((it) {
-                                //效果还剩3天时自动刷新令牌
-                                final differenceTime = DateTime.fromMillisecondsSinceEpoch(it! * 1000).difference(DateTime.now());
-                                if (differenceTime < const Duration(days: 3)) {
-                                    updateAccessToken(loginedUserInformations.refreshToken);
-                                    //debugPrint("${DateTime.fromMillisecondsSinceEpoch(it*1000).difference(DateTime.now()).inDays}");
-                                }
-
-                            }
-                        );
-
-                    }
-
-                    notifyListeners();
-
+              loginedUserInformations.expiredTime?.let((it) {
+                //效果还剩3天时自动刷新令牌
+                final differenceTime = DateTime.fromMillisecondsSinceEpoch(it! * 1000).difference(DateTime.now());
+                if (differenceTime < const Duration(days: 3)) {
+                  updateAccessToken(loginedUserInformations.refreshToken);
+                    //debugPrint("${DateTime.fromMillisecondsSinceEpoch(it*1000).difference(DateTime.now()).inDays}");
                 }
-            );
+
+              });
+            }
+
+            notifyListeners();
+          }
+
+
+
+
+
+        );
     }
 
     bool? isLogining;
 
     bool isLogined() => loginedUserInformations.accessToken != null;
 
-    void resetLoginStatus() {
+    void logout() {
         isLogining = null;
         loginedUserInformations = getDefaultLoginedUserInformations();
+		currentUserNotificaions.clear();
         notifyListeners();
     }
 
@@ -134,41 +140,43 @@ class AccountModel extends ChangeNotifier {
                 BangumiWebUrls.oAuthToken,
                 data: BangumiQuerys.getAccessTokenQuery(code),
             ).then((response) async {
-                        if (response.statusCode == 200) {
-                            debugPrint("accessToken: Valid, ${DateTime.now().millisecondsSinceEpoch ~/ 1000} / ${loginedUserInformations.expiredTime}");
+              if (response.statusCode == 200) {
+                  debugPrint("accessToken: Valid, ${DateTime.now().millisecondsSinceEpoch ~/ 1000} / ${loginedUserInformations.expiredTime}");
 
-                            await verifySessionValidity(
-                                response.data["access_token"],
-                                fallbackAction: (statusCode) {
-                                    if (statusCode == BangumiResponseStatusCode.unauthorized) {
-                                        launchUrlString(BangumiWebUrls.webAuthPage());
-                                    }
-                                }
-                            ).then((isValid) {
-                                        if (isValid) {
-                                            loginedUserInformations
-                                                ..accessToken = response.data["access_token"]
-                                                ..expiredTime = DateTime.now().millisecondsSinceEpoch ~/ 1000 + (response.data["expires_in"] as int)
-                                                ..refreshToken = response.data["refresh_token"]
-                                            ;
+                  await verifySessionValidity(
+                      response.data["access_token"],
+                      fallbackAction: (statusCode) {
+                          if (statusCode == BangumiResponseStatusCode.unauthorized) {
+                              launchUrlString(BangumiWebUrls.webAuthPage());
+                          }
+                      }
+                  ).then((isValid) {
+                              if (isValid) {
+                                  loginedUserInformations
+                                    //返回的data数据不包含用户信息 仅包含用户的id(不是userName)
+                                      //..userInformation = loadUserInformations(response.data["user"])
+                                      ..accessToken = response.data["access_token"]
+                                      ..expiredTime = DateTime.now().millisecondsSinceEpoch ~/ 1000 + (response.data["expires_in"] as int)
+                                      ..refreshToken = response.data["refresh_token"]
+                                  ;
 
-                                            updateLoginInformation(loginedUserInformations);
-                                            isLogining = false;
-                                            getAccessTokenCompleter.complete(true);
+                                  updateLoginInformation(loginedUserInformations);
+                                  isLogining = false;
+                                  getAccessTokenCompleter.complete(true);
 
-                                        }
+                              }
 
-                                        else {
-                                            loginedUserInformations = getDefaultLoginedUserInformations();
-                                            isLogining = false;
-                                            getAccessTokenCompleter.complete(false);
-                                        }
-                                    }
-                                );
+                              else {
+                                  loginedUserInformations = getDefaultLoginedUserInformations();
+                                  isLogining = false;
+                                  getAccessTokenCompleter.complete(false);
+                              }
+                          }
+                      );
 
-                        }
-                    }
-                );
+              }
+          }
+      );
         }
 
         on DioException catch(e){
@@ -370,7 +378,7 @@ class AccountModel extends ChangeNotifier {
         return getTrunsTileTokenCompleter.future;
     }
 
-    Future<bool> postContent({
+    Future<int> postContent({
         dynamic subjectID,
         String? title,
         String? content,
@@ -380,7 +388,7 @@ class AccountModel extends ChangeNotifier {
         Function(String message)? fallbackAction
     }) async {
 
-        Completer<bool> contentCompleter = Completer();
+        Completer<int> contentCompleter = Completer();
 
         String requestUrl = "";
 
@@ -388,7 +396,7 @@ class AccountModel extends ChangeNotifier {
 
         if (loginedUserInformations.accessToken == null) {
             debugPrint("账号未登录");
-            contentCompleter.complete(false);
+            contentCompleter.complete(0);
         }
 
         switch (postContentType){
@@ -399,9 +407,22 @@ class AccountModel extends ChangeNotifier {
                 //缺失中
             }
 
-            case PostCommentType.timeline: requestUrl = BangumiAPIUrls.postTimeline();
+            case PostCommentType.postTimeline: {
 
-            case PostCommentType.replyGroupTopic: requestUrl = BangumiAPIUrls.postGroupTopic(subjectID!);
+                if (actionType == UserContentActionType.post) {
+                    requestUrl = BangumiAPIUrls.postTimeline();
+                }
+
+                else {
+                    requestUrl = '${BangumiAPIUrls.postTimeline()}/$subjectID';
+                }
+
+            }
+
+            case PostCommentType.postGroupTopic:{
+              requestUrl = BangumiAPIUrls.postGroupTopic(subjectID!);
+            }
+
 
             default:{}
 
@@ -409,24 +430,24 @@ class AccountModel extends ChangeNotifier {
 
         if (postContentType == null || requestUrl.isEmpty) {
             debugPrint(
-                "content空数据错误:"
-                "postContentType:$postContentType/subjectID:$subjectID/requestUrl:$requestUrl"
+                "空数据错误:"
+                "postContentType:$postContentType / subjectID:$subjectID / requestUrl:$requestUrl"
             );
-            contentCompleter.complete(false);
+            contentCompleter.complete(0);
         }
 
         switch (actionType){
 
             case UserContentActionType.post:{
 
-                if (loginedUserInformations.turnsTileToken == null) return false;
+                if (loginedUserInformations.turnsTileToken == null) return 0;
 
                 contentFuture = () => HttpApiClient.client.post(
                     requestUrl,
                     data: BangumiQuerys.postQuery(
-                        title: title,
-                        content: content,
-                        turnstileToken: loginedUserInformations.turnsTileToken,
+                      title: title,
+                      content: content,
+                      turnstileToken: loginedUserInformations.turnsTileToken,
                     ),
                     options: BangumiAPIUrls.bangumiAccessOption,
                 );
@@ -453,23 +474,33 @@ class AccountModel extends ChangeNotifier {
 
         }
 
-        await contentFuture().then((response) {
-                if (response.statusCode == 200) {
-                    contentCompleter.complete(true);
-                }
+        try{
+            await contentFuture().then((response) {
+                    if (response.statusCode == 200) {
+                        //目前只有 subjectComment 返回的 data 是空的 {}
+                        //应该说是PUT行为是不返回的
+                        //debugPrint("postID:${response.data["id"]}");
+                        contentCompleter.complete(response.data["id"] ?? 200);
+                    }
 
-                else {
-                    contentCompleter.complete(false);
-                    fallbackAction?.call(response.data["message"]);
-                }
+                    else {
+                        contentCompleter.complete(0);
+                        fallbackAction?.call('${response.statusCode} ${response.data["message"]}');
+                    }
 
-            });
+                });
+        }
+
+        on DioException catch (e){
+            debugPrint("DioException:${e.response?.data}");
+            fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
+        }
 
         return contentCompleter.future;
 
     }
 
-    Future<bool> toggleComment({
+    Future<int> toggleComment({
         int? contentID,
         int? commentID,
         String? commentContent,
@@ -478,45 +509,45 @@ class AccountModel extends ChangeNotifier {
         Function(String message)? fallbackAction
     }) async {
 
-        Completer<bool> commentCompleter = Completer();
+        Completer<int> commentCompleter = Completer();
         String requestUrl = "";
 
         late Future<Response<dynamic>> Function() commentFuture;
 
         if (loginedUserInformations.accessToken == null) {
             debugPrint("账号未登录");
-            commentCompleter.complete(false);
+            commentCompleter.complete(0);
         }
 
         switch (postCommentType){
 
             case PostCommentType.replyEpComment:{
                 requestUrl = actionType == UserContentActionType.post ?
-                    BangumiAPIUrls.postEpComment(contentID!) :
-                    BangumiAPIUrls.actionEpComment(commentID!);
+                BangumiAPIUrls.postEpComment(contentID!) :
+                BangumiAPIUrls.actionEpComment(commentID!);
 
             }
 
             case PostCommentType.replyTopic:{
 
                 requestUrl = actionType == UserContentActionType.post ?
-                    BangumiAPIUrls.postTopicComment(contentID!) :
-                    BangumiAPIUrls.actionTopicComment(commentID!);
+                BangumiAPIUrls.postTopicComment(contentID!) :
+                BangumiAPIUrls.actionTopicComment(commentID!);
 
             }
 
             case PostCommentType.replyGroupTopic:{
 
                 requestUrl = actionType == UserContentActionType.post ?
-                    BangumiAPIUrls.postGroupTopicComment(contentID!) :
-                    BangumiAPIUrls.actionTopicComment(commentID!);
+                BangumiAPIUrls.postGroupTopicComment(contentID!) :
+                BangumiAPIUrls.actionTopicComment(commentID!);
 
             }
 
             case PostCommentType.replyBlog:{
                 requestUrl = actionType == UserContentActionType.post ?
-                    BangumiAPIUrls.postBlogComment(contentID!) :
-                    BangumiAPIUrls.actionBlogComment(commentID!);
+                BangumiAPIUrls.postBlogComment(contentID!) :
+                BangumiAPIUrls.actionBlogComment(commentID!);
 
             }
 
@@ -533,13 +564,13 @@ class AccountModel extends ChangeNotifier {
                 "comment空数据错误:"
                 "postCommentType:$postCommentType/commentID:$commentID"
             );
-            return false;
+            return 0;
         }
 
         switch (actionType){
             case UserContentActionType.post:{
 
-                if (loginedUserInformations.turnsTileToken == null) return false;
+                if (loginedUserInformations.turnsTileToken == null) return 0;
 
                 commentFuture = () => HttpApiClient.client.post(
                     requestUrl,
@@ -572,11 +603,11 @@ class AccountModel extends ChangeNotifier {
         await commentFuture().then((response) {
                 if (response.statusCode == 200) {
                     loginedUserInformations.turnsTileToken = null;
-                    commentCompleter.complete(true);
+                    commentCompleter.complete(response.data["id"]);
                 }
 
                 else {
-                    commentCompleter.complete(false);
+                    commentCompleter.complete(0);
                     fallbackAction?.call(response.data["message"]);
                 }
 
@@ -670,6 +701,78 @@ class AccountModel extends ChangeNotifier {
 
         return likeCompleter.future;
     }
+
+    Future<bool> getNotifications({
+      bool? unread,
+      int? limit,
+      Function(String)? fallbackAction
+    }) async {
+
+        Completer<bool> notficationCompleter = Completer();
+
+        if (loginedUserInformations.accessToken == null) {
+            debugPrint("账号未登录");
+            notficationCompleter.complete(false);
+        }
+
+
+        await HttpApiClient.client.get(
+          BangumiAPIUrls.notify,
+          queryParameters: BangumiQuerys.notificationsQuery(limit: limit,unread: unread),
+          options: BangumiAPIUrls.bangumiAccessOption,
+        )
+        .then((response) {
+          if (response.statusCode == 200) {
+            currentUserNotificaions = loadUserNotificaions(response.data["data"]);
+            
+            notficationCompleter.complete(true);
+            
+          }
+
+          else {
+            notficationCompleter.complete(false);
+            fallbackAction?.call("${response.data["message"]}");
+          }
+
+        });
+
+        return notficationCompleter.future;
+    }
+
+	Future<bool> clearNotifications({
+      List<int>? notificationIDList,
+      Function(String)? fallbackAction
+    }) async {
+
+        Completer<bool> clearNotficationCompleter = Completer();
+
+        if (loginedUserInformations.accessToken == null) {
+            debugPrint("账号未登录");
+            clearNotficationCompleter.complete(false);
+        }
+
+
+        await HttpApiClient.client.get(
+          BangumiAPIUrls.clearNotify,
+          queryParameters: BangumiQuerys.clearNotificationsQuery(notificationIDList: notificationIDList),
+          options: BangumiAPIUrls.bangumiAccessOption,
+        )
+        .then((response) {
+          if (response.statusCode == 200) {
+            clearNotficationCompleter.complete(true);
+          }
+
+          else {
+            clearNotficationCompleter.complete(false);
+            fallbackAction?.call("${response.data["message"]}");
+          }
+
+        });
+
+        return clearNotficationCompleter.future;
+    }
+
+	
 
     @override
     void notifyListeners() {
