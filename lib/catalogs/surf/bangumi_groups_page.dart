@@ -9,14 +9,12 @@ import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
-import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 
 import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
-import 'package:bangu_lite/models/providers/user_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -248,7 +246,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                                                                     if (index >= selectedGroupData.length) return const SizedBox.shrink();
                 
                                                                     return Container(
-                                                                        color: index % 2 == 0 ? Colors.grey.withValues(alpha: 0.2) : null,
+                                                                        color: index % 2 == 0 ? Colors.grey.withValues(alpha: 0.3) : null,
                                                                         child: BangumiTimelineTile(
                                                                             surfTimelineDetails: selectedGroupData[index],
                                                                             //timelineType: BangumiTimelineType.group,

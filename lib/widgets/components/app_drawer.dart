@@ -2,7 +2,7 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
@@ -116,28 +116,77 @@ class AppDrawer extends StatelessWidget {
 
 
                       if(loginedStatus)
-                        ...List.generate(
-                          BangumiPrivateHubType.values.length, 
-                          (index) => ListTile(
-                            leading: Icon(BangumiPrivateHubType.values[index].iconData),
-                            title: Text(BangumiPrivateHubType.values[index].typeName),
-                            onTap: (){
-                              if(index == BangumiPrivateHubType.trend.index){
-                                showUserInfomationDialog(context, AccountModel.loginedUserInformations.userInformation);
-                              }
 
-                              else{
+                        Column(
+                          children: [
+                            ListTile(
+                              leading: SizedBox(
+                                width: 50,
+                                child: Icon(BangumiPrivateHubType.trend.iconData)
+                              ),
+                              title: Text(BangumiPrivateHubType.trend.typeName),
+                              onTap: (){
+                                showUserInfomationDialog(
+                                  context,
+                                  AccountModel.loginedUserInformations.userInformation!..userName = "shironegi"
+                                );
+                              }
+                            ),
+
+
+                            ListTile(
+                              leading: Selector<AccountModel,int>(
+                                selector: (_, accountModel) => accountModel.unreadNotifications,
+                                shouldRebuild: (previous, next) => previous != next,
+                                builder: (_,unreadNotifications,child) {
+                                  return SizedBox(
+                                    width: 50,
+                                    child: Stack(
+                                      children: [
+                                          Icon(BangumiPrivateHubType.email.iconData),
+                                    
+                                          if(unreadNotifications != 0)
+                                              Positioned(
+                                                right: 12,
+                                                top: 0,
+                                                child: Stack(
+                                                  children: [
+                                                    Container(
+                                                      width: 25,
+                                                        decoration: BoxDecoration(
+                                                          color: judgeCurrentThemeColor(context),
+                                                          borderRadius: BorderRadius.circular(12)
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            "$unreadNotifications",
+                                                            style: const TextStyle(color: Colors.black,fontSize: 12)
+                                                          ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              ),
+                                            
+                                
+                                              const SizedBox.shrink()
+                                      ],
+                                    ),
+                                  );
+                                }
+                              ),
+                              title: Text(BangumiPrivateHubType.email.typeName),
+                              onTap: (){
                                 Navigator.pushNamed(
                                   context,
                                   Routes.notificationsPage,
                                 );   
-                                
+          
                               }
-                              
-                              
-                            }
-                          )
-                        )
+                            )
+                          ],
+                        ),
+                        
 
                     ],
                   );

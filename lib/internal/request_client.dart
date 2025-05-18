@@ -193,13 +193,16 @@ class BangumiWebUrls{
   static String subjectTopics(int subjectID) => '${subject(subjectID)}/board';
 
   static String subjectTopic(int topicID) => '$baseUrl/subject/topic/$topicID';
+
+  //附带: https://bangumi.tv/index/77285/comments#post_86407
+  static String indexComment(int indexID) => '$baseUrl/index/$indexID/comments';
   
 
   static String ep(int epID) => '$baseUrl/ep/$epID';
   static String user(String username) => '$baseUrl/user/$username';
   static String userTimeline(String username) => '${user(username)}/timeline';
 
-  static String timelineReplies(String relationsUser,int timelineID) => '${userTimeline(relationsUser)}/timeline/status/$timelineID';
+  static String timelineReplies(String relationsUser,int timelineID) => '${userTimeline(relationsUser)}/status/$timelineID';
 
   //接受数字ID 与 name 作为参数
   static String group(dynamic groupName) => '$baseUrl/group/$groupName';
@@ -359,10 +362,10 @@ class BangumiQuerys {
 
   static Map<String,dynamic> notificationsQuery({
 		int? limit,
-		bool? unread,
+		//bool? unread,
 	}) => {
 		"limit": limit ?? 20,
-		"unread": unread ?? false
+		//"unread": unread
 	};
 
   static Map<String,dynamic> clearNotificationsQuery({

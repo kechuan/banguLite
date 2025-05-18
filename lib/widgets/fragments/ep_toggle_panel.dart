@@ -38,8 +38,11 @@ class EpTogglePanel extends StatelessWidget {
                 containedInkWell: true,
                 highlightColor: Colors.transparent,
                 hoverColor: Colors.transparent,
-                onTap: () => epModel.updateSelectedEp(max(1,currentEp-1)),
-                child:  Row(
+                onTap: (){
+                  if(epModel.epsData[(currentEp-1)]?.epID == null) return;
+                  epModel.updateSelectedEp(max(1,currentEp-1));
+                },
+                child: Row(
                   spacing: 12,
                   children: [
     
@@ -50,6 +53,10 @@ class EpTogglePanel extends StatelessWidget {
 
                         //越过边境线 需求加载
                         if( currentEp != 1 && epModel.epsData[currentEp-1] == null){
+
+                          if(currentEp == 0 && epModel.subjectID == 0){
+                            return const SizedBox.shrink();
+                          }
     
                             return Row(
                               children: [
@@ -105,6 +112,12 @@ class EpTogglePanel extends StatelessWidget {
 
                         //越过边境线 需求加载
                         if( epModel.epsData[currentEp+1]?.epID == null && currentEp+1 <= totalEps){
+
+                          if(currentEp == 0 && epModel.subjectID == 0){
+                            return const SizedBox.shrink();
+                          }
+
+
                           return Row(
                             children: [
                               ScalableText("${convertEPInfoType(epModel.epsData[currentEp+1]?.type)}. ${currentEp+1}",style: const TextStyle(color: Colors.grey,fontFamily: "MiSansFont"),),

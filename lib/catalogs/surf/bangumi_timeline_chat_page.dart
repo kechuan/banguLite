@@ -17,26 +17,22 @@ import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 @FFAutoImport()
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
-import 'package:provider/provider.dart';
 
-/// 又要有 每个地方都能抵达的通用性(只能通过Url传送) 又要传送封装数据...
-/// 。。还是算了 维持现状吧
 
 @FFRoute(name: '/TimelineChat')
 class BangumiTimelineChatPage extends StatefulWidget {
   const BangumiTimelineChatPage({
     super.key,
     required this.timelineID,
-    required this.comment,
     this.onDeleteAction
 
   });
 
   final int timelineID;
-  final String comment;
   final Function(int)? onDeleteAction;
   
 
@@ -104,7 +100,6 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
                   final currentEpCommentDetails = EpCommentDetails(
                     commentID: widget.timelineID
                   )
-                    ..comment = widget.comment
                     ..epCommentIndex = '1'
                     
                   ;
@@ -118,6 +113,7 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
                       if(snapshot.hasData){
                         if(snapshot.data.data.isEmpty) break;
                         currentEpCommentDetails.userInformation = loadUserInformations(snapshot.data.data.first['user']);
+                        currentEpCommentDetails.comment = snapshot.data.data.first['memo']['status']['tsukkomi'];
                         currentEpCommentDetails.commentTimeStamp = snapshot.data.data.first['createdAt'];
                       }
 

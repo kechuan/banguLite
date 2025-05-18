@@ -21,7 +21,36 @@ class EpsInfo {
 
 }
 
-List<EpsInfo> loadEpsData(Response bangumiEpsInfoResponse){
+List<EpsInfo> loadEpsData(List bangumiEpsInfoResponse){
+  
+  List epsDataList = bangumiEpsInfoResponse;
+
+  List<EpsInfo> currentBangumiEpsInfo = [];
+
+  for(Map currentEpInfoMap in epsDataList){
+    EpsInfo currentEpInfo = EpsInfo();
+
+    currentEpInfo
+      ..airDate = currentEpInfoMap["airdate"]
+      ..name = convertAmpsSymbol(currentEpInfoMap["name"])
+      ..nameCN = convertAmpsSymbol(currentEpInfoMap["name_cn"])
+      ..epID = currentEpInfoMap["id"]
+      ..epIndex = currentEpInfoMap["ep"] ?? currentEpInfoMap["sort"]
+      ..sort = currentEpInfoMap["sort"]
+      ..type = currentEpInfoMap["type"]
+      ..commentLength = currentEpInfoMap["comment"]
+      ..description = currentEpInfoMap["desc"]
+    ;
+
+      currentBangumiEpsInfo.add(currentEpInfo);
+      
+  }
+
+  return currentBangumiEpsInfo;
+        
+}
+
+List<EpsInfo> loadSingleEp(Response bangumiEpsInfoResponse){
   
   List epsDataList = bangumiEpsInfoResponse.data["data"];
 
@@ -55,7 +84,11 @@ String convertCollectionName(EpsInfo? currentInfo,num currentEpIndex){
 
   String currentEpType =  convertEPInfoType(currentInfo.type);
 
-  num currentIndex = currentInfo.sort ?? currentEpIndex;
+  num currentIndex = 
+    currentEpIndex == 0 ?
+    currentInfo.epID ?? currentEpIndex :
+    currentInfo.sort ?? currentEpIndex
+  ;
   String currentEpText = currentInfo.nameCN ?? currentInfo.name ?? ""; 
 
   return "$currentEpType. $currentIndex ${currentEpText.isEmpty ? currentInfo.name : currentEpText}";

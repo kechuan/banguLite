@@ -102,15 +102,29 @@ enum NotificationType{
   unknown(0,"未知"),
   groupTopicReply(1,"在小组话题"),
   groupPostReply(2,"在你的小组话题"),
+
   indexTopicReply(3,"在评论收藏"),
   indexPostReply(4,"在你的收藏"),
+
   characterTopicReply(5,"在人物收藏"),
   characterPostReply(6,"在你的人物收藏"),
+
   subjectTopicReply(7,"在条目话题"),
   subjectPostReply(8,"在你的条目话题"),
 
+  subjectEPPost(9,"在章节的评论"),
+  subjectEPPostReply(10,"在章节回复的评论"),
+
+  indexCommentPost(11,"在章节的评论"),
+  indexCommentReply(12,"在章节回复的评论"),
+
+  
+
+
   requestFriend(14,"发来好友请求"),
   acceptFriend(15,"通过了好友请求"),
+
+  timelineReply(22,"在时间线的"),
   
   ;
 

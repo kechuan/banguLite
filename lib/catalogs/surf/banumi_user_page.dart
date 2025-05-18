@@ -15,6 +15,8 @@ class BanumiUserPage extends StatelessWidget {
 
     final accountModel = context.read<AccountModel>();
 
+    accountModel;
+
     return Scaffold(
       appBar: AppBar(),
       body: const SizedBox.shrink(),

@@ -119,13 +119,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                             SliverPinnedHeader(
                                               child: SafeArea(
                                                 bottom: false,
-                                                child: BangumiContentAppbar(
-                                                  contentID: epModel.epsData[selectedEp]?.epID,
-                                                  titleText: convertCollectionName(epModel.epsData[max(1,selectedEp)], max(1,selectedEp)),
-                                                  webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]?.epID ?? 0),
-                                                  postCommentType: PostCommentType.replyEpComment,
-                                                  surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
-                                                ),
+                                                child: buildEpAppBar(currentEpInfoData,selectedEp)
                                               ),
                                             ),
                                             
@@ -185,7 +179,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                                           builder: (_,currentEpInfoData,child){
                                                             return SizedBox(
                                                               height: 60,
-                                                              child: EpTogglePanel(currentEp: selectedEp,totalEps: epModel.epsData.length ?? widget.totalEps)
+                                                              child: EpTogglePanel(currentEp: selectedEp,totalEps: epModel.epsData.length)
                                                             );
                                                           }
                                                         ),
@@ -242,13 +236,13 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                                     child: appbar!
                                   );
                                 },
-                                child:BangumiContentAppbar(
-                                  contentID: epModel.epsData[selectedEp]?.epID,
-                                  titleText: convertCollectionName(epModel.epsData[max(1,selectedEp)], max(1,selectedEp)),
-                                  webUrl: BangumiWebUrls.ep(epModel.epsData[epModel.selectedEp]?.epID ?? 0),
-                                  postCommentType: PostCommentType.replyEpComment,
-                                  surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
-                                )
+                                child:Selector<EpModel,EpsInfo?>(
+                                  selector: (_, epModel) => epModel.epsData[epModel.selectedEp],
+                                  shouldRebuild: (previous, next)=> previous!=next,
+                                  builder: (_,currentEpInfoData,child){
+                                    return buildEpAppBar(currentEpInfoData,selectedEp);
+                                  }
+                                ),
                                 
                               ),
               
@@ -272,6 +266,16 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
       },
     );
     
+  }
+
+  Widget buildEpAppBar(EpsInfo? currentEpInfoData,num selectedEp){
+    return BangumiContentAppbar(
+      contentID: currentEpInfoData?.epID,
+      titleText: convertCollectionName(currentEpInfoData, selectedEp),
+      webUrl: BangumiWebUrls.ep(currentEpInfoData?.epID ?? 0),
+      postCommentType: PostCommentType.replyEpComment,
+      surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
+    );
   }
 
 }

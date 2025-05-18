@@ -187,7 +187,6 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
     invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
 
     final groupsModel = context.read<GroupsModel>();
-    final accountModel = context.read<AccountModel>();
 
     final selectedGroupDataLength = groupsModel.groupsData[BangumiSurfGroupType.values[index]]!.length;
 

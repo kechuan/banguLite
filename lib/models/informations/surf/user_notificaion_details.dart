@@ -30,9 +30,10 @@ List<UserNotificaion> loadUserNotificaions(List<dynamic> bangumiNotificationsDat
         (currentNotificationType)=>currentNotificationType.notificationTypeIndex == currentNotificationMap["type"],
         orElse: ()=>NotificationType.unknown
       )
+      ..contentTitle = currentNotificationMap["title"]
       ..sourceID = currentNotificationMap["mainID"]
       ..relationID = currentNotificationMap["relationID"]
-      ..createdTime = currentNotificationMap["createdAT"]
+      ..createdTime = currentNotificationMap["createdAt"]
       ..userInformation = loadUserInformations(currentNotificationMap['sender'])
       ..isUnRead = currentNotificationMap["unread"]
     ;

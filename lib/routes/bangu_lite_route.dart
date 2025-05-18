@@ -106,9 +106,6 @@ FFRouteSettings getRouteSettings({
           timelineID: asT<int>(
             safeArguments['timelineID'],
           )!,
-          comment: asT<String>(
-            safeArguments['comment'],
-          )!,
           onDeleteAction: asT<Function(int)?>(
             safeArguments['onDeleteAction'],
           ),

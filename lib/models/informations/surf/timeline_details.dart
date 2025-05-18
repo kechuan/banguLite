@@ -200,13 +200,10 @@ String convertTimelineDescription(
 
     else if(currentTimeline.catAction == TimelineCatStatus.Comment.value){
       actionText = 
+      //TODO 创立 timelineChatModel 建立以加载这些数据
         "["
         "url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}"
         "?timelineID=${currentTimeline.timelineID}"
-        //这个操作实际上非常危险.. 毕竟params理论上只最大支持4k 字符 要是原本的正常编码自然什么问题没有
-        //但一旦需求通过Uri体系就需要转译 转译的字符数可能会超过4k
-        //唉 暂时先这样吧 毕竟一般情况下没人往时间线吐槽1000字 
-        "&comment=${Uri.encodeComponent(currentTimeline.commentDetails!.comment!)}"
         "]"
         "${TimelineCatStatus.Comment.actionName}"
       ;

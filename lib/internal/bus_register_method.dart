@@ -56,8 +56,9 @@ void appRouteMethodListener(BuildContext context,String link){
               //暂定 随后会自动获取totalEp信息
               'totalEps': 13,
               'epModel': EpModel(
-                subjectID: int.parse(appRouteUri.queryParameters['subjectID']!),
-                selectedEp: num.parse(appRouteUri.queryParameters['selectedEp']!)
+                subjectID: int.tryParse(appRouteUri.queryParameters['subjectID'] ?? "") ?? 0,
+                selectedEp: num.tryParse(appRouteUri.queryParameters['selectedEp'] ?? "") ?? 0,
+                injectEpID: resID,
               ),
             }
           );
@@ -163,7 +164,6 @@ void appRouteMethodListener(BuildContext context,String link){
             Routes.timelineChat,
             arguments: {
               'timelineID':appRouteUri.queryParameters['timelineID'],
-              'comment':appRouteUri.queryParameters['comment'],
               'onDeleteAction':(int resultID){
 
                 if(resultID!=0){
