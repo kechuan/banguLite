@@ -119,6 +119,7 @@ class AppDrawer extends StatelessWidget {
 
                         Column(
                           children: [
+
                             ListTile(
                               leading: SizedBox(
                                 width: 50,
@@ -139,6 +140,16 @@ class AppDrawer extends StatelessWidget {
                                 selector: (_, accountModel) => accountModel.unreadNotifications,
                                 shouldRebuild: (previous, next) => previous != next,
                                 builder: (_,unreadNotifications,child) {
+
+                                  if(unreadNotifications == 0){
+
+                                    return SizedBox(
+                                      width: 50,
+                                      child: Icon(BangumiPrivateHubType.email.iconData)
+                                    );
+                                     
+                                  }
+
                                   return SizedBox(
                                     width: 50,
                                     child: Stack(

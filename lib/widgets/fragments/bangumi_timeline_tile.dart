@@ -61,8 +61,10 @@ class BangumiTimelineTile extends StatelessWidget {
 
             bus.emit(
               "AppRoute",
-              BangumiWebUrls.subjectTopic(surfTimelineDetails.detailID ?? 0)
+              '${BangumiWebUrls.subjectTopic(surfTimelineDetails.detailID ?? 0)}?topicTitle=${surfTimelineDetails.title}'
             );
+
+            
 
           }
           

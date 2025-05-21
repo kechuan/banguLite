@@ -3,6 +3,7 @@ import 'package:bangu_lite/internal/const.dart';
 import 'package:bangu_lite/internal/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -12,6 +13,7 @@ import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 
 @FFRoute(name: '/loginAuth')
@@ -54,12 +56,9 @@ class BangumiAuthPage extends StatelessWidget {
                       constraints: const BoxConstraints(
                         minWidth: 80,
                         maxWidth: 100,
-                        //maxHeight: 120 
                       ),
                       child: Image.asset(
                         'assets/icons/icon.png',
-                        //height: 120,
-                        //width: 120,
                       ),
                     ),
                   ),
@@ -213,13 +212,18 @@ class BangumiAuthPage extends StatelessWidget {
                         ],
                       );
         
-                      
-                      
                     }
         
                     else{
                       resultText = '验证会话已过期 请再次重试';
-                      resultIcon = const Icon(Icons.refresh);
+                      resultIcon = IconButton(
+                        onPressed: (){
+                          launchUrlString(BangumiWebUrls.webAuthPage());
+                          accountModel.isLogining = true;
+                          accountModel.notifyListeners();
+                        }, 
+                        icon: const Icon(Icons.refresh)
+                      );
                     }
                   }
                 }
@@ -243,7 +247,6 @@ class BangumiAuthPage extends StatelessWidget {
               }
               
             ),
-        
         
             Selector<AccountModel, ({bool? isLogining,bool loginedStatus})> (
               selector: (_, accountModel) => (isLogining: accountModel.isLogining, loginedStatus: accountModel.isLogined()),
@@ -273,6 +276,7 @@ class BangumiAuthPage extends StatelessWidget {
                       }
         
                       else{
+                        if(accountModel.isLogining == true) return;
                         accountModel.login();
                       }
         

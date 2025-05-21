@@ -39,9 +39,10 @@ class AppUserAvatar extends StatelessWidget {
           );
 
         },
-        child: Selector<AccountModel,bool>(
-          selector: (_, accountModel) => accountModel.isLogined(),
-          builder: (_,isLogined,child){
+        child: Selector<AccountModel,bool?>(
+          selector: (_, accountModel) => accountModel.isLogining,
+          shouldRebuild: (pre,next)=> true,
+          builder: (_,isLogining,child){
             if(AccountModel.loginedUserInformations.userInformation?.avatarUrl != null){
               return CachedImageLoader(imageUrl: AccountModel.loginedUserInformations.userInformation?.avatarUrl);
             }

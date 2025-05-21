@@ -3,6 +3,7 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_details.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 
@@ -63,7 +64,19 @@ class _BangumiTopicPageState extends BangumiContentPageState
   String getWebUrl(int? topicID) => BangumiWebUrls.subjectTopic(topicID ?? 0);
 
   @override
-  Future<void> loadContent(int topicID,{bool isRefresh = false}) => getContentModel().loadContentDetail(topicID,isRefresh:isRefresh);
+  Future<void> loadContent(int topicID,{bool isRefresh = false}){
+    return getContentModel().loadContentDetail(
+		topicID,
+		isRefresh:isRefresh,
+		fallbackAction: (message) {
+			showRequestSnackBar(
+				context, 
+				message: message,
+				requestStatus: false,
+			);
+		},
+    );
+  }
 
   
 }

@@ -156,6 +156,13 @@ abstract class BangumiContentPageState<
                   child: FutureBuilder(
                     future: contentFuture,
                     builder: (_, snapshot) {
+
+                      if(snapshot.data == false){
+                        return const Center(
+                          child: ScalableText("加载失败"),
+                        );
+                      }
+
                   
 						          final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
 						          final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
@@ -243,7 +250,7 @@ abstract class BangumiContentPageState<
                                   ),
                                 
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                                    padding: const EdgeInsets.symmetric(horizontal: 12),
                                     child: Row(
                                       spacing: 12,
                                       children: [

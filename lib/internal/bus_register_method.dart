@@ -83,7 +83,8 @@ void appRouteMethodListener(BuildContext context,String link){
             Routes.subjectTopic,
             arguments: {
               "topicModel":TopicModel(subjectID: 'topic'),
-              "topicInfo":TopicInfo(id: resID,contentTitle: "topicID: $resID"),
+              //"topicInfo":TopicInfo(id: resID,contentTitle: "topicID: $resID"),
+              "topicInfo":TopicInfo(id: resID,contentTitle: appRouteUri.queryParameters['topicTitle'] ??  "topicID: $resID"),
             }
           );
 
@@ -164,6 +165,7 @@ void appRouteMethodListener(BuildContext context,String link){
             Routes.timelineChat,
             arguments: {
               'timelineID':appRouteUri.queryParameters['timelineID'],
+              'comment':appRouteUri.queryParameters['comment'],
               'onDeleteAction':(int resultID){
 
                 if(resultID!=0){
@@ -189,16 +191,13 @@ void appRouteMethodListener(BuildContext context,String link){
   }
 }
 
-void appLoginMethodListener(BuildContext context,String link) async {
+void appLoginMethodListener(BuildContext context,String link){
   final accountModel = context.read<AccountModel>();
   
   debugPrint("detected BangumiLogin: $link");
 
   if(link.startsWith(APPInformationRepository.bangumiOAuthCallbackUri.scheme)){
-    
     final code = link.split("code=").last;
-    await accountModel.getAccessToken(code).then((result){
-      accountModel.notifyListeners();
-    });
+    accountModel.getAccessToken(code);
   }
 }

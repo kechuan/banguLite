@@ -15,6 +15,19 @@ class UserNotificaion extends ContentInfo {
   //好友请求 relationID 为 0,否则即为消息回复提醒
   int? relationID;
   bool? isUnRead;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is UserNotificaion && other.hashCode == hashCode;
+  }
+
+  //理论上 notificationID 应该是 immutable 的重要参数
+  //数据库不会给已产出的ID再额外做出更改
+  @override
+  int get hashCode => notificationID.hashCode;
+  
+
 }
 
 List<UserNotificaion> loadUserNotificaions(List<dynamic> bangumiNotificationsData){

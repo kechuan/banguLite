@@ -32,7 +32,6 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
   final ValueNotifier<int> updateNotifier = ValueNotifier(0);
   final ValueNotifier<int> clearNotifier = ValueNotifier(0);
 
-  
   Future? notificationFuture;
 
   @override
@@ -80,10 +79,12 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
       body: EasyRefresh(
         header: const MaterialHeader(),
         footer: const MaterialFooter(),
-        
+		refreshOnStart: accountModel.currentUserNotificaions.isEmpty,
         onRefresh: () {
           notificationFuture = accountModel.getNotifications(
             limit: 40,
+            //不为空时 逻辑上应该只请求新的部分 而非全部内容
+            unread: accountModel.currentUserNotificaions.isNotEmpty,
             fallbackAction: (message) {
               fadeToaster(context: context, message: message);
             },
@@ -113,14 +114,16 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                   separatorBuilder: (_, __) => const Divider(),
                   itemBuilder: (_,index){
             
-                    final currentNotification = accountModel.currentUserNotificaions[index];
+                    final currentNotification = accountModel.currentUserNotificaions.elementAt(index);
             
                     String referenceContent = "";
                     String referenceLink = "";
             
                     switch (currentNotification.notificationType) {
                       case NotificationType.groupTopicReply:
-                      case NotificationType.groupPostReply:{
+                      case NotificationType.groupPostReply:
+                      case NotificationType.groupTopicCall:
+                      {
                         referenceLink = BangumiWebUrls.groupTopic(currentNotification.sourceID ?? 0);
                       }
             
@@ -131,31 +134,56 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                       }
             
                       case NotificationType.characterTopicReply:
-                      case NotificationType.characterPostReply:{
+                      case NotificationType.characterPostReply:
+					  case NotificationType.characterTopicCall:
+					  {
                         referenceLink = BangumiWebUrls.character(currentNotification.sourceID ?? 0);
                       }
             
                       case NotificationType.subjectTopicReply:
-                      case NotificationType.subjectPostReply:{
+                      case NotificationType.subjectTopicPostReply:
+                      case NotificationType.subjectTopicCall:
+                      {
                         referenceLink = BangumiWebUrls.subjectTopic(currentNotification.sourceID ?? 0);
+                      }
+
+                      case NotificationType.blogReply:
+                      case NotificationType.blogPostReply:
+                      case NotificationType.blogPostCall:{
+                        referenceLink = BangumiWebUrls.userBlog(currentNotification.sourceID ?? 0);
                       }
             
                       case NotificationType.subjectEPPost:
-                      case NotificationType.subjectEPPostReply:{
+                      case NotificationType.subjectEPPostReply:
+                      case NotificationType.subjectEPPostCall:
+                      {
                         referenceLink = BangumiWebUrls.ep(currentNotification.sourceID ?? 0);
                       }
             
-                      case NotificationType.timelineReply:{
-                        
-                        referenceLink = 
-                          '${BangumiAPIUrls.timelineReply(currentNotification.sourceID ?? 0)}'
-                          '?timelineID=${currentNotification.sourceID ?? 0}'
-                        ;
+                      case NotificationType.timelineReply:
+                      case NotificationType.indexTimelineCall:
+                      {
+
+                        if(currentNotification.contentTitle == "吐槽"){
+                          referenceLink = 
+                            '${BangumiAPIUrls.timelineReply(currentNotification.sourceID ?? 0)}'
+                            '?timelineID=${currentNotification.sourceID ?? 0}'
+                          ;
+                        }
+
+                        else{
+                          referenceLink = BangumiWebUrls.indexComment(currentNotification.sourceID ?? 0);
+                        }
 
                       }
+
+                      case NotificationType.requestFriend:
+                      case NotificationType.acceptFriend:{}
             
             
-                      default:{}
+                      default:{
+                        referenceContent = '${currentNotification.contentTitle} id:${currentNotification.sourceID}' ;
+                      }
                     }
             
                     if(referenceLink.isNotEmpty){
@@ -210,7 +238,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                                       NotificationType.acceptFriend
                                     ].contains(currentNotification.notificationType)
                                     ? ''
-                                    : '中回复了你'
+                                    : currentNotification.notificationType?.isCall == true ? '中提及了你' : '中回复了你'
                                   }',
                                 stylesheet: BBStylesheet(
                                   tags: allEffectTag,

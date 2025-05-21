@@ -78,7 +78,8 @@ enum ScoreRank{
 }
 
 //目前。。删除收藏的方式好像是。。从时间线直接删除??
-//没有 官方API 还没提供
+//没有 也不是. 在rn版的app里实际上也是通过 前端的操作删除的
+//官方的API 尚未提供
 enum StarType{
   want(1,"想看"),
   watched(2,"看过"),
@@ -99,39 +100,55 @@ enum StarType{
 
 enum NotificationType{
 
-  unknown(0,"未知"),
-  groupTopicReply(1,"在小组话题"),
-  groupPostReply(2,"在你的小组话题"),
+  //推测:可能 对于发帖人来说 无论是 回复 亦或者是 楼中楼回复 都被归类于
+  // TopicReply 而非 PostReply
 
-  indexTopicReply(3,"在评论收藏"),
-  indexPostReply(4,"在你的收藏"),
+  unknown(0,"未知",false),
 
-  characterTopicReply(5,"在人物收藏"),
-  characterPostReply(6,"在你的人物收藏"),
+  //Pass
+  groupTopicReply(1,"在你发布的小组话题",false),
+  groupPostReply(2,"在小组话题",false),
+  groupTopicCall(23,"在小组话题",true),
 
-  subjectTopicReply(7,"在条目话题"),
-  subjectPostReply(8,"在你的条目话题"),
+  //pass subjectTopicPost
+  subjectTopicReply(3,"在你发布的条目评论",false),
+  subjectTopicPostReply(4,"在条目评论",false),
+  subjectTopicCall(24,"在番剧话题",true),
 
-  subjectEPPost(9,"在章节的评论"),
-  subjectEPPostReply(10,"在章节回复的评论"),
+  //这个5号。。真的能被触发吗..
+  characterTopicReply(5,"在你的人物收藏",false),
+  characterPostReply(6,"在人物收藏",false),
+  characterTopicCall(25,"在人物收藏",true),
 
-  indexCommentPost(11,"在章节的评论"),
-  indexCommentReply(12,"在章节回复的评论"),
-
+  //Blog 触发
+  blogReply(7,"在你的条目话题",false),
+  blogPostReply(8,"在条目话题",false),
+  blogPostCall(29,"在日志中",true),
   
+  subjectEPPost(9,"在章节的评论",false),
+  subjectEPPostReply(10,"在章节回复的评论",false),
+  subjectEPPostCall(30,"在章节的评论",true),
 
+  indexCommentPost(11,"在收藏目录",false),
+  indexCommentReply(12,"在收藏目录回复的评论",false),
 
-  requestFriend(14,"发来好友请求"),
-  acceptFriend(15,"通过了好友请求"),
+  timelineReply(22,"在时间线",false),
+  indexTimelineCall(28,"在其他地方",true),
 
-  timelineReply(22,"在时间线的"),
-  
+  requestFriend(14,"发来了好友请求",false),
+  acceptFriend(15,"通过了好友请求",false),
+
   ;
 
   final int notificationTypeIndex;
   final String notificationTypeName;
+  final bool isCall;
 
-  const NotificationType(this.notificationTypeIndex,this.notificationTypeName);
+  const NotificationType(
+    this.notificationTypeIndex,
+    this.notificationTypeName,
+    this.isCall
+  );
 
 }
 

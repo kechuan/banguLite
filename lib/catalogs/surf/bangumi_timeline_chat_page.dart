@@ -28,11 +28,13 @@ class BangumiTimelineChatPage extends StatefulWidget {
   const BangumiTimelineChatPage({
     super.key,
     required this.timelineID,
+    this.comment,
     this.onDeleteAction
 
   });
 
   final int timelineID;
+  final String? comment;
   final Function(int)? onDeleteAction;
   
 
@@ -88,55 +90,54 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
 
       body: SafeArea(
         child: EasyRefresh(
-          child: Column(
-            spacing: 16,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              FutureBuilder(
-                future: timelineFuture,
-                builder: (_,snapshot) {
-
-                  final currentEpCommentDetails = EpCommentDetails(
-                    commentID: widget.timelineID
-                  )
-                    ..epCommentIndex = '1'
-                    
-                  ;
-              
-                  switch(snapshot.connectionState){
-
-                    case ConnectionState.waiting:{}
-              
-                    case ConnectionState.done:{
-
-                      if(snapshot.hasData){
-                        if(snapshot.data.data.isEmpty) break;
-                        currentEpCommentDetails.userInformation = loadUserInformations(snapshot.data.data.first['user']);
-                        currentEpCommentDetails.comment = snapshot.data.data.first['memo']['status']['tsukkomi'];
-                        currentEpCommentDetails.commentTimeStamp = snapshot.data.data.first['createdAt'];
+          child: SingleChildScrollView(
+            child: Column(
+              spacing: 16,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+            
+                FutureBuilder(
+                  future: timelineFuture,
+                  builder: (_,snapshot) {
+            
+                    final currentEpCommentDetails = EpCommentDetails(
+                      commentID: widget.timelineID
+                    )
+                      ..epCommentIndex = '1'
+                      ..comment = widget.comment
+                      
+                    ;
+                
+                    switch(snapshot.connectionState){
+            
+                      case ConnectionState.waiting:{}
+                
+                      case ConnectionState.done:{
+            
+                        if(snapshot.hasData){
+                          if(snapshot.data.data.isEmpty) break;
+                          currentEpCommentDetails.userInformation = loadUserInformations(snapshot.data.data.first['user']);
+                          currentEpCommentDetails.commentTimeStamp = snapshot.data.data.first['createdAt'];
+                        }
+            
                       }
-
+                
+                      default:{}
                     }
-              
-                    default:{}
-                  }
-
-                  return Padding(
-                    padding: PaddingH16,
-                    child: EpCommentTile(
+            
+                    return EpCommentTile(
                       contentID: widget.timelineID,
                       epCommentData: currentEpCommentDetails,
                       postCommentType:PostCommentType.postTimeline,
                       onUpdateComment: (content) {
-
+                    
                         final accountModel = context.read<AccountModel>();
-
+                    
                         invokePopout() => Navigator.pop(context);
-
-
+                    
+                    
                         if(content == null){
-
+                    
                           accountModel.postContent(
                             subjectID: widget.timelineID,
                             postContentType: PostCommentType.postTimeline,
@@ -159,43 +160,41 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
                           
                           
                         }
-
+                    
                       },
-                    )
-                  );
-              
-                  
-                }
-              ),
-
-
-              const Divider(),
-
-              FutureBuilder(
-                future: timelineChatFuture,
-                builder: (_,snapshot) {
-              
-                  switch(snapshot.connectionState){
-              
-                    case ConnectionState.done:{
-        
-                      List<EpCommentDetails> timelineChatData = loadEpCommentDetails(snapshot.data.data);
-        
-                      return Expanded(
-                        child: AnimatedList.separated(
+                    );
+                
+                    
+                  }
+                ),
+            
+                const Divider(),
+            
+                FutureBuilder(
+                  future: timelineChatFuture,
+                  builder: (_,snapshot) {
+                
+                    switch(snapshot.connectionState){
+                
+                      case ConnectionState.done:{
+                    
+                        List<EpCommentDetails> timelineChatData = loadEpCommentDetails(snapshot.data.data);
+                    
+                        return AnimatedList.separated(
+                          shrinkWrap: true, 
                           physics: const NeverScrollableScrollPhysics(),
                           key: animatedListKey,
                           initialItemCount: timelineChatData.isEmpty ? 1 : timelineChatData.length,
                           separatorBuilder: (_, index, animation) => const Divider(),
                           removedSeparatorBuilder: (_, index, animation) => const Divider(),
                           itemBuilder: (_, contentCommentIndex, animation) {
-
+                          
                             if(timelineChatData.isEmpty && userCommentMap.isEmpty){
                               return const Center(
                                 child: Text('该时间线吐槽暂无回复...'),
                               );
                             }
-        
+                                            
                             if(contentCommentIndex >= timelineChatData.length){
                               final currentEpCommentDetails =  EpCommentDetails()
                                 ..userInformation = AccountModel.loginedUserInformations.userInformation
@@ -213,28 +212,28 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
                                 )
                               );
                             }
-        
+                                            
                             return EpCommentTile(
                               contentID: widget.timelineID,
                               epCommentData: timelineChatData[contentCommentIndex],
                             );
                           },
-                        ),
-                      );
-
+                        );
+                            
+                      }
+                
+                      default:{
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                        
                     }
-              
-                    default:{
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                      
+                
+                    
                   }
+                ),
               
-                  
-                }
-              ),
-            
-            ],
+              ],
+            ),
           )
         ),
       ),

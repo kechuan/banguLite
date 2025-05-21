@@ -30,7 +30,8 @@ abstract class BaseModel
 
   Future<bool> loadSubjectSubContentList({
     Map<String, dynamic> queryParameters = const {},
-    bool isReloaded = false
+    bool isReloaded = false,
+    Function(String)? fallbackAction
   }) async {
 
     Completer<bool> completer = Completer();
@@ -47,8 +48,8 @@ abstract class BaseModel
       return false;
     }
 
-
-    await HttpApiClient.client.get(
+    try{
+      await HttpApiClient.client.get(
         getContentListUrl(subjectID),
         queryParameters: queryParameters,
         options: BangumiAPIUrls.bangumiAccessOption,
@@ -64,14 +65,13 @@ abstract class BaseModel
         
       });
 
-    //try {
-      
 
-    //} 
-    
-    //on DioException catch (e) {
-    //  debugPrint("Request Error: ${e.toString()}");
-    //}
+    }
+
+    on DioException catch(e){
+      fallbackAction?.call('${e.response?.statusCode} ${e.response?.statusMessage}');
+      return false;
+    }
 
     return completer.future;
   }
@@ -91,20 +91,23 @@ abstract class BaseModel
   }
     
   // 抽象方法：加载特定内容详情
-  Future<void> loadContentDetail(
+  Future<bool> loadContentDetail(
     int contentID,
     {
       Map<String, dynamic>? queryParameters,
-      bool isRefresh = false
+      bool isRefresh = false,
+      Function(String)? fallbackAction
     }
   ) async {
 
-    if(getContentDetailUrl(contentID) == null) return;
+    Completer<bool> contentDetailCompleter = Completer();
+
+    if(getContentDetailUrl(contentID) == null) return false;
 
     if (contentDetailData[contentID] != null) {
       if(!isRefresh){
         debugPrint("content: $contentID already loaded or in processing");
-        return;
+        return false;
       }
       
     }
@@ -121,12 +124,20 @@ abstract class BaseModel
         if (response.data != null) {
           contentDetailData[contentID] = convertResponseToDetail(response.data) as D;
           debugPrint("$contentID load content done");
-          notifyListeners();
+          contentDetailCompleter.complete(true);
+          //notifyListeners();
         }
       });
-    } on DioException catch (e) {
+    } 
+    
+    on DioException catch (e) {
       debugPrint("Request Error: ${e.toString()}");
+      
+      fallbackAction?.call('${e.response?.statusCode} ${e.response?.statusMessage}');
+      contentDetailCompleter.complete(false);
     }
+
+    return contentDetailCompleter.future;
   }
 
   // 抽象方法：获取API URL
