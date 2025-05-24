@@ -1,7 +1,7 @@
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
@@ -180,9 +180,9 @@ class _CommentReactionState extends State<CommentReaction> {
                         if(!isReactAble) return;
                   
                         invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
-                          context,
                           message: message,
                           requestStatus: requestStatus,
+                          backgroundColor: judgeCurrentThemeColor(context)
                         );
                   
                         debugPrint("reactDataLike:$reactDataLike, dataLikeIndex:$dataLikeIndex, subject:${widget.commentID}");

@@ -1,4 +1,5 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,7 @@ class CachedImageLoader extends StatelessWidget {
               DateTime loadStartTime = DateTime.now();
 
               return CachedNetworkImage(
+                httpHeaders: HttpApiClient.broswerHeader,
                 imageUrl: imageUrl!,
                 imageBuilder: (_,imageProvider){
                   return DecoratedBox(

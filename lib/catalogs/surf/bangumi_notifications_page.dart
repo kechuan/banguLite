@@ -1,9 +1,9 @@
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
-import 'package:bangu_lite/internal/extension.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
@@ -108,13 +108,20 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
 
                   default: {}
                 }
-            
+
+				final notificationList = accountModel.currentUserNotificaions.toList().also((it){
+					it.sort(
+						(prev,next) => next.createdTime!.compareTo(prev.createdTime!)
+					);
+				});
+				
                 return ListView.separated(
                   itemCount: accountModel.currentUserNotificaions.length,
                   separatorBuilder: (_, __) => const Divider(),
                   itemBuilder: (_,index){
             
-                    final currentNotification = accountModel.currentUserNotificaions.elementAt(index);
+                    //final currentNotification = accountModel.currentUserNotificaions.elementAt(index);
+					final currentNotification = notificationList[index];
             
                     String referenceContent = "";
                     String referenceLink = "";
@@ -207,13 +214,15 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                           ].contains(currentNotification.notificationType)
                           ){
                             bus.emit('AppRoute',referenceLink);
-                            
-                            accountModel.clearNotifications(notificationIDList: [currentNotification.notificationID ?? 0]).then((result){
-                              if(result){
-                                clearNotifier.value += 1;
-                              }
-                            });
-                            
+
+							if(currentNotification.isUnRead == true){
+								accountModel.clearNotifications(notificationIDList: [currentNotification.notificationID ?? 0]).then((result){
+									if(result){
+										clearNotifier.value += 1;
+									}
+								});
+							}
+
                           }
                         },
                         title: Row(
@@ -280,6 +289,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                                             
                                   IconButton(
                                     onPressed: (){
+										
                                             
                                       accountModel.clearNotifications(
                                         notificationIDList: [currentNotification.id ?? 0],

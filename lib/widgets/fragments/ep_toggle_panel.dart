@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
@@ -120,14 +120,14 @@ class EpTogglePanel extends StatelessWidget {
 
                           return Row(
                             children: [
-                              ScalableText("${convertEPInfoType(epModel.epsData[currentEp+1]?.type)}. ${currentEp+1}",style: const TextStyle(color: Colors.grey,fontFamily: "MiSansFont"),),
+                              ScalableText("${convertEPInfoType(epModel.epsData[currentEp+1]?.type)}. ${currentEp+1}",style: const TextStyle(color: Colors.grey)),
     
                               const Padding(padding: PaddingH6),
     
                               const SizedBox(
                                 height: 20,
                                 width: 20,
-                                child:  CircularProgressIndicator(strokeWidth: 3)
+                                child: CircularProgressIndicator(strokeWidth: 3)
                               )
                             ],
                                           

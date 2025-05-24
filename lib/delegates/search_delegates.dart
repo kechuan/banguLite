@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';

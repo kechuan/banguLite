@@ -1,8 +1,8 @@
 
 import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -32,12 +32,10 @@ class BangumiEpPage extends StatefulWidget {
   const BangumiEpPage({
     super.key,
     required this.epModel,
-    required this.totalEps,
     this.bangumiThemeColor,
   });
 
   final EpModel epModel;
-  final int totalEps;
   final Color? bangumiThemeColor;
 
 
@@ -65,7 +63,6 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
       builder: (context,child){
 
         final epModel = widget.epModel;
-
 
         epsInformationFuture ??= epModel.getEpsInformation(offset: epModel.selectedEp~/100 );
 
@@ -343,12 +340,14 @@ class EpCommentPageDetails extends StatelessWidget {
 			shouldRebuild: (previous, next)=> previous!=next,
 			
 			builder: (_,currentEpCommentData,child){
+
+        final epModel = context.read<EpModel>();
 				
 				return FutureBuilder(
-					future: context.read<EpModel>().loadEpComment(),
+					future: epModel.loadEpComment(),
 					builder: (_,snapshot) {
 
-						final epModel = context.read<EpModel>();
+						
 						num currentEp = epModel.selectedEp;
 				
 						debugPrint("currentEp:$currentEp");

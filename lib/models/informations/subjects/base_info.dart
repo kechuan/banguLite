@@ -17,6 +17,8 @@ abstract class ContentInfo extends BaseInfo {
 
   //Blog/Topic 应需求
   int? sourceID;
+
+  //GroupInfo需求
   //String? sourceTitle;
 
   //title

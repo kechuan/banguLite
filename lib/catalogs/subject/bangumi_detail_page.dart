@@ -1,6 +1,6 @@
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -19,7 +19,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 import 'package:url_launcher/url_launcher_string.dart';
 
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -184,7 +184,6 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                               ..updatedAt = DateTime.now().millisecondsSinceEpoch
                               ..title = bangumiModel.bangumiDetails?.name ?? ""
                               ..bangumiTimelineType = BangumiTimelineType.subject
-                              ..sourceTitle = null
                               ..commentDetails = (
                                 CommentDetails()
                                   ..userInformation = (

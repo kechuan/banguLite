@@ -27,16 +27,19 @@ class ReviewInfo extends ContentInfo {
 List<ReviewInfo> loadReviewsDetails(Response bangumiReviewsResponse){
   final List<ReviewInfo> subejctReviewsList = [];
 
+  final regexp = RegExp(r'\d+[^/]');
+
+  String accessPath = bangumiReviewsResponse.requestOptions.path;
+
   List<dynamic> bangumiRelationsDataList = bangumiReviewsResponse.data["data"];
 
   for(Map subejctReviewsMap in bangumiRelationsDataList){
     ReviewInfo currentReviewDetail = ReviewInfo();
 
 		currentReviewDetail
-      
       ..reviewID = subejctReviewsMap["id"]
       ..userInformation = loadUserInformations(subejctReviewsMap["user"])
-
+      ..sourceID = int.tryParse('${regexp.firstMatch(accessPath)?.group(0)}')
       ..blogID = subejctReviewsMap["entry"]["id"]
       ..reviewTitle = subejctReviewsMap["entry"]["title"]
       ..summary = subejctReviewsMap["entry"]["summary"]

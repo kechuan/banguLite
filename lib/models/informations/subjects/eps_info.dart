@@ -1,4 +1,4 @@
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:dio/dio.dart';
 
 class EpsInfo {

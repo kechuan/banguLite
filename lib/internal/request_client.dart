@@ -1,7 +1,7 @@
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -202,6 +202,7 @@ class BangumiWebUrls{
   static String user(String username) => '$baseUrl/user/$username';
   static String userTimeline(String username) => '${user(username)}/timeline';
 
+  ///relationsUser 只是一个摆设 实际上只要 timelineID 正确就行...
   static String timelineReplies(String relationsUser,int timelineID) => '${userTimeline(relationsUser)}/status/$timelineID';
 
   //接受数字ID 与 name 作为参数
@@ -411,7 +412,7 @@ class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.8.0",
+                      version = "0.9.0",
                       author = "kechuan"
   ;
 

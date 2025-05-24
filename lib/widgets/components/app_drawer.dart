@@ -1,7 +1,7 @@
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -127,9 +127,11 @@ class AppDrawer extends StatelessWidget {
                               ),
                               title: Text(BangumiPrivateHubType.trend.typeName),
                               onTap: (){
+
                                 showUserInfomationDialog(
                                   context,
-                                  AccountModel.loginedUserInformations.userInformation!..userName = "shironegi"
+                                  //AccountModel.loginedUserInformations.userInformation!..userName = "shironegi"
+                                  AccountModel.loginedUserInformations.userInformation
                                 );
                               }
                             ),

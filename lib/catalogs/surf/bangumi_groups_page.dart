@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/callback.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/utils/callback.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -85,9 +85,9 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                             //final userModel = context.read<UserModel>();
                 
                             invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
-                                context, 
                                 message: message,
                                 requestStatus: requestStatus,
+                                backgroundColor: judgeCurrentThemeColor(context)
                             );
                 
                             invokeSendComment( (String,String) message) => accountModel.postContent(
@@ -108,8 +108,8 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                                       GroupTopicInfo()
                                         ..createdTime = DateTime.now().millisecond
                                         ..contentTitle = message.$1
-										..topicID = resultID
-										..userInformation = AccountModel.loginedUserInformations.userInformation
+                                        ..topicID = resultID
+                                        ..userInformation = AccountModel.loginedUserInformations.userInformation
                                         ..groupInfo = groupsModel.selectedGroupInfo
 
                                     ,
@@ -165,113 +165,108 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                         },
                         
                     ),
-                    body: Builder(
-                        builder: (context) {
-                
-                            return EasyRefresh(
-                                header: const MaterialHeader(),
-                                footer: const MaterialFooter(),
-                                refreshOnStart: true,
-                                onRefresh: () => loadGroupTopics(context),
-                                onLoad: () => loadGroupTopics(context, isAppend: true),
-                
-                                child: CustomScrollView(
-                                    controller: animatedGroupTopicsListController,
-                                    slivers: [
-                
-                                        MultiSliver(
-                                            pushPinnedChildren: true,
-                                            children: [
-                
-                                                SliverSafeArea(
-                                                    bottom: false,
-                                                    sliver: SliverPinnedHeader(
-                                                        child: Container(
-                                                            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
-                                                            child: ExpansionTile(
-                                                                tilePadding: const EdgeInsets.all(6),
-                                                                controller: expansionTileController,
-                                                                title: Row(
-                                                                    spacing: 6,
-                                                                    children: [
-                                                                        IconButton(onPressed: () => Navigator.of(context).pop(), icon: const Icon(Icons.arrow_back)),
-                
-                                                                        ValueListenableBuilder(
-                                                                            valueListenable: groupTitleNotifier,
-                                                                            builder: (_, groupTitle, __) => ScalableText(groupTitle ?? "小组话题列表")
-                                                                        ),
-                
-                                                                    ],
-                                                                ),
-                
-                                                                children: [
-                                                                    GroupsSelectView(
-                                                                        sliverAnimatedListKey: sliverAnimatedListKey, 
-                                                                        expansionTileController: expansionTileController, 
-                                                                        groupTitleNotifier: groupTitleNotifier,
-                                                                        loadGroupTopicCallback: (context) {
-                                                                            expansionTileController.collapse();
-                                                                            loadGroupTopics(context);
-                                                                        },
-                                                                    )
-                
-                                                                ],
+                    body: EasyRefresh(
+                      header: const MaterialHeader(),
+                      footer: const MaterialFooter(),
+                      refreshOnStart: widget.selectedGroupInfo?.groupName != null,
+                      onRefresh: () => loadUIGroupTopics(context),
+                      onLoad: () => loadUIGroupTopics(context, isAppend: true),
+      
+                      child: SafeArea(
+                        child: CustomScrollView(
+                            controller: animatedGroupTopicsListController,
+                            slivers: [
+                              
+                                MultiSliver(
+                                    pushPinnedChildren: true,
+                                    children: [
+                              
+                                        SliverPinnedHeader(
+                                            child: Container(
+                                                color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
+                                                child: ExpansionTile(
+                                                    onExpansionChanged: (status){
+                                                      if(status){
+                                                        final groupsModel = context.read<GroupsModel>();
+                                                        groupsModel.groupsData.values.first.isEmpty ? groupsModel.loadGroups() : null;
+                                                      }
+                                                      
+                                                    },
+                                                    tilePadding: const EdgeInsets.all(6),
+                                                    controller: expansionTileController,
+                                                    title: Row(
+                                                        spacing: 6,
+                                                        children: [
+                                                            IconButton(onPressed: () => Navigator.of(context).pop(), icon: const Icon(Icons.arrow_back)),
+                                                                      
+                                                            ValueListenableBuilder(
+                                                                valueListenable: groupTitleNotifier,
+                                                                builder: (_, groupTitle, __) => ScalableText(groupTitle ?? "小组话题列表")
                                                             ),
-                                                        ),
+                                                                      
+                                                        ],
                                                     ),
+                                                                      
+                                                    children: [
+                                                        GroupsSelectView(
+                                                            sliverAnimatedListKey: sliverAnimatedListKey, 
+                                                            expansionTileController: expansionTileController, 
+                                                            groupTitleNotifier: groupTitleNotifier,
+                                                            loadGroupTopicCallback: (context) {
+                                                                expansionTileController.collapse();
+                                                                loadUIGroupTopics(context);
+                                                            },
+                                                        )
+                                                                      
+                                                    ],
                                                 ),
-                
-                                                SliverPadding(
-                                                    padding: Padding16,
-                                                    sliver: Consumer<GroupsModel>(
-                                                        builder: (_, groupsModel, __) {
-                
-                                                            List selectedGroupData = groupTitleNotifier.value == null ?
-                                                                timelineFlowModel.timelinesData[BangumiTimelineType.group] ?? [] :
-                                                                loadSurfTimelineDetails(
-                                                                    groupsModel.contentListData,
-                                                                    bangumiTimelineType: BangumiTimelineType.group
-                                                                )
-                                                            ;
-                
-                                                            //debugPrint("currentTopic : ${groupsModel.selectedGroupInfo?.groupName}");
-                
-                                                            return SliverAnimatedList(
-                
-                                                                key: sliverAnimatedListKey,
-                                                                initialItemCount: selectedGroupData.length,
-                                                                itemBuilder: (_, index, animation) {
-                
-                                                                    // AnimatedList 奇怪的问题.. selectedGroupData 指向的好像不是同一个?? 这是怎么回事??
-                                                                    if (index >= selectedGroupData.length) return const SizedBox.shrink();
-                
-                                                                    return Container(
-                                                                        color: index % 2 == 0 ? Colors.grey.withValues(alpha: 0.3) : null,
-                                                                        child: BangumiTimelineTile(
-                                                                            surfTimelineDetails: selectedGroupData[index],
-                                                                            //timelineType: BangumiTimelineType.group,
-                
-                                                                            //groupTopicInfo: 
-                                                                            //  groupsModel.contentListData.isEmpty ?
-                                                                            //  GroupTopicInfo.fromSurfTimeline(selectedGroupData[index]) :
-                                                                            //  groupsModel.contentListData[index],
-                
-                                                                        ),
-                                                                    );
-                                                                }
+                                            ),
+                                        ),
+                              
+                                        SliverPadding(
+                                            padding: Padding16,
+                                            sliver: Consumer<GroupsModel>(
+                                                builder: (_, groupsModel, __) {
+                              
+                                                    List selectedGroupData = groupTitleNotifier.value == null ?
+                                                        timelineFlowModel.timelinesData[BangumiTimelineType.group] ?? [] :
+                                                        loadSurfTimelineDetails(
+                                                            groupsModel.contentListData,
+                                                            bangumiTimelineType: BangumiTimelineType.group
+                                                        )
+                                                    ;
+                              
+                                                    //debugPrint("currentTopic : ${groupsModel.selectedGroupInfo?.groupName}");
+                              
+                                                    return SliverAnimatedList(
+                              
+                                                        key: sliverAnimatedListKey,
+                                                        initialItemCount: selectedGroupData.length,
+                                                        itemBuilder: (_, index, animation) {
+                              
+                                                            // AnimatedList 奇怪的问题.. selectedGroupData 指向的好像不是同一个?? 这是怎么回事??
+                                                            if (index >= selectedGroupData.length) return const SizedBox.shrink();
+                              
+                                                            return Container(
+                                                                color: index % 2 == 0 ? Colors.grey.withValues(alpha: 0.3) : null,
+                                                                child: BangumiTimelineTile(
+                                                                  surfTimelineDetails: selectedGroupData[index],
+                                                                ),
                                                             );
                                                         }
-                                                    ),
-                                                ),
-                
-                                            ]
+                                                    );
+                                                }
+                                            ),
                                         ),
-                
-                                    ],
+                              
+                                    ]
                                 ),
-                            );
-                        }
-                    ),
+                              
+                            ],
+                        ),
+                      ),
+                  )
+              
                 
                 );
               }
@@ -279,7 +274,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
         );
     }
 
-    void loadGroupTopics(
+    void loadUIGroupTopics(
         BuildContext context,
         {
           bool? isAppend,

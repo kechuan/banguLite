@@ -1,3 +1,4 @@
+/// 任意扩展 仿kt语法糖
 extension ScopeFunctions<T> on T {
   /// 类似 Kotlin 的 let 函数
   /// 在对象上执行 [action] 并返回结果
@@ -26,5 +27,17 @@ extension ScopeFunctions<T> on T {
   T apply(void Function() action) {
     action();
     return this;
+  }
+
+  bool takeCondition(bool Function(T) predicate) {
+    return predicate(this);
+  }
+
+
+}
+
+extension NumExtensions on num { 
+  bool isInRange(num min, num max) {
+    return this >= min && this <= max;
   }
 }

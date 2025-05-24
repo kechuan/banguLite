@@ -166,7 +166,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiEpPage : [EpModel(required) epModel, int(required) totalEps, Color? bangumiThemeColor]
+  /// BangumiEpPage : [EpModel(required) epModel, Color? bangumiThemeColor]
   static const String subjectEp = '/subjectEp';
 
   /// '/subjectTopic'

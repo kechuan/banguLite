@@ -1,5 +1,6 @@
 import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_details.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
@@ -70,9 +71,9 @@ class _BangumiTopicPageState extends BangumiContentPageState
 		isRefresh:isRefresh,
 		fallbackAction: (message) {
 			showRequestSnackBar(
-				context, 
 				message: message,
 				requestStatus: false,
+        backgroundColor: judgeCurrentThemeColor(context)
 			);
 		},
     );

@@ -1,7 +1,7 @@
 
 import 'dart:math';
 
-import 'package:bangu_lite/internal/extract.dart';
+import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/bangumi_define/timeline_const.dart';
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
@@ -205,10 +205,12 @@ String convertTimelineDescription(
         "["
         "url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}"
         "?timelineID=${currentTimeline.timelineID}"
-        //这个操作实际上非常危险.. 毕竟params理论上只最大支持4k 字符 要是原本的正常编码自然什么问题没有
-        //但一旦需求通过Uri体系就需要转译 转译的字符数可能会超过4k
-        //唉 暂时先这样吧 毕竟一般情况下没人往时间线吐槽1000字 
-        "&comment=${Uri.encodeComponent(currentTimeline.commentDetails!.comment!)}"
+
+        /// 这个操作实际上非常危险.. 毕竟params理论上只最大支持4k字符 要是原本的正常编码自然什么问题没有
+        /// 但一旦需求通过Uri体系就需要转译 转译的字符数可能会超过4k
+        /// 唉 暂时先这样吧 毕竟一般情况下没人往时间线吐槽超过1000字 
+        /// DAU没两位数的家伙还不配思考这些情况
+        "&comment=${Uri.encodeComponent(currentTimeline.commentDetails?.comment ?? "")}"
         "]"
         "${TimelineCatStatus.Comment.actionName}"
       ;
@@ -313,14 +315,10 @@ String convertDefaultTimeline(
       else if(action == TimelineCatDaily.JoinGroup.value || action == TimelineCatDaily.CreateGroup.value){
         //jumpLink = "这里是群组ID:${objectIDSet.first}";
         // objectNameList: {boring, 靠谱人生茶话会}
-        jumpLink = BangumiWebUrls.group(objectIDSet.first);
+        jumpLink = '${BangumiWebUrls.group(objectIDSet.first)}&groupTitle=${objectNameSet.first}';
       }
 
-      else if(action == TimelineCatDaily.JoinGroup.value || action == TimelineCatDaily.CreateGroup.value){
-        //jumpLink = "这里是群组ID:${objectIDSet.first}";
-        // objectNameList: {boring, 靠谱人生茶话会}
-        jumpLink = BangumiWebUrls.group(objectIDSet.first);
-      }
+
 
       else if (action == TimelineCatDaily.JoinParadise.value){
         jumpLink = "这里是乐园ID:${objectIDSet.first}";

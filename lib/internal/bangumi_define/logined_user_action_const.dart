@@ -2,12 +2,12 @@ enum PostCommentType{
   //subject,Ep不可能由用户发起 只拥有 reply 权限
   subjectComment("番剧吐槽"),
   replyEpComment("单集吐槽"),
-  
-  postTopic("发布帖子"),
-  replyTopic("回复帖子"),
 
   postBlog("发布博客"),
   replyBlog("回复博客"),
+  
+  postTopic("发布帖子"),
+  replyTopic("回复帖子"),
 
   postGroupTopic("发布小组帖子"),
   replyGroupTopic("回复小组帖子"),

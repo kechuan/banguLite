@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bus_register_method.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_tab_content_select.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -64,9 +65,14 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
 
   @override
   void initState(){
+
     carouselSpinTimer();
     calendarLoadFuture = context.read<IndexModel>().loadCalendar();
 
+    //real init For provider context
+    context.read<AccountModel>().initModel(context);
+
+    //由 轮换页进行 监听 AppRoute 
     bus.on('AppRoute', (link) {
       if (!mounted) return;
       appRouteMethodListener(context, link);

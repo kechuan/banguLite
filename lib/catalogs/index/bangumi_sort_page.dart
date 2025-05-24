@@ -3,7 +3,7 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_wave_footer.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -250,7 +250,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                 
                                 itemBuilder: (_, index, animation) {
                         
-                                  debugPrint("index:$index");
+                                  //debugPrint("index:$index");
                               
                                   if(messageList.isEmpty){
                                     return const Center(child: ScalableText("没有搜索到内容.."));

@@ -39,6 +39,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
         loadBlogPhotos(selectedBlogID),
       ]
     ).then((responseList){
+
       final commentResponse = responseList[1] as Response;
       final photoResponse = responseList[2] as Response;
 
@@ -62,6 +63,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
 
     return await HttpApiClient.client.get(
       BangumiAPIUrls.blogComment(blogID),
+      options: BangumiAPIUrls.bangumiAccessOption
     );
   }
 
@@ -70,6 +72,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
 
     return await HttpApiClient.client.get(
       BangumiAPIUrls.blogPhotos(blogID),
+      options: BangumiAPIUrls.bangumiAccessOption
     );
   }
 

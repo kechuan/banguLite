@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -85,12 +87,12 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
       child: PopupMenuButton<CommentActionType>(
         onSelected: (commentAction){
 
-          debugPrint("contentID: ${widget.contentID}, reply:${widget.commentData.commentID}");
+          debugPrint("contentID: ${widget.contentID}, reply:${widget.commentData.commentID}, action:${widget.postCommentType}");
 
           invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
-            context,
             message: message,
             requestStatus: requestStatus,
+            backgroundColor: judgeCurrentThemeColor(context)
           );
 
           invokeSendComment(String message)=> accountModel.toggleComment(
@@ -101,7 +103,14 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
             postCommentType: widget.postCommentType,
             actionType : commentAction == CommentActionType.edit ? UserContentActionType.edit : UserContentActionType.post,
             fallbackAction: (message){
-              fadeToaster(context: context, message: message,duration: const Duration(seconds: 5));
+
+              debugPrint("[PostContent] ${widget.contentID} SendContent: $message");
+
+              invokeRequestSnackBar(
+                message: message,
+                requestStatus: false,
+              );
+              
             }
           ); 
 
@@ -121,7 +130,9 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                   'referenceObject': '${widget.commentData.comment}',
                   'preservationContent': indexModel.draftContent[widget.commentData.commentID]
                 }
-              ).then((content) async{
+              ).then((content) async {
+
+                /// 此处回复的内容应只有 content 也就是 String
 
                 if(content is String){
 
@@ -135,10 +146,9 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                       //UI层 Callback
 
                       widget.onReplyComment?.call(widget.commentData.commentID!,content);
+                      invokeRequestSnackBar(requestStatus: true);
                     }
 
-   
-                    invokeRequestSnackBar(requestStatus: resultID != 0);
                     
 
                   });
@@ -159,10 +169,24 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
             case CommentActionType.report:{
               //Dialog reportReason 暂且不做
               debugPrint("report");
+              fadeToaster(context: context, message: "暂未开放");
             }
-              
-              
+
             case CommentActionType.edit:{
+
+              final throwFlag = widget.commentData.takeCondition((it){
+                if(it is EpCommentDetails){
+                  if(it.repliedComment?.isNotEmpty == true){
+                    fadeToaster(context: context, message: "一般用户无法更改携带回复的评论");
+                    return true;
+                  }
+                }
+
+                return false;
+              });
+
+              if(throwFlag == true) return;
+
 
               Navigator.pushNamed(
                 context,
@@ -171,7 +195,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                   'contentID':widget.commentData.commentID,
                   'postCommentType':widget.postCommentType,
                   'title': '编辑这段评论',
-                  'preservationContent': widget.commentData.comment
+                  'preservationContent': ("",widget.commentData.comment)
                 }
               ).then((content) async{
                 if(content is String){
@@ -186,12 +210,8 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                       debugPrint("[EditContent] sendMessageresultID:$resultID SendContent: $content");
                       //UI层 Callback
                       widget.onUpdateComment?.call(content);
-                      //widget.onReplyComment?.call(widget.commentData.commentID!,content);
+                      invokeRequestSnackBar(requestStatus: true);
                     }
-
-                    invokeRequestSnackBar(requestStatus: resultID != 0);
-                    
-
                   });
 
                 }
@@ -209,7 +229,6 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                   widget.onUpdateComment?.call(null);
                 },
               );
-
 
             }
               
@@ -255,6 +274,8 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                       case CommentActionType.edit:{
                         if(
                           [
+                            /// Blog有点特殊 一般人无法修改带有replies 的 comment
+                            /// "you don't have permission to edit a comment with replies"
                             PostCommentType.postTimeline,
                             PostCommentType.replyTimeline,
                           ].contains(widget.postCommentType)
@@ -263,6 +284,12 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                         }
                       }
                       case CommentActionType.delete:{
+
+                        if(widget.commentData.userInformation?.userID != AccountModel.loginedUserInformations.userInformation?.userID){
+                          isActionAvaliable = false;
+                          
+                        }
+
                         if(
                           widget.postCommentType == PostCommentType.subjectComment ||
                           widget.postCommentType == PostCommentType.replyTimeline
@@ -270,16 +297,12 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                           isActionAvaliable = false;
                         }
 
-                        if(widget.commentData.userInformation?.userID != AccountModel.loginedUserInformations.userInformation?.userID){
-                          isActionAvaliable = false;
-                        }
+                        
                       }
 
                       case CommentActionType.report:{
                         isActionAvaliable = false;
                       }
-
-                      
                   }
 
                 }

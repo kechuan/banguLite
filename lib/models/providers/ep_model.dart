@@ -1,11 +1,10 @@
 import 'dart:async';
 
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class EpModel extends ChangeNotifier{
@@ -23,9 +22,8 @@ class EpModel extends ChangeNotifier{
     this.selectedEp = 0,
     this.injectEpID = 0
   }){
-    /// 一般来说 单EP模式的特征就是 selectedEp,subjectID 皆为0(遇到EP.0的表示就算了)
+    /// 一般来说 单EP模式的特征就是 [selectedEp],[subjectID] 皆为0(遇到EP.0的表示就算了)
     if(subjectID != 0) getEpsInformation();
-
     if(injectEpID != 0) getSingleEPInformation();
   }
 
@@ -104,7 +102,7 @@ class EpModel extends ChangeNotifier{
           if(epOffset!=null){
             for(int epInfoIndex = 0; epInfoIndex < currentRangeEpsData.length; epInfoIndex++){
               epsData.addAll({
-                (epOffset+epInfoIndex): currentRangeEpsData[epInfoIndex]
+                (epOffset+epInfoIndex) : currentRangeEpsData[epInfoIndex]
               });
             }
           }
@@ -136,27 +134,16 @@ class EpModel extends ChangeNotifier{
 
     Completer<bool> singleEPCompleter = Completer();
 
-    await Future.wait(
-      [
-        HttpApiClient.client.get(BangumiAPIUrls.ep(injectEpID)),
-        loadEpComment(),
-      ]
-    ).then((responseList){
-
-      final epResponse = responseList[0] as Response;
-
-      epsData[0] = loadEpsData([epResponse.data]).first;
-        
+    await HttpApiClient.client.get(BangumiAPIUrls.ep(injectEpID)).then((singleEPResponse){
+      epsData[0] = loadEpsData([singleEPResponse.data]).first;
       singleEPCompleter.complete(true);
-
     });
-
 
 
     return singleEPCompleter.future;
   }
 
-	Future<bool> loadEpComment() async{
+	Future<bool> loadEpComment() async {
 
     Completer<bool> epCommentCompleter = Completer();
 
@@ -183,12 +170,16 @@ class EpModel extends ChangeNotifier{
           debugPrint("$selectedEp in Progress");
         }
 
-        debugPrint("$selectedEp already loaded");
+        else{
+          debugPrint("$selectedEp already loaded");
+        }
+
+        
         
         return false;
       }
 
-      int requestID = epsData[selectedEp]?.epID ?? 0;
+      requestID = epsData[selectedEp]?.epID ?? 0;
       if(requestID == 0) return false;
     }
 
@@ -197,7 +188,7 @@ class EpModel extends ChangeNotifier{
       requestID = injectEpID;
 
       if(epCommentData[selectedEp] != null){
-        debugPrint("$selectedEp => injectID: $requestID already loaded");
+        debugPrint("$selectedEp => injectEpID: $requestID already loaded");
         return false;
       }
 

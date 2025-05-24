@@ -1,7 +1,7 @@
 import 'dart:io';
 
 
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/platforms/register_windows_applink.dart';
@@ -9,6 +9,7 @@ import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/models/providers/user_model.dart';
 import 'package:bangu_lite/models/providers/webview_model.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -82,16 +83,15 @@ class MainApp extends StatelessWidget {
             shouldRebuild: (previous, next) => previous!=next,
             builder: (_, currentColor, child){
               return MaterialApp(
+                scaffoldMessengerKey: scaffoldMessengerKey,
                 //debugShowCheckedModeBanner: false,
                 theme: ThemeData(
                   colorScheme: ColorScheme.fromSeed(seedColor: currentColor),
-                  //fontFamilyFallback: convertSystemFontFamily(),
                   fontFamilyFallback:convertSystemFontFamily()
                   
                 ),
                 darkTheme: ThemeData(
                   brightness: Brightness.dark,
-                  //fontFamilyFallback: convertSystemFontFamily(),
                   fontFamilyFallback:convertSystemFontFamily(),
                   
                   colorScheme: ColorScheme.dark(
@@ -126,10 +126,7 @@ class MainApp extends StatelessWidget {
                
               );
             }
-            
 
-            
-            
             
           );
         }

@@ -1,5 +1,5 @@
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
-import 'package:bangu_lite/internal/extract.dart';
+import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 
@@ -62,7 +62,7 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
           ..title = infoDataList[index].topicTitle
           ..sourceTitle = extractNameCNData(surfTimelineListData[index]["subject"])
           //破坏行为
-          ..sourceID = infoDataList[index].subjectID
+          ..sourceID = infoDataList[index].sourceID
           ..commentDetails = (
             CommentDetails()
               ..userInformation = loadUserInformations(

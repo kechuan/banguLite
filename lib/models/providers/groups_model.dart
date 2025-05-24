@@ -19,8 +19,16 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
     super.subjectID = 'groups',
     this.selectedGroupInfo
   }){
-    if(subjectID == 'groups') return;
-    loadGroups();
+    //if(subjectID == 'groups') return;
+
+    //loadGroups();
+
+    if(selectedGroupInfo?.groupName == null){
+       loadGroups();
+    }
+
+
+    
   }
 
   GroupInfo? selectedGroupInfo;
@@ -36,7 +44,7 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
     int? limit,
     int? offset,
     Map<String,String>? accessQuery,
-    Function({String? message})? fallbackAction
+    Function(String)? fallbackAction
   }) async {
 
     Completer<bool> requestGroupsCompleter = Completer();
@@ -67,15 +75,15 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
 
         else{
           requestGroupsCompleter.complete(false);
-          fallbackAction?.call(message:'${response.statusCode} ${response.data["message"]}');
+          fallbackAction?.call('${response.statusCode} ${response.data["message"]}');
         }
 
 
       });
     }
 
-    on DioException catch  (e){
-      fallbackAction?.call(message:'${e.response?.statusCode} ${e.response?.data["message"]}');
+    on DioException catch (e){
+      fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
     }
 
     
@@ -116,6 +124,7 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
 
   @override
   List<GroupTopicInfo> createEmptyInfoList() => [GroupTopicInfo.empty()];
+  
   @override
   GroupTopicDetails createEmptyDetails() => GroupTopicDetails.empty();
 

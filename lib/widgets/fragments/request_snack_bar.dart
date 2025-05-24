@@ -1,17 +1,35 @@
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
+//DateTime? lastCallTime;
+
 void showRequestSnackBar(
-  BuildContext context,
   {
     bool? requestStatus,
     String? message,
     Duration? duration,
+    Color? backgroundColor
   }
 ){
 
+  //final currentTime = DateTime.now();
   
+  //// 防抖检查
+  //if (
+  //  lastCallTime != null && 
+  //  (currentTime.millisecondsSinceEpoch - (lastCallTime?.millisecondsSinceEpoch ?? 0))~/1000 < 5
+  //) {
+  //  debugPrint("[PostContent] Denied ${(currentTime.millisecondsSinceEpoch - (lastCallTime?.millisecondsSinceEpoch ?? 0))~/1000}");
+  //  return;
+  //}
+
+  //else{
+  //  debugPrint("[PostContent] ${lastCallTime?.millisecond} / ${currentTime.millisecond}");
+  //  lastCallTime = currentTime;
+  //}
+
   late Widget trailingWidget;
 
   switch(requestStatus){
@@ -38,11 +56,10 @@ void showRequestSnackBar(
       
   }
 
-  
-  ScaffoldMessenger.of(context).removeCurrentSnackBar();
-  ScaffoldMessenger.of(context).showSnackBar(
+  scaffoldMessengerKey.currentState?.removeCurrentSnackBar();
+  scaffoldMessengerKey.currentState?.showSnackBar(
     SnackBar(
-        backgroundColor:judgeCurrentThemeColor(context),
+        backgroundColor:backgroundColor,
         content: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

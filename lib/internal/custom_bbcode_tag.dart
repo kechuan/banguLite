@@ -1,10 +1,12 @@
 
-import 'package:bangu_lite/internal/callback.dart';
-import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/callback.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
+import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/comment_image_panel.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -62,7 +64,7 @@ final allEffectTag = [
     ),
 
     CodeTag(),
-	UserTag()
+	  UserTag()
 ];
 
 final richlessEffectTag = allEffectTag.getRange(0, allEffectTag.length - 4);
@@ -301,11 +303,35 @@ class UserTag extends WrappedStyleTag {
 
 	@override
 	List<InlineSpan> wrap(FlutterRenderer renderer, bbob.Element element, List<InlineSpan> spans) {
-		return [ 
-			TextSpan(
-				text: spans.isEmpty ? "" : '@${spans.first.toPlainText()}'
+
+    return [ 
+			WidgetSpan(
+        child: Builder(
+          builder: (context) {
+            return DecoratedBox(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withValues(alpha: 0.5),
+                    spreadRadius: 1,
+                    blurRadius: 1,
+                    offset: const Offset(0, 1), // changes position of shadow
+                  ),
+                
+                ]
+              ),
+              child: ScalableText(
+                '@${spans.first.toPlainText()}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            );
+          }
+        ),
+				
 			),
 		];
+
+
 	}
 
     

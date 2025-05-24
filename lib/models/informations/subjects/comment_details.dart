@@ -5,8 +5,7 @@ import 'package:dio/dio.dart';
 
 abstract class BaseComment {
   BaseComment({
-
-
+    
     // CommentDetails 实际上不需要这个字段 
     // 但。。有些 通用的页面需要这个字段。而我不可能就为了这一个字段再开一个 特化的类
     // 那就干脆直接填平好了

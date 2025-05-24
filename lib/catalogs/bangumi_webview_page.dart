@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:bangu_lite/internal/extract.dart';
+import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';

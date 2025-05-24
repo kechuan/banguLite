@@ -28,6 +28,12 @@ void animatedListAppendContentCallback(
         );
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
+
+          if((animatedListController?.offset ?? 0.0) < kToolbarHeight){
+            return;
+          }
+
+
           animatedListController?.animateTo(
             animatedListController.offset + 120,
             duration: const Duration(milliseconds: 300),

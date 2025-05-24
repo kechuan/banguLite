@@ -1,5 +1,5 @@
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
@@ -62,9 +62,9 @@ class _StarButtonState extends State<StarButton> {
             );
         
             invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
-              context,
               message: message,
               requestStatus: requestStatus,
+              backgroundColor: judgeCurrentThemeColor(context)
             );
         
             showStarSubjectDialog(

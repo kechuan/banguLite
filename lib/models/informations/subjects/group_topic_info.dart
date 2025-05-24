@@ -7,7 +7,6 @@ import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 class GroupTopicInfo extends TopicInfo {
   GroupTopicInfo({super.id});
 
-  //TopicInfo? topicInfo;
   GroupInfo? groupInfo;
 
   factory GroupTopicInfo.empty() => GroupTopicInfo(id: 0);
@@ -16,9 +15,10 @@ class GroupTopicInfo extends TopicInfo {
     return GroupTopicInfo(
       id: surfTimelineData.detailID
     )
+      
       ..topicTitle = surfTimelineData.title
       ..topicID = surfTimelineData.detailID
-      ..sourceID = surfTimelineData.sourceID
+      
       ..userInformation = surfTimelineData.commentDetails?.userInformation
       ..repliesCount = surfTimelineData.replies
     
@@ -44,6 +44,7 @@ List<GroupTopicInfo> loadGroupTopicInfo(
       return GroupTopicInfo(
         //id: currentTopicInfo.topicID
       )
+
         ..topicTitle = currentTopicInfo.topicTitle
         ..topicID = currentTopicInfo.topicID
         ..userInformation = currentTopicInfo.userInformation

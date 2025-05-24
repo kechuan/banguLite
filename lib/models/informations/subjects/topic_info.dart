@@ -15,8 +15,8 @@ class TopicInfo extends ContentInfo {
   String? get topicTitle => contentTitle;
   set topicTitle(String? value) => contentTitle = value;
 
-  int? get subjectID => sourceID;
-  set subjectID(int? value) => sourceID = value;
+  //int? get subjectID => sourceID;
+  //set subjectID(int? value) => sourceID = value;
 
   factory TopicInfo.empty() {
     return TopicInfo(id: 0);
@@ -32,16 +32,16 @@ List<TopicInfo> loadTopicsInfo(List bangumiTopicsInfoData){
     	UserInformation currentUserInformation = loadUserInformations(currentTopicMap["creator"] ?? currentTopicMap["user"] );
 
 		currentTopic
-        ..subjectID = currentTopicMap["parentID"]
-        ..topicID = currentTopicMap["id"]
-        ..topicTitle = currentTopicMap["title"]
-        ..createdTime = currentTopicMap["createdAt"]
-        ..repliesCount = currentTopicMap["replyCount"]
-        ..lastRepliedTime = currentTopicMap["updatedAt"]
-        ..userInformation = currentUserInformation
-      ;
+      ..sourceID = currentTopicMap["parentID"]
+      ..topicID = currentTopicMap["id"]
+      ..topicTitle = currentTopicMap["title"]
+      ..createdTime = currentTopicMap["createdAt"]
+      ..repliesCount = currentTopicMap["replyCount"]
+      ..lastRepliedTime = currentTopicMap["updatedAt"]
+      ..userInformation = currentUserInformation
+    ;
 
-			topicsList.add(currentTopic);
+    topicsList.add(currentTopic);
 	} 
 
 	 return topicsList;

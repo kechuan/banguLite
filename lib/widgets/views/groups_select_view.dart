@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
-import 'package:bangu_lite/internal/callback.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/utils/callback.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -194,7 +194,9 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
         mode: BangumiSurfGroupType.values[index],
         offset: isAppend == true ? selectedGroupDataLength : 0,
         accessQuery: BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken ?? ""),
-        fallbackAction: invokeToaster,
+        fallbackAction: (message){
+          invokeToaster(message: message);
+        },
       ).then((result){
         
         List newSelectedGroupData = groupsModel.groupsData[BangumiSurfGroupType.values[index]]!;

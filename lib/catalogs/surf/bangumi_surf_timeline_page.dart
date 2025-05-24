@@ -2,6 +2,7 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -85,9 +86,9 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
 				          final indexModel = context.read<IndexModel>();
 
                   invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
-                    context,
                     message: message,
                     requestStatus: requestStatus,
+                    backgroundColor: judgeCurrentThemeColor(context)
                   );
 
                   invokeSendComment(String message) => accountModel.postContent(

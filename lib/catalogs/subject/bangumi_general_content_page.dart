@@ -1,13 +1,16 @@
 import 'dart:math';
 
+import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
@@ -77,6 +80,7 @@ abstract class BangumiContentPageState<
       value: contentModel,
       builder: (context, child) {
 
+        //debugPrint('sub / id :${getSubContentID()} / ${contentInfo.id}');
         debugPrint('sub / id :${getSubContentID()} / ${contentInfo.id}');
 
         contentFuture ??= loadContent(getSubContentID() ?? contentInfo.id ?? 0);
@@ -162,16 +166,65 @@ abstract class BangumiContentPageState<
                           child: ScalableText("加载失败"),
                         );
                       }
-
-                  
-						          final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
-						          final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
-						          final int commentListCount = (getCommentCount(contentDetail, isCommentLoading) ?? 0);
+		
+                      final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
+                      final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
+                      final int commentListCount = (getCommentCount(contentDetail, isCommentLoading) ?? 0);
 
                       int resultCommentCount = getPostCommentType() == PostCommentType.replyTopic ?
                       commentListCount :
                       commentListCount+1
                       ;
+
+
+                      if(contentDetail?.detailID != 0){
+
+                        String? subjectTitle;
+
+                        switch(getPostCommentType()){
+
+                          
+                          case PostCommentType.replyTopic:
+                          case PostCommentType.replyBlog:{
+
+
+                            subjectTitle =  getPostCommentType() == PostCommentType.replyTopic ? '帖子' : '博客';
+
+                            
+
+                            MyHive.historySurfDataBase.put(
+                              getSubContentID() ?? contentInfo.id ?? 0,
+                                SurfTimelineDetails(
+                                detailID: getSubContentID() ?? contentInfo.id ?? 0,
+                              )
+                                ..updatedAt = DateTime.now().millisecondsSinceEpoch
+                                ..title = contentDetail?.contentTitle ?? contentInfo.contentTitle
+                                ..sourceTitle = subjectTitle
+                                ..sourceID = contentInfo.sourceID
+                                ..bangumiTimelineType = BangumiTimelineType.fromPostCommentType(getPostCommentType())
+                                ..replies = commentListCount
+                                ..commentDetails = (
+                                  CommentDetails()
+                                    ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
+                                  )
+                            );
+
+
+                          }
+
+                     
+
+
+                          default:{}
+                          
+                        }
+
+
+
+
+                      }
+
+                      
 
                       if(isCommentLoading){
                         return Skeletonizer.sliver(

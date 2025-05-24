@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 
 class AppConfig extends HiveObject{
   

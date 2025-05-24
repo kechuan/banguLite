@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
@@ -47,7 +48,10 @@ class BangumiContentAppbar extends StatelessWidget {
         children: [
       
           IconButton(
-            onPressed: () => Navigator.of(context).maybePop(),
+            onPressed: (){
+              debugPrint("back Trigger");
+              Navigator.of(context).maybePop();
+            },
             icon: const Icon(Icons.arrow_back),
           ),
             
@@ -78,9 +82,9 @@ class BangumiContentAppbar extends StatelessWidget {
               }
 
               invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
-                context,
                 message: message,
                 requestStatus: requestStatus,
+                backgroundColor: judgeCurrentThemeColor(context)
               );
 
               invokeSendComment(String message) => accountModel.toggleComment(
@@ -117,8 +121,8 @@ class BangumiContentAppbar extends StatelessWidget {
 
                 debugPrint("[PostContent] id:$contentID/$postCommentType");
 
-				//invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
-				//onSendMessage?.call(content as String);
+                //invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
+                //onSendMessage?.call(content as String);
 
                 if(content is String){
 

@@ -4,11 +4,11 @@ import 'dart:io';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
-import 'package:bangu_lite/internal/extension.dart';
-import 'package:bangu_lite/internal/extract.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
+import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/max_number_input_formatter.dart';
@@ -28,7 +28,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 @FFAutoImport()
-import 'package:bangu_lite/internal/const.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 @FFAutoImport()
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -133,7 +133,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
                           showDraftContentPreserveDialog(
                             context,
-                            widget.contentID ?? 0,
+                            widget.replyID ?? widget.contentID ?? 0,
                             title: titleEditingController.text,
                             content: contentEditingController.text,
                           );
@@ -219,31 +219,21 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
                         widget.referenceObject != null ?
 
-                            Padding(
-                                padding: Padding16,
-                                child: Center(
-                                    child: EasyRefresh(
-                                        child: ConstrainedBox(
-                                            constraints: const BoxConstraints(maxHeight: 200),
-                                            child: BBCodeText(
-                                                data: '${widget.title?.split('回复').last} 说: ${widget.referenceObject}',
-                                                //data: convertBangumiCommentSticker(widget.referenceObject ?? ""),
-                                                stylesheet: BBStylesheet(
-                                                    tags: [
-                                                        AdapterQuoteTag(),
-                                                        BangumiStickerTag(),
-                                                        BoldTag(),
-                                                        ItalicTag(),
-                                                        SizeTag(),
-                                                        PatchColorTag(),
-                                                    ],
-                                                    selectableText: true,
-                                                    defaultText: const TextStyle(fontFamily: "MiSansFont")
-                                                ),
-                                            ),
-                                        ),
-                                    ),
-                                ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                  padding: Padding16,
+                                  child: EasyRefresh(
+                                      child: ConstrainedBox(
+                                          constraints: const BoxConstraints(maxHeight: 200),
+                                          child: BBCodeText(
+                                              data: '${widget.title?.split('回复').last} 说: ${widget.referenceObject}',
+                                              stylesheet: appDefaultStyleSheet(context,richless: true)
+                                  
+                                          ),
+                                      ),
+                                  ),
+                              ),
                             ) : const SizedBox.shrink(),
 
                         Expanded(

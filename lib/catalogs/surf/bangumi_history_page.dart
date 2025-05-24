@@ -1,6 +1,6 @@
 import 'package:bangu_lite/delegates/star_sort_strategy.dart';
-import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
@@ -57,8 +57,10 @@ class _BangumiHistoryPageState extends State<BangumiHistoryPage> {
       body: EasyRefresh(
         onRefresh: () => setState(() {}),
         header: const MaterialHeader(),
-        child: CustomScrollView(
-          slivers: buildSection(context)
+        child: SafeArea(
+          child: CustomScrollView(
+            slivers: buildSection(context)
+          ),
         ),
       ),
     );
@@ -77,8 +79,6 @@ List<Widget> buildSection(
     MyHive.historySurfDataBase.values.toList();
 
   dataSource.sort((prev, next) => next.updatedAt!.compareTo(prev.updatedAt!));
-
-  
 
   for (int starIndex = 0; starIndex < dataSource.length; starIndex++) {
 
@@ -101,8 +101,6 @@ List<Widget> buildSection(
     String headerText = "";
     int startIndex = 0;
     int itemCount = 0;
-
-    
 
     headerText = groupIndices.keys.elementAt(index); //当前所属组别
     startIndex = groupIndices.values.elementAt(index); //dataSource的起始下标
@@ -158,11 +156,11 @@ Widget buildSectionList(
   DateTime recordTime = DateTime(0);
 
   List<SurfTimelineDetails> rangeData = data.sublist(startIndex, startIndex + itemCount);
-  //rangeData.sort((a, b) => b.updatedAt!.compareTo(a.updatedAt!));
 
   return Padding(
     padding: PaddingH6V12,
     child: ListView.builder(
+      padding: const EdgeInsets.all(0),
       physics: const NeverScrollableScrollPhysics(),
       itemCount: itemCount,
       shrinkWrap: true,

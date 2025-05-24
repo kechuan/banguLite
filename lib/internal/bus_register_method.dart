@@ -1,4 +1,5 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
@@ -46,19 +47,21 @@ void appRouteMethodListener(BuildContext context,String link){
       ){
         if(context.mounted){
           //EpModel(subjectID: widget.subjectID,selectedEp: 1)
-          //难点在于怎么传递 subjectID 信息 答案: Params传递
+          //难点在于怎么传递 subjectID 信息 答案: Params传递  
 
           debugPrint("ep link: $link");
+
+            int subjectID = int.tryParse(appRouteUri.queryParameters['subjectID'] ?? "") ?? 0;
+            num selectedEp = num.tryParse(appRouteUri.queryParameters['selectedEp'] ?? "") ?? 0;
 
             Navigator.pushNamed(
             context, Routes.subjectEp,
             arguments: {
               //暂定 随后会自动获取totalEp信息
-              'totalEps': 13,
               'epModel': EpModel(
-                subjectID: int.tryParse(appRouteUri.queryParameters['subjectID'] ?? "") ?? 0,
-                selectedEp: num.tryParse(appRouteUri.queryParameters['selectedEp'] ?? "") ?? 0,
-                injectEpID: resID,
+                subjectID: subjectID,
+                selectedEp: selectedEp,
+                injectEpID: subjectID == 0 ? resID : 0,
               ),
             }
           );
@@ -133,11 +136,16 @@ void appRouteMethodListener(BuildContext context,String link){
       }
 
       else if(
-        link.startsWith(BangumiWebUrls.group(resID)) ||
-        link.startsWith(BangumiWebUrls.relativeGroup(resID)) 
+        link.startsWith(BangumiWebUrls.group(matchLink?.split(RegExp('/')).last)) ||
+        link.startsWith(BangumiWebUrls.relativeGroup(matchLink?.split(RegExp('/')).last)) 
       ){
 
-        debugPrint("group link: $link, ${matchLink?.split(RegExp('/')).last}");
+		final groupNameRegexp = RegExp('group/([^&]+)');
+
+        debugPrint(
+			"groupName:${groupNameRegexp.firstMatch(link)?.group(1)}"
+			"groupTitle:${link.split('groupTitle=').last}"
+		);
 
 
         if(context.mounted){
@@ -146,7 +154,10 @@ void appRouteMethodListener(BuildContext context,String link){
             context,
             Routes.groups,
             arguments: {
-              "selectedGroupInfo": GroupInfo(id: 0)..groupName = "${matchLink?.split(RegExp('/')).last}",
+              "selectedGroupInfo": GroupInfo()
+			  	..groupName = groupNameRegexp.firstMatch(link)?.group(1)
+				..groupTitle = link.split('groupTitle=').last
+			,
             }
           );
         }
@@ -170,7 +181,6 @@ void appRouteMethodListener(BuildContext context,String link){
 
                 if(resultID!=0){
                   showRequestSnackBar(
-                    context,
                     message: '删除成功',
                     requestStatus: true,
                   );
@@ -189,6 +199,10 @@ void appRouteMethodListener(BuildContext context,String link){
 
         
   }
+
+  else{
+	launchUrlString(link);
+  }
 }
 
 void appLoginMethodListener(BuildContext context,String link){
@@ -198,6 +212,11 @@ void appLoginMethodListener(BuildContext context,String link){
 
   if(link.startsWith(APPInformationRepository.bangumiOAuthCallbackUri.scheme)){
     final code = link.split("code=").last;
-    accountModel.getAccessToken(code);
+    accountModel.getAccessToken(
+		code,
+		fallbackAction: (message){
+			showRequestSnackBar(message: message, requestStatus: false,backgroundColor: judgeCurrentThemeColor(context));
+		}
+	);
   }
 }

@@ -1,3 +1,5 @@
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:flutter/material.dart';
 
 enum BangumiCommentAuthorType{
@@ -44,18 +46,39 @@ enum BangumiTimelineType{
   subject("条目",Icons.crop_free),
   group("小组",Icons.forum_outlined),
   timeline("时间线",Icons.history),
-  //条目 有两组内容 Topic / Blog
+  // 条目 有两组内容 Topic / Blog
   // 但API目前只有 trending 与 latest Topic 并没有 Blog...
 
-  //全部就意味着。。所有的API都要请求 然后还要自己编排createdAt排序
-  //实际上等于填充了 timelinesData 的所有类别
-  
+
   ;
 
   final String typeName;
   final IconData iconData;
 
   const BangumiTimelineType(this.typeName,this.iconData);
+
+  static BangumiTimelineType? fromPostCommentType(PostCommentType? postCommentType){
+
+    if(postCommentType == null) return null;
+
+    if(postCommentType.index.isInRange(PostCommentType.subjectComment.index, PostCommentType.replyTopic.index)){
+      return BangumiTimelineType.subject;
+    }
+
+    if(postCommentType.index.isInRange(PostCommentType.postGroupTopic.index, PostCommentType.replyGroupTopic.index)){
+      return BangumiTimelineType.group;
+    }
+
+    if(postCommentType.index.isInRange(PostCommentType.postTimeline.index, PostCommentType.replyTimeline.index)){
+      return BangumiTimelineType.timeline;
+    }
+
+    return null;
+
+    
+
+    
+  }
 }
 
 enum BangumiSurfGroupType {

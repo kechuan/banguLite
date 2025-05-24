@@ -3,9 +3,9 @@ import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
-import 'package:bangu_lite/internal/extension.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -21,7 +21,7 @@ class EpCommentTile extends StatefulWidget {
     super.key,
     required this.contentID,
     required this.epCommentData,
-	  this.postCommentType,
+	  required this.postCommentType,
     this.themeColor, 
     this.onUpdateComment,
     this.authorType
@@ -68,7 +68,6 @@ class _EpCommentTileState extends State<EpCommentTile> {
 
 
     return ListTile(
-      
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [

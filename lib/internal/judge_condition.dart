@@ -1,5 +1,5 @@
-import 'package:bangu_lite/internal/const.dart';
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:bangu_lite/internal/convert.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:flutter/material.dart';
 
 class UpdateClient {
