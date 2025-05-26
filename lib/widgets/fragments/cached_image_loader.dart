@@ -35,6 +35,7 @@ class CachedImageLoader extends StatelessWidget {
 
               return CachedNetworkImage(
                 httpHeaders: HttpApiClient.broswerHeader,
+              
                 imageUrl: imageUrl!,
                 imageBuilder: (_,imageProvider){
                   return DecoratedBox(

@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:bangu_lite/catalogs/about_page.dart';
 import 'package:bangu_lite/internal/bus_register_method.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -66,6 +68,8 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
   @override
   void initState(){
 
+    invokeShowUpdateDialog(latestRelease) => showUpdateDialog(context,latestRelease);
+
     carouselSpinTimer();
     calendarLoadFuture = context.read<IndexModel>().loadCalendar();
 
@@ -80,6 +84,10 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
 
     bus.on('LoginRoute', (link) {
       appLoginMethodListener(context, link);
+    });
+
+    pullLatestRelease().then((latestRelease){
+      Future.delayed(const Duration(seconds: 5), ()=> invokeShowUpdateDialog(latestRelease));
     });
     
     super.initState();

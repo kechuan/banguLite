@@ -19,8 +19,6 @@ class TopicModel extends BaseModel<TopicInfo, TopicDetails> {
     );
   }
 
-  Future<void> loadTopic(int topicID) async => await loadContentDetail(topicID);
-
   @override
   createEmptyInfoList() => [TopicInfo.empty()];
   @override

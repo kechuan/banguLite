@@ -143,9 +143,9 @@ void appRouteMethodListener(BuildContext context,String link){
 		final groupNameRegexp = RegExp('group/([^&]+)');
 
         debugPrint(
-			"groupName:${groupNameRegexp.firstMatch(link)?.group(1)}"
-			"groupTitle:${link.split('groupTitle=').last}"
-		);
+          "groupName:${groupNameRegexp.firstMatch(link)?.group(1)}"
+          "groupTitle:${link.split('groupTitle=').last}"
+        );
 
 
         if(context.mounted){
@@ -155,9 +155,9 @@ void appRouteMethodListener(BuildContext context,String link){
             Routes.groups,
             arguments: {
               "selectedGroupInfo": GroupInfo()
-			  	..groupName = groupNameRegexp.firstMatch(link)?.group(1)
-				..groupTitle = link.split('groupTitle=').last
-			,
+              ..groupName = groupNameRegexp.firstMatch(link)?.group(1)
+              ..groupTitle = link.split('groupTitle=').last
+            ,
             }
           );
         }

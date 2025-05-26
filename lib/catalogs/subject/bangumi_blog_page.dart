@@ -1,7 +1,9 @@
 import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/informations/subjects/blog_details.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
@@ -84,6 +86,11 @@ class _BangumiBlogPageState extends BangumiContentPageState
   String getWebUrl(int? blogID)=> BangumiWebUrls.userBlog(blogID ?? 0);
 
   @override
-  Future<void> loadContent(int blogID,{bool isRefresh = false}) => getContentModel().loadBlog(blogID,isRefresh: isRefresh);
+  Future<void> loadContent(int blogID,{bool isRefresh = false}){
+    return getContentModel().loadBlog(
+      blogID,
+      isRefresh: isRefresh,
+      fallbackAction: (message) => showRequestSnackBar(message:message,requestStatus: false,backgroundColor: judgeCurrentThemeColor(context)));
+  }
 
 }

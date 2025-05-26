@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
-//DateTime? lastCallTime;
 
 void showRequestSnackBar(
   {
@@ -14,22 +13,7 @@ void showRequestSnackBar(
   }
 ){
 
-  //final currentTime = DateTime.now();
-  
-  //// 防抖检查
-  //if (
-  //  lastCallTime != null && 
-  //  (currentTime.millisecondsSinceEpoch - (lastCallTime?.millisecondsSinceEpoch ?? 0))~/1000 < 5
-  //) {
-  //  debugPrint("[PostContent] Denied ${(currentTime.millisecondsSinceEpoch - (lastCallTime?.millisecondsSinceEpoch ?? 0))~/1000}");
-  //  return;
-  //}
-
-  //else{
-  //  debugPrint("[PostContent] ${lastCallTime?.millisecond} / ${currentTime.millisecond}");
-  //  lastCallTime = currentTime;
-  //}
-
+ 
   late Widget trailingWidget;
 
   switch(requestStatus){
@@ -63,7 +47,7 @@ void showRequestSnackBar(
         content: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            ScalableText(message),
+            ScalableText(message,style: const TextStyle(color: Colors.black),),
             trailingWidget,
           ],
         ),

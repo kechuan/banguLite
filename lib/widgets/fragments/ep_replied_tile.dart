@@ -4,6 +4,7 @@ import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/comment_replied_sheet.dart';
@@ -49,58 +50,71 @@ class EpRepliedTile extends ListTile {
         child: ListTile(
           tileColor: judgeDarknessMode(context) ? const Color.fromARGB(255, 118, 121, 119) : const Color.fromARGB(225, 212, 232, 215),
           title: Center(
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-            
+                
+                /// 拼接显示方案
                 ...List.generate(
-                  min(3,epCommentData.repliedComment!.length), 
-                  (index){
-                    
-                    return Padding(
-                      padding: PaddingV6,
-                      child: ShowCommentTap(
-                        contentID: contentID,
-                        postCommentType:postCommentType,
-                        epCommentData: epCommentData,
-                        commentIndex: index,
-                        child: Row(
-                          spacing: 12,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ScalableText("${epCommentData.repliedComment![index].userInformation?.nickName}:"),
-                  
-                            Expanded(
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxHeight: AppFontSize.s16 * 6, //字符的字高普遍比字宽大1倍
-                                  maxWidth: double.infinity
-                                   
-                                ),
-                                child: Builder(
-                                  builder: (_) {
-                                    return ScalableText(
-                                      "${
-                                        epCommentData.repliedComment![index].comment
-                                        ?.replaceAll(quoteBBcodeRegexp, '"')
-                                        .replaceAll(bbcodeRegexp, '')
-                                      }",
-                                      maxLines: 3,
-                                      style: const TextStyle(overflow: TextOverflow.ellipsis),
-                                    );
+                  min(3, epCommentData.repliedComment!.length), 
+                  (index) {
+                    final comment = epCommentData.repliedComment![index];
+                    final quoteContent = quoteBBcodeContentRegexp
+                        .firstMatch(comment.comment ?? "")
+                        ?.group(1) ?? "";
+                    final mainContent = comment.comment
+                        ?.split(quoteBBcodeRegexp)
+                        .last
+                        .replaceAll(bbcodeRegexp, '') ?? "";
 
-                                  }
-                                ),
+                        return Padding(
+                          padding: PaddingV6,
+                          child: ShowCommentTap(
+                            contentID: contentID,
+                            postCommentType: postCommentType,
+                            epCommentData: epCommentData,
+                            commentIndex: index,
+                            child: IntrinsicHeight(  // 确保行高一致
+                              child: Row(
+                                spacing: 12,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ScalableText("${comment.userInformation?.nickName}:"),
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: RichText(  // 使用 RichText 合并文本
+                                        text: TextSpan(
+                                          style: TextStyle(
+                                            fontFamilyFallback: convertSystemFontFamily(),
+                                            fontSize: AppFontSize.s16,
+                                            
+                                          ),
+                                          children: [
+                                            if (quoteContent.isNotEmpty) ...[
+                                              TextSpan(
+                                                text: quoteContent.length > 30 
+                                                  ? "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}...\n"
+                                                  : "${quoteContent.replaceAll(bbcodeRegexp, '')}\n",
+                                                style: const TextStyle(fontWeight: FontWeight.bold),
+                                              ),
+                                            ],
+                                            TextSpan(text: mainContent),
+                                          ],
+                                        ),
+                                        maxLines: 4,  // 引用1行 + 内容3行
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            )
-                  
-                          ],
-                        ),
-                        
-                      ),
-                    );
-                    
-                  }
+                            ),
+                          ),
+                        );
+                      }
                 ),
                   
                 if(epCommentData.repliedComment!.length > 3) 

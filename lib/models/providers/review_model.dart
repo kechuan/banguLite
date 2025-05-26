@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/blog_details.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/models/informations/subjects/review_details.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 
@@ -26,7 +28,13 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
     );
   }
 
-  Future<void> loadBlog(int selectedBlogID,{bool isRefresh = false}) async {
+  Future<void> loadBlog(
+    int selectedBlogID,
+    {
+      bool isRefresh = false,
+      Function(String)? fallbackAction
+    }
+  ) async {
 
     if(selectedBlogID == 0 || selectedBlogID == -1) return;
 
@@ -34,12 +42,11 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
 
     await Future.wait(
       [
-        loadContentDetail(selectedBlogID,isRefresh: isRefresh),
+        loadContentDetail(selectedBlogID,isRefresh: isRefresh,fallbackAction: fallbackAction),
         loadBlogComment(selectedBlogID),
         loadBlogPhotos(selectedBlogID),
       ]
     ).then((responseList){
-
       final commentResponse = responseList[1] as Response;
       final photoResponse = responseList[2] as Response;
 

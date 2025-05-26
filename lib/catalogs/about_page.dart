@@ -66,12 +66,9 @@ class AboutPage extends StatelessWidget {
                     title: const ScalableText('检查更新'),
                     onTap: () async {
 
-                      Release release = Release();
-
                       invokeAsyncToaster() => fadeToaster(context: context, message: "暂无更新");
-                      invokeShowUpdateDialog() => showUpdateDialog(context,release);
+                      invokeShowUpdateDialog(latestRelease) => showUpdateDialog(context,latestRelease);
                       
-
                       fadeToaster(context: context, message: "检查中...");
 
                       await pullLatestRelease().then((latestRelease){
@@ -79,8 +76,7 @@ class AboutPage extends StatelessWidget {
                         if(latestRelease==null){ invokeAsyncToaster();}
 
                         else{
-                          release = latestRelease;
-                          invokeShowUpdateDialog();
+                          invokeShowUpdateDialog(latestRelease);
                         }
                         
                       });
@@ -105,7 +101,9 @@ class AboutPage extends StatelessWidget {
   }
 }
 
-void showUpdateDialog(BuildContext context,Release latestRelease){
+void showUpdateDialog(BuildContext context,Release? latestRelease){
+  if(latestRelease==null) return;
+
   showModalBottomSheet(
     context: context, 
     constraints: BoxConstraints(

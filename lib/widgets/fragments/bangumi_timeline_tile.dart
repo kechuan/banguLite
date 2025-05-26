@@ -9,6 +9,7 @@ import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
@@ -24,12 +25,15 @@ class BangumiTimelineTile extends StatelessWidget {
   const BangumiTimelineTile({
     super.key,
     required this.surfTimelineDetails,
-    this.isRecordMode
+    this.isRecordMode,
+    this.onTap
+
     
   });
 
   final SurfTimelineDetails surfTimelineDetails;
   final bool? isRecordMode;
+  final bool Function()? onTap;
 
 
   @override
@@ -37,6 +41,8 @@ class BangumiTimelineTile extends StatelessWidget {
 		return ListTile(
 		contentPadding: const EdgeInsets.all(0),
 		onTap: () {
+
+      if(onTap?.call() == false) return;
 
 			debugPrint("timeline DetailID:${surfTimelineDetails.detailID} timelineType:${surfTimelineDetails.bangumiTimelineType}");
 
