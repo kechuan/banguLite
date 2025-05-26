@@ -111,7 +111,7 @@ enum SeasonType{
 
 enum AppThemeColor{
   ice(Color.fromARGB(255, 219, 251, 255)),
-  macha(Color.fromARGB(255, 219, 245, 223)),
+  macha(Color.fromARGB(255, 198, 228, 203)),
   sea(Color.fromARGB(255, 140, 205, 244)), //Primary: const Color.fromARGB(255, 140, 205, 244)
   ruby(Color.fromARGB(255, 255, 217, 217)),
   ;

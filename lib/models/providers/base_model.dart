@@ -126,7 +126,7 @@ abstract class BaseModel
           contentDetailData[contentID] = convertResponseToDetail(response.data) as D;
           debugPrint("$contentID load content done");
           contentDetailCompleter.complete(true);
-          //notifyListeners();
+          notifyListeners();
         }
       });
     } 

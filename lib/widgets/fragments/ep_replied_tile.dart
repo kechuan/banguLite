@@ -46,9 +46,12 @@ class EpRepliedTile extends ListTile {
     return Padding(
       padding: Padding16,
       child: Container(
-        decoration: BoxDecoration(border: Border.all()),
+        decoration: BoxDecoration(
+          border: Border.all(),
+          borderRadius: BorderRadius.circular(12),
+          color: judgeDarknessMode(context) ? const Color.fromARGB(255, 118, 121, 119) : const Color.fromARGB(225, 212, 232, 215),
+        ),
         child: ListTile(
-          tileColor: judgeDarknessMode(context) ? const Color.fromARGB(255, 118, 121, 119) : const Color.fromARGB(225, 212, 232, 215),
           title: Center(
 
             child: Column(
@@ -98,10 +101,13 @@ class EpRepliedTile extends ListTile {
                                                 text: quoteContent.length > 30 
                                                   ? "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}...\n"
                                                   : "${quoteContent.replaceAll(bbcodeRegexp, '')}\n",
-                                                style: const TextStyle(fontWeight: FontWeight.bold),
-                                              ),
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: judgeDarknessMode(context) ? Colors.white : Colors.black)
+                                                
+                                                ),
                                             ],
-                                            TextSpan(text: mainContent),
+                                            TextSpan(text: mainContent,style: TextStyle(color: judgeDarknessMode(context) ? Colors.white : Colors.black)),
                                           ],
                                         ),
                                         maxLines: 4,  // 引用1行 + 内容3行

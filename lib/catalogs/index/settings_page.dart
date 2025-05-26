@@ -475,17 +475,9 @@ class ClearCacheTile extends ListTile{
           child: Center(
             child: ListTile(
               onTap: () async {
-                computingStatusNotifier.value = true;
-            
-                final indexModel = context.read<IndexModel>();
 
-                if(MyHive.cachedImageDir.existsSync()){
-                  await MyHive.cachedImageDir.delete(recursive: true).then((_){
-                    indexModel.updateCachedSize().then(
-                      (_)=>computingStatusNotifier.value = false
-                    );
-                  });
-                }
+                computingStatusNotifier.value = true;
+                context.read<IndexModel>().updateCachedSize().then((_)=>computingStatusNotifier.value = false);
                 
               },
               title: Row(
@@ -495,9 +487,20 @@ class ClearCacheTile extends ListTile{
                   Row(
                     children: [
                       IconButton(
-                        onPressed: (){
-                          context.read<IndexModel>().updateCachedSize().then((_)=>computingStatusNotifier.value = false);
+                        onPressed: () async {
+
                           computingStatusNotifier.value = true;
+            
+                          final indexModel = context.read<IndexModel>();
+
+                          if(MyHive.cachedImageDir.existsSync()){
+                            await MyHive.cachedImageDir.delete(recursive: true).then((_){
+                              indexModel.updateCachedSize().then(
+                                (_)=>computingStatusNotifier.value = false
+                              );
+                            });
+                          }
+                          
                         },
                         icon: const Icon(Icons.refresh)
                       ),

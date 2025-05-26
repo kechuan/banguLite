@@ -2,6 +2,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -99,7 +100,7 @@ class BangumiAuthPage extends StatelessWidget {
                 ),
                 child: Padding(
                   padding: Padding16,
-                  child: BBCodeText(
+                  child: AdapterBBCodeText(
                     data: 
                       '[center]本软件支持 [color=F1A8D6]Bangumi[/color] 登录,登录后即可透过本软件管理你的 [color=F1A8D6]Bangumi[/color] 账号,用于执行发帖、回帖、点赞、收藏等操作。[/center]\n'
                       '[center]当然即使 [b]不登录[/b]，你依旧可以像浏览未登录情况下的 [color=F1A8D6]Bangumi[/color] 网站一样使用本软件。[/center]'

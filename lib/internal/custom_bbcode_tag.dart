@@ -5,8 +5,6 @@ import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/informations/surf/user_details.dart';
-import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/comment_image_panel.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -68,7 +66,6 @@ final allEffectTag = [
 ];
 
 final richlessEffectTag = allEffectTag.getRange(0, allEffectTag.length - 4);
-
 
 class MaskDisplay extends StatelessWidget {
     final String maskText;

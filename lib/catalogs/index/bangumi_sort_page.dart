@@ -3,6 +3,7 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_wave_footer.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -249,6 +250,8 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                 initialItemCount: messageList.isEmpty ? 1 : messageList.length,
                                 
                                 itemBuilder: (_, index, animation) {
+
+                                  if(viewType != ViewType.listView) return const SizedBox.shrink();
                         
                                   //debugPrint("index:$index");
                               
@@ -264,16 +267,16 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                   return FadeTransition(
                                     opacity: animation,
                                     child: BangumiListTile(
-										bangumiDetails: messageList[index],
-                                      	imageSize: const Size(100,150),
-										onTap: () {
-											Navigator.pushNamed(
-											context,
-											Routes.subjectDetail,
-											arguments: {"subjectID":messageList[index].id}
-											);
-										},
-                              
+                                      bangumiDetails: messageList[index],
+                                      imageSize: const Size(100,150),
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                        context,
+                                        Routes.subjectDetail,
+                                        arguments: {"subjectID":messageList[index].id}
+                                        );
+                                      },
+                                                
                               
                                     )
                               
@@ -287,21 +290,22 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                             SliverOffstage(
                               offstage: viewType != ViewType.gridView || loadCount == 0,
 
-
                               sliver: SliverPadding(
                                 padding: const EdgeInsets.all(16),
                                 sliver: SliverAnimatedGrid(
                                   key: messageGridStreamKey,
                                   initialItemCount: messageList.length,
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 4 : 2,
                                     mainAxisSpacing: 32,
                                     crossAxisSpacing: 16,
                                   ),
                                   itemBuilder: (context, currentBangumiIndex, animation) {
+
+                                    if(viewType != ViewType.gridView) return const SizedBox.shrink();
                                 
                                     if(currentBangumiIndex > messageList.length - 1){
-                                      debugPrint("prevent strangeOverFlow rebuild");
+                                      debugPrint("prevent strangeOverFlow rebuild: $currentBangumiIndex/${messageList.length}");
                                       return const SizedBox.shrink();
                                     }
                                 
@@ -331,30 +335,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                 ),
                               )
 
-                              //  child: Padding(
-                              //    padding: const EdgeInsets.all(16),
-                              //    child: NotificationListener<ScrollUpdateNotification>(
-                              //      onNotification: (notification) => true,
-                              //      child: BanguTileGridView(
-                              //        keyDeliver: messageGridStreamKey,
-                              //        bangumiLists: messageList,
-                              //      ),
-                              //    ),
-                              //  ),
-                              //),
-
-                              //sliver: SliverToBoxAdapter(
-                              //  child: Padding(
-                              //    padding: const EdgeInsets.all(16),
-                              //    child: NotificationListener<ScrollUpdateNotification>(
-                              //      onNotification: (notification) => true,
-                              //      child: BanguTileGridView(
-                              //        keyDeliver: messageGridStreamKey,
-                              //        bangumiLists: messageList,
-                              //      ),
-                              //    ),
-                              //  ),
-                              //),
+                     
 
 
                             )
@@ -422,17 +403,22 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                   child: child!
                 );
               },
-              child: SizedBox(
-                  height: 70,
-                  child: ElevatedButton(
-                    onPressed: (){
-                      messageList.length > 30 ?
-                      sortScrollController.jumpTo(0) :
-                      sortScrollController.animateTo(0,duration: const Duration(milliseconds: 300), curve: Curves.linear);
-                    },
-                    child: const Icon(Icons.arrow_upward)
-                  ),
-                )
+              child: FloatingActionButton.extended(
+                backgroundColor: judgeCurrentThemeColor(context),
+                label: const Row(
+                  spacing: 12,
+                  children: [
+                    Text("回顶部"),
+                    Icon(Icons.arrow_upward)
+                  ],
+                ),
+                onPressed: (){
+                  messageList.length > 30 ?
+                  sortScrollController.jumpTo(0) :
+                  sortScrollController.animateTo(0,duration: const Duration(milliseconds: 300), curve: Curves.linear);
+                },
+           
+              )
             ),
         );
       }

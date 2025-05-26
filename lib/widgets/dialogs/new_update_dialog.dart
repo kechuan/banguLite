@@ -153,7 +153,16 @@ class NewUpdateDialog extends StatelessWidget {
                       ],
                     ),
                     trailing: IconButton(
+                      
                       onPressed: (){
+
+                        if(UpdateClient.updateClient.speedTimer != null){
+                          fadeToaster(context: context,message: "已存在进行中的任务");
+                          return;
+                        }
+
+                        fadeToaster(context: context,message: "开始下载 ${latestRelease.assets![index].name}");
+
                         UpdateClient.getInstance().totalSize = latestRelease.assets![index].size ?? 0;
                         downloadApplication(
                           context,

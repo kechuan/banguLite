@@ -5,11 +5,11 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
@@ -17,7 +17,6 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class BangumiTimelineTile extends StatelessWidget {
@@ -60,23 +59,23 @@ class BangumiTimelineTile extends StatelessWidget {
 
 					else{
 
-						MyHive.historySurfDataBase.put(
-						surfTimelineDetails.detailID,
-						surfTimelineDetails.copyWithUpdateAt(surfTimelineDetails)
-						);
+						//MyHive.historySurfDataBase.put(
+            //  surfTimelineDetails.detailID,
+            //  surfTimelineDetails.copyWithUpdateAt(surfTimelineDetails)
+						//);
 
 						if(surfTimelineDetails.sourceTitle == "博客"){
-						bus.emit(
-							"AppRoute",
-							BangumiWebUrls.userBlog(surfTimelineDetails.detailID ?? 0)
-						);
+              bus.emit(
+                "AppRoute",
+                BangumiWebUrls.userBlog(surfTimelineDetails.detailID ?? 0)
+              );
 						}
 
 						else{
-						bus.emit(
-							"AppRoute",
-							'${BangumiWebUrls.subjectTopic(surfTimelineDetails.detailID ?? 0)}?topicTitle=${surfTimelineDetails.title}'
-						);
+              bus.emit(
+                "AppRoute",
+                '${BangumiWebUrls.subjectTopic(surfTimelineDetails.detailID ?? 0)}?topicTitle=${surfTimelineDetails.title}'
+              );
 						}
 
 
@@ -122,25 +121,27 @@ class BangumiTimelineTile extends StatelessWidget {
 				crossAxisAlignment: CrossAxisAlignment.start,
 				children: [
 					
-					BBCodeText(
-					data: '${surfTimelineDetails.title}',
-					stylesheet: appDefaultStyleSheet(context)
+
+          AdapterBBCodeText(
+            data: '${surfTimelineDetails.title}',
+            stylesheet: appDefaultStyleSheet(context,richless: true),
+            maxLine: 3,
 					),
 					
 
 					if(
-					surfTimelineDetails.commentDetails?.rate != null &&
-					surfTimelineDetails.commentDetails?.rate != 0
-					)
-					SizedBox(
-						height: 50,
-						child: StarScoreList(
-						ratingScore: surfTimelineDetails.commentDetails?.rate ?? 0,
-						themeColor: judgeCurrentThemeColor(context),
-						)
-					)
-				],
-				),
+            surfTimelineDetails.commentDetails?.rate != null &&
+            surfTimelineDetails.commentDetails?.rate != 0
+          )
+            SizedBox(
+              height: 50,
+              child: StarScoreList(
+                ratingScore: surfTimelineDetails.commentDetails?.rate ?? 0,
+                themeColor: judgeCurrentThemeColor(context),
+              )
+            )
+          ],
+          ),
 				),
 
 
@@ -165,7 +166,7 @@ class BangumiTimelineTile extends StatelessWidget {
 						minWidth: min(constraint.maxWidth*2/3, 250),
 						maxWidth: constraint.maxWidth - 80,
 					),
-					child: BBCodeText(
+					child: AdapterBBCodeText(
 						data: "[quote]${surfTimelineDetails.commentDetails?.comment}[/quote]",
 						stylesheet: appDefaultStyleSheet(context,richless: true)
 					)

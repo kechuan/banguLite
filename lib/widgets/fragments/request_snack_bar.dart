@@ -9,17 +9,15 @@ void showRequestSnackBar(
     bool? requestStatus,
     String? message,
     Duration? duration,
-    Color? backgroundColor
+    Color? backgroundColor,
+    Widget? trailingWidget
   }
 ){
-
- 
-  late Widget trailingWidget;
 
   switch(requestStatus){
 
     case null:{
-      trailingWidget = const SizedBox(
+      trailingWidget ??= const SizedBox(
         height: 25,
         width: 25,
         child: CircularProgressIndicator()
@@ -29,12 +27,12 @@ void showRequestSnackBar(
     }
       
     case true:{
-      trailingWidget = const Icon(Icons.done_all);
+      trailingWidget ??= const Icon(Icons.done_all);
       message ??= "发送成功";
     }
       
     case false:{
-      trailingWidget = const Icon(Icons.close);
+      trailingWidget ??= const Icon(Icons.close);
       message ??= "发送失败";
     }
       

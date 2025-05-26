@@ -16,7 +16,6 @@ class HttpApiClient{
 
   static Map<String,String> broswerHeader = {
     "User-Agent":'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0',
-    "Referer": "https://bangumi.tv/"
   };
 
   static Map<String,String> nonWebviewHeader = {
@@ -412,7 +411,7 @@ class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.9.0",
+                      version = "0.9.1",
                       author = "kechuan"
   ;
 

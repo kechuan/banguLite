@@ -10,6 +10,7 @@ import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_tab_content_select.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
@@ -87,7 +88,18 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
     });
 
     pullLatestRelease().then((latestRelease){
-      Future.delayed(const Duration(seconds: 5), ()=> invokeShowUpdateDialog(latestRelease));
+      if(latestRelease == null) return;
+      
+      Future.delayed(
+        const Duration(seconds: 5), 
+        ()=> showRequestSnackBar(
+          message: "检测到新版本",
+          trailingWidget: TextButton(
+            onPressed: ()=> invokeShowUpdateDialog(latestRelease),
+            child: const Text('去更新',style: TextStyle(color: Colors.black),)
+          )
+        )
+      );
     });
     
     super.initState();

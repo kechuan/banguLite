@@ -9,9 +9,11 @@ class DateRangeSelect extends StatelessWidget {
   const DateRangeSelect({
     super.key,
     required this.dateRangeEditingController,
+    this.initMonth
   });
 
   final TextEditingController dateRangeEditingController;
+  final int? initMonth;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +74,7 @@ class DateRangeSelect extends StatelessWidget {
             isExpanded: true,
             isDense: true,
             menuMaxHeight: (kMinInteractiveDimension*3),
-
+            value: initMonth,
             items: [
               ...List.generate(
                 12, (index){

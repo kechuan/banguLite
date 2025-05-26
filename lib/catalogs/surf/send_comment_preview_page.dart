@@ -1,9 +1,10 @@
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 @FFRoute(name: '/commentPreview')
 class SendCommentPreview extends StatelessWidget {
@@ -19,11 +20,17 @@ class SendCommentPreview extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('预览')),
-      body: Padding(
-        padding: Padding16,
-        child: BBCodeText(
-          data: convertBangumiCommentSticker(renderText),
-          stylesheet: appDefaultStyleSheet(context)
+      body: EasyRefresh(
+        child: SizedBox.expand(
+          child: Padding(
+            padding: Padding16,
+            child: SingleChildScrollView(
+              child: AdapterBBCodeText(
+                data: convertBangumiCommentSticker(renderText),
+                stylesheet: appDefaultStyleSheet(context)
+              ),
+            ),
+          ),
         ),
       ),
 

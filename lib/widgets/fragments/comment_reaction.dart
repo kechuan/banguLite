@@ -241,12 +241,9 @@ class _CommentReactionState extends State<CommentReaction> {
                                 color: judgeDarknessMode(context) ? Colors.black : Colors.white
                               ),
 
-                              child: ScalableText("${
-                                //以 reactDataLike 为本地标准
-
-                                (localCommentReactions[dataLikeIndex]?.length ?? 0)
-
-                              }")
+                              child: ScalableText(
+                                "${localCommentReactions[dataLikeIndex]?.length ?? 0}"
+                              )
                           ),
                         ],
                       ),

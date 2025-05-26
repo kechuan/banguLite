@@ -4,6 +4,7 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -19,7 +20,6 @@ import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -290,7 +290,7 @@ class UserInformationDialog extends StatelessWidget {
                                                                                             style: const TextStyle(color: Colors.blueGrey, fontSize: 14),
                                                                                         ),
 
-                                                                                        BBCodeText(
+                                                                                        AdapterBBCodeText(
                                                                                             data: convertTimelineDescription(timelineActions[index]),
                                                                                             stylesheet: appDefaultStyleSheet(context)
                                                                                         ),

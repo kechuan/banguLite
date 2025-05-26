@@ -6,6 +6,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/extract.dart';
@@ -226,7 +227,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                   child: EasyRefresh(
                                       child: ConstrainedBox(
                                           constraints: const BoxConstraints(maxHeight: 200),
-                                          child: BBCodeText(
+                                          child: AdapterBBCodeText(
                                               data: '${widget.title?.split('回复').last} 说: ${widget.referenceObject}',
                                               stylesheet: appDefaultStyleSheet(context,richless: true)
                                   
@@ -705,7 +706,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                                             child: ScalableText('[${BBCodeTag.values[index].name}]',),
                                                         ),
                                                         child: Center(
-                                                            child: BBCodeText(
+                                                            child: AdapterBBCodeText(
                                                                 data: '[${BBCodeTag.values[index].name}]${BBCodeTag.values[index].tagName}[/${BBCodeTag.values[index].name}]',
 
                                                                 stylesheet: BBStylesheet(
@@ -752,7 +753,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                                 ),
                                                 child: Center(
                                                     child: AbsorbPointer(
-                                                        child: BBCodeText(
+                                                        child: AdapterBBCodeText(
                                                             data: '[url=]超链接[/url]',
                                                             stylesheet: BBStylesheet(
                                                                 tags: allEffectTag,

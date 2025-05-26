@@ -168,7 +168,8 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                     body: EasyRefresh(
                       header: const MaterialHeader(),
                       footer: const MaterialFooter(),
-                      refreshOnStart: widget.selectedGroupInfo?.groupName != null,
+                      //refreshOnStart: widget.selectedGroupInfo?.groupName == null,
+                      refreshOnStart: true,
                       onRefresh: () => loadUIGroupTopics(context),
                       onLoad: () => loadUIGroupTopics(context, isAppend: true),
       

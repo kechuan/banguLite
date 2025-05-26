@@ -1,6 +1,8 @@
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
@@ -204,6 +206,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                           opacity: (currentNotification.isUnRead == true) ? 1 : 0.65,
                           child: listTile!
                         );
+
                       },
                       child: ListTile(
                         onTap: (){
@@ -235,7 +238,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                             ),
                                               
                             Expanded(
-                              child: BBCodeText(
+                              child: AdapterBBCodeText(
                                 data: 
                                   '[url=${BangumiWebUrls.user('${currentNotification.userInformation?.userName}')}]${currentNotification.userInformation?.getName()}[/url] '
                                   '${currentNotification.notificationType?.notificationTypeName} '
@@ -255,6 +258,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                                     overflow: TextOverflow.ellipsis,
                                     fontSize: 16,
                                     fontFamilyFallback: convertSystemFontFamily(),
+                                    color: judgeDarknessMode(context) ? Colors.white : Colors.black,
                                   )
                                 ),
                                 

@@ -39,127 +39,130 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
     final indexModel = context.read<IndexModel>();
 
     loadInformationFuture ??= loadByteInformation(widget.imageUrl);
+
+    RequestByteInformation? pictureRequestInformation;
     
     return FutureBuilder(
       future: loadInformationFuture,
       builder: (_,snapshot) {
 
+
+       
+
         switch(snapshot.connectionState){
 
           case ConnectionState.done:{
-            if(snapshot.hasData && snapshot.data!=null){
 
-                RequestByteInformation pictureRequestInformation = snapshot.data;
+            pictureRequestInformation = snapshot.data;
 
-                bool isValid = 
-                  pictureRequestInformation.contentLength != null ||
-                  excludeImageFormatted.contains(pictureRequestInformation.contentType?.split("/")[1]) == true
-                ;
+             bool isValid = 
+              pictureRequestInformation?.contentLength != null ||
+              excludeImageFormatted.contains(pictureRequestInformation?.contentType?.split("/")[1]) == true
+            ;
 
-                debugPrint("loadStatus: ${indexModel.userConfig.isManuallyImageLoad}");
-
-                if(isValid && indexModel.userConfig.isManuallyImageLoad == false){
-                  imageLoadNotifier.value = true;
-                }
-
-                return Card(
-                  shadowColor: Colors.white,
-                  elevation: 6,
-                  child: UnVisibleResponse(
-                    onTap: (){
-                      if(!isValid){
-                        Navigator.pushNamed(
-                          context,
-                          Routes.webview,
-                          arguments: {"url":widget.imageUrl},
-                        );
-                      }
-
-                      else{
-                        imageLoadNotifier.value = true;
-                      }
-                      
-                    },
-                    child: ValueListenableBuilder(
-                      valueListenable: imageLoadNotifier,
-                      builder: (_,imageLoadNotifier,child) {
-                  
-                        if(imageLoadNotifier == false){
-                          return SizedBox(
-                            height: 200,
-                            width: 200,
-                            child: Column(
-                              
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Spacer(),
-
-                                Expanded(
-                                  child: ConstrainedBox(
-                                    constraints: const BoxConstraints(maxWidth: 200),
-                                    child: ScalableText(
-                                      !isValid ? "图片无法加载" : "点击查看图片",
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(color: !isValid ? Colors.grey : null),
-                                    )
-                                  ),
-                                ),
-
-                                (!isValid) ? Padding(
-                                  padding: PaddingV12,
-                                  child: Column(
-                                    spacing: 12,
-                                    children: [
-                                      const ScalableText("点击跳转以查看图片",style: TextStyle(fontWeight: FontWeight.bold)),
-                                      ScalableText("link: ${widget.imageUrl}",maxLines: 3,overflow: TextOverflow.ellipsis,textAlign: TextAlign.center,),
-                                    ],
-                                  ),
-                                ): const SizedBox.shrink(),
-                                
-                                isValid ? Padding(
-                                  padding: PaddingV6,
-                                  child: Column(
-                                    spacing: 12,
-                                    children: [
-                                      ScalableText("size: ${convertTypeSize(pictureRequestInformation.contentLength ?? 0)}"),
-                                      ScalableText("type: ${pictureRequestInformation.contentType}"),
-                                    ],
-                                  ),
-                                ) : const SizedBox.shrink()
-                                
-                              ],
-                            ),
-                          );
-                        }
-
-                        return CachedNetworkImage(
-                          imageUrl: widget.imageUrl,
-                          progressIndicatorBuilder: (context, url, progress){ 
-              
-                            return LoadingCard(
-                              progress: "${((progress.progress ?? 0.0)*100).toStringAsFixed(2)}%",
-                            );
-
-                          },
-                          imageBuilder: (_, imageProvider) {
-                            return UnVisibleResponse(
-                              onTap: (){
-                                  Navigator.pushNamed(
-                                  context,
-                                  Routes.photoView,
-                                  arguments: {"imageProvider":imageProvider},
-                                );
-                              },
-                              child: Image(image: imageProvider)
-                            );
-                          },
-                        );
-                        
-                      }
-                    ),
-                  ),
-                );
+            if(isValid && indexModel.userConfig.isManuallyImageLoad == false){
+              debugPrint("loadStatus: ${indexModel.userConfig.isManuallyImageLoad}");
+              imageLoadNotifier.value = true;
             }
+
+            return Card(
+              shadowColor: Colors.white,
+              elevation: 6,
+              child: UnVisibleResponse(
+                onTap: (){
+                  if(!isValid){
+                    Navigator.pushNamed(
+                      context,
+                      Routes.webview,
+                      arguments: {"url":widget.imageUrl},
+                    );
+                  }
+
+                  else{
+                    imageLoadNotifier.value = true;
+                  }
+                  
+                },
+                child: ValueListenableBuilder(
+                  valueListenable: imageLoadNotifier,
+                  builder: (_,imageLoadNotifier,child) {
+              
+                    if(imageLoadNotifier == false){
+                      return SizedBox(
+                        height: 200,
+                        width: 200,
+                        child: Column(
+                          
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Spacer(),
+
+                            Expanded(
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(maxWidth: 200),
+                                child: ScalableText(
+                                  !isValid ? "图片无法加载" : "点击查看图片",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(color: !isValid ? Colors.grey : null),
+                                )
+                              ),
+                            ),
+
+                            (!isValid) ? Padding(
+                              padding: PaddingV12,
+                              child: Column(
+                                spacing: 12,
+                                children: [
+                                  const ScalableText("点击跳转以查看图片",style: TextStyle(fontWeight: FontWeight.bold)),
+                                  ScalableText("link: ${widget.imageUrl}",maxLines: 3,overflow: TextOverflow.ellipsis,textAlign: TextAlign.center,),
+                                ],
+                              ),
+                            ): const SizedBox.shrink(),
+                            
+                            isValid ? Padding(
+                              padding: PaddingV6,
+                              child: Column(
+                                spacing: 12,
+                                children: [
+                                  ScalableText("size: ${convertTypeSize(pictureRequestInformation?.contentLength ?? 0)}"),
+                                  ScalableText("type: ${pictureRequestInformation?.contentType}"),
+                                ],
+                              ),
+                            ) : const SizedBox.shrink()
+                            
+                          ],
+                        ),
+                      );
+                    }
+
+                    return CachedNetworkImage(
+                      imageUrl: widget.imageUrl,
+                      progressIndicatorBuilder: (context, url, progress){ 
+          
+                        return LoadingCard(
+                          progress: "${((progress.progress ?? 0.0)*100).toStringAsFixed(2)}%",
+                        );
+
+                      },
+                      imageBuilder: (_, imageProvider) {
+                        return UnVisibleResponse(
+                          onTap: (){
+                              Navigator.pushNamed(
+                              context,
+                              Routes.photoView,
+                              arguments: {"imageProvider":imageProvider},
+                            );
+                          },
+                          child: Image(image: imageProvider)
+                        );
+                      },
+                    );
+                    
+                  }
+                ),
+              ),
+            );
+
           }
 
           default: {}

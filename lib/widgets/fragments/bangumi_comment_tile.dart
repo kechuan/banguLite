@@ -1,5 +1,6 @@
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
@@ -8,7 +9,6 @@ import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
 import 'package:flutter/material.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
-import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 class BangumiCommentTile extends StatelessWidget {
   const BangumiCommentTile({
@@ -95,7 +95,7 @@ class BangumiCommentTile extends StatelessWidget {
           //比直接使用Scaffold更轻量化的隔离scroll physic 手段
           ScrollConfiguration(
             behavior: ScrollConfiguration.of(context).copyWith(physics: const NeverScrollableScrollPhysics()),
-            child: BBCodeText(
+            child: AdapterBBCodeText(
               data: convertBangumiCommentSticker(commentData.comment ?? "comment"),
               stylesheet: appDefaultStyleSheet(context,selectableText:true)
             ),

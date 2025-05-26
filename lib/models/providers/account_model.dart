@@ -3,7 +3,6 @@
 import 'dart:async';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/bangumi_define/response_status_code.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:bangu_lite/internal/hive.dart';
@@ -432,6 +431,7 @@ class AccountModel extends ChangeNotifier {
                 "空数据错误:"
                 "postContentType:$postContentType / subjectID:$subjectID / requestUrl:$requestUrl"
             );
+            fallbackAction?.call("发送失败");
             contentCompleter.complete(0);
         }
 

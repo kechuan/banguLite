@@ -206,11 +206,16 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
 
                   //网络层 Callback
                   await invokeSendComment(content).then((resultID){
+                    debugPrint("[EditContent] sendMessageresultID:$resultID SendContent: $content");
+
                     if(resultID != 0){
-                      debugPrint("[EditContent] sendMessageresultID:$resultID SendContent: $content");
                       //UI层 Callback
                       widget.onUpdateComment?.call(content);
                       invokeRequestSnackBar(requestStatus: true);
+                    }
+
+                    else{
+                      invokeRequestSnackBar(message: "发送失败",requestStatus: false);
                     }
                   });
 
@@ -276,6 +281,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                           [
                             /// Blog有点特殊 一般人无法修改带有replies 的 comment
                             /// "you don't have permission to edit a comment with replies"
+                            PostCommentType.subjectComment,
                             PostCommentType.postTimeline,
                             PostCommentType.replyTimeline,
                           ].contains(widget.postCommentType)

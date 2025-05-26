@@ -161,21 +161,20 @@ abstract class BangumiContentPageState<
                     future: contentFuture,
                     builder: (_, snapshot) {
 
-                      if(snapshot.data == false){
+                      final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
+                      final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
+                      final int commentListCount = (getCommentCount(contentDetail, isCommentLoading) ?? 0);
+
+                      if(snapshot.data == false && contentDetail?.detailID == 0){
                         return const Center(
                           child: ScalableText("加载失败"),
                         );
                       }
-		
-                      final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
-                      final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
-                      final int commentListCount = (getCommentCount(contentDetail, isCommentLoading) ?? 0);
 
                       int resultCommentCount = getPostCommentType() == PostCommentType.replyTopic ?
                       commentListCount :
                       commentListCount+1
                       ;
-
 
                       if(contentDetail?.detailID != 0){
 
@@ -185,12 +184,12 @@ abstract class BangumiContentPageState<
 
                           
                           case PostCommentType.replyTopic:
-                          case PostCommentType.replyBlog:{
+                          case PostCommentType.replyBlog:
+                          case PostCommentType.replyGroupTopic:
+                          {
 
 
                             subjectTitle =  getPostCommentType() == PostCommentType.replyTopic ? '帖子' : '博客';
-
-                            
 
                             MyHive.historySurfDataBase.put(
                               getSubContentID() ?? contentInfo.id ?? 0,
