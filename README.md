@@ -6,7 +6,7 @@
 
 
 
-![Platform](https://img.shields.io/badge/support%20platform-android %7C windows-green) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b5d3920ab1d04d3baaca63ce5a8ea09a)](https://app.codacy.com/gh/kechuan/banguLite?utm_source=github.com&utm_medium=referral&utm_content=kechuan/banguLite&utm_campaign=Badge_Grade) ![GitHub Downloads](https://img.shields.io/github/downloads/kechuan/banguLite/total)
+![Platform](https://img.shields.io/badge/support%20platform-android%7Cwindows-green) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b5d3920ab1d04d3baaca63ce5a8ea09a)](https://app.codacy.com/gh/kechuan/banguLite?utm_source=github.com&utm_medium=referral&utm_content=kechuan/banguLite&utm_campaign=Badge_Grade) ![GitHub Downloads](https://img.shields.io/github/downloads/kechuan/banguLite/total)
 
 
 
