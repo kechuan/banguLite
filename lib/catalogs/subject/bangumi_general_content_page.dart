@@ -188,8 +188,11 @@ abstract class BangumiContentPageState<
                           case PostCommentType.replyGroupTopic:
                           {
 
+                            final accessID = getSubContentID() ?? contentInfo.id ?? 0;
 
-                            subjectTitle =  getPostCommentType() == PostCommentType.replyTopic ? '帖子' : '博客';
+                            subjectTitle = getPostCommentType() == PostCommentType.replyTopic ? '帖子' : '博客';
+
+                            if(accessID == 0) break;
 
                             MyHive.historySurfDataBase.put(
                               getSubContentID() ?? contentInfo.id ?? 0,

@@ -165,9 +165,9 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
   }
 
   // 切换多选模式
-  void toggleMultiSelectMode() async {
+  void toggleMultiSelectMode({bool? isOpen}) async {
 	
-	multiSelectModeNotifier.value = !multiSelectModeNotifier.value;
+	multiSelectModeNotifier.value = isOpen ?? !multiSelectModeNotifier.value;
 
 	multiSelectModeNotifier.value ? 
 	await bottomBarController.forward() : 
@@ -269,8 +269,8 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
 							...[
 								IconButton(
 								onPressed: ()=> toggleMultiSelectMode(),
-								icon: const Icon(Icons.checklist),
-								tooltip: '多选模式',
+									icon: const Icon(Icons.checklist),
+									tooltip: '多选模式',
 								),
 								IconButton(
 								onPressed: (){
@@ -279,10 +279,13 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
 										title: "清空全部历史记录",
 										content: "确定要清空全部历史记录吗？",
 										confirmAction: (){
-											//MyHive.historySurfDataBase.clear();
-											toggleMultiSelectMode();
+
+											setState(() {
+												toggleMultiSelectMode(isOpen: false);
+												MyHive.historySurfDataBase.clear();
+											});
 				
-											//fadeToaster(context: context, message: '历史记录已清空');
+											fadeToaster(context: context, message: '历史记录已清空');
 										}
 				
 									);
@@ -469,7 +472,7 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
         shrinkWrap: true,
         itemBuilder: (_, index) {
           final item = rangeData[index];
-          final itemID = item.detailID!;
+          final itemID = item.detailID;
           final isDeleting = deletingItems.contains(itemID);
         //  final isSelected = selectedItems.contains(itemID);
 
@@ -597,7 +600,10 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
     		    			child: BangumiTimelineTile(
     							onTap: () {
     								if(multiSelectModeNotifier.value){ 
-    									toggleItemSelection(item.detailID!);
+										if(item.detailID != null){
+											toggleItemSelection(item.detailID!);
+										}
+    									
     									return false;
     								}
     

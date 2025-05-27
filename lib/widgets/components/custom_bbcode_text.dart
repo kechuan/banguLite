@@ -4,10 +4,10 @@ import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 class AdapterBBCodeText extends BBCodeText{
   const AdapterBBCodeText({
+    required super.data,
     super.key,
     super.stylesheet,
     super.errorBuilder,
-    required super.data,
     this.maxLine
   });
 
