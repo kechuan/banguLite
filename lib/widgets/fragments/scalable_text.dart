@@ -22,28 +22,28 @@ class ScalableText extends Text {
     TextStyle? currentStyle = style ?? const TextStyle();
     double? originalSize = currentStyle.fontSize;
 
+    final resultStyle = currentStyle.copyWith(
+        fontSize: originalSize != null ? 
+          AppFontSize.getScaledSize(originalSize) : 
+          AppFontSize.getScaledSize(AppFontSize.s16)
+        ,
+        overflow: overflow
+      );
+
     return selectable ?
     SelectableText(
       text,
-      style: currentStyle.copyWith(
-        fontSize: originalSize != null ? 
-          AppFontSize.getScaledSize(originalSize) : 
-          AppFontSize.getScaledSize(AppFontSize.s16)
-      ),
+      style: resultStyle,
       textAlign:textAlign,
       maxLines: maxLines,
+      
     ) :
     Text(
       text,
-      
-      style: currentStyle.copyWith(
-        fontSize: originalSize != null ? 
-          AppFontSize.getScaledSize(originalSize) : 
-          AppFontSize.getScaledSize(AppFontSize.s16)
-      ),
+      style: resultStyle,
       textAlign: textAlign,
       maxLines: maxLines,
-      overflow: overflow,
+
     );
   }
 }

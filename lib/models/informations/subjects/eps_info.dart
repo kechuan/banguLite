@@ -1,5 +1,4 @@
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:dio/dio.dart';
 
 class EpsInfo {
   String? airDate;
@@ -50,34 +49,6 @@ List<EpsInfo> loadEpsData(List bangumiEpsInfoResponse){
         
 }
 
-List<EpsInfo> loadSingleEp(Response bangumiEpsInfoResponse){
-  
-  List epsDataList = bangumiEpsInfoResponse.data["data"];
-
-  List<EpsInfo> currentBangumiEpsInfo = [];
-
-  for(Map currentEpInfoMap in epsDataList){
-    EpsInfo currentEpInfo = EpsInfo();
-
-    currentEpInfo
-      ..airDate = currentEpInfoMap["airdate"]
-      ..name = convertAmpsSymbol(currentEpInfoMap["name"])
-      ..nameCN = convertAmpsSymbol(currentEpInfoMap["name_cn"])
-      ..epID = currentEpInfoMap["id"]
-      ..epIndex = currentEpInfoMap["ep"]
-      ..sort = currentEpInfoMap["sort"]
-      ..type = currentEpInfoMap["type"]
-      ..commentLength = currentEpInfoMap["comment"]
-      ..description = currentEpInfoMap["desc"]
-    ;
-
-      currentBangumiEpsInfo.add(currentEpInfo);
-      
-  }
-
-  return currentBangumiEpsInfo;
-        
-}
 
 String convertCollectionName(EpsInfo? currentInfo,num currentEpIndex){
   if(currentInfo==null) return "loading";
