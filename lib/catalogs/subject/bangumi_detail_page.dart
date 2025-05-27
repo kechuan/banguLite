@@ -55,6 +55,9 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
 
   ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
 
+  ValueNotifier<bool> reviewsCollaspeStatusNotifier = ValueNotifier(false);
+  ValueNotifier<bool> topicsCollaspeStatusNotifier = ValueNotifier(false);
+
   @override
   Widget build(BuildContext context) {
 
@@ -137,21 +140,24 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                 
                 body: NotificationListener<ScrollNotification>(
                   onNotification: (notification) {
-                  //final bangumiModel = context.read<BangumiModel>();
-                  BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails; //dependenc
-                  
+
                   final double offset = notification.metrics.pixels; //scrollview 的 offset : 注意不要让更内层的scrollView影响到它监听
+
                   if (offset >= 60) { 
+
+                    if(appbarTitleNotifier.value.isNotEmpty) return false;
         
                     WidgetsBinding.instance.addPostFrameCallback((_) {
-                    appbarTitleNotifier.value = currentSubjectDetail?.name ?? "";
+                      appbarTitleNotifier.value = bangumiModel.bangumiDetails?.name ?? "";
                     });
                   }
                 
                   else{
+
+                    if(appbarTitleNotifier.value.isEmpty) return false;
         
                     WidgetsBinding.instance.addPostFrameCallback((_) {
-                    appbarTitleNotifier.value = "";
+                      appbarTitleNotifier.value = "";
                     });
                     
                   }
@@ -254,11 +260,18 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
         
                                   BangumiSummary(summary: currentSubjectDetail?.summary),
                                   
-                                  BangumiDetailRecentReview(name: bangumiModel.bangumiDetails?.name),
+                                  BangumiDetailRecentReview(
+                                    name: bangumiModel.bangumiDetails?.name,
+                                    collapseStatusNotifer:reviewsCollaspeStatusNotifier
+                                  ),
         
                                   const BangumiDetailRelations(),
         
-                                  BangumiDetailTopics(name: bangumiModel.bangumiDetails?.name),
+                                  BangumiDetailTopics(
+                                    name: bangumiModel.bangumiDetails?.name,
+                                    collapseStatusNotifer:topicsCollaspeStatusNotifier
+                                    
+                                  ),
                                   
                                   NotificationListener<ScrollNotification>(
                                   onNotification: (_) => true,

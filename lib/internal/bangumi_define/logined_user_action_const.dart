@@ -1,8 +1,13 @@
 enum PostCommentType{
-  //subject,Ep不可能由用户发起 只拥有 reply 权限
+  //subject不会拥有回复评论的选项
   subjectComment("番剧吐槽"),
-  replyEpComment("单集吐槽"),
 
+  postEpComment("发表单集吐槽"),
+
+  //API 暂没有 replyEpComment 的功能
+  replyEpComment("回复单集吐槽"),
+  
+  //API 暂没有 blog 的功能
   postBlog("发布博客"),
   replyBlog("回复博客"),
   

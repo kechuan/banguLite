@@ -3,10 +3,9 @@ extension ScopeFunctions<T> on T {
   /// 类似 Kotlin 的 let 函数
   /// 在对象上执行 [action] 并返回结果
   /// 对象作为参数传递给 [action]
-  R let<R>(R Function(T? it) action) {
-
-    if (this == null) return null as R;
-    return action(this);
+  R? let<R>(R Function(T it) action) {
+     
+    return action.call(this);
   }
   
   /// 类似 Kotlin 的 also 函数

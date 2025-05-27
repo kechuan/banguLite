@@ -66,14 +66,14 @@ class AccountModel extends ChangeNotifier {
                         getNotifications();
 
                         loginedUserInformations.expiredTime?.let((it) {
-                                //效果还剩3天时自动刷新令牌
-                                final differenceTime = DateTime.fromMillisecondsSinceEpoch(it! * 1000).difference(DateTime.now());
-                                if (differenceTime < const Duration(days: 3)) {
-                                    updateAccessToken(loginedUserInformations.refreshToken);
-                                    //debugPrint("${DateTime.fromMillisecondsSinceEpoch(it*1000).difference(DateTime.now()).inDays}");
-                                }
+                          //效果还剩3天时自动刷新令牌
+                          final differenceTime = DateTime.fromMillisecondsSinceEpoch(it * 1000).difference(DateTime.now());
+                          if (differenceTime < const Duration(days: 3)) {
+                              updateAccessToken(loginedUserInformations.refreshToken);
+                              //debugPrint("${DateTime.fromMillisecondsSinceEpoch(it*1000).difference(DateTime.now()).inDays}");
+                          }
 
-                            });
+                        });
                     }
 
                     else {
@@ -521,10 +521,10 @@ class AccountModel extends ChangeNotifier {
 
         switch (postCommentType){
 
-            case PostCommentType.replyEpComment:{
+            case PostCommentType.postEpComment:{
                 requestUrl = actionType == UserContentActionType.post ?
-                    BangumiAPIUrls.postEpComment(contentID!) :
-                    BangumiAPIUrls.actionEpComment(commentID!);
+                BangumiAPIUrls.postEpComment(contentID!) :
+                BangumiAPIUrls.actionEpComment(commentID!);
 
             }
 
@@ -577,9 +577,9 @@ class AccountModel extends ChangeNotifier {
               commentFuture = () => HttpApiClient.client.post(
                   requestUrl,
                   data: BangumiQuerys.replyQuery(
-                      content: commentContent,
-                      replyTo: commentID ?? 0,
-                      turnstileToken: loginedUserInformations.turnsTileToken,
+                    content: commentContent,
+                    replyTo: commentID ?? 0,
+                    turnstileToken: loginedUserInformations.turnsTileToken,
                   ),
                   options: BangumiAPIUrls.bangumiAccessOption,
               );
@@ -650,7 +650,7 @@ class AccountModel extends ChangeNotifier {
 
             // lacking...
             case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.toggleSubjectCommentLike(commentID!);
-            case PostCommentType.replyEpComment: requestUrl = BangumiAPIUrls.toggleEPCommentLike(commentID!);
+            case PostCommentType.postEpComment: requestUrl = BangumiAPIUrls.toggleEPCommentLike(commentID!);
             case PostCommentType.replyTopic: requestUrl = BangumiAPIUrls.toggleTopicLike(commentID!);
             case PostCommentType.replyGroupTopic: requestUrl = BangumiAPIUrls.toggleGroupTopicLike(commentID!);
 

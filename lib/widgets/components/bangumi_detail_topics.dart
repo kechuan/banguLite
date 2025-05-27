@@ -16,23 +16,22 @@ import 'package:skeletonizer/skeletonizer.dart';
 class BangumiDetailTopics extends StatelessWidget {
   const BangumiDetailTopics({
     super.key,
-    this.name
+    this.name,
+    required this.collapseStatusNotifer,
   });
 
   final String? name;
+  final ValueNotifier<bool> collapseStatusNotifer;
   
   @override
   Widget build(BuildContext context) {
 
-  final ValueNotifier<bool> topicCollapseStatusNotifier = ValueNotifier(true);
-
-    
 	  final bangumiModel = context.read<BangumiModel>();
     final topicModel = context.read<TopicModel>();
 
     return Padding(
-        padding: Padding12,
-        child: Selector<TopicModel,List<TopicInfo>>(
+      padding: Padding12,
+      child: Selector<TopicModel,List<TopicInfo>>(
           selector: (_, topicModel){
              if(topicModel.contentListData.isEmpty) return [];
              return topicModel.contentListData;
@@ -43,11 +42,11 @@ class BangumiDetailTopics extends StatelessWidget {
             },
           builder: (_, topicsList, child) {
             return ExpansionTile(
-              initiallyExpanded: true,
+              initiallyExpanded: !collapseStatusNotifer.value,
               tilePadding: const EdgeInsets.all(0),
               showTrailingIcon: false,
               shape: const Border(),
-              onExpansionChanged: (topicCollapseStatus) => topicCollapseStatusNotifier.value = topicCollapseStatus,
+              onExpansionChanged: (topicExpandedStatus) => collapseStatusNotifer.value = !topicExpandedStatus,
               title: Row(
                 children: [
                   Padding(
@@ -56,7 +55,7 @@ class BangumiDetailTopics extends StatelessWidget {
                       children: [
                         const ScalableText("讨论版",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
                         ValueListenableBuilder(
-                          valueListenable: topicCollapseStatusNotifier,
+                          valueListenable: collapseStatusNotifer,
                           builder: (_,topicCollapseStatus,child){
                             return topicCollapseStatus ?  const Icon(Icons.arrow_drop_down_outlined) : const Icon(Icons.arrow_drop_up_outlined);
                           }

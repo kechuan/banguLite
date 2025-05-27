@@ -51,13 +51,20 @@ class _BangumiTopicPageState extends BangumiContentPageState
   @override
   PostCommentType? getPostCommentType() => PostCommentType.replyTopic;
 
+
+  /// API 把 主楼信息的 content 也归类为 Replies内 也就是 Replies.first
+  /// 按道理来说 是不可能会出现 .isEmpty 的情况的
+  /// 隔壁的 GroupTopic 的数据也是如此
   @override
   int? getCommentCount(TopicDetails? contentDetail, bool isLoading){
+
     if(!isContentLoading(contentDetail?.topicID)){
       if(contentDetail?.topicID != null){
-        return contentDetail!.topicRepliedComment!.isEmpty ? 0 : contentDetail.topicRepliedComment!.length;
+        //return contentDetail!.topicRepliedComment!.isEmpty ? 0 : contentDetail.topicRepliedComment!.length - 1;
+        return contentDetail!.topicRepliedComment!.length - 1;
       }
     }
+
     return null;
   }
 

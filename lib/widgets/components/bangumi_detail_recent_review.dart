@@ -19,15 +19,17 @@ import 'package:skeletonizer/skeletonizer.dart';
 class BangumiDetailRecentReview extends StatelessWidget {
   const BangumiDetailRecentReview({
     super.key,
-    this.name
+    this.name,
+    required this.collapseStatusNotifer,
   });
 
   final String? name;
+  final ValueNotifier<bool> collapseStatusNotifer;
 
   @override
   Widget build(BuildContext context) {
 
-    final ValueNotifier<bool> reviewCollapseStatusNotifier = ValueNotifier(true);
+    //final ValueNotifier<bool> reviewCollapseStatusNotifier = ValueNotifier(true);
 
     return Padding(
       padding: Padding16,
@@ -35,11 +37,11 @@ class BangumiDetailRecentReview extends StatelessWidget {
         builder: (_,reviewModel,child) {
 
             return ExpansionTile(
-              initiallyExpanded: true,
+              initiallyExpanded: !collapseStatusNotifer.value,
               tilePadding: const EdgeInsets.all(0),
               showTrailingIcon: false,
               shape: const Border(),
-              onExpansionChanged: (topicCollapseStatus) => reviewCollapseStatusNotifier.value = topicCollapseStatus,
+              onExpansionChanged: (topicExpandedStatus) => collapseStatusNotifer.value = !topicExpandedStatus,
               title: Row(
                 children: [
                   Padding(
@@ -48,7 +50,7 @@ class BangumiDetailRecentReview extends StatelessWidget {
                       children: [
                         const ScalableText("长评",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
                         ValueListenableBuilder(
-                          valueListenable: reviewCollapseStatusNotifier,
+                          valueListenable: collapseStatusNotifer,
                           builder: (_,topicCollapseStatus,__)=> topicCollapseStatus ? const Icon(Icons.arrow_drop_down_outlined) : const Icon(Icons.arrow_drop_up_outlined)
                         )
                       ],

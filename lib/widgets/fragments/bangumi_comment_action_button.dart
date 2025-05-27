@@ -76,11 +76,21 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
     super.dispose();
   }
 
+  invokeToaster({String? message})=> fadeToaster(context: context, message: message ?? "请求中");
+
+  invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
+    message: message,
+    requestStatus: requestStatus,
+    backgroundColor: judgeCurrentThemeColor(context)
+  );
+
   @override
   Widget build(BuildContext context) {
 
     final accountModel = context.read<AccountModel>();
     final indexModel = context.read<IndexModel>();
+
+    final ModalRoute<dynamic>? currentRoute = ModalRoute.of(context);
 
     return CompositedTransformTarget(
       link: stickerLayerLink,
@@ -88,12 +98,6 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
         onSelected: (commentAction){
 
           debugPrint("contentID: ${widget.contentID}, reply:${widget.commentData.commentID}, action:${widget.postCommentType}");
-
-          invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
-            message: message,
-            requestStatus: requestStatus,
-            backgroundColor: judgeCurrentThemeColor(context)
-          );
 
           invokeSendComment(String message)=> accountModel.toggleComment(
             /// widget.commentData.contentID 并不可靠 因为部分获取的字段并不包含它
@@ -104,13 +108,19 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
             actionType : commentAction == CommentActionType.edit ? UserContentActionType.edit : UserContentActionType.post,
             fallbackAction: (message){
 
-              debugPrint("[PostContent] ${widget.contentID} SendContent: $message");
+              debugPrint("[ToggleContent] ${widget.contentID} SendContent: $message");
 
-              invokeRequestSnackBar(
-                message: message,
-                requestStatus: false,
-              );
-              
+              if (currentRoute is ModalBottomSheetRoute) {
+                invokeToaster(message: message);
+              }
+
+              else{
+                invokeRequestSnackBar(
+                  message: message,
+                  requestStatus: false,
+                );
+              }
+
             }
           ); 
 
@@ -118,6 +128,8 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
           switch(commentAction){
 
             case CommentActionType.reply:{
+
+              
 
               Navigator.pushNamed(
                 context,
@@ -146,14 +158,21 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                       //UI层 Callback
 
                       widget.onReplyComment?.call(widget.commentData.commentID!,content);
-                      invokeRequestSnackBar(requestStatus: true);
+
+                      if (currentRoute is ModalBottomSheetRoute) {
+                        invokeToaster(message: "回复成功");
+                      }
+
+                      else{
+                        invokeRequestSnackBar(requestStatus: true);
+                      }
+
                     }
 
                     
 
                   });
 
-                
                 }
               });
                 
@@ -169,15 +188,18 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
             case CommentActionType.report:{
               //Dialog reportReason 暂且不做
               debugPrint("report");
-              fadeToaster(context: context, message: "暂未开放");
+              invokeToaster(message: "暂未开放");
             }
 
             case CommentActionType.edit:{
 
+              //invokeToaster({String? message})=> fadeToaster(context: context, message: message ?? "修改成功");
+
               final throwFlag = widget.commentData.takeCondition((it){
                 if(it is EpCommentDetails){
                   if(it.repliedComment?.isNotEmpty == true){
-                    fadeToaster(context: context, message: "一般用户无法更改携带回复的评论");
+                    invokeToaster(message: "一般用户无法更改携带回复的评论");
+                    
                     return true;
                   }
                 }
@@ -200,7 +222,16 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
               ).then((content) async{
                 if(content is String){
 
-                  invokeRequestSnackBar();
+
+                  if (currentRoute is ModalBottomSheetRoute) {
+                    invokeToaster(message: "请求中",);
+                  }
+
+                  else{
+                    invokeRequestSnackBar();
+                  }
+
+                  //invokeRequestSnackBar();
 
                   //widget.onUpdateComment?.call(content);
 
@@ -211,12 +242,20 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                     if(resultID != 0){
                       //UI层 Callback
                       widget.onUpdateComment?.call(content);
-                      invokeRequestSnackBar(requestStatus: true);
+
+                      if (currentRoute is ModalBottomSheetRoute) {
+                        invokeToaster();
+                      }
+
+                      else{
+                        invokeRequestSnackBar(requestStatus: true);
+                      }
+
+
+                      
                     }
 
-                    else{
-                      invokeRequestSnackBar(message: "发送失败",requestStatus: false);
-                    }
+                    
                   });
 
                 }
@@ -258,6 +297,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                         if(
                           [
                             PostCommentType.subjectComment,
+                            PostCommentType.postEpComment
                           ].contains(widget.postCommentType)
                         ){
                           isActionAvaliable = false;
@@ -277,6 +317,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                       }
 
                       case CommentActionType.edit:{
+
                         if(
                           [
                             /// Blog有点特殊 一般人无法修改带有replies 的 comment
@@ -286,14 +327,24 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                             PostCommentType.replyTimeline,
                           ].contains(widget.postCommentType)
                         ){
+
                           isActionAvaliable = false;
+
+                        }
+
+                        else{
+
+                          if(widget.commentData.userInformation?.userID != AccountModel.loginedUserInformations.userInformation?.userID){
+                            isActionAvaliable = false;
+                          }
+
                         }
                       }
+                      
                       case CommentActionType.delete:{
 
                         if(widget.commentData.userInformation?.userID != AccountModel.loginedUserInformations.userInformation?.userID){
                           isActionAvaliable = false;
-                          
                         }
 
                         if(
@@ -354,5 +405,8 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
     );
 
   }
+
+  
+
 }
 

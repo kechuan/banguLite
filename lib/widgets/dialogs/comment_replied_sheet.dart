@@ -55,9 +55,10 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
             epCommentData: currentComment.repliedComment![index-1],
             themeColor: themeColor,
             authorType: 
-            currentComment.repliedComment![index-1].userInformation?.userID == currentComment.userInformation?.userID ?
-            BangumiCommentAuthorType.levelAuthor:
-            null ,
+              currentComment.repliedComment![index-1].userInformation?.userID == currentComment.userInformation?.userID ?
+              BangumiCommentAuthorType.levelAuthor:
+              null
+            ,
           );
         }
 

@@ -154,7 +154,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
 
                   widget.epCommentData.commentReactions?.let((commentReactions){
 
-                    bool isReactionExist = commentReactions!.keys.every(
+                    bool isReactionExist = commentReactions.keys.every(
                       (currentDataLike) => currentDataLike == datalikeIndex
                     );
         

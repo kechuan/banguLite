@@ -270,7 +270,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
       contentID: currentEpInfoData?.epID,
       titleText: convertCollectionName(currentEpInfoData, selectedEp),
       webUrl: BangumiWebUrls.ep(currentEpInfoData?.epID ?? 0),
-      postCommentType: PostCommentType.replyEpComment,
+      postCommentType: PostCommentType.postEpComment,
       surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.6)
     );
   }
@@ -400,7 +400,7 @@ class EpCommentPageDetails extends StatelessWidget {
 
                     return EpCommentView(
                       contentID: epModel.subjectID,
-                      postCommentType: PostCommentType.replyEpComment,
+                      postCommentType: PostCommentType.postEpComment,
                       epCommentData: epModel.epCommentData[currentEp]![epCommentIndex-1]
                     );
                   },

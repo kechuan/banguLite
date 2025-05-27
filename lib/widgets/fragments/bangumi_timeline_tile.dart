@@ -59,11 +59,6 @@ class BangumiTimelineTile extends StatelessWidget {
 
 					else{
 
-						//MyHive.historySurfDataBase.put(
-            //  surfTimelineDetails.detailID,
-            //  surfTimelineDetails.copyWithUpdateAt(surfTimelineDetails)
-						//);
-
 						if(surfTimelineDetails.sourceTitle == "博客"){
               bus.emit(
                 "AppRoute",
@@ -87,10 +82,11 @@ class BangumiTimelineTile extends StatelessWidget {
 					
 				case BangumiTimelineType.group:{
 
-					MyHive.historySurfDataBase.put(
-						surfTimelineDetails.detailID,
-						surfTimelineDetails.copyWithUpdateAt(surfTimelineDetails)
-					);
+					//MyHive.historySurfDataBase.put(
+					//	surfTimelineDetails.detailID,
+					//	surfTimelineDetails.copyWithUpdateAt(surfTimelineDetails)
+					//);
+
 
 					bus.emit(
 						"AppRoute",
