@@ -73,7 +73,11 @@ class AboutPage extends StatelessWidget {
 
                       await pullLatestRelease().then((latestRelease){
 
-                        if(latestRelease==null){ invokeAsyncToaster();}
+                        if(
+                          latestRelease==null ||
+                          APPInformationRepository.version == latestRelease.tagName
+
+                        ){ invokeAsyncToaster();}
 
                         else{
                           invokeShowUpdateDialog(latestRelease);

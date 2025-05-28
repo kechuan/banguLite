@@ -521,18 +521,18 @@ class AccountModel extends ChangeNotifier {
 
         switch (postCommentType){
 
-            case PostCommentType.postEpComment:{
-                requestUrl = actionType == UserContentActionType.post ?
-                BangumiAPIUrls.postEpComment(contentID!) :
-                BangumiAPIUrls.actionEpComment(commentID!);
+            case PostCommentType.replyEpComment:{
+            requestUrl = actionType == UserContentActionType.post ?
+            BangumiAPIUrls.postEpComment(contentID!) :
+            BangumiAPIUrls.actionEpComment(commentID!);
 
             }
 
             case PostCommentType.replyTopic:{
 
                 requestUrl = actionType == UserContentActionType.post ?
-                    BangumiAPIUrls.postTopicComment(contentID!) :
-                    BangumiAPIUrls.actionTopicComment(commentID!);
+                BangumiAPIUrls.postTopicComment(contentID!) :
+                BangumiAPIUrls.actionTopicComment(commentID!);
 
             }
 
@@ -546,8 +546,8 @@ class AccountModel extends ChangeNotifier {
 
             case PostCommentType.replyBlog:{
                 requestUrl = actionType == UserContentActionType.post ?
-                    BangumiAPIUrls.postBlogComment(contentID!) :
-                    BangumiAPIUrls.actionBlogComment(commentID!);
+                BangumiAPIUrls.postBlogComment(contentID!) :
+                BangumiAPIUrls.actionBlogComment(commentID!);
 
             }
 
@@ -568,7 +568,7 @@ class AccountModel extends ChangeNotifier {
             );
             return 0;
         }
-      
+
       switch (actionType){
           case UserContentActionType.post:{
 
@@ -577,9 +577,9 @@ class AccountModel extends ChangeNotifier {
               commentFuture = () => HttpApiClient.client.post(
                   requestUrl,
                   data: BangumiQuerys.replyQuery(
-                    content: commentContent,
-                    replyTo: commentID ?? 0,
-                    turnstileToken: loginedUserInformations.turnsTileToken,
+                  content: commentContent,
+                  replyTo: commentID ?? 0,
+                  turnstileToken: loginedUserInformations.turnsTileToken,
                   ),
                   options: BangumiAPIUrls.bangumiAccessOption,
               );
@@ -587,9 +587,9 @@ class AccountModel extends ChangeNotifier {
 
           case UserContentActionType.edit:{
               commentFuture = () => HttpApiClient.client.put(
-                  requestUrl,
-                  data: BangumiQuerys.editQuery(content: commentContent),
-                  options: BangumiAPIUrls.bangumiAccessOption,
+              requestUrl,
+              data: BangumiQuerys.editQuery(content: commentContent),
+              options: BangumiAPIUrls.bangumiAccessOption,
               );
           }
 
@@ -605,13 +605,23 @@ class AccountModel extends ChangeNotifier {
       try{
         await commentFuture().then((response) {
           if (response.statusCode == 200) {
-            commentCompleter.complete(response.data["id"]);
+            debugPrint("response id:${response.data["id"]}");
+            commentCompleter.complete(response.data["id"] ?? 1);
           }
         });
       }
 
       on DioException catch (e){
-        debugPrint("[ToggleComment] '${e.response?.statusCode} ${e.response?.data["message"]}'");
+        debugPrint(
+          "[ToggleComment] '${e.response?.statusCode} ${e.response?.data["message"]}'\n"
+          "requestUrl: $requestUrl \n"
+          "Query: ${BangumiQuerys.replyQuery(
+            content: commentContent,
+            replyTo: commentID ?? 0,
+            turnstileToken: loginedUserInformations.turnsTileToken,
+          )}"
+
+        );
         fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
         commentCompleter.complete(0);
       }
@@ -650,7 +660,7 @@ class AccountModel extends ChangeNotifier {
 
             // lacking...
             case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.toggleSubjectCommentLike(commentID!);
-            case PostCommentType.postEpComment: requestUrl = BangumiAPIUrls.toggleEPCommentLike(commentID!);
+            case PostCommentType.replyEpComment: requestUrl = BangumiAPIUrls.toggleEPCommentLike(commentID!);
             case PostCommentType.replyTopic: requestUrl = BangumiAPIUrls.toggleTopicLike(commentID!);
             case PostCommentType.replyGroupTopic: requestUrl = BangumiAPIUrls.toggleGroupTopicLike(commentID!);
 

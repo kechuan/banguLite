@@ -225,7 +225,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                                         ),
                               
                                         SliverPadding(
-                                            padding: Padding16,
+                                            padding: PaddingH6V16,
                                             sliver: Consumer<GroupsModel>(
                                                 builder: (_, groupsModel, __) {
                               

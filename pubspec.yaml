@@ -1,7 +1,7 @@
 name: bangu_lite
 description: "Lite to Surf Bangumi"
 publish_to: 'none'
-version: 0.9.1
+version: 0.9.2
 
 environment:
   sdk: ^3.5.0

@@ -25,14 +25,13 @@ class IndexLandscape extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final ValueNotifier<bool> expandedMenuNotifier = ValueNotifier(false);
-
     final indexModel = context.read<IndexModel>();
-    
     
     return ValueListenableBuilder(
       valueListenable: selectedPageIndexNotifier,
       builder: (_,currentPageIndex,railLeading) {
 
+        expandedMenuNotifier.value = false;
 
         return LayoutBuilder(
           builder: (_,constraint) {
@@ -125,6 +124,7 @@ class IndexLandscape extends StatelessWidget {
                       ValueListenableBuilder(
                         valueListenable: expandedMenuNotifier,
                         builder: (_,menuExpandedStatus,menu) {
+
                           return AnimatedPositioned(
                             left: menuExpandedStatus ? 0 : -350,
                             width: min(350, MediaQuery.sizeOf(context).width*3/4),

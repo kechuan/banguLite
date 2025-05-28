@@ -61,7 +61,7 @@ class _BangumiGroupTopicPageState extends BangumiContentPageState
   int? getCommentCount(GroupTopicDetails? contentDetail, bool isLoading){
     if(!isContentLoading(contentDetail?.groupTopicID)){
       if(contentDetail?.groupTopicID != null){
-        return contentDetail!.contentRepliedComment!.length - 1;
+        return contentDetail!.contentRepliedComment?.length ?? 0;
       }
     }
     return null;

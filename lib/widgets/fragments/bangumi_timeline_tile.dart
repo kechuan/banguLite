@@ -7,7 +7,6 @@ import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
-import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
@@ -51,9 +50,9 @@ class BangumiTimelineTile extends StatelessWidget {
 
 					if(surfTimelineDetails.sourceTitle == null){
 						Navigator.pushNamed(
-						context,
-						Routes.subjectDetail,
-						arguments: {"subjectID":surfTimelineDetails.detailID},
+              context,
+              Routes.subjectDetail,
+              arguments: {"subjectID":surfTimelineDetails.detailID},
 						);
 					}
 
@@ -120,7 +119,7 @@ class BangumiTimelineTile extends StatelessWidget {
 
           AdapterBBCodeText(
             data: '${surfTimelineDetails.title}',
-            stylesheet: appDefaultStyleSheet(context,richless: true),
+            stylesheet: appDefaultStyleSheet(context),
             maxLine: 3,
 					),
 					

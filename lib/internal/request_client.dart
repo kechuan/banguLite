@@ -4,9 +4,6 @@ import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:github/github.dart';
 
 
 
@@ -411,7 +408,7 @@ class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.9.1",
+                      version = "0.9.2",
                       author = "kechuan"
   ;
 
@@ -424,27 +421,7 @@ class APPInformationRepository{
 
 }
 
-Future<Release?> pullLatestRelease() async {
 
-  final github = GitHub();
-  Release? latestRelease;
-
-  try {
-
-    await github.repositories.getLatestRelease(RepositorySlug(APPInformationRepository.author, APPInformationRepository.projectName)).then((release){
-      if(APPInformationRepository.version == release.tagName) return latestRelease;
-      latestRelease = release;
-    });
-
-  } 
-  
-  catch (e) {
-    debugPrint('获取 tags 时出错: $e');
-  }
-
-  return latestRelease; 
-
-}
 
 void downloadSticker() async {  
   await Future.wait(
@@ -470,4 +447,3 @@ void downloadSticker() async {
   );
 
 }
-

@@ -61,7 +61,7 @@ class _BangumiTopicPageState extends BangumiContentPageState
     if(!isContentLoading(contentDetail?.topicID)){
       if(contentDetail?.topicID != null){
         //return contentDetail!.topicRepliedComment!.isEmpty ? 0 : contentDetail.topicRepliedComment!.length - 1;
-        return contentDetail!.topicRepliedComment!.length - 1;
+        return contentDetail!.topicRepliedComment?.length ?? 0;
       }
     }
 

@@ -3,16 +3,15 @@ import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/hive.dart';
-import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
+import 'package:bangu_lite/widgets/dialogs/new_update_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 @FFRoute(name: 'settings')
 class SettingsPage extends StatelessWidget {
@@ -608,21 +607,10 @@ class TestTile extends ListTile{
       height: 80,
       child: Center(
         child: ListTile(
-          trailing: IconButton(
-            onPressed: (){
-
-              Navigator.pushNamed(
-                context,
-                Routes.webview,
-                arguments: {"url":BangumiWebUrls.trunstileAuth()},
-              );
-              
-
-            }, 
-            icon: const Icon(Icons.cookie)
-          ),
-          onTap: ()=> launchUrlString(BangumiWebUrls.webAuthPage()),
-          title: ScalableText("登入",style: TextStyle(fontSize: AppFontSize.s16))
+          onTap: () {
+            cleanInstalledPackageCache("0.9.2");
+          },
+          title: ScalableText("测试触发工具",style: TextStyle(fontSize: AppFontSize.s16))
         ),
       ),
     );

@@ -57,14 +57,16 @@ class AdapterBBCodeText extends BBCodeText{
         TextSpan(children: spans, style: stylesheet?.defaultTextStyle),
         textScaler: textScaler,
         maxLines: maxLine,
-        style: const TextStyle(overflow: TextOverflow.ellipsis),
+        style: TextStyle(
+          overflow: maxLine != null ? TextOverflow.ellipsis : null,
+        ),
       );
     }
     return RichText(
         text: TextSpan(children: spans, style: stylesheet?.defaultTextStyle),
         textScaler: textScaler,
         maxLines: maxLine,
-        overflow: TextOverflow.ellipsis
+        overflow: maxLine != null ? TextOverflow.ellipsis : TextOverflow.clip,
       );
   }
 

@@ -8,6 +8,8 @@ import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/platforms/android_intent.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/update_client.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:dio/dio.dart';
@@ -293,3 +295,59 @@ class NewUpdateDialog extends StatelessWidget {
 }
 
 
+Future<Release?> pullLatestRelease() async {
+
+  final github = GitHub();
+  Release? latestRelease;
+
+  try {
+
+    await github.repositories.getLatestRelease(RepositorySlug(APPInformationRepository.author, APPInformationRepository.projectName)).then((release){
+      latestRelease = release;
+    });
+
+  } 
+  
+  catch (e) {
+    debugPrint('获取 tags 时出错: $e');
+    showRequestSnackBar(message: "$e");
+  }
+
+  return latestRelease; 
+
+}
+
+
+void cleanInstalledPackageCache(String? tagName){
+  if(tagName == null) return;
+
+  final List<String> deteceFileList = [
+    'banguLite-$tagName-arm64-v8a.apk',
+    'banguLite-$tagName-armeabi-v7a.apk',
+    'banguLite-$tagName-windows-x64.rar'
+  ];
+
+  MyHive.downloadDir?.let((it){
+    if(it.existsSync()){
+      for(FileSystemEntity currentFileSystem in it.listSync()){
+
+        if(currentFileSystem is File){
+
+          String currentFileName = 
+          currentFileSystem.uri.toFilePath()
+            .split(Platform.pathSeparator).removeLast();
+
+            if(deteceFileList.contains(currentFileName)){
+              currentFileSystem.delete();
+            }
+
+        }
+
+        
+      }
+
+    }
+
+  });
+
+}

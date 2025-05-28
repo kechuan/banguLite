@@ -244,7 +244,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                       widget.onUpdateComment?.call(content);
 
                       if (currentRoute is ModalBottomSheetRoute) {
-                        invokeToaster();
+                        invokeToaster(message: "发送成功");
                       }
 
                       else{
@@ -289,7 +289,11 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
               bool isActionAvaliable = 
                 widget.commentBlockStatus == true ? false : true;
 
-                if(isActionAvaliable && accountModel.isLogined()){
+                if(
+                  isActionAvaliable && 
+                  accountModel.isLogined() &&
+                  widget.commentData.commentID != null
+                ){
 
                   switch(currentCommentActionType){
 
@@ -297,7 +301,6 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                         if(
                           [
                             PostCommentType.subjectComment,
-                            PostCommentType.postEpComment
                           ].contains(widget.postCommentType)
                         ){
                           isActionAvaliable = false;
@@ -340,7 +343,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
 
                         }
                       }
-                      
+
                       case CommentActionType.delete:{
 
                         if(widget.commentData.userInformation?.userID != AccountModel.loginedUserInformations.userInformation?.userID){

@@ -49,9 +49,6 @@ final allEffectTag = [
     MaskTag(),
     BangumiStickerTag(),
 
-    //RichTag
-    LateLoadImgTag(),
-    LateLoadImgTag(tagName: "photo"),
     UrlTag(
       onTap: (link) async => 
         await canLaunchUrlString(link).then(
@@ -60,6 +57,10 @@ final allEffectTag = [
           }
         )
     ),
+
+    //RichTag
+    LateLoadImgTag(),
+    LateLoadImgTag(tagName: "photo"),
 
     CodeTag(),
 	  UserTag()

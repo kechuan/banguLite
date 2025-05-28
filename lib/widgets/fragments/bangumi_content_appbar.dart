@@ -76,6 +76,8 @@ class BangumiContentAppbar extends StatelessWidget {
           IconButton(
             onPressed: (){
 
+              
+
               if(postCommentType == PostCommentType.postBlog){
                 fadeToaster(context: context, message: '暂不支持发送长评');
                 return;
@@ -108,6 +110,8 @@ class BangumiContentAppbar extends StatelessWidget {
                 fadeToaster(context: context, message: "评论功能需求登录用户");
                 return;
               }
+
+                
 
               Navigator.of(context).pushNamed(
                 Routes.sendComment,

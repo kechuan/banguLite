@@ -51,7 +51,7 @@ class MyHive {
         cachedImageDir = Directory('${directory.path}${Platform.pathSeparator}libCachedImageData');
       });
 
-      downloadDir = await getDownloadsDirectory();
+      downloadDir = Directory('${filesDir.path}${Platform.pathSeparator}downloads');
 
     }
     
