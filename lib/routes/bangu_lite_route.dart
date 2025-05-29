@@ -112,6 +112,12 @@ FFRouteSettings getRouteSettings({
           onDeleteAction: asT<Function(int)?>(
             safeArguments['onDeleteAction'],
           ),
+          userName: asT<String?>(
+            safeArguments['userName'],
+          ),
+          createdAt: asT<int?>(
+            safeArguments['createdAt'],
+          ),
         ),
       );
     case '/commentPreview':

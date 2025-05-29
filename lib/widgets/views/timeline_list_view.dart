@@ -50,6 +50,7 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
           header: const MaterialHeader(),
           footer: const MaterialFooter(),
           refreshOnStart: timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]?.isEmpty ?? true,
+          callRefreshOverOffset: 15,
           onRefresh: () => loadTimelineContent(context),
           onLoad: () => loadTimelineContent(context,isAppend: true),
         

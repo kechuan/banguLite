@@ -76,10 +76,12 @@ class BangumiContentAppbar extends StatelessWidget {
           IconButton(
             onPressed: (){
 
+              invokeToaster({String? message})=> fadeToaster(context: context, message: message ?? "请求中");
+
               
 
               if(postCommentType == PostCommentType.postBlog){
-                fadeToaster(context: context, message: '暂不支持发送长评');
+                invokeToaster(message: '暂不支持发送长评');
                 return;
               }
 
@@ -107,7 +109,7 @@ class BangumiContentAppbar extends StatelessWidget {
               );
 
               if(accountModel.isLogined() == false){
-                fadeToaster(context: context, message: "评论功能需求登录用户");
+                invokeToaster(message: "评论功能需求登录用户");
                 return;
               }
 
@@ -130,9 +132,6 @@ class BangumiContentAppbar extends StatelessWidget {
 
                 if(content is String){
 
-                  //invokeRequestSnackBar(message: "UI回帖成功",requestStatus: true);
-                  //onSendMessage?.call(content);
-
                   //网络层 Callback
                   await invokeSendComment(content).then((result){
                     debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
@@ -140,6 +139,15 @@ class BangumiContentAppbar extends StatelessWidget {
                     if(result != 0){
                       invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
                       onSendMessage?.call(content);
+                    }
+
+                    else{
+                      invokeToaster(message: "因错误未能发送 已保留至草稿纸");
+
+                      indexModel.draftContent.addAll({
+                        contentID : ("",content)
+                      });
+
                     }
                     
                   });
@@ -157,6 +165,15 @@ class BangumiContentAppbar extends StatelessWidget {
                     if(result != 0){
                       invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
                       onSendMessage?.call(content);
+                    }
+
+                    else{
+                      invokeToaster(message: "因错误未能发送 内容已保留至草稿纸");
+
+                      indexModel.draftContent.addAll({
+                        contentID : (content.$1,content.$2)
+                      });
+
                     }
                     
                   });

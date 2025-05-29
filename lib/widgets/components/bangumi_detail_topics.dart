@@ -73,7 +73,7 @@ class BangumiDetailTopics extends StatelessWidget {
             
                           onPressed: (){
 
-                            if(topicsList.first.id == 0) return;
+                            //if(topicsList.first.id == 0) return;
 
                             Navigator.pushNamed(
                               context,
@@ -86,7 +86,7 @@ class BangumiDetailTopics extends StatelessWidget {
                             );
 
                           },
-                          child: ScalableText("更多讨论 >",style: TextStyle(decoration: TextDecoration.underline,color: topicsList.isEmpty || topicsList.first.id == 0 ? Colors.grey : null)),  
+                          child: const ScalableText("更多讨论 >",style: TextStyle(decoration: TextDecoration.underline)),  
                         )
                       )
             

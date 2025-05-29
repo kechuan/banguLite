@@ -211,7 +211,7 @@ class UserInformationDialog extends StatelessWidget {
                                     future: userModel.loadUserInfomation(userInformation?.userName, userInformation),
                                     builder: (_, snapshot) {
 
-                                        final timelineActions = userModel.userData[userInformation?.userName]?.timelineActions;
+                                        final timelineActions = UserModel.userData[userInformation?.userName]?.timelineActions;
 
                                         switch (snapshot.connectionState){
                                             case ConnectionState.done:{
@@ -247,7 +247,7 @@ class UserInformationDialog extends StatelessWidget {
                                                                 // 收藏数据
                                                                 Builder(
                                                                     builder: (_) {
-                                                                        final statListData = convertSubjectStat(userModel.userData[userInformation?.userName]?.subjectStat);
+                                                                        final statListData = convertSubjectStat(UserModel.userData[userInformation?.userName]?.subjectStat);
                                                                         return Wrap(
                                                                             spacing: 6,
                                                                             runSpacing: 12,

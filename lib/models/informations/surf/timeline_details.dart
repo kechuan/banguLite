@@ -20,6 +20,8 @@ class TimelineDetails extends BaseDetails {
   //因为部分 timeline 不仅携带 comment 信息 甚至还有 replies 只能直接运用 commentDetails 信息了
   CommentDetails? commentDetails;
 
+  String? get authorName => commentDetails?.userInformation?.userName;
+
   // int => String
   int? catType;
   int? catAction;
@@ -82,7 +84,7 @@ class TimelineDetails extends BaseDetails {
 }
 
 
-List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData){
+List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData,{UserInformation? currentUserInformation}){
 
   List<TimelineDetails> timelineDetailsList = [];
 
@@ -97,7 +99,7 @@ List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData){
     timelineDetails
       ..commentDetails = (
         CommentDetails()
-          ..userInformation = loadUserInformations(bangumiTimelineData['user'])
+          ..userInformation = currentUserInformation ?? loadUserInformations(bangumiTimelineData['user'])
           ..comment = resultFields['comment']
           ..commentReactions = resultFields['reactions']
           ..rate = resultFields['rate']
@@ -202,9 +204,13 @@ String convertTimelineDescription(
       actionText = 
        //注: 因为 公共的 timelineID 无法溯源(最多只保存1000条)
        //因此 timelineID 的信息是不可靠的 最好提供 comment 信息 没有的也就没办法了
+
+       
         "["
         "url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}"
         "?timelineID=${currentTimeline.timelineID}"
+        "&userName=${currentTimeline.commentDetails?.userInformation?.userName}"
+        "&createdAt=${currentTimeline.timelineCreatedAt}"
 
         /// 这个操作实际上非常危险.. 毕竟params理论上只最大支持4k字符 要是原本的正常编码自然什么问题没有
         /// 但一旦需求通过Uri体系就需要转译 转译的字符数可能会超过4k

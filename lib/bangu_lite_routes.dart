@@ -65,7 +65,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiTimelineChatPage : [int(required) timelineID, String? comment,  Function(int)? onDeleteAction]
+  /// BangumiTimelineChatPage : [int(required) timelineID, String? comment,  Function(int)? onDeleteAction, String? userName, int? createdAt]
   static const String timelineChat = '/TimelineChat';
 
   /// '/commentPreview'

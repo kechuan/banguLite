@@ -64,7 +64,7 @@ class BangumiAuthPage extends StatelessWidget {
                     ),
                   ),
                     
-                   Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children:
                      [
@@ -78,7 +78,7 @@ class BangumiAuthPage extends StatelessWidget {
                         child: const Icon(Icons.arrow_forward_ios)
                       ),
                     ],
-                                   ),
+                  ),
                     
                   Flexible(
                     child: Image.asset(
@@ -133,7 +133,6 @@ class BangumiAuthPage extends StatelessWidget {
                   case null:{
         
                     if(loginData.loginedStatus){
-                      final accountModel = context.read<AccountModel>();
         
                       leadingWidget = Row(
                         spacing: 12,
@@ -183,7 +182,6 @@ class BangumiAuthPage extends StatelessWidget {
                     
                   case false:{
                     if(loginData.loginedStatus){
-                      final accountModel = context.read<AccountModel>();
         
                       leadingWidget = Row(
                         spacing: 12,

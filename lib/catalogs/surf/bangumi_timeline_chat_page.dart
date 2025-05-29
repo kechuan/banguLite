@@ -4,6 +4,7 @@ import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/user_model.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 
@@ -25,12 +26,16 @@ class BangumiTimelineChatPage extends StatefulWidget {
     required this.timelineID,
     this.comment,
     this.onDeleteAction,
+    this.userName,
+    this.createdAt,
     
 
   });
 
   final int timelineID;
   final String? comment;
+  final String? userName;
+  final int? createdAt;
   final Function(int)? onDeleteAction;
   
 
@@ -54,7 +59,7 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
     timelineFuture ??= HttpApiClient.client.get(
       BangumiAPIUrls.timeline(),
       queryParameters: {
-        "mode" : 'friends',
+        "mode" : 'all',
         "limit" : 1,
         "until" : (widget.timelineID+1)
       },
@@ -96,34 +101,20 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
               
-                  FutureBuilder(
-                    future: timelineFuture,
-                    builder: (_,snapshot) {
+                  Builder(
+                    
+                    builder: (_) {
+
+                      
               
                       final currentEpCommentDetails = EpCommentDetails(
                         commentID: widget.timelineID
                       )
                         ..epCommentIndex = '1'
                         ..comment = widget.comment
-                        
+                        ..userInformation = UserModel.userData[widget.userName]?.userInfomation
+                        ..commentTimeStamp = widget.createdAt
                       ;
-                  
-                      switch(snapshot.connectionState){
-              
-                        case ConnectionState.waiting:{}
-                  
-                        case ConnectionState.done:{
-              
-                          if(snapshot.hasData){
-                            if(snapshot.data.data.isEmpty) break;
-                            currentEpCommentDetails.userInformation = loadUserInformations(snapshot.data.data.first['user']);
-                            currentEpCommentDetails.commentTimeStamp = snapshot.data.data.first['createdAt'];
-                          }
-              
-                        }
-                  
-                        default:{}
-                      }
               
                       return EpCommentTile(
                         contentID: widget.timelineID,
@@ -182,6 +173,7 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
                       
                           return AnimatedList.separated(
                             shrinkWrap: true, 
+                            physics: const NeverScrollableScrollPhysics(),
                             key: animatedListKey,
                             initialItemCount: timelineChatData.isEmpty ? 1 : timelineChatData.length,
                             separatorBuilder: (_, index, animation) => const Divider(),

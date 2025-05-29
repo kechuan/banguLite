@@ -75,30 +75,35 @@ class HSLColorPicker extends StatelessWidget {
                   );
                 }
               ),
+
+              Flexible(
+                child: SingleChildScrollView(
+                  child: ColorPicker(
+                        color: selectedColor,
+                        padding: Padding12,
+                        
+                        pickerTypeLabels: const {
+                          ColorPickerType.both: '主色调',
+                          ColorPickerType.wheel: '自定义',
+                        },
+                        
+                        pickersEnabled: const <ColorPickerType, bool>{
+                          ColorPickerType.both: true,
+                          ColorPickerType.primary: false,
+                          ColorPickerType.accent: false,
+                          ColorPickerType.bw: false,
+                          ColorPickerType.wheel: true,
+                        },
+                        enableShadesSelection: false,
+                        onColorChanged: (newColor) {
+                          if (newColor == selectedColor) return;
+                          currentColorNotifier.value = newColor;
+                        },
+                    ),
+                ),
+              ),
           
-              ColorPicker(
-                  color: selectedColor,
-                  padding: Padding12,
-                  
-                  pickerTypeLabels: const {
-                    ColorPickerType.both: '主色调',
-                    ColorPickerType.wheel: '自定义',
-                  },
-                  
-                  pickersEnabled: const <ColorPickerType, bool>{
-                    ColorPickerType.both: true,
-                    ColorPickerType.primary: false,
-                    ColorPickerType.accent: false,
-                    ColorPickerType.bw: false,
-                    //ColorPickerType.custom: true,
-                    ColorPickerType.wheel: true,
-                  },
-                  enableShadesSelection: false,
-                  onColorChanged: (newColor) {
-                    if (newColor == selectedColor) return;
-                    currentColorNotifier.value = newColor;
-                  },
-              )
+
             ],
           ),
         ),

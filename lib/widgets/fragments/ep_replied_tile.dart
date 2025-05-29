@@ -96,17 +96,25 @@ class EpRepliedTile extends ListTile {
                                             
                                           ),
                                           children: [
+
                                             if (quoteContent.isNotEmpty) ...[
                                               TextSpan(
-                                                text: quoteContent.length > 30 
-                                                  ? "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}...\n"
-                                                  : "${quoteContent.replaceAll(bbcodeRegexp, '')}\n",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: judgeDarknessMode(context) ? Colors.white : Colors.black)
+                                                  text: quoteContent.length > 30 
+                                                    ? "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}...\n"
+                                                    : "${quoteContent.replaceAll(bbcodeRegexp, '')}\n",
+                                                  style: TextStyle(
+                                                    fontSize: AppFontSize.s14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: judgeDarknessMode(context) ? Colors.white : Colors.black,
+                                                    shadows:[BoxShadow(spreadRadius: 0.5, blurRadius: 0.5, color: Colors.black.withValues(alpha: 0.5))],
+                                                    decoration: TextDecoration.underline
+                                                  ),
+                                                  
+                                                  
                                                 
-                                                ),
+                                              ),
                                             ],
+
                                             TextSpan(text: mainContent,style: TextStyle(color: judgeDarknessMode(context) ? Colors.white : Colors.black)),
                                           ],
                                         ),

@@ -251,6 +251,7 @@ class ColorThemeTile extends ListTile{
                               //show 调色板
                               showModalBottomSheet(
                                 isScrollControlled: true,
+                                enableDrag: false,
                                 backgroundColor: Colors.transparent,
                                 constraints: BoxConstraints(
                                   maxWidth: MediaQuery.sizeOf(context).width*5/6,

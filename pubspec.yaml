@@ -24,6 +24,8 @@ dependencies:
   #hive: ^2.2.3
   #hive_flutter: ^1.1.0
   github: ^9.24.0
+  #hive_ce: ^2.11.1
+  #hive_ce_flutter: ^2.3.0
   hive_ce: ^2.11.1
   hive_ce_flutter: ^2.3.0
   infinite_carousel: ^1.1.1
@@ -43,6 +45,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^4.0.0
   build_runner: ^2.4.11
+  #hive_ce_generator: 1.8.1
   hive_ce_generator: 1.8.1
   flutter_launcher_icons: ^0.14.1
 

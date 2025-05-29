@@ -140,7 +140,7 @@ void appRouteMethodListener(BuildContext context,String link){
         link.startsWith(BangumiWebUrls.relativeGroup(matchLink?.split(RegExp('/')).last)) 
       ){
 
-		final groupNameRegexp = RegExp('group/([^&]+)');
+		  final groupNameRegexp = RegExp('group/([^&]+)');
 
         debugPrint(
           "groupName:${groupNameRegexp.firstMatch(link)?.group(1)}"
@@ -168,6 +168,8 @@ void appRouteMethodListener(BuildContext context,String link){
         link.startsWith(BangumiAPIUrls.timelineReply(int.parse(appRouteUri.queryParameters['timelineID'] ?? '0')))
       ){
 
+        /// 因为跳转的时候 一般会拥有 用户信息 那么传个userName什么的也没有问题
+
         if(context.mounted){
 
           //stupid way. but general...
@@ -177,6 +179,8 @@ void appRouteMethodListener(BuildContext context,String link){
             arguments: {
               'timelineID':appRouteUri.queryParameters['timelineID'],
               'comment':appRouteUri.queryParameters['comment'],
+              'createdAt':appRouteUri.queryParameters['createdAt'],
+              'userName':appRouteUri.queryParameters['userName'],
               'onDeleteAction':(int resultID){
 
                 if(resultID!=0){

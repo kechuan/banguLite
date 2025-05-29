@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 class UserModel extends ChangeNotifier{
 
   //userID: UserInformation
-  Map<String,UserDetails> userData = {};
+  static Map<String,UserDetails> userData = {};
 
   Future<void> loadUserInfomation(
     String? userName,
@@ -40,13 +40,13 @@ class UserModel extends ChangeNotifier{
 
         currentUserDetail.timelineActions = loadTimelineDetails(
           responseList[1].data,
+          currentUserInformation:currentUserDetail.userInfomation
+
         );
 
         userData.addAll({
           userName:currentUserDetail
         });
-
-        //debugPrint("currentUserDetail timelineActions: ${currentUserDetail.timelineActions}");
 
         userInfomationCompleter.complete();
 

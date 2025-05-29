@@ -321,7 +321,7 @@ Future<Release?> pullLatestRelease() async {
 void cleanInstalledPackageCache(String? tagName){
   if(tagName == null) return;
 
-  final List<String> deteceFileList = [
+  final List<String> detecedFileList = [
     'banguLite-$tagName-arm64-v8a.apk',
     'banguLite-$tagName-armeabi-v7a.apk',
     'banguLite-$tagName-windows-x64.rar'
@@ -337,7 +337,7 @@ void cleanInstalledPackageCache(String? tagName){
           currentFileSystem.uri.toFilePath()
             .split(Platform.pathSeparator).removeLast();
 
-            if(deteceFileList.contains(currentFileName)){
+            if(detecedFileList.contains(currentFileName)){
               currentFileSystem.delete();
             }
 

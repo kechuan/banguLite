@@ -117,12 +117,15 @@ class AccountModel extends ChangeNotifier {
 
         else {
 
+
           return await generalRequest(
             BangumiAPIUrls.me,
+            options: Options(
+              headers: BangumiQuerys.bearerTokenAccessQuery(accessToken)
+            ),
             generalCompleteLoadAction:(response, completer) {
               debugPrint("accessToken: Valid, ${DateTime.now().millisecondsSinceEpoch ~/ 1000} / ${loginedUserInformations.expiredTime}");
               loginedUserInformations.userInformation = loadUserInformations(response.data);
-              updateLoginInformation(loginedUserInformations);
               completer.complete(true);
             },
             generalFallbackAction: (String errorMessage,Completer<dynamic> completer){

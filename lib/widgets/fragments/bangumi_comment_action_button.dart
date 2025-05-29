@@ -106,20 +106,24 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
             commentContent: message,
             postCommentType: widget.postCommentType,
             actionType : commentAction == CommentActionType.edit ? UserContentActionType.edit : UserContentActionType.post,
-            fallbackAction: (message){
+            fallbackAction: (errorMessage){
 
-              debugPrint("[ToggleContent] ${widget.contentID} SendContent: $message");
+              debugPrint("[ToggleContent] ${widget.contentID} SendContent: $errorMessage");
 
               if (currentRoute is ModalBottomSheetRoute) {
-                invokeToaster(message: message);
+                invokeToaster(message: errorMessage);
               }
 
               else{
                 invokeRequestSnackBar(
-                  message: message,
+                  message: errorMessage,
                   requestStatus: false,
                 );
               }
+
+              indexModel.draftContent.addAll({
+                widget.contentID : ("",message)
+              });
 
             }
           ); 
@@ -128,8 +132,6 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
           switch(commentAction){
 
             case CommentActionType.reply:{
-
-              
 
               Navigator.pushNamed(
                 context,
@@ -168,6 +170,8 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                       }
 
                     }
+
+                    
 
                     
 
