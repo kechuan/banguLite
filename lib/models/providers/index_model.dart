@@ -200,7 +200,7 @@ class AppFontSize {
   static double get s14 => 14 * scale.fontScale;
   static double getScaledSize(double fontSize) => fontSize * scale.fontScale;
 
-  static init(){
+  static void init(){
     //Hive 存放
     scale = ScaleType.medium;
   }

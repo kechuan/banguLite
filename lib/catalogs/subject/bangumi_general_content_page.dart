@@ -518,7 +518,7 @@ abstract class BangumiContentPageState<
           }
         ),
                 
-        if(contentCommentIndex < max(0,commentListCount) + userCommentMap.length)
+        if(contentCommentIndex < max(0,commentListCount) + userCommentMap.length - 1)
           const Divider()
       ],
     );

@@ -9,18 +9,18 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
-
-
 class BuildDetailImages extends StatelessWidget {
   const BuildDetailImages({
     super.key,
+    this.imageID,
+    this.imageName,
     this.detailImageUrl,
-    this.imageID
   });
 
-  final String? detailImageUrl;
   final int? imageID;
+  final String? imageName;
+  final String? detailImageUrl;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,10 @@ class BuildDetailImages extends StatelessWidget {
               Navigator.pushNamed(
                 context,
                 Routes.photoView,
-                arguments: {"imageProvider":imageProvider},
+                arguments: {
+                  "imageProvider":imageProvider,
+                  "name": imageName
+                },
               );
 
             },

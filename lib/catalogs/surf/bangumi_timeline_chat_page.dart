@@ -2,7 +2,6 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/judge_condition.dart';
 
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/user_model.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';

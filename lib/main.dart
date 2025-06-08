@@ -22,8 +22,6 @@ import 'package:provider/provider.dart';
 
 void main() async {
 
-  
-
   if (kReleaseMode) {
     debugPrint = (String? message, {int? wrapWidth}) {};
   }
@@ -40,12 +38,12 @@ void main() async {
       SystemUiMode.edgeToEdge,  // 使用 edgeToEdge 模式
     );
 
-	SystemChrome.setSystemUIOverlayStyle(
-		const SystemUiOverlayStyle(
-			systemNavigationBarColor: Colors.transparent,
-			systemNavigationBarDividerColor: Colors.transparent,
-		),
-	);
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+    );
   }
 
   runApp(const MainApp());

@@ -17,7 +17,9 @@ class MyHive {
 
   static late final Directory filesDir; //存储目录
   static late final Directory cachedImageDir;
+  
   static late final Directory? downloadDir;
+  static late final Directory? downloadImageDir;
 
   //static late final Box<Map<String,String?>> starBangumisDataBase;
   static late final Box<StarBangumiDetails> starBangumisDataBase;
@@ -52,6 +54,7 @@ class MyHive {
       });
 
       downloadDir = Directory('${filesDir.path}${Platform.pathSeparator}downloads');
+      downloadImageDir = Directory('${downloadDir?.path}${Platform.pathSeparator}images');
 
     }
     

@@ -76,9 +76,9 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
     super.dispose();
   }
 
-  invokeToaster({String? message})=> fadeToaster(context: context, message: message ?? "请求中");
+  void invokeToaster({String? message})=> fadeToaster(context: context, message: message ?? "请求中");
 
-  invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
+  void invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
     message: message,
     requestStatus: requestStatus,
     backgroundColor: judgeCurrentThemeColor(context)

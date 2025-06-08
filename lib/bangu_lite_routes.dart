@@ -130,7 +130,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiPictureViewPage : [ImageProvider(required) imageProvider]
+  /// BangumiPictureViewPage : [ImageProvider(required) imageProvider, String? name]
   static const String photoView = '/photoView';
 
   /// '/sendComment'

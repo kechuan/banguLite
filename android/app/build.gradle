@@ -45,9 +45,13 @@ android {
 		
     }
 
+	// gradle 工具默认 识别的名称 : app-development-debug.apk
+
 	applicationVariants.all { variant ->
 		variant.outputs.all { output ->
 			def abi = output.getFilter(com.android.build.OutputFile.ABI)
+			//def abi = output.filters.find { it.filterType == com.android.build.OutputFile.ABI }
+
 			if (abi != null) {
 				outputFileName = "banguLite-${variant.versionName}-${abi}.apk"
 				def abiVersionCode = project.ext.abiCodes.get(abi)
@@ -72,34 +76,30 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
 
-            signingConfig = signingConfigs.debug
 			minifyEnabled true
+			splits.abi.universalApk = false
         }
 
-		
-        
+		debug{
+			splits.abi.universalApk = true
+		}
 
-		//debug {
-        //    signingConfig signingConfigs.debug
-		//	//buildDir = "build/outputs/apk" // 指定输出目录
-            
-        //    //setProperty("archivesBaseName", "app-${variant.name}")
-        //}
     }
 
-
-    //flavorDimensions = ["development","production"]
-	//flavorDimensions "environment"
 	flavorDimensions = ["environment"]
 
+	//原来 gradle 也能 透过这种方式来传递 @string/app_name 给 xml
     productFlavors{
         development{
             dimension "environment"
-			applicationId "io.flutter.banguLite.dev"  // 明确指定包名
+			applicationId "io.flutter.banguLite.dev"  
+			resValue "string", "app_name", "BanguLite-dev"
         }
         production{
             dimension "environment"
-			applicationId "io.flutter.banguLite"  // 明确指定包名
+			applicationId "io.flutter.banguLite"
+			resValue "string", "app_name", "BanguLite"
+			splits.abi.universalApk = false
         }
     }
 
@@ -108,22 +108,24 @@ android {
         // 基于不同的abi架构配置不同的apk
         abi {
 
-          // 必须为true，打包才会为不同的abi生成不同的apk
-          enable true
-         
-          // 默认情况下，包含了所有的ABI。
-          // 所以使用reset()清空所有的ABI，再使用include指定我们想要生成的架构armeabi-v7a、arm-v8a
-          reset()
+			// release时必须为true，打包才会为不同的abi生成不同的apk
+			// 否则就没必要打包 因此属性跟随 universalApk 就好
+			// 只要不为 universal 即可打包
+			enable !splits.abi.universalApk
+			
+			// 默认情况下，包含了所有的ABI。
+			// 所以使用reset()清空所有的ABI，再使用include指定我们想要生成的架构armeabi-v7a、arm-v8a
+			reset()
 
-          // 逗号分隔列表的形式指定 Gradle 应针对哪些 ABI 生成 APK。只与 reset() 结合使用，以指定确切的 ABI 列表。
-          // include "armeabi-v7a", "arm64-v8a"
+			// 逗号分隔列表的形式指定 Gradle 应针对哪些 ABI 生成 APK。只与 reset() 结合使用，以指定确切的 ABI 列表。
+			// include "armeabi-v7a", "arm64-v8a"
 
-          //noinspection ChromeOsAbiSupport
-          include "arm64-v8a","armeabi-v7a"
+			//noinspection ChromeOsAbiSupport
+			include "arm64-v8a","armeabi-v7a"
 		  
 
-          // 是否生成通用的apk，也就是包含所有ABI的apk。如果设为 true，那么除了按 ABI 生成的 APK 之外，Gradle 还会生成一个通用 APK。
-          universalApk false
+			//属性交由上层 buildType 控制
+			//universalApk splits.abi.universalApk
         }
     }
 }

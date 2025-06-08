@@ -98,24 +98,33 @@ class EpRepliedTile extends ListTile {
                                           children: [
 
                                             if (quoteContent.isNotEmpty) ...[
-                                              TextSpan(
-                                                  text: quoteContent.length > 30 
-                                                    ? "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}...\n"
-                                                    : "${quoteContent.replaceAll(bbcodeRegexp, '')}\n",
-                                                  style: TextStyle(
-                                                    fontSize: AppFontSize.s14,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: judgeDarknessMode(context) ? Colors.white : Colors.black,
-                                                    shadows:[BoxShadow(spreadRadius: 0.5, blurRadius: 0.5, color: Colors.black.withValues(alpha: 0.5))],
-                                                    decoration: TextDecoration.underline
+                                              WidgetSpan(
+                                                child: DecoratedBox(
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(),
+                                                    borderRadius: BorderRadius.circular(6),
                                                   ),
-                                                  
-                                                  
-                                                
+                                                  child: Padding(
+                                                    padding: Padding6,
+                                                    child: ScalableText(
+                                                      quoteContent.length > 30 
+                                                      ? "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}...\n"
+                                                      : "${quoteContent.replaceAll(bbcodeRegexp, '')}\n",
+                                                      maxLines: 1,
+                                                      style: TextStyle(color: judgeCurrentThemeColor(context).withValues(alpha: 0.8)),
+                                                    ),
+                                                  )
+                                                )
                                               ),
                                             ],
 
-                                            TextSpan(text: mainContent,style: TextStyle(color: judgeDarknessMode(context) ? Colors.white : Colors.black)),
+                                            TextSpan(
+                                              text: mainContent,
+                                              style: TextStyle(
+                                                color: judgeDarknessMode(context) ? Colors.white : Colors.black,
+                                              )
+                                            ),
+                                            
                                           ],
                                         ),
                                         maxLines: 4,  // 引用1行 + 内容3行

@@ -52,7 +52,9 @@ class _BangumiIndexPageState extends State<BangumiIndexPage> {
         }
 
         else{
+          
           await SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+
         }
 
       },

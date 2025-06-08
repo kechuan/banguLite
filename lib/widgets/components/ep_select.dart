@@ -60,46 +60,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
           return Column(
             children: [
           
-                segements >= 2 ?
-                  //Tabbar
-                  Theme(
-                    data: Theme.of(context).copyWith(
-                      scrollbarTheme: const ScrollbarThemeData(
-                        thickness: WidgetStatePropertyAll(0.0) //it work
-                      )
-                    ),
-                    child: SizedBox(
-                      height: 60,
-                      child: TabBar(
-                        indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                        controller: epTabController,
-                        onTap: (index){
-                          epSegementsIndexNotifier.value = index;
-                          epsInformationFuture = epModel.getEpsInformation(offset: index+1);
-                        },
-                        isScrollable: true,
-                        tabs: List.generate(
-                          segements, 
-                          (index) => SizedBox(
-                            height: 60,
-                            width: 100,
-                            child: Center(child: ScalableText("${(index*100)+1}~${min((index+1)*100,widget.totalEps)}"))
-                          )
-                          
-                        ),
-                          
-                      ),
-                    ),
-                  ):
-      
-                  widget.portialMode == true ? 
-                    Center(
-                      child: Padding(
-                        padding: PaddingV12,
-                        child: ScalableText("${widget.name}"),
-                      )
-                    ):
-                  const SizedBox.shrink(),
+                buildTabSegement(),
           
                 //TabView
                 SizedBox(
@@ -139,7 +100,8 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                             
                             itemBuilder: (_,index){
                                   
-                              Color currentEpsColor = Colors.grey ; //默认灰 未放送
+                              Color currentEpsColor = Colors.grey; //默认灰 未放送
+
                               int currentEpIndex = (currentSegementRange)+(index)+1;
                           
                               EpsInfo? currentInfo = epModel.epsData[currentEpIndex];
@@ -147,14 +109,16 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                               //对于时间跨度很大的番剧。像海贼王这种的 我处理方式就是最简单的 air_date 判断了 
                               //不可能做到百分百准确 但没办法 已经没有更好的思路了
                           
-                              DateTime? currentEpAirDate = DateTime.tryParse(currentInfo?.airDate ?? "");
-                          
-                              if(currentEpAirDate!=null){
-                                currentTime.difference(currentEpAirDate) > const Duration(hours: 1) ?
-                                currentEpsColor = Theme.of(context).scaffoldBackgroundColor: //已放送
-                                //currentEpsColor = Colors.indigo: //已放送
-                                null ;
+                              DateTime currentEpAirDate = convertDateTime(currentInfo?.airDate ?? "");
+
+                              if(currentTime.difference(currentEpAirDate) > const Duration(hours: 1)){
+                                if(currentEpAirDate != DateTime(0)){
+                                  currentEpsColor = Theme.of(context).scaffoldBackgroundColor;
+                                }
+                                
                               }
+
+
                           
                               if(widget.airedEps < widget.totalEps){ //如果还有未放送的
                                 if(widget.airedEps == currentEpIndex) currentEpsColor = AppThemeColor.macha.color; //标注当前放送中最新的一集
@@ -202,7 +166,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
                                         convertCollectionName(currentInfo,currentEpIndex),
                                         style: const TextStyle(color: Colors.black),
                                         textAlign: TextAlign.center,
-                                        maxLines: 2 ,
+                                        maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ) 
@@ -231,4 +195,54 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
         
     	
   }
+
+  Widget buildTabSegement(){
+
+    final epModel = context.read<EpModel>();
+
+    int segements = convertSegement(widget.totalEps,100);
+
+    if(segements <= 1){
+      if(widget.portialMode != true) return const SizedBox.shrink();
+
+      return Center(
+        child: Padding(
+          padding: PaddingV12,
+          child: ScalableText("${widget.name}"),
+        )
+      );
+    }
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        scrollbarTheme: const ScrollbarThemeData(
+          thickness: WidgetStatePropertyAll(0.0) //it work
+        )
+      ),
+      child: SizedBox(
+        height: 60,
+        child: TabBar(
+          indicatorColor: Theme.of(context).scaffoldBackgroundColor,
+          controller: epTabController,
+          onTap: (index){
+            epSegementsIndexNotifier.value = index;
+            epsInformationFuture = epModel.getEpsInformation(offset: index+1);
+          },
+          isScrollable: true,
+          tabs: List.generate(
+            segements, 
+            (index) => SizedBox(
+              height: 60,
+              width: 100,
+              child: Center(child: ScalableText("${(index*100)+1}~${min((index+1)*100,widget.totalEps)}"))
+            )
+            
+          ),
+            
+        ),
+      ),
+    );
+      
+  }
 }
+

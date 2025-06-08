@@ -45,7 +45,7 @@ class BangumiGroupsPage extends StatefulWidget {
 
 class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 
-    final expansionTileController = ExpansionTileController();
+    final expansibleController = ExpansibleController();
     final groupTitleNotifier = ValueNotifier<String?>(null);
     final sliverAnimatedListKey = GlobalKey<SliverAnimatedListState>();
 
@@ -195,7 +195,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                                                       
                                                     },
                                                     tilePadding: const EdgeInsets.all(6),
-                                                    controller: expansionTileController,
+                                                    controller: expansibleController,
                                                     title: Row(
                                                         spacing: 6,
                                                         children: [
@@ -212,10 +212,10 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                                                     children: [
                                                         GroupsSelectView(
                                                             sliverAnimatedListKey: sliverAnimatedListKey, 
-                                                            expansionTileController: expansionTileController, 
+                                                            expansibleController: expansibleController, 
                                                             groupTitleNotifier: groupTitleNotifier,
                                                             loadGroupTopicCallback: (context) {
-                                                                expansionTileController.collapse();
+                                                                expansibleController.collapse();
                                                                 loadUIGroupTopics(context);
                                                             },
                                                         )

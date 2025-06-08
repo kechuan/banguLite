@@ -17,13 +17,13 @@ class EventBus {
   final _emap = <Object, List<EventCallback>?>{};
 
   //添加订阅者
-  void on(eventName, EventCallback f) {
+  void on(dynamic eventName, EventCallback f) {
     _emap[eventName] ??=  <EventCallback>[];
     _emap[eventName]!.add(f);
   }
 
   //移除订阅者
-  void off(eventName, [EventCallback? f]) {
+  void off(dynamic eventName, [EventCallback? f]) {
     List? list = _emap[eventName];
     if (eventName == null || list == null) return;
     if (f == null) {
@@ -34,7 +34,7 @@ class EventBus {
   }
 
   //触发事件，事件触发后该事件所有订阅者会被调用
-  void emit(eventName, [arg]) {
+  void emit(dynamic eventName, [arg]) {
     List? list = _emap[eventName];
     if (list == null) return;
     int len = list.length - 1;

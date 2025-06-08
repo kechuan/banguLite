@@ -240,8 +240,6 @@ class AccountModel extends ChangeNotifier {
         }
     ) async {
 
-        Completer<bool> userActionCompleter = Completer();
-
         if (username == null) return false;
 
         try{
@@ -272,16 +270,15 @@ class AccountModel extends ChangeNotifier {
                 } 
             }
 
-            userActionCompleter.complete(true);
+            return true;
         }
 
         on DioException catch(e){
             debugPrint("[UserRelation] ${e.response?.statusCode} error:${e.response?.data["message"]}");
             fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
-            userActionCompleter.complete(false);
-        }
 
-        return userActionCompleter.future;
+            return false;
+        }
 
     }
 
@@ -390,15 +387,14 @@ class AccountModel extends ChangeNotifier {
       Function(String message)? fallbackAction
     }) async {
 
-        Completer<int> contentCompleter = Completer();
-
         String requestUrl = "";
 
         late Future<Response<dynamic>> Function() contentFuture;
 
         if (loginedUserInformations.accessToken == null) {
             debugPrint("账号未登录");
-            contentCompleter.complete(0);
+            return 0;
+            //contentCompleter.complete(0);
         }
 
         switch (postContentType){
@@ -435,7 +431,7 @@ class AccountModel extends ChangeNotifier {
                 "postContentType:$postContentType / subjectID:$subjectID / requestUrl:$requestUrl"
             );
             fallbackAction?.call("发送失败");
-            contentCompleter.complete(0);
+            return 0;
         }
 
         switch (actionType){
@@ -478,28 +474,25 @@ class AccountModel extends ChangeNotifier {
 
         try{
             await contentFuture().then((response) {
-                    if (response.statusCode == 200) {
-                        //目前只有 subjectComment 返回的 data 是空的 {}
-                        //应该说是PUT行为是不返回的
-                        //debugPrint("postID:${response.data["id"]}");
-                        contentCompleter.complete(response.data["id"] ?? 200);
-                    }
+                if (response.statusCode == 200) {
 
-                    else {
-                        contentCompleter.complete(0);
-                        fallbackAction?.call('${response.statusCode} ${response.data["message"]}');
-                    }
-
-                });
+                    //目前只有 subjectComment 返回的 data 是空的 {}
+                    //应该说是PUT行为是不返回的
+                    //debugPrint("postID:${response.data["id"]}");
+                    //contentCompleter.complete(response.data["id"] ?? 200);
+                    return response.data["id"] ?? 1;
+                }
+            });
         }
 
         on DioException catch (e){
             debugPrint("[PostContent] DioException:${e.response?.data}");
             fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
-            contentCompleter.complete(0);
         }
 
-        return contentCompleter.future;
+        return 0;
+
+        //return contentCompleter.future;
 
     }
 
@@ -512,14 +505,14 @@ class AccountModel extends ChangeNotifier {
       Function(String message)? fallbackAction
     }) async {
 
-        Completer<int> commentCompleter = Completer();
+        //Completer<int> commentCompleter = Completer();
         String requestUrl = "";
 
         late Future<Response<dynamic>> Function() commentFuture;
 
         if (loginedUserInformations.accessToken == null) {
             debugPrint("账号未登录");
-            commentCompleter.complete(0);
+            return 0;
         }
 
         switch (postCommentType){
@@ -609,7 +602,7 @@ class AccountModel extends ChangeNotifier {
         await commentFuture().then((response) {
           if (response.statusCode == 200) {
             debugPrint("response id:${response.data["id"]}");
-            commentCompleter.complete(response.data["id"] ?? 1);
+            return response.data["id"] ?? 1;
           }
         });
       }
@@ -626,14 +619,13 @@ class AccountModel extends ChangeNotifier {
 
         );
         fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
-        commentCompleter.complete(0);
       }
 
       finally{
         loginedUserInformations.turnsTileToken = null;
       }
 
-      return commentCompleter.future;
+      return 0;
 
     }
 
@@ -706,7 +698,7 @@ class AccountModel extends ChangeNotifier {
 
         await actionLikeFuture().then((response) {
                 if (response.statusCode == 200) {
-                    debugPrint("$actionType succ: $commentID => $stickerLikeIndex");
+                    debugPrint("$actionType succ: commentID:$commentID / sticker:$stickerLikeIndex");
                     likeCompleter.complete(true);
                 }
 

@@ -10,15 +10,24 @@ Future<void> registerWindowDeepLink(String scheme) async {
   String appPath = Platform.resolvedExecutable;
 
   String protocolRegKey = 'Software\\Classes\\$scheme';
-  RegistryValue protocolRegValue = const RegistryValue(
+
+  //old format
+  //RegistryValue protocolRegValue = const RegistryValue(
+  //  'URL Protocol',
+  //  RegistryValueType.string,
+  //  '',
+  //);
+
+  RegistryValue protocolRegValue = const RegistryValue.string(
     'URL Protocol',
-    RegistryValueType.string,
     '',
   );
+
+
+  //old format
   String protocolCmdRegKey = 'shell\\open\\command';
-  RegistryValue protocolCmdRegValue = RegistryValue(
+  RegistryValue protocolCmdRegValue = RegistryValue.string(
     '',
-    RegistryValueType.string,
     '"$appPath" "%1"',
   );
 

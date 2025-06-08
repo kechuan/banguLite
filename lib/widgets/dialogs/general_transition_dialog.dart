@@ -2,7 +2,7 @@
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
-void showTransitionAlertDialog(
+Future<dynamic> showTransitionAlertDialog(
   BuildContext context,
   {
     String? title,
@@ -13,7 +13,7 @@ void showTransitionAlertDialog(
     String? confirmText,
   }
 ){
-    showGeneralDialog(
+    return showGeneralDialog(
       barrierDismissible: true,
       barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
       context: context,
@@ -23,16 +23,13 @@ void showTransitionAlertDialog(
           content: ScalableText("$content"),
           actions:[
             TextButton(
-              onPressed: (){
-                cancelAction?.call();
-                Navigator.of(context).pop();
+              onPressed: () async {
+                Navigator.of(context).pop(await cancelAction?.call());
               }, child: ScalableText(cancelText ?? "取消")
             ),
             TextButton(
               onPressed: () async {
-                confirmAction?.call();
-                Navigator.of(context).pop();
-
+                Navigator.of(context).pop(await confirmAction?.call());
               }, 
               child: ScalableText(confirmText ?? "确认")
             )

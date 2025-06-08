@@ -250,7 +250,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
                 stylesheet: appDefaultStyleSheet(context,selectableText: true),
                 errorBuilder: (context, error, stackTrace) {
                   return ScalableText("${widget.epCommentData.comment}",
-                  );
+                );
                 },
               ) 
             

@@ -44,7 +44,7 @@ class StarSubjectDialog extends StatelessWidget {
     final ValueNotifier<StarType> starTypeNotifier = ValueNotifier<StarType>(commentDetails?.type ?? StarType.none);
 
     final TextEditingController contentEditingController = TextEditingController(text: commentDetails?.comment);
-    final ExpansionTileController commentExpansionTileController = ExpansionTileController();
+    final ExpansibleController commentExpansibleController = ExpansibleController();
 
     return Dialog(
       child: ValueListenableBuilder(
@@ -89,8 +89,8 @@ class StarSubjectDialog extends StatelessWidget {
                             if(starType == StarType.none){
                               commentExpandedStatusNotifier.value = false;
 
-                              if(commentExpansionTileController.isExpanded){
-                              commentExpansionTileController.collapse();
+                              if(commentExpansibleController.isExpanded){
+                              commentExpansibleController.collapse();
                               }
 
                             }
@@ -130,7 +130,7 @@ class StarSubjectDialog extends StatelessWidget {
                       valueListenable: starTypeNotifier,
                         builder: (_,starType,child) {
                         return ExpansionTile(
-                        controller: commentExpansionTileController,
+                        controller: commentExpansibleController,
                         enabled: starType != StarType.none,
                         onExpansionChanged: (value) => commentExpandedStatusNotifier.value = value,
                         initiallyExpanded: commentExpandedStatus,

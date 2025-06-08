@@ -9,7 +9,9 @@ import 'package:dio/dio.dart';
 
 class HttpApiClient{
   static final client = Dio();
-  static BaseOptions clientOption = Dio().options;
+  static BaseOptions clientOption = BaseOptions(
+    connectTimeout: const Duration(seconds: 5),
+  );
 
   static Map<String,String> broswerHeader = {
     "User-Agent":'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0',
@@ -408,7 +410,7 @@ class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.9.2",
+                      version = "0.9.3",
                       author = "kechuan"
   ;
 

@@ -1,15 +1,20 @@
+import 'dart:io';
+
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/platforms/android_method_channel.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
-import 'package:bangu_lite/widgets/dialogs/new_update_dialog.dart';
+import 'package:bangu_lite/widgets/dialogs/inital_image_storage_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
+import 'package:docman/docman.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,10 +33,11 @@ class SettingsPage extends StatelessWidget {
 
     const List<Widget> behaviourConfigList = [
       CommentImageLoadModeTile(),
+	    ImageStorageManageTile(),
       ClearCacheTile(),
       ConfigTile(),
       AboutTile(),
-      //TestTile()
+      if(kDebugMode) TestTile()
     ];
 
 
@@ -255,7 +261,7 @@ class ColorThemeTile extends ListTile{
                                 backgroundColor: Colors.transparent,
                                 constraints: BoxConstraints(
                                   maxWidth: MediaQuery.sizeOf(context).width*5/6,
-                                  maxHeight: 400
+                                  maxHeight: 450
                                 ),
                                 context: context,
                                 builder: (_){
@@ -598,6 +604,113 @@ class AboutTile extends ListTile{
 
 }
 
+class ImageStorageManageTile extends ListTile{
+  const ImageStorageManageTile({super.key});
+
+  
+
+	@override
+	Widget build(BuildContext context) {
+
+		final ValueNotifier<int> updateStorageNotifier = ValueNotifier(0);
+
+		Future<String> imageStoragePath = getImageStoragePath();
+		
+		return Center(
+			child: ListTile(
+			
+				title: Row(
+					mainAxisAlignment: MainAxisAlignment.spaceBetween,
+					children: [
+						ScalableText("图片展示保存位置",style: TextStyle(fontSize: AppFontSize.s16)),
+
+						Row(
+							children: [
+
+								TextButton(
+									onPressed: () {
+
+										initalImageStorageDialog(context).then((result){
+											if(result != null){
+												imageStoragePath = getImageStoragePath();
+												updateStorageNotifier.value += 1;
+											}
+										});
+
+									}, 
+									child: ScalableText("设置")
+								),
+
+								
+							],
+						)
+					],
+				),
+				subtitle: DecoratedBox(
+					decoration: BoxDecoration(
+						borderRadius: BorderRadius.circular(12),
+						color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.6)
+					),
+					child: Padding(
+						padding: Padding6,
+						child: ValueListenableBuilder(
+							valueListenable: updateStorageNotifier,
+							builder: (_, __, ___) {
+							return FutureBuilder(
+								future: imageStoragePath,
+								builder: (_, snapshot) {
+							
+									String resultText = "";
+							
+									switch(snapshot.connectionState) {
+
+										case ConnectionState.waiting:{
+											resultText = "正在检查...";
+										}
+											
+										case ConnectionState.done:{
+											resultText = snapshot.data ?? "";
+										}
+							
+										default:{} 
+									}
+							
+							
+									return ScalableText("存储目录: $resultText");
+								}
+							);
+							}
+						),
+					)
+				),
+					
+			),
+		);
+
+	}
+
+	Future<String> getImageStoragePath() async { 
+
+		String resultPath = "";
+
+		if(Platform.isAndroid){
+
+			final androidPermissionsList = await DocMan.perms.list();
+
+			androidPermissionsList.sort((a,b)=> b.time.compareTo(a.time));
+			resultPath = androidPermissionsList.first.uri;
+		}
+
+		else{
+			resultPath = "${MyHive.downloadImageDir?.path}";
+		}
+
+		return resultPath;
+	}
+
+}
+
+
 class TestTile extends ListTile{
   const TestTile({super.key});
 
@@ -608,8 +721,15 @@ class TestTile extends ListTile{
       height: 80,
       child: Center(
         child: ListTile(
-          onTap: () {
-            cleanInstalledPackageCache("0.9.2");
+          onTap: () async {
+          
+            debugPrint("callAndroidFunction");
+
+            DocMan.perms.releaseAll();
+
+            //await callAndroidFunction();
+
+			
           },
           title: ScalableText("测试触发工具",style: TextStyle(fontSize: AppFontSize.s16))
         ),
@@ -617,5 +737,25 @@ class TestTile extends ListTile{
     );
 
     }
+
+}
+
+
+void saveImageFile(DocumentFile? targetWriteDocument,DocumentFile? selectedDocFile) async {
+
+	if( selectedDocFile == null || targetWriteDocument == null) return;
+
+	debugPrint("目标目录 URI: ${targetWriteDocument.uri}");
+	debugPrint("目标目录是否存在 (exists()): ${targetWriteDocument.exists}");
+	debugPrint("目标目录是否为目录 (isDirectory()): ${targetWriteDocument.isDirectory}");
+
+	if(targetWriteDocument.isDirectory && targetWriteDocument.canCreate){
+		targetWriteDocument.createFile(
+			name: selectedDocFile.name,
+			bytes: await selectedDocFile.read()
+		);
+		debugPrint("${selectedDocFile.name} created!");
+	}
+	
 
 }

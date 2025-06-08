@@ -17,7 +17,7 @@ class GroupsSelectView extends StatefulWidget {
     super.key,
     //required this.animatedGroupsListController,
     required this.sliverAnimatedListKey,
-    required this.expansionTileController,
+    required this.expansibleController,
     required this.groupTitleNotifier, 
     
     this.loadGroupTopicCallback,
@@ -27,7 +27,7 @@ class GroupsSelectView extends StatefulWidget {
 
   //final ScrollController animatedGroupsListController;
   final GlobalKey<SliverAnimatedListState> sliverAnimatedListKey;
-  final ExpansionTileController expansionTileController;
+  final ExpansibleController expansibleController;
   final ValueNotifier<String?> groupTitleNotifier;
 
   final Function(BuildContext)? loadGroupTopicCallback;

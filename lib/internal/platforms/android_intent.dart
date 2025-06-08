@@ -5,9 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 
-void noop(){}
-
-Future<void> installApk(File downloadedApkFile,{Function() fallback = noop}) async {
+Future<void> installApk(File downloadedApkFile,{Function()? fallback}) async {
 
   // 请求安装权限（Android 8.0+）
   if (await checkInstallPermission()) {
@@ -16,7 +14,7 @@ Future<void> installApk(File downloadedApkFile,{Function() fallback = noop}) asy
 
   else{
     //后备行为
-    fallback();
+    fallback?.call();
 
   }
 

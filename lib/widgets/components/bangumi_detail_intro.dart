@@ -46,6 +46,8 @@ class IntroPortrait extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    
+
     return Column(
       spacing: 12,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,8 +62,11 @@ class IntroPortrait extends StatelessWidget {
               flex: 2,
               child: FittedBox(
                 child: BuildDetailImages(
+                  imageName: bangumiDetails.name,
+                  imageID: bangumiDetails.id,
                   detailImageUrl: bangumiDetails.coverUrl,
-                  imageID: bangumiDetails.id
+                  
+
                 )
               )
             ),
@@ -282,7 +287,8 @@ class IntroLandscape extends StatelessWidget {
               child: FittedBox(
                 child: BuildDetailImages(
                   detailImageUrl: bangumiDetails.coverUrl,
-                  imageID: bangumiDetails.id
+                  imageID: bangumiDetails.id,
+                  imageName: bangumiDetails.name,
                 )
               )
             ),

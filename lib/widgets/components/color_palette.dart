@@ -24,7 +24,7 @@ class HSLColorPicker extends StatelessWidget {
           return ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: Scaffold(
-              backgroundColor: currentColor.withValues(alpha: 0.8) ,
+              backgroundColor: currentColor.withValues(alpha: 0.6) ,
               body: child!
             ),
           );

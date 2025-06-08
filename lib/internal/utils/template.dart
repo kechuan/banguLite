@@ -65,7 +65,7 @@ Future<dynamic> generalRequest(
 
   }
 
-  /// 由外部控制 completer 的返回数据
+  /// 由外部控制 completer 的返回数据 与 时机
   try{
     contentFuture().then((response){
       if(response.statusCode == 200){

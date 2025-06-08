@@ -241,6 +241,9 @@ FFRouteSettings getRouteSettings({
           imageProvider: asT<ImageProvider>(
             safeArguments['imageProvider'],
           )!,
+          name: asT<String?>(
+            safeArguments['name'],
+          ),
         ),
       );
     case '/sendComment':

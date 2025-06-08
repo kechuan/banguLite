@@ -49,24 +49,19 @@ final allEffectTag = [
     MaskTag(),
     BangumiStickerTag(),
 
-    UrlTag(
-      onTap: (link) async => 
-        await canLaunchUrlString(link).then(
-          (launchable) {
-              if (launchable) bus.emit('AppRoute', link);	
-          }
-        )
-    ),
+    AdapterUrlTag(tagName: "URL"),
+    AdapterUrlTag(tagName: "url"),
 
     //RichTag
     LateLoadImgTag(),
     LateLoadImgTag(tagName: "photo"),
+    LateLoadImgTag(tagName: "IMG"),
 
     CodeTag(),
 	  UserTag()
 ];
 
-final richlessEffectTag = allEffectTag.getRange(0, allEffectTag.length - 4);
+final richlessEffectTag = allEffectTag.getRange(0, allEffectTag.length - 5);
 
 class MaskDisplay extends StatelessWidget {
     final String maskText;
@@ -225,6 +220,37 @@ class AdapterQuoteDisplay extends StatelessWidget{
     }
 
 
+
+}
+
+class AdapterUrlTag extends StyleTag{
+  AdapterUrlTag({
+    this.tagName,
+    this.onTap
+  }): urlTag = UrlTag(onTap: onTap ?? (link) async {
+    await canLaunchUrlString(link).then(
+      (launchable) {
+          if (launchable) bus.emit('AppRoute', link);	
+      }
+    );
+  }), super( tagName ?? "url");
+
+  final UrlTag urlTag;
+  final Function(String)? onTap;
+
+  final String? tagName;
+
+  @override
+  void onTagStart(FlutterRenderer renderer) => urlTag.onTagStart(renderer);
+
+  @override
+  void onTagEnd(FlutterRenderer renderer) => urlTag.onTagEnd(renderer);
+
+  @override
+  TextStyle transformStyle(
+    TextStyle oldStyle, 
+    Map<String, String>? attributes
+  ) => urlTag.transformStyle(oldStyle, attributes);
 
 }
 
@@ -397,6 +423,7 @@ class LateLoadImgTag extends AdvancedTag {
 
     @override
     List<InlineSpan> parse(FlutterRenderer renderer, bbob.Element element) {
+
         if (element.children.isEmpty) {
             return [TextSpan(text: "[$tag]")];
         }
@@ -404,7 +431,7 @@ class LateLoadImgTag extends AdvancedTag {
         String imageUrl = element.children.first.textContent;
 
         if (tagName == "photo") {
-            imageUrl = BangumiAPIUrls.imgurl(imageUrl);
+          imageUrl = BangumiAPIUrls.imgurl(imageUrl);
         }
 
         //debugPrint("lateLoad textContent:${imageUrl}");
