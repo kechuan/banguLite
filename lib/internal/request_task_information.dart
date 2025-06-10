@@ -32,7 +32,7 @@ Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
     imageUrl,
     options: Options(
       headers: {'range':'bytes=0-1'},
-    )).timeout(const Duration(seconds: 3)).then((response){
+    )).timeout(const Duration(seconds: 5)).then((response){
 
       if(response.data!=null){
           pictureRequestInformation

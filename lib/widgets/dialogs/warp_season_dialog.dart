@@ -167,8 +167,8 @@ class SelectSeasonLandscape extends StatelessWidget {
 		          ),
 		          child: AnimatedContainer(
 		            duration: const Duration(milliseconds: 300),
-		            color: convertPassedSeason(year, currentMonth) < seasonTypeIndex ? Colors.grey : AppThemeColor.values[seasonTypeIndex].color , //unable will be grey.,,
-		            child: SizedBox(child: Center(child: Text(SeasonType.values[seasonTypeIndex].seasonText))),
+		            color: convertPassedSeason(year, currentMonth) < seasonTypeIndex ? Colors.grey : AppThemeColor.values[seasonTypeIndex].color, //unable will be grey.,,
+		            child: SizedBox(child: Center(child: Text(SeasonType.values[seasonTypeIndex].seasonText,style: TextStyle(color: Colors.black)))),
 		          )
 		        );
 		      }

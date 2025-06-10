@@ -687,18 +687,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                                 return UnVisibleResponse(
                                                     onTap: () {
 
-                                                        int currentPostion = widget.contentEditingController.selection.start;
-
-                                                        widget.contentEditingController.text = 
-                                                        convertInsertContent(
-                                                            originalText: widget.contentEditingController.text,
-                                                            insertText: '[${BBCodeTag.values[index].name}][/${BBCodeTag.values[index].name}]',
-                                                            insertOffset: currentPostion
-                                                        );
-
-                                                        widget.contentEditingController.selection = TextSelection.fromPosition(
-                                                            TextPosition(offset: currentPostion + 2 + BBCodeTag.values[index].name.length)
-                                                        );
+                                                      insertTagContent(BBCodeTag.values[index].name);
 
                                                     },
                                                     child: GridTile(
@@ -730,19 +719,8 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                         //[url=test]链接描述[/url]
                                         UnVisibleResponse(
                                             onTap: () {
-                                                int currentPostion = widget.contentEditingController.selection.start;
 
-                                                widget.contentEditingController.text = 
-                                                convertInsertContent(
-                                                    originalText: widget.contentEditingController.text,
-                                                    insertText: "[url='hyperLink']链接名称[/url]",
-                                                    insertOffset: currentPostion
-                                                );
-
-                                                widget.contentEditingController.selection = TextSelection(
-                                                    baseOffset: currentPostion + "[url='hyperLink']".length + '链接名称'.length,
-                                                    extentOffset: currentPostion + "[url='hyperLink']".length
-                                                );
+                                              insertTagContent("url",tagContent: "hyperLink",selectionContent: "链接名称");
 
                                             },
                                             child: GridTile(
@@ -754,11 +732,8 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                                 child: Center(
                                                     child: AbsorbPointer(
                                                         child: AdapterBBCodeText(
-                                                            data: '[url=]超链接[/url]',
-                                                            stylesheet: BBStylesheet(
-                                                                tags: allEffectTag,
-                                                                defaultText: TextStyle(fontFamilyFallback: convertSystemFontFamily())
-                                                            ),
+                                                          data: '[url=]超链接[/url]',
+                                                          stylesheet: appDefaultStyleSheet(context)
                                                         ),
                                                     ),
                                                 ),
@@ -768,18 +743,9 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                         UnVisibleResponse(
                                             onTap: () {
 
-                                                int currentPostion = widget.contentEditingController.selection.start;
+                                               insertTagContent("img");
 
-                                                widget.contentEditingController.text = 
-                                                convertInsertContent(
-                                                    originalText: widget.contentEditingController.text,
-                                                    insertText: "[img][/img]",
-                                                    insertOffset: currentPostion
-                                                );
-
-                                                widget.contentEditingController.selection = TextSelection.fromPosition(
-                                                    TextPosition(offset: currentPostion + "[img]".length)
-                                                );
+                                                
 
                                             },
                                             child: const GridTile(
@@ -837,7 +803,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                             SizedBox(
                                                 width: 50,
                                                 child: TextField(
-
+                                                    scrollPhysics: const NeverScrollableScrollPhysics(),
                                                     controller: fontSizeEditingController,
                                                     textAlign: TextAlign.center,
                                                     decoration: const InputDecoration(
@@ -866,7 +832,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                                     padding: const EdgeInsets.all(0),
                                                     initialValue: 16,
                                                     icon: const Icon(Icons.arrow_drop_down),
-                                                    onSelected: (value) => fontSizeEditingController.text = value.toString(),
+                                                    onSelected: (value)=> fontSizeEditingController.text = value.toString(),
                                                     constraints: const BoxConstraints(maxHeight: 200),
 
                                                     itemBuilder: (_) {
@@ -886,7 +852,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                             IconButton(
                                                 icon: const Icon(Icons.upload),
                                                 onPressed: () {
-                                                    widget.contentEditingController.text += "[size=${(int.tryParse(fontSizeEditingController.text) ?? 16).clamp(8, 64)}][/size]";
+                                                  insertTagContent("size",tagContent: (int.tryParse(fontSizeEditingController.text) ?? 16).clamp(8, 64).toString());
                                                 },
                                             ),
 
@@ -908,13 +874,14 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                                 children: [
 
                                                     ScalableText("文字颜色 #", style: TextStyle(
-                                                            color: Color(selectedColor.value32bit))
+                                                      color: Color(selectedColor.value32bit))
                                                     ),
 
                                                     SizedBox(
                                                         width: 80,
                                                         child: TextField(
                                                             controller: hexColorEditingController,
+                                                            scrollPhysics: const NeverScrollableScrollPhysics(),
                                                             textAlign: TextAlign.center,
                                                             decoration: const InputDecoration(
                                                                 isDense: true, //相当于shrinkWrap
@@ -933,8 +900,6 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                                         icon: const Icon(Icons.brush_outlined),
                                                         onPressed: () {
 
-                                                            //final Color color = Color(int.tryParse('0xFF${colorEditingValue.text}') ?? 0xFFFFFFFF);
-
                                                             showModalBottomSheet(
                                                                 backgroundColor: Colors.transparent,
                                                                 constraints: BoxConstraints(
@@ -944,10 +909,10 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                                                 context: context,
                                                                 builder: (_) => HSLColorPicker(selectedColor: selectedColor)
                                                             ).then((newColor) {
-                                                                        if (newColor != null && newColor is Color) {
-                                                                            hexColorEditingController.value = TextEditingValue(text: newColor.hex);
-                                                                        }
-                                                                    });
+                                                                if (newColor != null && newColor is Color) {
+                                                                    hexColorEditingController.value = TextEditingValue(text: newColor.hex);
+                                                                }
+                                                            });
                                                         }, 
 
                                                     ),
@@ -955,7 +920,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                                     IconButton(
                                                         icon: const Icon(Icons.upload),
                                                         onPressed: () {
-                                                            widget.contentEditingController.text += "[color=${hexColorEditingController.text}][/color]";
+                                                          insertTagContent("color",tagContent: hexColorEditingController.text);
                                                         },
                                                     ),
 
@@ -972,4 +937,58 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
             ),
         );
     }
+
+
+    void insertTagContent(
+      String tag,
+      {
+        String? tagContent,
+        String? selectionContent,
+
+      }
+    ){
+      int currentPostion = widget.contentEditingController.selection.start;
+
+      String resultPrefixTag = "";
+
+      if(tagContent == null && selectionContent == null) {
+        resultPrefixTag = "[$tag]";
+      }
+
+      else if(tagContent == null && selectionContent != null) {
+        resultPrefixTag = "[$tag]$selectionContent";
+      }
+
+      else if(tagContent != null && selectionContent == null) {
+        resultPrefixTag = "[$tag=$tagContent]";
+      }
+
+      else{
+        resultPrefixTag = "[$tag=$tagContent]$selectionContent";
+      }
+
+      widget.contentEditingController.text = 
+      convertInsertContent(
+          originalText: widget.contentEditingController.text,
+          insertText: "$resultPrefixTag[/$tag]",
+          insertOffset: currentPostion
+      );
+
+      if(selectionContent == null){
+        widget.contentEditingController.selection = TextSelection.fromPosition(
+          TextPosition(offset: currentPostion + resultPrefixTag.length)
+        );
+
+      }
+
+      else{
+        widget.contentEditingController.selection = TextSelection(
+          baseOffset: currentPostion + resultPrefixTag.length - selectionContent.length,
+          extentOffset: currentPostion + resultPrefixTag.length
+        );
+      }
+
+
+    }
+
 }

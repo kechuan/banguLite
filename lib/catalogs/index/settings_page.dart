@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/platforms/android_method_channel.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -17,6 +16,7 @@ import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 @FFRoute(name: 'settings')
 class SettingsPage extends StatelessWidget {
@@ -130,19 +130,6 @@ class SettingsPage extends StatelessWidget {
           ),
         ),
       ),
-
-      //body: EasyRefresh(
-      //  child: ListView.separated(
-      //  shrinkWrap: true,
-      //  itemCount: configWidgetList.length,
-      //  itemBuilder: (context, index) {
-      //    return configWidgetList[index];
-      //  },
-      //  separatorBuilder: (context, index) => const Divider(height: 1),
-          
-      //  ),
-      //),
-
 
     );
   }
@@ -618,71 +605,109 @@ class ImageStorageManageTile extends ListTile{
 		
 		return Center(
 			child: ListTile(
-			
 				title: Row(
 					mainAxisAlignment: MainAxisAlignment.spaceBetween,
 					children: [
-						ScalableText("图片展示保存位置",style: TextStyle(fontSize: AppFontSize.s16)),
+						ScalableText("手动保存的图片位置",style: TextStyle(fontSize: AppFontSize.s16)),
 
-						Row(
-							children: [
+            Row(
+              spacing: 12,
+              children: [
 
-								TextButton(
-									onPressed: () {
+                TextButton(
+                  onPressed: () {
+                
+                    if(Platform.isAndroid){
+                      initalImageStorageDialog(context).then((result){
+                        if(result != null){
+                          imageStoragePath = getImageStoragePath();
+                          updateStorageNotifier.value += 1;
+                        }
+                      });
+                    }
+                
+                    else{
 
-										initalImageStorageDialog(context).then((result){
-											if(result != null){
-												imageStoragePath = getImageStoragePath();
-												updateStorageNotifier.value += 1;
-											}
-										});
+                      launchUrlString(
+                        MyHive.downloadImageDir!.path,
+                        mode: LaunchMode.externalApplication,
+                      );
 
-									}, 
-									child: ScalableText("设置")
-								),
+                    }
+                
+                    
+                
+                  }, 
+                  child: ScalableText(Platform.isAndroid ? "设置" : "打开目录")
+                ),
 
-								
-							],
-						)
-					],
+                //TextButton(
+                //  onPressed: () async {
+
+
+                //    if (Platform.isAndroid) {
+                //      openFileExplorerIntent(await getImageStoragePath());
+
+                //    } 
+                    
+                //    else {
+                //      launchUrlString(
+                //        MyHive.downloadImageDir!.path,
+                //        mode: LaunchMode.externalApplication,
+                //      );
+                //    }
+
+                //  }, 
+                //  child: ScalableText("打开目录")
+                //),
+
+              ],
+
+
+            )
+					
+          ],
 				),
-				subtitle: DecoratedBox(
-					decoration: BoxDecoration(
-						borderRadius: BorderRadius.circular(12),
-						color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.6)
-					),
-					child: Padding(
-						padding: Padding6,
-						child: ValueListenableBuilder(
-							valueListenable: updateStorageNotifier,
-							builder: (_, __, ___) {
-							return FutureBuilder(
-								future: imageStoragePath,
-								builder: (_, snapshot) {
-							
-									String resultText = "";
-							
-									switch(snapshot.connectionState) {
-
-										case ConnectionState.waiting:{
-											resultText = "正在检查...";
-										}
-											
-										case ConnectionState.done:{
-											resultText = snapshot.data ?? "";
-										}
-							
-										default:{} 
-									}
-							
-							
-									return ScalableText("存储目录: $resultText");
-								}
-							);
-							}
-						),
-					)
-				),
+				subtitle: Padding(
+          padding: PaddingV12,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.6)
+            ),
+            child: Padding(
+              padding: Padding6,
+              child: ValueListenableBuilder(
+                valueListenable: updateStorageNotifier,
+                builder: (_, __, ___) {
+                return FutureBuilder(
+                  future: imageStoragePath,
+                  builder: (_, snapshot) {
+                
+                    String resultText = "";
+                
+                    switch(snapshot.connectionState) {
+          
+                      case ConnectionState.waiting:{
+                        resultText = "正在检查...";
+                      }
+                        
+                      case ConnectionState.done:{
+                        resultText = snapshot.data ?? "";
+                      }
+                
+                      default:{} 
+                    }
+                
+                
+                    return ScalableText("存储目录: $resultText");
+                  }
+                );
+                }
+              ),
+            )
+          ),
+        ),
 					
 			),
 		);
@@ -725,7 +750,11 @@ class TestTile extends ListTile{
           
             debugPrint("callAndroidFunction");
 
-            DocMan.perms.releaseAll();
+            await DocMan.perms.list().then((result){
+              debugPrint("list: $result");
+            });
+
+            //DocMan.perms.releaseAll();
 
             //await callAndroidFunction();
 

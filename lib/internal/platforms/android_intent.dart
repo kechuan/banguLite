@@ -80,3 +80,4 @@ Future<void> launchInstallIntent(File apkFile) async {
     debugPrint('启动安装界面失败: $e');
   }
 }
+

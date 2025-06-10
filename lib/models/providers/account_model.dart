@@ -17,8 +17,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-
-
 class AccountModel extends ChangeNotifier {
 
     AccountModel();
@@ -54,35 +52,31 @@ class AccountModel extends ChangeNotifier {
             },
         ).then((status) {
 
-                    isLogining = true;
-                    notifyListeners();
+          //刷新 avatar用
 
-                    if (status) {
+          if (status) {
+            debugPrint("expired at:${loginedUserInformations.expiredTime}");
+            //debugPrint("accessToken:${loginedUserInformations.accessToken}");
+            getNotifications();
 
-                        debugPrint("expired at:${loginedUserInformations.expiredTime}");
-                        //debugPrint("accessToken:${loginedUserInformations.accessToken}");
-                        isLogining = null;
+            loginedUserInformations.expiredTime?.let((it) {
+                //效果还剩3天时自动刷新令牌
+                final differenceTime = DateTime.fromMillisecondsSinceEpoch(it * 1000).difference(DateTime.now());
+                if (differenceTime < const Duration(days: 3)) {
+                    updateAccessToken(loginedUserInformations.refreshToken);
+                    //debugPrint("${DateTime.fromMillisecondsSinceEpoch(it*1000).difference(DateTime.now()).inDays}");
+                }
 
-                        getNotifications();
+              });
+          }
 
-                        loginedUserInformations.expiredTime?.let((it) {
-                          //效果还剩3天时自动刷新令牌
-                          final differenceTime = DateTime.fromMillisecondsSinceEpoch(it * 1000).difference(DateTime.now());
-                          if (differenceTime < const Duration(days: 3)) {
-                              updateAccessToken(loginedUserInformations.refreshToken);
-                              //debugPrint("${DateTime.fromMillisecondsSinceEpoch(it*1000).difference(DateTime.now()).inDays}");
-                          }
+          else {
+            isLogining = false;
+            loginedUserInformations = getDefaultLoginedUserInformations();
+          }
 
-                        });
-                    }
-
-                    else {
-                        loginedUserInformations = getDefaultLoginedUserInformations();
-                        isLogining = null;
-                    }
-
-                    notifyListeners();
-                });
+          notifyListeners();
+      });
     }
 
     void logout() {
