@@ -6,7 +6,6 @@ import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/views/timeline_list_view.dart';
@@ -32,7 +31,8 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
     final ValueNotifier<BangumiTimelineSortType> timelineSortTypeNotifier = ValueNotifier(BangumiTimelineSortType.all);
 
     final PageController timelinePageController = PageController();
-    final EasyRefreshController topicListViewEasyRefreshController = EasyRefreshController();
+
+    final EasyRefreshController timelineViewEasyRefreshController = EasyRefreshController();
     late TabController tabController; // 新增TabController声明
 
     double residualOffset = 0.0;
@@ -47,30 +47,6 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
             vsync: this,
             length: BangumiSurfTimelineType.values.length,
         );
-
-        tabController.addListener(() {
-
-          //debugPrint('[tabController] 差值:$residualOffset');
-
-          //if((tabController.index - timelinePageController.page!).abs() < 1) return;
-
-          //timelinePageController.jumpToPage(tabController.index);
-
-
-          //if(residualOffset != 0.0) return;
-
-          //if (tabController.indexIsChanging && residualOffset.abs() < 0.5) {
-
-          //    timelinePageController.animateToPage(
-          //        tabController.index,
-          //        duration: const Duration(milliseconds: 300),
-          //        curve: Curves.easeInOut,
-          //    );
-
-          //}
-
-      });
-
     }
 
     @override
@@ -169,19 +145,8 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
                         indicatorSize: TabBarIndicatorSize.tab,
                         onTap: (value) {
 
-                          if((value - timelinePageController.page!).abs().toInt() > 1){
-                            timelinePageController.jumpToPage(value);
-                          }
+                          timelinePageControllerAction(value);
 
-                          else{
-                            timelinePageController.animateToPage(
-                              value,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeOut
-                            );
-                          }
-
-                          
                         },
                         tabs: List.generate(
                             BangumiSurfTimelineType.values.length, (index) {
@@ -206,11 +171,7 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
                             controller: timelinePageController,
                             onPageChanged: (value) {
 
-
                               tabController.animateTo(value);
-
-                              final timelineFlowModel = context.read<TimelineFlowModel>();
-                              timelineFlowModel.updateTimelineIndex(tabController.index);
                               
                               debugPrint("PageView Changed:$value");
 
@@ -218,15 +179,14 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
                             itemBuilder: (_, timelineIndex) {
 
                               return BangumiTimelineContentView(
-                                tabController: tabController, 
-                                timelinePageController: timelinePageController,
-                                groupTypeNotifier: groupTypeNotifier,
-                                timelineSortTypeNotifier: timelineSortTypeNotifier,
-                                topicListViewEasyRefreshController: topicListViewEasyRefreshController,
-              
-                              );
+                                  currentPageIndex: timelineIndex,
+                                  groupTypeNotifier: groupTypeNotifier,
+                                  timelineSortTypeNotifier: timelineSortTypeNotifier,
+                                  timelineViewEasyRefreshController: timelineViewEasyRefreshController,
+                                              
+                                );
+                            }
 
-                            },
                           ),
                         ),
                     )
@@ -277,9 +237,17 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
                             onSelected: (value) {
 
                               tabController.animateTo(index);
+                              timelinePageControllerAction(index);
 
                               notifier.value = value;
-                              topicListViewEasyRefreshController.callRefresh();
+
+                              /// 如果直接执行 会让当前的页面丢失callRefresh 从而无法触发 onRefresh回调
+                              /// 笨方法 但有用 反正动画效果都是 300ms 的 即使没动画这样的latency也是完全可以接受
+
+                              Future.delayed(const Duration(milliseconds: 200)).then((_){
+                                timelineViewEasyRefreshController.callRefresh();
+                              });
+                              
 
                             },
                             child: const Icon(Icons.arrow_drop_down),
@@ -293,6 +261,20 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
       );
 
       
+    }
+
+    void timelinePageControllerAction(int newIndex){
+      if((newIndex - timelinePageController.page!).abs().toInt() > 1){
+        timelinePageController.jumpToPage(newIndex);
+      }
+
+      else{
+        timelinePageController.animateToPage(
+          newIndex,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut
+        );
+      }
     }
 
 

@@ -17,24 +17,26 @@ import 'package:provider/provider.dart';
 class BangumiTimelineContentView extends StatefulWidget{
 
   const BangumiTimelineContentView({
-    super.key, 
-    required this.tabController,
-    required this.timelinePageController,
+    super.key,
 
+	required this.currentPageIndex,
     required this.groupTypeNotifier,
     required this.timelineSortTypeNotifier,
 
-    required this.topicListViewEasyRefreshController,
+    required this.timelineViewEasyRefreshController,
+
+	
 
   });
 
-   final TabController tabController; // 新增TabController声明
-   final PageController timelinePageController;
+  final int currentPageIndex;
+
+
 
    final ValueNotifier<BangumiSurfGroupType> groupTypeNotifier;
    final ValueNotifier<BangumiTimelineSortType> timelineSortTypeNotifier;
 
-   final EasyRefreshController topicListViewEasyRefreshController;
+   final EasyRefreshController timelineViewEasyRefreshController;
 
 
   @override
@@ -44,67 +46,62 @@ class BangumiTimelineContentView extends StatefulWidget{
 }
 
 class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineContentView> 
-with SingleTickerProviderStateMixin, RouteLifecycleMixin   {
+	with SingleTickerProviderStateMixin, RouteLifecycleMixin {
 
   GlobalKey<AnimatedListState> animatedKey = GlobalKey();
   final ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-
+	//super.build(context);
     final timelineFlowModel = context.read<TimelineFlowModel>();
 
-    return Selector<TimelineFlowModel,int>(
-      selector: (_, timelineFlowModel) => timelineFlowModel.currentTimelineIndex,
-      shouldRebuild: (previous, next) {
-        return previous != next;  
-      },
-      builder: (_,__,___) {
 
-        return EasyRefresh(
-          controller: widget.topicListViewEasyRefreshController,
-          triggerAxis: Axis.vertical,
-          header: const MaterialHeader(),
-          footer: const MaterialFooter(),
-          refreshOnStart: timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.tabController.index]]?.isEmpty ?? true,
-          callRefreshOverOffset: 15,
-          onRefresh: () => loadTimelineContent(context),
-          onLoad: () => loadTimelineContent(context,isAppend: true),
-        
-          child: Column(
-            children: [
-              Expanded(
-                child: AnimatedList(
-                  controller: scrollController,
-                  key: animatedKey,
-                  initialItemCount: timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.tabController.index]]?.length ?? 0,
-                  shrinkWrap: true,
-                  itemBuilder: (_,index,animation){
-                    
-                    //Animated Question
+		debugPrint("timelineList rebuild: ${widget.currentPageIndex}");
 
-                    if(index >= timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.tabController.index]]!.length){
-                      return const SizedBox();
-                    }
-                    
-        
-                    return Container(
-                      padding: PaddingH12,
-                      color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
-                      child: BangumiTimelineTile(
-                        surfTimelineDetails: timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.tabController.index]]![index],
-                      )
-                    );
-        
-                  }
-                ),
-              ),
-            ],
-          ),
-        
+
+		return EasyRefresh(
+			controller: widget.timelineViewEasyRefreshController,
+			triggerAxis: Axis.vertical,
+			header: const MaterialHeader(),
+			footer: const MaterialFooter(),
+			refreshOnStart: timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.currentPageIndex]]?.isEmpty ?? true,
+			callRefreshOverOffset: 15,
+			onRefresh: () => loadTimelineContent(context),
+			onLoad: () => loadTimelineContent(context,isAppend: true),
+			
+			child: Column(
+				children: [
+				Expanded(
+					child: AnimatedList(
+					controller: scrollController,
+					key: animatedKey,
+					initialItemCount: timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.currentPageIndex]]?.length ?? 0,
+					shrinkWrap: true,
+					itemBuilder: (_,index,animation){
+						
+						//Animated Question
+
+						if(index >= timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.currentPageIndex]]!.length){
+							return const SizedBox();
+						}
+						
+			
+						return Container(
+							padding: PaddingH12,
+							color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
+							child: BangumiTimelineTile(
+								surfTimelineDetails: timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.currentPageIndex]]![index],
+							)
+						);
+			
+					}
+					),
+				),
+				],
+			),
+			
         );
-      }
-    );
   }
 
   void loadTimelineContent(
@@ -119,7 +116,7 @@ with SingleTickerProviderStateMixin, RouteLifecycleMixin   {
 
     if(accountModel.isLogined() == false){
       if(
-        widget.tabController.index == BangumiSurfTimelineType.group.index &&
+        widget.currentPageIndex == BangumiSurfTimelineType.group.index &&
         widget.groupTypeNotifier.value != BangumiSurfGroupType.all
       ){
         invokeToaster(message: "登录以获取更多内容");
@@ -129,13 +126,13 @@ with SingleTickerProviderStateMixin, RouteLifecycleMixin   {
 
 
       Map<String,dynamic> queryParameters = {};
-      final initData = timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.tabController.index]];
+      final initData = timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.currentPageIndex]];
       int initalLength = initData?.length ?? 0;
 
 
       if(isAppend == true){
 
-        switch(BangumiSurfTimelineType.values[widget.tabController.index]){
+        switch(BangumiSurfTimelineType.values[widget.currentPageIndex]){
           case BangumiSurfTimelineType.subject:{queryParameters = BangumiQuerys.groupTopicQuery..["offset"] = initalLength;}
           case BangumiSurfTimelineType.group:{
             queryParameters = BangumiQuerys.groupsTopicsQuery(mode: widget.groupTypeNotifier.value,offset: initalLength);
@@ -153,7 +150,7 @@ with SingleTickerProviderStateMixin, RouteLifecycleMixin   {
 
       else{
 
-        switch(BangumiSurfTimelineType.values[widget.tabController.index]){
+        switch(BangumiSurfTimelineType.values[widget.currentPageIndex]){
           
           case BangumiSurfTimelineType.group:{
             queryParameters = BangumiQuerys.groupsTopicsQuery(mode: widget.groupTypeNotifier.value);
@@ -173,16 +170,14 @@ with SingleTickerProviderStateMixin, RouteLifecycleMixin   {
 
 
       await timelineFlowModel.requestSelectedTimeLineType(
-        BangumiSurfTimelineType.values[widget.tabController.index],
+        BangumiSurfTimelineType.values[widget.currentPageIndex],
         isAppend:isAppend,
         queryParameters: queryParameters
       ).then((result){
 
-        final currentTimelineData = timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.tabController.index]];
+        final currentTimelineData = timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.currentPageIndex]];
 
         int receiveLength = max(0,currentTimelineData?.length ?? 0 - initalLength);
-
-        
 
         animatedListAppendContentCallback(
           result,

@@ -17,13 +17,6 @@ class TimelineFlowModel extends ChangeNotifier {
     BangumiSurfTimelineType.timeline: [],
   };
 
-  int currentTimelineIndex = 0;
-
-  void updateTimelineIndex(int newIndex){
-    currentTimelineIndex = newIndex;
-    notifyListeners();
-  }
-
    //上滑 或 初次载入时触发
   Future<bool> requestSelectedTimeLineType(
     BangumiSurfTimelineType timelineType,

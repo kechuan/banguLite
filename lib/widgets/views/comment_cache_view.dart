@@ -122,6 +122,7 @@ class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepA
           debugPrint("widget.currentPageIndex: ${widget.currentPageIndex+1} loadData");
           //isDataLoaded = true;
 
+		  //提前加载页码以保持浏览体验流畅
           WidgetsBinding.instance.addPostFrameCallback((timestamp){
             context.read<CommentModel>().loadComments(
               //widget.id,
