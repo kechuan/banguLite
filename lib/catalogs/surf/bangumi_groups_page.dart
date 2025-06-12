@@ -231,10 +231,10 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                                                 builder: (_, groupsModel, __) {
                               
                                                     List selectedGroupData = groupTitleNotifier.value == null ?
-                                                        timelineFlowModel.timelinesData[BangumiTimelineType.group] ?? [] :
+                                                        timelineFlowModel.timelinesData[BangumiSurfTimelineType.group] ?? [] :
                                                         loadSurfTimelineDetails(
                                                             groupsModel.contentListData,
-                                                            bangumiTimelineType: BangumiTimelineType.group
+                                                            bangumiSurfTimelineType: BangumiSurfTimelineType.group
                                                         )
                                                     ;
                               
@@ -291,7 +291,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
         final Function() invokeRequest;
 
         List selectedGroupData = groupTitleNotifier.value == null ?
-        timelineFlowModel.timelinesData[BangumiTimelineType.group] ?? [] :
+        timelineFlowModel.timelinesData[BangumiSurfTimelineType.group] ?? [] :
         groupsModel.contentListData;
 
         final initalLength = selectedGroupData.length;
@@ -299,7 +299,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
         if (groupTitleNotifier.value == null) {
 
             invokeRequest = () => timelineFlowModel.requestSelectedTimeLineType(
-                BangumiTimelineType.group,
+                BangumiSurfTimelineType.group,
                 isAppend: isAppend,
                 queryParameters: BangumiQuerys.groupsTopicsQuery(offset: initalLength)
             );
@@ -315,7 +315,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                 //无法让 selectedGroupData 重新获取引用 只能再次赋值变量
 
                 List newSelectedGroupData = groupTitleNotifier.value == null ?
-                timelineFlowModel.timelinesData[BangumiTimelineType.group] ?? [] :
+                timelineFlowModel.timelinesData[BangumiSurfTimelineType.group] ?? [] :
                 groupsModel.contentListData;
 
                 final int receiveLength = max(0, newSelectedGroupData.length);

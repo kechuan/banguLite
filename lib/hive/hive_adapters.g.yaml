@@ -127,7 +127,7 @@ types:
         index: 0
       title:
         index: 1
-      bangumiTimelineType:
+      bangumiSurfTimelineType:
         index: 2
       sourceTitle:
         index: 3
@@ -159,7 +159,7 @@ types:
         index: 6
       commentReactions:
         index: 7
-  BangumiTimelineType:
+  bangumiSurfTimelineType:
     typeId: 12
     nextIndex: 4
     fields:

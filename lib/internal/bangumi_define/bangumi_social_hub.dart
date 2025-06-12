@@ -41,7 +41,7 @@ enum BangumiSocialHubType{
   const BangumiSocialHubType(this.typeName,this.iconData);
 }
 
-enum BangumiTimelineType{
+enum BangumiSurfTimelineType{
   all("全部",Icons.history),
   subject("条目",Icons.crop_free),
   group("小组",Icons.forum_outlined),
@@ -55,31 +55,40 @@ enum BangumiTimelineType{
   final String typeName;
   final IconData iconData;
 
-  const BangumiTimelineType(this.typeName,this.iconData);
+  const BangumiSurfTimelineType(this.typeName,this.iconData);
 
-  static BangumiTimelineType? fromPostCommentType(PostCommentType? postCommentType){
+  static BangumiSurfTimelineType? fromPostCommentType(PostCommentType? postCommentType){
 
     if(postCommentType == null) return null;
 
     if(postCommentType.index.isInRange(PostCommentType.subjectComment.index, PostCommentType.replyTopic.index)){
-      return BangumiTimelineType.subject;
+      return BangumiSurfTimelineType.subject;
     }
 
     if(postCommentType.index.isInRange(PostCommentType.postGroupTopic.index, PostCommentType.replyGroupTopic.index)){
-      return BangumiTimelineType.group;
+      return BangumiSurfTimelineType.group;
     }
 
     if(postCommentType.index.isInRange(PostCommentType.postTimeline.index, PostCommentType.replyTimeline.index)){
-      return BangumiTimelineType.timeline;
+      return BangumiSurfTimelineType.timeline;
     }
 
     return null;
 
-    
-
-    
   }
 }
+
+enum BangumiTimelineSortType{
+  all("全部"),
+  friends("仅好友")
+  ;
+
+  final String typeName;
+  const BangumiTimelineSortType(this.typeName);
+
+}
+
+
 
 enum BangumiSurfGroupType {
 

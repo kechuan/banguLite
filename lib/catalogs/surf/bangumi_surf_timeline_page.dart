@@ -6,6 +6,7 @@ import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/views/timeline_list_view.dart';
@@ -28,6 +29,8 @@ class BangumiTimelinePage extends StatefulWidget {
 class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage> with SingleTickerProviderStateMixin, RouteLifecycleMixin  {
 
     final ValueNotifier<BangumiSurfGroupType> groupTypeNotifier = ValueNotifier(BangumiSurfGroupType.all);
+    final ValueNotifier<BangumiTimelineSortType> timelineSortTypeNotifier = ValueNotifier(BangumiTimelineSortType.all);
+
     final PageController timelinePageController = PageController();
     final EasyRefreshController topicListViewEasyRefreshController = EasyRefreshController();
     late TabController tabController; // 新增TabController声明
@@ -40,25 +43,31 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
         super.initState();
 
         tabController = TabController(
-            initialIndex: BangumiTimelineType.all.index,
+            initialIndex: BangumiSurfTimelineType.all.index,
             vsync: this,
-            length: BangumiTimelineType.values.length,
+            length: BangumiSurfTimelineType.values.length,
         );
 
         tabController.addListener(() {
 
-          debugPrint('[tabController] 差值:$residualOffset');
-          if(residualOffset != 0.0) return;
+          //debugPrint('[tabController] 差值:$residualOffset');
 
-          if (tabController.indexIsChanging && residualOffset.abs() < 0.5) {
+          //if((tabController.index - timelinePageController.page!).abs() < 1) return;
 
-              timelinePageController.animateToPage(
-                  tabController.index,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-              );
+          //timelinePageController.jumpToPage(tabController.index);
 
-          }
+
+          //if(residualOffset != 0.0) return;
+
+          //if (tabController.indexIsChanging && residualOffset.abs() < 0.5) {
+
+          //    timelinePageController.animateToPage(
+          //        tabController.index,
+          //        duration: const Duration(milliseconds: 300),
+          //        curve: Curves.easeInOut,
+          //    );
+
+          //}
 
       });
 
@@ -157,135 +166,135 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
                 children: [
                     TabBar( // 直接使用显式控制器
                         controller: tabController, // 关联控制器
+                        indicatorSize: TabBarIndicatorSize.tab,
                         onTap: (value) {
 
-                            tabController.animateTo(value);
+                          if((value - timelinePageController.page!).abs().toInt() > 1){
+                            timelinePageController.jumpToPage(value);
+                          }
 
-                            if ((value - timelinePageController.page!).abs() > 1) {
-                                timelinePageController.jumpToPage(
-                                    value,
-                                );
-                            }
+                          else{
+                            timelinePageController.animateToPage(
+                              value,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOut
+                            );
+                          }
 
-                            else {
-                                timelinePageController.animateToPage(
-                                    value,
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeOut
-                                );
-                            }
-
+                          
                         },
-                        indicatorSize: TabBarIndicatorSize.tab,
                         tabs: List.generate(
-                            BangumiTimelineType.values.length, (index) {
+                            BangumiSurfTimelineType.values.length, (index) {
 
-                                if (index == BangumiTimelineType.group.index) {
-                                    return Tab(
-
-                                        child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-
-                                                ValueListenableBuilder(
-                                                    valueListenable: groupTypeNotifier,
-                                                    builder: (_, groupType, child) {
-                                                        if (groupType == BangumiSurfGroupType.all) return const SizedBox.shrink();
-                                                        return ScalableText(groupTypeNotifier.value.typeName, style: const TextStyle(fontSize: 12));
-                                                    }
-                                                ),
-
-                                                Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                    spacing: 6,
-                                                    children: [
-                                                        ScalableText(BangumiTimelineType.values[index].typeName),
-
-                                                        PopupMenuButton<BangumiSurfGroupType>(
-                                                            padding: EdgeInsets.zero,
-                                                            initialValue: BangumiSurfGroupType.all,
-                                                            itemBuilder: (_) {
-                                                                return BangumiSurfGroupType.values.map(
-                                                                    (currentGroupType) {
-                                                                        return PopupMenuItem<BangumiSurfGroupType>(
-                                                                            value: currentGroupType,
-                                                                            child: Text(currentGroupType.typeName),
-                                                                        );
-                                                                    }).toList();
-                                                            },
-                                                            onSelected: (value) {
-
-                                                                timelinePageController.animateToPage(
-                                                                    index,
-                                                                    duration: const Duration(milliseconds: 300),
-                                                                    curve: Curves.easeOut
-                                                                ).then((_) {
-                                                                  groupTypeNotifier.value = value;
-                                                                  topicListViewEasyRefreshController.callRefresh();
-                                                                });
-
-                                                            },
-                                                            child: const Icon(Icons.arrow_drop_down),
-
-                                                        )
-
-                                                    ],
-                                                ),
-                                            ],
-                                        ),
-                                    );
+                                if (index == BangumiSurfTimelineType.group.index) {
+                                  return specialTab(index,BangumiSurfGroupType.values,groupTypeNotifier);
                                 }
 
-                                return Tab(text: BangumiTimelineType.values[index].typeName);
+                                else if(index == BangumiSurfTimelineType.timeline.index){
+                                  return specialTab(index,BangumiTimelineSortType.values,timelineSortTypeNotifier);
+                                }
+
+                                return Tab(text: BangumiSurfTimelineType.values[index].typeName);
                             }
                         )
                     ),
 
                     Expanded(
                         child: EasyRefresh(
-                            child: PageView.builder(
-                                itemCount: BangumiTimelineType.values.length,
-                                controller: timelinePageController,
-                                onPageChanged: (value) {
+                          child: PageView.builder(
+                            itemCount: BangumiSurfTimelineType.values.length,
+                            controller: timelinePageController,
+                            onPageChanged: (value) {
 
-                                    residualOffset = tabController.index - timelinePageController.page!;
 
-                                    //debugPrint('差值:$residualOffset');
+                              tabController.animateTo(value);
 
-                                    if (residualOffset.abs() < 0.5) {
-                                        return;
-                                    }
+                              final timelineFlowModel = context.read<TimelineFlowModel>();
+                              timelineFlowModel.updateTimelineIndex(tabController.index);
+                              
+                              debugPrint("PageView Changed:$value");
 
-                                    //EasyRefresh 手势 与 pageView 通病 无法同时使用
+                            },
+                            itemBuilder: (_, timelineIndex) {
 
-                                    timelinePageController.jumpToPage(tabController.index);
-                                    
+                              return BangumiTimelineContentView(
+                                tabController: tabController, 
+                                timelinePageController: timelinePageController,
+                                groupTypeNotifier: groupTypeNotifier,
+                                timelineSortTypeNotifier: timelineSortTypeNotifier,
+                                topicListViewEasyRefreshController: topicListViewEasyRefreshController,
+              
+                              );
 
-                                    tabController.animateTo(value);
-
-                                },
-                                itemBuilder: (_, timelineIndex) {
-                                    return ValueListenableBuilder(
-                                        valueListenable: groupTypeNotifier,
-                                        builder: (_, currentGroupType, __) {
-
-                                            return BangumiTimelineContentView(
-                                                tabController: tabController, 
-                                                timelinePageController: timelinePageController,
-                                                groupTypeNotifier: groupTypeNotifier,
-                                                topicListViewEasyRefreshController: topicListViewEasyRefreshController,
-
-                                            );
-
-                                        }
-                                    );
-                                },
-                            ),
+                            },
+                          ),
                         ),
                     )
                 ],
             ),
         );
     }
+
+
+    Widget specialTab(
+      int index, 
+      List<dynamic> enumList,
+      ValueNotifier<dynamic> notifier
+    ){
+
+      return Tab(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+
+                ValueListenableBuilder(
+                    valueListenable: notifier,
+                    builder: (_, notifierValue, child) {
+                        if (notifierValue.index == 0) return const SizedBox.shrink();
+                        return ScalableText(notifier.value.typeName, style: const TextStyle(fontSize: 12));
+                    }
+                ),
+
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    spacing: 6,
+                    children: [
+                        ScalableText(BangumiSurfTimelineType.values[index].typeName),
+
+                        PopupMenuButton<dynamic>(
+                            padding: EdgeInsets.zero,
+                            initialValue: enumList.first,
+                            itemBuilder: (_) {
+                              return enumList.map(
+                                (currentGroupType) {
+                                    return PopupMenuItem<dynamic>(
+                                      value: currentGroupType,
+                                      child: Text(currentGroupType.typeName),
+                                    );
+                                }
+                              ).toList();
+                            },
+                            onSelected: (value) {
+
+                              tabController.animateTo(index);
+
+                              notifier.value = value;
+                              topicListViewEasyRefreshController.callRefresh();
+
+                            },
+                            child: const Icon(Icons.arrow_drop_down),
+
+                        )
+
+                    ],
+                ),
+            ],
+        ),
+      );
+
+      
+    }
+
+
 
 }

@@ -68,7 +68,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
 
     return await HttpApiClient.client.get(
       BangumiAPIUrls.blogComment(blogID),
-      options: BangumiAPIUrls.bangumiAccessOption
+      options: BangumiAPIUrls.bangumiAccessOption()
     );
   }
 
@@ -77,7 +77,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
 
     return await HttpApiClient.client.get(
       BangumiAPIUrls.blogPhotos(blogID),
-      options: BangumiAPIUrls.bangumiAccessOption
+      options: BangumiAPIUrls.bangumiAccessOption()
     );
   }
 

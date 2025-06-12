@@ -226,7 +226,8 @@ class AdapterQuoteDisplay extends StatelessWidget{
 class AdapterUrlTag extends StyleTag{
   AdapterUrlTag({
     this.tagName,
-    this.onTap
+    this.onTap,
+    
   }): urlTag = UrlTag(onTap: onTap ?? (link) async {
     await canLaunchUrlString(link).then(
       (launchable) {

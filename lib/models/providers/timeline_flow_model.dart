@@ -10,16 +10,23 @@ import 'package:flutter/material.dart';
 class TimelineFlowModel extends ChangeNotifier {
   TimelineFlowModel();
 
-  final Map<BangumiTimelineType,List<SurfTimelineDetails>> timelinesData = {
-    BangumiTimelineType.all: [],
-    BangumiTimelineType.subject: [],
-    BangumiTimelineType.group: [],
-    BangumiTimelineType.timeline: [],
+  final Map<BangumiSurfTimelineType,List<SurfTimelineDetails>> timelinesData = {
+    BangumiSurfTimelineType.all: [],
+    BangumiSurfTimelineType.subject: [],
+    BangumiSurfTimelineType.group: [],
+    BangumiSurfTimelineType.timeline: [],
   };
+
+  int currentTimelineIndex = 0;
+
+  void updateTimelineIndex(int newIndex){
+    currentTimelineIndex = newIndex;
+    notifyListeners();
+  }
 
    //上滑 或 初次载入时触发
   Future<bool> requestSelectedTimeLineType(
-    BangumiTimelineType timelineType,
+    BangumiSurfTimelineType timelineType,
     {
 	    bool? isAppend,
       Map<String,dynamic>? queryParameters,
@@ -37,7 +44,7 @@ class TimelineFlowModel extends ChangeNotifier {
     late Future<List<Response<dynamic>>> Function() timelineFuture;
 
     switch(timelineType){
-      case BangumiTimelineType.all:{
+      case BangumiSurfTimelineType.all:{
         timelineFuture = () => Future.wait(
           [
             HttpApiClient.client.get(
@@ -46,19 +53,20 @@ class TimelineFlowModel extends ChangeNotifier {
             ),
             HttpApiClient.client.get(
               BangumiAPIUrls.latestGroupTopics(),
-              options: BangumiAPIUrls.bangumiAccessOption,
+              options: BangumiAPIUrls.bangumiAccessOption(),
               queryParameters: BangumiQuerys.groupsTopicsQuery(),
             ),
             HttpApiClient.client.get(
               BangumiAPIUrls.timeline(),
-              queryParameters:BangumiQuerys.timelineQuery
+              options: BangumiAPIUrls.bangumiAccessOption(),
+              queryParameters:BangumiQuerys.timelineQuery()
             ),
           ]
         );
       }
         
       //不完整 缺失 Reviews/Blog 但没办法了
-      case BangumiTimelineType.subject:{
+      case BangumiSurfTimelineType.subject:{
         timelineFuture = () async {
           final response = await HttpApiClient.client.get(
             BangumiAPIUrls.latestSubjectTopics(),
@@ -70,13 +78,13 @@ class TimelineFlowModel extends ChangeNotifier {
         };
       }
         
-      case BangumiTimelineType.group:{
+      case BangumiSurfTimelineType.group:{
 
         timelineFuture = () async {
           final response = await HttpApiClient.client.get(
             BangumiAPIUrls.latestGroupTopics(),
             queryParameters: queryParameters ?? BangumiQuerys.groupsTopicsQuery(),
-            options: BangumiAPIUrls.bangumiAccessOption,
+            options: BangumiAPIUrls.bangumiAccessOption(),
           );
 
           return [response];
@@ -85,11 +93,12 @@ class TimelineFlowModel extends ChangeNotifier {
       }
         
         
-      case BangumiTimelineType.timeline:{
+      case BangumiSurfTimelineType.timeline:{
         timelineFuture = () async {
           final response = await HttpApiClient.client.get(
             BangumiAPIUrls.timeline(),
-            queryParameters: queryParameters ?? BangumiQuerys.timelineQuery
+            options: BangumiAPIUrls.bangumiAccessOption(),
+            queryParameters: queryParameters ?? BangumiQuerys.timelineQuery()
           );
 
           return [response];
@@ -113,9 +122,9 @@ class TimelineFlowModel extends ChangeNotifier {
               response[responseIndex].data ;
 
 
-            timelinesData[BangumiTimelineType.values[responseIndex+1]] = loadSurfTimelineDetails(
+            timelinesData[BangumiSurfTimelineType.values[responseIndex+1]] = loadSurfTimelineDetails(
               extractResponseData,
-              bangumiTimelineType: BangumiTimelineType.values[responseIndex+1]
+              bangumiSurfTimelineType: BangumiSurfTimelineType.values[responseIndex+1]
             );
           }
 
@@ -124,18 +133,18 @@ class TimelineFlowModel extends ChangeNotifier {
           }
         }
 
-        timelinesData[BangumiTimelineType.all]!.addAll(
-          timelinesData[BangumiTimelineType.subject]! +
-          timelinesData[BangumiTimelineType.group]! +
+        timelinesData[BangumiSurfTimelineType.all]!.addAll(
+          timelinesData[BangumiSurfTimelineType.subject]! +
+          timelinesData[BangumiSurfTimelineType.group]! +
 
           //对于Timeline类型 则需筛选无Comment数据 
           //这也导致 数据并不完整 不打算实现onLoad逻辑 只实现onRefresh逻辑
-          timelinesData[BangumiTimelineType.timeline]!.where((currentTimeline){
+          timelinesData[BangumiSurfTimelineType.timeline]!.where((currentTimeline){
             return currentTimeline.commentDetails?.comment != null;
           }).toList()
         );
 
-        timelinesData[BangumiTimelineType.all]!.sort(
+        timelinesData[BangumiSurfTimelineType.all]!.sort(
           (prev,next) => next.updatedAt?.compareTo(prev.updatedAt ?? 0) ?? 0
         );
       }
@@ -149,7 +158,7 @@ class TimelineFlowModel extends ChangeNotifier {
         }
 
         dynamic extractResponseData = 
-          timelineType != BangumiTimelineType.timeline ?
+          timelineType != BangumiSurfTimelineType.timeline ?
           response[0].data["data"] :
           response[0].data 
         ;
@@ -158,14 +167,14 @@ class TimelineFlowModel extends ChangeNotifier {
           timelinesData[timelineType]?.addAll(
             loadSurfTimelineDetails(
             extractResponseData,
-            bangumiTimelineType: timelineType
+            bangumiSurfTimelineType: timelineType
           ));
         }
 
         else{
           timelinesData[timelineType] = loadSurfTimelineDetails(
             extractResponseData,
-            bangumiTimelineType: timelineType
+            bangumiSurfTimelineType: timelineType
           );
         }
         

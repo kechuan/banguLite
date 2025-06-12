@@ -25,7 +25,7 @@ part 'hive_adapters.g.dart';
     AdapterSpec<LoginedUserInformations>(),
     AdapterSpec<SurfTimelineDetails>(),
     AdapterSpec<CommentDetails>(),
-    AdapterSpec<BangumiTimelineType>(),
+    AdapterSpec<BangumiSurfTimelineType>(),
     AdapterSpec<StarType>(),
     //AdapterSpec<SurfRecordDetails>()
 

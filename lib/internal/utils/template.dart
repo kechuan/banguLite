@@ -34,7 +34,7 @@ Future<dynamic> generalRequest(
       contentFuture = () => HttpApiClient.client.get(
         requestUrl,
         data: queryParameters,
-        options: options ?? BangumiAPIUrls.bangumiAccessOption,
+        options: options ?? BangumiAPIUrls.bangumiAccessOption(),
       );
     }
     
@@ -43,7 +43,7 @@ Future<dynamic> generalRequest(
         requestUrl,
         queryParameters: queryParameters,
         data: data,
-        options: options ?? BangumiAPIUrls.bangumiAccessOption,
+        options: options ?? BangumiAPIUrls.bangumiAccessOption(),
       );
     }
 
@@ -51,7 +51,7 @@ Future<dynamic> generalRequest(
       contentFuture = () => HttpApiClient.client.delete(
         requestUrl,
         data: queryParameters,
-        options: options ?? BangumiAPIUrls.bangumiAccessOption,
+        options: options ?? BangumiAPIUrls.bangumiAccessOption(),
       );
     }
 
@@ -59,7 +59,7 @@ Future<dynamic> generalRequest(
       contentFuture = () => HttpApiClient.client.put(
         requestUrl,
         data: queryParameters,
-        options: options ?? BangumiAPIUrls.bangumiAccessOption,
+        options: options ?? BangumiAPIUrls.bangumiAccessOption(),
       );
     }
 

@@ -99,7 +99,7 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
                 builder: (_, groupsModel, child) {
                  //GridView 与 PageView 冲突 
                  // 滑动的时候无法 滑动到外界的 PageView
-                 
+
                   //EasyRefresh 配合 滚动 onPageChanged 冲突 
                   return EasyRefresh(
                     footer: const MaterialFooter(),
@@ -128,8 +128,6 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
 
                                 widget.groupTitleNotifier.value = groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].groupTitle;
                                 groupsModel.selectedGroupInfo = groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index];
-
-
                                 widget.loadGroupTopicCallback?.call(context);
                               },
                               
@@ -187,12 +185,20 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
     invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
 
     final groupsModel = context.read<GroupsModel>();
+    final accountModel = context.read<AccountModel>();
 
-    final selectedGroupDataLength = groupsModel.groupsData[BangumiSurfGroupType.values[index]]!.length;
+    final selectedGroupData = groupsModel.groupsData[BangumiSurfGroupType.values[index]];
+
+    if(accountModel.isLogined() == false){
+      if(BangumiSurfGroupType.values[index] != BangumiSurfGroupType.all){
+        invokeToaster(message: "登录以获取更多内容");
+        return;
+      }
+    }
 
     await groupsModel.loadGroups(
         mode: BangumiSurfGroupType.values[index],
-        offset: isAppend == true ? selectedGroupDataLength : 0,
+        offset: isAppend == true ? selectedGroupData!.length : 0,
         accessQuery: BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken ?? ""),
         fallbackAction: (message){
           invokeToaster(message: message);
@@ -205,7 +211,7 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
 
         animatedListAppendContentCallback(
           result,
-          isAppend == true ? selectedGroupDataLength : 0,
+          isAppend == true ? selectedGroupData!.length : 0,
           receiveLength,
           fallbackAction: invokeToaster,
           animatedListController: animatedGroupListController

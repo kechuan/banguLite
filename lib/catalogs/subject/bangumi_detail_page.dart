@@ -189,7 +189,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                             )
                               ..updatedAt = DateTime.now().millisecondsSinceEpoch
                               ..title = bangumiModel.bangumiDetails?.name ?? ""
-                              ..bangumiTimelineType = BangumiTimelineType.subject
+                              ..bangumiSurfTimelineType = BangumiSurfTimelineType.subject
                               ..commentDetails = (
                                 CommentDetails()
                                   ..userInformation = (

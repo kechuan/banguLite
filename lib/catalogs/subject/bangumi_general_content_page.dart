@@ -348,7 +348,7 @@ abstract class BangumiContentPageState<
               ..title = contentDetail?.contentTitle ?? contentInfo.contentTitle
               ..sourceTitle = subjectTitle
               ..sourceID = contentInfo.sourceID
-              ..bangumiTimelineType = BangumiTimelineType.fromPostCommentType(getPostCommentType())
+              ..bangumiSurfTimelineType = BangumiSurfTimelineType.fromPostCommentType(getPostCommentType())
               ..replies = contentDetail?.contentRepliedComment?.length ?? 0
               ..commentDetails = (
                 CommentDetails()

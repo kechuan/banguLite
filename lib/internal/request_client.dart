@@ -33,6 +33,15 @@ class HttpApiClient{
 }
 
 class BangumiAPIUrls {
+
+
+  static Options bangumiAccessOption() => Options(
+    headers: AccountModel.loginedUserInformations.accessToken != null ?
+    BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken) :
+    null
+  );
+
+
   static const String baseUrl = "https://api.bgm.tv";
   static const String newUrl = "https://next.bgm.tv/p1";
   static const String baseResourceUrl = "https://lain.bgm.tv";
@@ -169,12 +178,7 @@ class BangumiAPIUrls {
   ) => '$baseResourceUrl/r/${width}x$height/$imagePath';
 
 
-  static Options bangumiAccessOption = Options(
-    headers: AccountModel.loginedUserInformations.accessToken != null ?
-    BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken) :
-    null
-  );
-
+  
 }
 
 class BangumiWebUrls{
@@ -373,6 +377,24 @@ class BangumiQuerys {
 		"id": notificationIDList ?? []
 	};
 
+  static Map<String,dynamic> timelineQuery({
+    int? limit,
+    int? until,
+    BangumiTimelineSortType? mode
+  }) {
+
+    Map<String,dynamic> defaultQuery = {
+      "limit":limit ?? 20,
+      "mode": mode ?? "all",
+    };
+
+    if(mode != null){
+      defaultQuery["mode"] = mode.name;
+    }
+
+    return defaultQuery;
+
+  }
 
   static Map<String,int>  commentAccessQuery = {"limit":10,"offset":0},
                           sortQuery = {"limit":10,"offset":0},
@@ -380,9 +402,9 @@ class BangumiQuerys {
                           epQuery = {"subject_id":0,"limit":100,"offset":0},
                           relationsQuery = {"type":2,"limit":20,"offset":0},
                           reviewsQuery = {"limit":20,"offset":0},
-                          groupTopicQuery = {"limit":20,"offset":0},
+                          groupTopicQuery = {"limit":20,"offset":0}
                           //until字段 timelineID count Down 如目标为 998 那么 就要从 999 开始搜寻
-                          timelineQuery = {"limit":20}
+                          
   ;
                              
 

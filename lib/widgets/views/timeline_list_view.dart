@@ -6,6 +6,7 @@ import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -13,43 +14,59 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 
-class BangumiTimelineContentView extends StatefulWidget {
+class BangumiTimelineContentView extends StatefulWidget{
 
   const BangumiTimelineContentView({
     super.key, 
     required this.tabController,
     required this.timelinePageController,
-    required this.groupTypeNotifier, 
+
+    required this.groupTypeNotifier,
+    required this.timelineSortTypeNotifier,
+
     required this.topicListViewEasyRefreshController,
 
   });
 
    final TabController tabController; // 新增TabController声明
    final PageController timelinePageController;
+
    final ValueNotifier<BangumiSurfGroupType> groupTypeNotifier;
+   final ValueNotifier<BangumiTimelineSortType> timelineSortTypeNotifier;
 
    final EasyRefreshController topicListViewEasyRefreshController;
 
 
   @override
   State<BangumiTimelineContentView> createState() => _BangumiTimelineContentView();
+
+
 }
 
-class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineContentView> with SingleTickerProviderStateMixin, RouteLifecycleMixin  {
+class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineContentView> 
+with SingleTickerProviderStateMixin, RouteLifecycleMixin   {
 
   GlobalKey<AnimatedListState> animatedKey = GlobalKey();
   final ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TimelineFlowModel>(
-      builder: (_,timelineFlowModel,__) {
+
+    final timelineFlowModel = context.read<TimelineFlowModel>();
+
+    return Selector<TimelineFlowModel,int>(
+      selector: (_, timelineFlowModel) => timelineFlowModel.currentTimelineIndex,
+      shouldRebuild: (previous, next) {
+        return previous != next;  
+      },
+      builder: (_,__,___) {
+
         return EasyRefresh(
           controller: widget.topicListViewEasyRefreshController,
           triggerAxis: Axis.vertical,
           header: const MaterialHeader(),
           footer: const MaterialFooter(),
-          refreshOnStart: timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]?.isEmpty ?? true,
+          refreshOnStart: timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.tabController.index]]?.isEmpty ?? true,
           callRefreshOverOffset: 15,
           onRefresh: () => loadTimelineContent(context),
           onLoad: () => loadTimelineContent(context,isAppend: true),
@@ -60,13 +77,13 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
                 child: AnimatedList(
                   controller: scrollController,
                   key: animatedKey,
-                  initialItemCount: timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]?.length ?? 0,
+                  initialItemCount: timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.tabController.index]]?.length ?? 0,
                   shrinkWrap: true,
                   itemBuilder: (_,index,animation){
                     
                     //Animated Question
 
-                    if(index >= timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]!.length){
+                    if(index >= timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.tabController.index]]!.length){
                       return const SizedBox();
                     }
                     
@@ -75,7 +92,7 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
                       padding: PaddingH12,
                       color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
                       child: BangumiTimelineTile(
-                        surfTimelineDetails: timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]]![index],
+                        surfTimelineDetails: timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.tabController.index]]![index],
                       )
                     );
         
@@ -95,41 +112,73 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
     { bool? isAppend }
   ) async{
       final timelineFlowModel = context.read<TimelineFlowModel>();
+      final accountModel = context.read<AccountModel>();
 
       invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
 
+
+    if(accountModel.isLogined() == false){
+      if(
+        widget.tabController.index == BangumiSurfTimelineType.group.index &&
+        widget.groupTypeNotifier.value != BangumiSurfGroupType.all
+      ){
+        invokeToaster(message: "登录以获取更多内容");
+        return;
+      }
+    }
+
+
       Map<String,dynamic> queryParameters = {};
-      final initData = timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]];
+      final initData = timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.tabController.index]];
       int initalLength = initData?.length ?? 0;
 
 
       if(isAppend == true){
 
-        switch(BangumiTimelineType.values[widget.tabController.index]){
-          case BangumiTimelineType.subject:{queryParameters = BangumiQuerys.groupTopicQuery..["offset"] = initalLength;}
-          case BangumiTimelineType.group:{
+        switch(BangumiSurfTimelineType.values[widget.tabController.index]){
+          case BangumiSurfTimelineType.subject:{queryParameters = BangumiQuerys.groupTopicQuery..["offset"] = initalLength;}
+          case BangumiSurfTimelineType.group:{
             queryParameters = BangumiQuerys.groupsTopicsQuery(mode: widget.groupTypeNotifier.value,offset: initalLength);
           }
-          case BangumiTimelineType.timeline:{queryParameters = BangumiQuerys.timelineQuery..["until"] = initData?.last.detailID ?? 0;}
+          case BangumiSurfTimelineType.timeline:{
+            queryParameters = 
+              BangumiQuerys.timelineQuery(
+                mode: widget.timelineSortTypeNotifier.value,
+                until: initData?.last.detailID ?? 0 
+              );
+          }
           default:{}
         }
       }
 
       else{
-        if(BangumiTimelineType.values[widget.tabController.index] == BangumiTimelineType.group){
-          queryParameters = BangumiQuerys.groupsTopicsQuery(mode: widget.groupTypeNotifier.value);
+
+        switch(BangumiSurfTimelineType.values[widget.tabController.index]){
+          
+          case BangumiSurfTimelineType.group:{
+            queryParameters = BangumiQuerys.groupsTopicsQuery(mode: widget.groupTypeNotifier.value);
+          }
+          case BangumiSurfTimelineType.timeline:{
+            queryParameters = 
+              BangumiQuerys.timelineQuery(
+                mode: widget.timelineSortTypeNotifier.value,
+              );
+          }
+
+          default:{}
+
         }
+
       }
 
-      
 
       await timelineFlowModel.requestSelectedTimeLineType(
-        BangumiTimelineType.values[widget.tabController.index],
+        BangumiSurfTimelineType.values[widget.tabController.index],
         isAppend:isAppend,
         queryParameters: queryParameters
       ).then((result){
 
-        final currentTimelineData = timelineFlowModel.timelinesData[BangumiTimelineType.values[widget.tabController.index]];
+        final currentTimelineData = timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.tabController.index]];
 
         int receiveLength = max(0,currentTimelineData?.length ?? 0 - initalLength);
 
@@ -148,5 +197,10 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
               
   }
 
-  
+  @override 
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
 }

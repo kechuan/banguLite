@@ -26,11 +26,11 @@ class CommentCachePage extends StatefulWidget {
 
 class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepAliveClientMixin {
 
-  static const int disactivePageRange = 3; //差值为3
-
   bool judgeDisactive(){
 
     final commentModel = context.read<CommentModel>();
+
+    final disactivePageRange = CommentModel.disactivePageRange;
 
     //判断页面是否为disactive状态: 透过 其在Model里的 currentPageIndex 与当前Page的相差值判断
 
@@ -41,7 +41,7 @@ class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepA
         commentModel.commentsData.remove(widget.currentPageIndex+1); //移除 以腾出内存
 
         debugPrint("rebuild: [${widget.currentPageIndex+1}] it should be disposed"); 
-        debugPrint("data:${commentModel.commentsData.keys}");
+        //debugPrint("data:${commentModel.commentsData.keys}");
         return true;
       }
     }
@@ -52,7 +52,7 @@ class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepA
         commentModel.commentsData.remove(widget.currentPageIndex+1); //移除 以腾出内存
 
         debugPrint("rebuild: [${widget.currentPageIndex+1}] it should be disposed");
-        debugPrint("data:${commentModel.commentsData}");
+        //debugPrint("data:${commentModel.commentsData}");
         
         return true;
       }
@@ -85,7 +85,7 @@ class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepA
         if(commentModel.currentPageIndex == widget.currentPageIndex+1) return true;
 
         //每次被通知更新的时候 先检查当前的页面是否还在alive范围内
-        updateKeepAlive(); 
+        updateKeepAlive();
         return !wantKeepAlive; //如果发现不在alive范围内 rebuild => dispose.
         
       },

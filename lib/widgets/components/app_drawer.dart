@@ -34,9 +34,11 @@ class AppDrawer extends StatelessWidget {
           
               const ScalableText("账号区域",style: TextStyle(fontSize: 14,color: Colors.grey)),
           
-              Selector<AccountModel,bool>(
-                selector: (context,accountModel)=>accountModel.isLogined(),
-                builder: (_,loginedStatus,child) {
+              Selector<AccountModel, ({bool? isLogining,bool loginedStatus})> (
+                selector: (_, accountModel) => (isLogining: accountModel.isLogining, loginedStatus: accountModel.isLogined()),
+                builder: (_, loginData, __) {
+                  final loginedStatus = loginData.loginedStatus;
+
                   return Column(
                     children: [
           

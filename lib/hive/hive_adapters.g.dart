@@ -399,7 +399,7 @@ class SurfTimelineDetailsAdapter extends TypeAdapter<SurfTimelineDetails> {
     )
       ..commentDetails = fields[0] as CommentDetails?
       ..title = fields[1] as String?
-      ..bangumiTimelineType = fields[2] as BangumiTimelineType?
+      ..bangumiSurfTimelineType = fields[2] as BangumiSurfTimelineType?
       ..sourceTitle = fields[3] as String?
       ..sourceID = fields[4] as dynamic
       ..replies = (fields[5] as num?)?.toInt()
@@ -415,7 +415,7 @@ class SurfTimelineDetailsAdapter extends TypeAdapter<SurfTimelineDetails> {
       ..writeByte(1)
       ..write(obj.title)
       ..writeByte(2)
-      ..write(obj.bangumiTimelineType)
+      ..write(obj.bangumiSurfTimelineType)
       ..writeByte(3)
       ..write(obj.sourceTitle)
       ..writeByte(4)
@@ -495,36 +495,36 @@ class CommentDetailsAdapter extends TypeAdapter<CommentDetails> {
           typeId == other.typeId;
 }
 
-class BangumiTimelineTypeAdapter extends TypeAdapter<BangumiTimelineType> {
+class BangumiTimelineTypeAdapter extends TypeAdapter<BangumiSurfTimelineType> {
   @override
   final int typeId = 12;
 
   @override
-  BangumiTimelineType read(BinaryReader reader) {
+  BangumiSurfTimelineType read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return BangumiTimelineType.all;
+        return BangumiSurfTimelineType.all;
       case 1:
-        return BangumiTimelineType.subject;
+        return BangumiSurfTimelineType.subject;
       case 2:
-        return BangumiTimelineType.group;
+        return BangumiSurfTimelineType.group;
       case 3:
-        return BangumiTimelineType.timeline;
+        return BangumiSurfTimelineType.timeline;
       default:
-        return BangumiTimelineType.all;
+        return BangumiSurfTimelineType.all;
     }
   }
 
   @override
-  void write(BinaryWriter writer, BangumiTimelineType obj) {
+  void write(BinaryWriter writer, BangumiSurfTimelineType obj) {
     switch (obj) {
-      case BangumiTimelineType.all:
+      case BangumiSurfTimelineType.all:
         writer.writeByte(0);
-      case BangumiTimelineType.subject:
+      case BangumiSurfTimelineType.subject:
         writer.writeByte(1);
-      case BangumiTimelineType.group:
+      case BangumiSurfTimelineType.group:
         writer.writeByte(2);
-      case BangumiTimelineType.timeline:
+      case BangumiSurfTimelineType.timeline:
         writer.writeByte(3);
     }
   }

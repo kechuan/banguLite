@@ -38,6 +38,7 @@ class AccountModel extends ChangeNotifier {
       updateLoginInformation(getDefaultLoginedUserInformations());
       currentUserNotificaions.clear();
       unreadNotifications = 0;
+
     }
 
     /// 在 [BangumiCalendarPage] 的 initState 进行初始化
@@ -51,8 +52,6 @@ class AccountModel extends ChangeNotifier {
                 showRequestSnackBar(message: message, requestStatus: false);
             },
         ).then((status) {
-
-          //刷新 avatar用
 
           if (status) {
             debugPrint("expired at:${loginedUserInformations.expiredTime}");
@@ -71,8 +70,8 @@ class AccountModel extends ChangeNotifier {
           }
 
           else {
-            isLogining = false;
-            loginedUserInformations = getDefaultLoginedUserInformations();
+            //刷新 avatar用
+            logout();
           }
 
           notifyListeners();
@@ -92,7 +91,7 @@ class AccountModel extends ChangeNotifier {
     }
 
     void loadUserDetail() {
-        loginedUserInformations = MyHive.loginUserDataBase.get('loginUserInformations') ?? getDefaultLoginedUserInformations();
+      loginedUserInformations = MyHive.loginUserDataBase.get('loginUserInformations') ?? getDefaultLoginedUserInformations();
     }
 
     void updateLoginInformation(LoginedUserInformations loginedUserInformations) {
@@ -156,19 +155,13 @@ class AccountModel extends ChangeNotifier {
                   ..refreshToken = response.data["refresh_token"]
                 ;
 
-                //更新信息
-                BangumiAPIUrls.bangumiAccessOption = Options(
-                  headers: AccountModel.loginedUserInformations.accessToken != null ?
-                  BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken) :
-                  null
-                );
 
                 updateLoginInformation(loginedUserInformations);
                 getNotifications();
               }
 
               else {
-                restoreData();
+                logout();
               }
 
               completer.complete(isValid);
@@ -241,25 +234,25 @@ class AccountModel extends ChangeNotifier {
                 case UserRelationsActionType.add:{
                     await HttpApiClient.client.put(
                         BangumiAPIUrls.addFriend(username),
-                        options: BangumiAPIUrls.bangumiAccessOption,
+                        options: BangumiAPIUrls.bangumiAccessOption(),
                     );
                 } 
                 case UserRelationsActionType.remove:{
                     await HttpApiClient.client.delete(
                         BangumiAPIUrls.removeFriend(username),
-                        options: BangumiAPIUrls.bangumiAccessOption,
+                        options: BangumiAPIUrls.bangumiAccessOption(),
                     );
                 } 
                 case UserRelationsActionType.block:{
                     await HttpApiClient.client.put(
                         BangumiAPIUrls.addBlockList(username),
-                        options: BangumiAPIUrls.bangumiAccessOption,
+                        options: BangumiAPIUrls.bangumiAccessOption(),
                     );
                 } 
                 case UserRelationsActionType.removeBlock:{
                     await HttpApiClient.client.delete(
                         BangumiAPIUrls.removeBlockList(username),
-                        options: BangumiAPIUrls.bangumiAccessOption,
+                        options: BangumiAPIUrls.bangumiAccessOption(),
                     );
                 } 
             }
@@ -441,7 +434,7 @@ class AccountModel extends ChangeNotifier {
                         content: content,
                         turnstileToken: loginedUserInformations.turnsTileToken,
                     ),
-                    options: BangumiAPIUrls.bangumiAccessOption,
+                    options: BangumiAPIUrls.bangumiAccessOption(),
                 );
             }
 
@@ -453,14 +446,14 @@ class AccountModel extends ChangeNotifier {
                             title: title,
                             content: content,
                         ),
-                    options: BangumiAPIUrls.bangumiAccessOption,
+                    options: BangumiAPIUrls.bangumiAccessOption(),
                 );
             }
 
             case UserContentActionType.delete:{
                 contentFuture = () => HttpApiClient.client.delete(
                     requestUrl,
-                    options: BangumiAPIUrls.bangumiAccessOption,
+                    options: BangumiAPIUrls.bangumiAccessOption(),
                 );
             }
 
@@ -571,7 +564,7 @@ class AccountModel extends ChangeNotifier {
                   replyTo: commentID ?? 0,
                   turnstileToken: loginedUserInformations.turnsTileToken,
                   ),
-                  options: BangumiAPIUrls.bangumiAccessOption,
+                  options: BangumiAPIUrls.bangumiAccessOption(),
               );
           }
 
@@ -579,14 +572,14 @@ class AccountModel extends ChangeNotifier {
               commentFuture = () => HttpApiClient.client.put(
               requestUrl,
               data: BangumiQuerys.editQuery(content: commentContent),
-              options: BangumiAPIUrls.bangumiAccessOption,
+              options: BangumiAPIUrls.bangumiAccessOption(),
               );
           }
 
           case UserContentActionType.delete:{
               commentFuture = () => HttpApiClient.client.delete(
                   requestUrl,
-                  options: BangumiAPIUrls.bangumiAccessOption,
+                  options: BangumiAPIUrls.bangumiAccessOption(),
               );
           }
 
@@ -672,7 +665,7 @@ class AccountModel extends ChangeNotifier {
 
                 actionLikeFuture = () => HttpApiClient.client.put(
                     requestUrl,
-                    options: BangumiAPIUrls.bangumiAccessOption,
+                    options: BangumiAPIUrls.bangumiAccessOption(),
                     data: {"value": stickerLikeIndex}
                 );
 
@@ -681,7 +674,7 @@ class AccountModel extends ChangeNotifier {
             case UserContentActionType.delete:{
                 actionLikeFuture = () => HttpApiClient.client.delete(
                     requestUrl,
-                    options: BangumiAPIUrls.bangumiAccessOption,
+                    options: BangumiAPIUrls.bangumiAccessOption(),
                 );
 
             }
@@ -727,7 +720,7 @@ class AccountModel extends ChangeNotifier {
         await HttpApiClient.client.get(
             BangumiAPIUrls.notify,
             queryParameters: notificationsQuery,
-            options: BangumiAPIUrls.bangumiAccessOption,
+            options: BangumiAPIUrls.bangumiAccessOption(),
         ).then((response) {
                     if (response.statusCode == 200) {
 
@@ -782,7 +775,7 @@ class AccountModel extends ChangeNotifier {
 
         await HttpApiClient.client.post(
             BangumiAPIUrls.clearNotify,
-            options: BangumiAPIUrls.bangumiAccessOption,
+            options: BangumiAPIUrls.bangumiAccessOption(),
             data: BangumiQuerys.clearNotificationsQuery(notificationIDList: notificationIDList)
         )
             .then((response) {

@@ -71,7 +71,7 @@ class UserModel extends ChangeNotifier{
   ){
     return HttpApiClient.client.get(
       BangumiAPIUrls.userTimeline(userName),
-      queryParameters: queryParameters ?? BangumiQuerys.timelineQuery
+      queryParameters: queryParameters ?? BangumiQuerys.timelineQuery()
     );
   }
 

@@ -46,17 +46,17 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
       length: widget.totalPageLength
     );
     
-      commentTabController.addListener((){
-        //疑问:
-        //如果不添加这种设置 在左右划屏幕的时候 就会直接被取消动画 而
-        //但如果添加了这种设置 那么主动点击的时候。。就直接被return掉了
+    commentTabController.addListener((){
+      //疑问:
+      //如果不添加这种设置 在左右划屏幕的时候 就会直接被取消动画 而
+      //但如果添加了这种设置 那么主动点击的时候。。就直接被return掉了
 
-        //只能这样了 阈值设置在 1 之内 好在jumpPage的时候只能是整数值
+      //只能这样了 阈值设置在 1 之内 好在jumpPage的时候只能是整数值
 
-        if((commentTabController.index - widget.commentPageController.page!).abs() < 0.9) return;
+      if((commentTabController.index - widget.commentPageController.page!).abs() < 0.9) return;
 
-        widget.commentPageController.jumpToPage(commentTabController.index);
-      });
+      widget.commentPageController.jumpToPage(commentTabController.index);
+    });
     
   }
 
@@ -81,7 +81,6 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
       Future.wait(
         List.generate(
           min(3,loadPageCount),
-          //(index) => commentModel.loadComments(widget.subjectID,pageIndex: index+1),
           (index) => commentModel.loadComments(pageIndex: index+1),
         )
       )

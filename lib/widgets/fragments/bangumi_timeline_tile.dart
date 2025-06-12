@@ -42,11 +42,11 @@ class BangumiTimelineTile extends StatelessWidget {
 
       if(onTap?.call() == false) return;
 
-			debugPrint("timeline DetailID:${surfTimelineDetails.detailID} timelineType:${surfTimelineDetails.bangumiTimelineType}");
+			debugPrint("timeline DetailID:${surfTimelineDetails.detailID} timelineType:${surfTimelineDetails.bangumiSurfTimelineType}");
 
 			///历史记录的updatedAt 与 展示用的 updatedAt 效果不一致
-			switch(surfTimelineDetails.bangumiTimelineType){
-				case BangumiTimelineType.subject:{
+			switch(surfTimelineDetails.bangumiSurfTimelineType){
+				case BangumiSurfTimelineType.subject:{
 
 					if(surfTimelineDetails.sourceTitle == null){
 						Navigator.pushNamed(
@@ -79,7 +79,7 @@ class BangumiTimelineTile extends StatelessWidget {
 
 				}
 					
-				case BangumiTimelineType.group:{
+				case BangumiSurfTimelineType.group:{
 
 					//MyHive.historySurfDataBase.put(
 					//	surfTimelineDetails.detailID,
@@ -185,7 +185,7 @@ class BangumiTimelineTile extends StatelessWidget {
 				children: [
 				
 					ScalableText(
-					"${surfTimelineDetails.bangumiTimelineType?.typeName ?? ""}"
+					"${surfTimelineDetails.bangumiSurfTimelineType?.typeName ?? ""}"
 					"${surfTimelineDetails.sourceTitle == null ? "" : " · "}"
 					,
 					style: const TextStyle(fontSize: 14,color: Colors.grey)
@@ -197,11 +197,11 @@ class BangumiTimelineTile extends StatelessWidget {
 
 						debugPrint("sourceID: ${surfTimelineDetails.sourceID}");
 
-						switch(surfTimelineDetails.bangumiTimelineType) {
+						switch(surfTimelineDetails.bangumiSurfTimelineType) {
 
 						//利用callback 加载数据? 否则历史记录里面会缺失avatar 
 						//或者干脆直接在subjectDetail里加载得了。。
-						case BangumiTimelineType.subject:{
+						case BangumiSurfTimelineType.subject:{
 							Navigator.pushNamed(
 							context,
 							Routes.subjectDetail,
@@ -209,7 +209,7 @@ class BangumiTimelineTile extends StatelessWidget {
 							);
 						}
 							
-						case BangumiTimelineType.group:{
+						case BangumiSurfTimelineType.group:{
 							Navigator.pushNamed(
 							context,
 							Routes.groups,

@@ -1,5 +1,6 @@
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/request_task_information.dart';
@@ -45,9 +46,6 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
     return FutureBuilder(
       future: loadInformationFuture,
       builder: (_,snapshot) {
-
-
-       
 
         switch(snapshot.connectionState){
 
@@ -137,6 +135,7 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
 
                     return CachedNetworkImage(
                       imageUrl: widget.imageUrl,
+                      httpHeaders: HttpApiClient.broswerHeader,
                       progressIndicatorBuilder: (context, url, progress){ 
           
                         return LoadingCard(

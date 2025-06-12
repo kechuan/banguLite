@@ -17,7 +17,7 @@ class SurfTimelineDetails extends BaseDetails {
 
   String? title;
   
-  BangumiTimelineType? bangumiTimelineType;
+  BangumiSurfTimelineType? bangumiSurfTimelineType;
   String? sourceTitle; // Subject&Group
   dynamic sourceID;
   
@@ -30,7 +30,7 @@ class SurfTimelineDetails extends BaseDetails {
     )
       ..commentDetails = surfTimelineDetails.commentDetails
       ..title = surfTimelineDetails.title
-      ..bangumiTimelineType = surfTimelineDetails.bangumiTimelineType
+      ..bangumiSurfTimelineType = surfTimelineDetails.bangumiSurfTimelineType
       ..sourceTitle = surfTimelineDetails.sourceTitle
       ..sourceID = surfTimelineDetails.sourceID
       ..replies = surfTimelineDetails.replies
@@ -43,22 +43,22 @@ class SurfTimelineDetails extends BaseDetails {
 List<SurfTimelineDetails> loadSurfTimelineDetails(
   List<dynamic> surfTimelineListData,
   {
-    BangumiTimelineType bangumiTimelineType = BangumiTimelineType.timeline,
+    BangumiSurfTimelineType bangumiSurfTimelineType = BangumiSurfTimelineType.timeline,
   }
 ){
 
   List<SurfTimelineDetails> surfTimelineDetailsList = [];
 
-  switch(bangumiTimelineType){
+  switch(bangumiSurfTimelineType){
     
-    case BangumiTimelineType.subject:{
+    case BangumiSurfTimelineType.subject:{
       List<TopicInfo> infoDataList = loadTopicsInfo(surfTimelineListData);
 
       for(int index = 0; index < infoDataList.length; index++){
         SurfTimelineDetails surfTimelineDetails = SurfTimelineDetails(
           detailID: infoDataList[index].topicID,
         )
-          ..bangumiTimelineType = bangumiTimelineType
+          ..bangumiSurfTimelineType = bangumiSurfTimelineType
           ..title = infoDataList[index].topicTitle
           ..sourceTitle = extractNameCNData(surfTimelineListData[index]["subject"])
           //破坏行为
@@ -81,7 +81,7 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
 
     }
       
-    case BangumiTimelineType.group:{
+    case BangumiSurfTimelineType.group:{
       //isGroupSource 从 group来源得到的就已经是 GroupTopicInfo 了
 
       List<GroupTopicInfo> groupDataList;
@@ -100,7 +100,7 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
           //groupTopicID
           detailID: groupDataList[index].topicID,
         )
-          ..bangumiTimelineType = bangumiTimelineType
+          ..bangumiSurfTimelineType = bangumiSurfTimelineType
           ..title = groupDataList[index].topicTitle
           ..sourceTitle = groupDataList[index].groupInfo?.groupTitle
           //groupID
@@ -119,7 +119,7 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
 
     }
       
-    case BangumiTimelineType.timeline:{
+    case BangumiSurfTimelineType.timeline:{
       List<TimelineDetails> timelineDataList = loadTimelineDetails(surfTimelineListData);
 
       for(int index = 0; index < timelineDataList.length; index++){
@@ -127,8 +127,8 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
         SurfTimelineDetails surfTimelineDetails = SurfTimelineDetails(
           detailID: timelineDataList[index].timelineID,
         )
-          ..bangumiTimelineType = bangumiTimelineType
-            //筛选时间线是否吐槽 则会以 commentDetails 是否含有 comment && bangumiTimelineType 判断
+          ..bangumiSurfTimelineType = bangumiSurfTimelineType
+            //筛选时间线是否吐槽 则会以 commentDetails 是否含有 comment && BangumiSurfTimelineType 判断
           ..title = convertTimelineDescription(timelineDataList[index],isCommentDeclared: false)
           ..commentDetails = timelineDataList[index].commentDetails
           ..replies = surfTimelineListData[index]["replies"]

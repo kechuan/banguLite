@@ -15,6 +15,8 @@ class CommentModel extends ChangeNotifier {
   
   CommentModel({required this.subjectID});
 
+  static const int disactivePageRange = 5;
+
   final int subjectID;
 
   ///subject的评论详情, 一页的长度为10个 [CommentDetails]
@@ -150,7 +152,7 @@ class CommentModel extends ChangeNotifier {
     }
 
     //aliveKeepPage Judge. must notifier at First then disposed.
-    if((currentPageIndex).abs() - pageIndex.abs() >= 3 || (currentPageIndex).abs() - pageIndex.abs() <= -3 ){
+    if((currentPageIndex).abs() - pageIndex.abs() >= disactivePageRange || (currentPageIndex).abs() - pageIndex.abs() <= -disactivePageRange ){
       debugPrint("prevent rebuild conflict:${commentsData.keys}");
       return;
     }
@@ -203,12 +205,6 @@ class CommentModel extends ChangeNotifier {
       ..["offset"] =  isReverse ?
                       (currentRequestRange > commentLength ? commentLength - pageRange : currentRequestRange) :
                       pageRange > commentLength ? 0 : currentRequestRange
-
-      //old Data
-      //..["limit"] = min(pageRange , (commentLength - (pageRange)*(pageIndex)).abs()) 
-      //..["offset"] =  isReverse ?
-      //commentLength - (pageRange*(pageIndex-1)) : //要反向的话得从0开始算起offset
-      //pageRange > commentLength ? 0 : (commentLength - (pageRange)*(pageIndex)).abs()
 
                 
     ).catchError((error){

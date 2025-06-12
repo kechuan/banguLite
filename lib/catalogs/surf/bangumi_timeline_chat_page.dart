@@ -62,7 +62,7 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
         "limit" : 1,
         "until" : (widget.timelineID+1)
       },
-      options: BangumiAPIUrls.bangumiAccessOption
+      options: BangumiAPIUrls.bangumiAccessOption()
 
     );
 
