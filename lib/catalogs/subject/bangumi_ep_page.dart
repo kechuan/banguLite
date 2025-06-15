@@ -1,6 +1,7 @@
 
 import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -11,6 +12,7 @@ import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 
 import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
@@ -312,10 +314,18 @@ class EpInfo extends StatelessWidget {
           ),
           
         ),
+
+        Padding(
+          padding: Padding12,
+          child: AdapterBBCodeText(
+            data: epsInfo[selectedEp]?.description ?? "",
+            stylesheet: appDefaultStyleSheet(context,selectableText: true),
+          ),
+        )
     
-        ListTile(
-          title:  ScalableText("${epsInfo[selectedEp]?.description}"),
-        ),
+        //ListTile(
+        //  title: ScalableText("${epsInfo[selectedEp]?.description}"),
+        //),
     
        
       ],

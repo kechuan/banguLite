@@ -277,6 +277,8 @@ class UserInformationDialog extends StatelessWidget {
                                                                     child: Padding(
                                                                         padding: PaddingH12 + Padding16,
                                                                         child: ListView.separated(
+                                                                            /// Android render problem.
+                                                                            padding: EdgeInsets.zero,
                                                                             itemCount: timelineActions?.length ?? 0,
                                                                             separatorBuilder: (_, index) => const Padding(padding: PaddingV6),
                                                                             itemBuilder: (_, index) {
