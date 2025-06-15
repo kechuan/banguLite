@@ -290,14 +290,11 @@ abstract class BangumiContentPageState<
                                   contentDetail
                                 );
                                   
-                                  
                               },
                             
                             ),
                           );
                                 
-                                    
-                                    
                         }
                       );
                     }

@@ -249,8 +249,8 @@ class _EpCommentTileState extends State<EpCommentTile> {
                 data: convertBangumiCommentSticker(widget.epCommentData.comment ?? ""),
                 stylesheet: appDefaultStyleSheet(context,selectableText: true),
                 errorBuilder: (context, error, stackTrace) {
-                  return ScalableText("${widget.epCommentData.comment}",
-                );
+                  debugPrint("renderError: ${widget.epCommentData.epCommentIndex} err:$error ");
+                  return ScalableText("${widget.epCommentData.comment}");
                 },
               ) 
             

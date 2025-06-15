@@ -7,7 +7,7 @@ const stickerDataLike = [0,79,54,140,62,122,104,80,141,88,85,90];
 final bbcodeRegexp = RegExp(r'\[/?[a-z]+(?:=[^\]]+)?\]');
 
 final quoteBBcodeRegexp = RegExp(r'\[\/?quote\]');
-final quoteBBcodeContentRegexp = RegExp(r'\[quote\](.*?)\[\/quote\]');
+final quoteBBcodeContentRegexp = RegExp(r'\[quote\](.*?)\[\/quote\]',multiLine: true,dotAll: true);
 
 enum WeekDay{
 

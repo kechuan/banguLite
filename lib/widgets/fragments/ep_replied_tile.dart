@@ -2,11 +2,13 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/dialogs/comment_replied_sheet.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
@@ -62,11 +64,14 @@ class EpRepliedTile extends ListTile {
                 ...List.generate(
                   min(3, epCommentData.repliedComment!.length), 
                   (index) {
-                    final comment = epCommentData.repliedComment![index];
+                    final repliedComment = epCommentData.repliedComment![index];
+
                     final quoteContent = quoteBBcodeContentRegexp
-                        .firstMatch(comment.comment ?? "")
-                        ?.group(1) ?? "";
-                    final mainContent = comment.comment
+                        .firstMatch(repliedComment.comment ?? "")
+                        ?.group(1) ?? ""
+                    ;
+
+                    final mainContent = repliedComment.comment
                         ?.split(quoteBBcodeRegexp)
                         .last
                         .replaceAll(bbcodeRegexp, '') ?? "";
@@ -84,16 +89,20 @@ class EpRepliedTile extends ListTile {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  ScalableText("${comment.userInformation?.nickName}:"),
+                                  ScalableText("${repliedComment.userInformation?.nickName}:"),
+                                  
                                   Expanded(
                                     child: Align(
                                       alignment: Alignment.centerLeft,
+                                      
+                                      /// 技术力缘故 无法做到 既能照顾 inline的RichText的maxline处理 还要照顾 widgetSpan的块处理 的 对齐maxline调整
+                                      /// 就当是个念想算了。。
+
                                       child: RichText(  // 使用 RichText 合并文本
                                         text: TextSpan(
                                           style: TextStyle(
                                             fontFamilyFallback: convertSystemFontFamily(),
                                             fontSize: AppFontSize.s16,
-                                            
                                           ),
                                           children: [
 
@@ -118,18 +127,28 @@ class EpRepliedTile extends ListTile {
                                               ),
                                             ],
 
-                                            TextSpan(
+                                            //WidgetSpan(
+                                            //  child: AdapterBBCodeText(
+                                            //    data: mainContent,
+                                            //    stylesheet: appDefaultStyleSheet(context,richless: true,selectableText: true),
+                                            //    maxLine: 3,
+                                            //  ),
+                                            //),
+
+                                            TextSpan( 
                                               text: mainContent,
                                               style: TextStyle(
                                                 color: judgeDarknessMode(context) ? Colors.white : Colors.black,
                                               )
                                             ),
                                             
+                                            
                                           ],
                                         ),
                                         maxLines: 4,  // 引用1行 + 内容3行
                                         overflow: TextOverflow.ellipsis,
                                       ),
+
                                     ),
                                   ),
                                 ],
