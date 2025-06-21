@@ -25,6 +25,8 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    debugPrint('${currentComment.state}: $commentIndex');
+
     if(commentIndex!=null) debugPrint("打开了第${commentIndex!+1}个评论");
 
     return ListView.builder(

@@ -64,15 +64,20 @@ class EpRepliedTile extends ListTile {
                   (index) {
                     final repliedComment = epCommentData.repliedComment![index];
 
-                    final quoteContent = quoteBBcodeContentRegexp
+                      debugPrint('${epCommentData.state}: ${repliedComment.epCommentIndex}');
+
+                      
+
+                      final quoteContent = quoteBBcodeContentRegexp
                         .firstMatch(repliedComment.comment ?? "")
                         ?.group(1) ?? ""
-                    ;
+                      ;
 
-                    final mainContent = repliedComment.comment
+                      final mainContent = repliedComment.comment
                         ?.split(quoteBBcodeRegexp)
                         .last
-                        .replaceAll(bbcodeRegexp, '') ?? "";
+                        .replaceAll(bbcodeRegexp, '') ?? ""
+                      ;
 
                         return Padding(
                           padding: PaddingV6,
@@ -81,76 +86,77 @@ class EpRepliedTile extends ListTile {
                             postCommentType: postCommentType,
                             epCommentData: epCommentData,
                             commentIndex: index,
-                            child: IntrinsicHeight(  // 确保行高一致
-                              child: Row(
-                                spacing: 12,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ScalableText("${repliedComment.userInformation?.nickName}:"),
-                                  
-                                  Expanded(
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      
-                                      /// 技术力缘故 无法做到 既能照顾 inline的RichText的maxline处理 还要照顾 widgetSpan的块处理 的 对齐maxline调整
-                                      /// 就当是个念想算了。。
+                            child: Row(
+                              spacing: 12,
+                              //mainAxisAlignment: MainAxisAlignment.center,
+                              //crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ScalableText("${repliedComment.userInformation?.nickName}:"),
 
-                                      child: RichText(  // 使用 RichText 合并文本
-                                        text: TextSpan(
-                                          style: TextStyle(
-                                            fontFamilyFallback: convertSystemFontFamily(),
-                                            fontSize: AppFontSize.s16,
-                                          ),
-                                          children: [
-
-                                            if (quoteContent.isNotEmpty) ...[
-                                              WidgetSpan(
-                                                child: DecoratedBox(
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(),
-                                                    borderRadius: BorderRadius.circular(6),
+                                epCommentData.repliedComment![index].state?.isNotAvaliable() == true ?
+                                ScalableText("发言已隐藏",style: TextStyle(fontStyle: FontStyle.italic)) :
+                                Expanded(
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    
+                                    /// 技术力缘故 无法做到 既能照顾 inline的RichText的maxline处理 还要照顾 widgetSpan的块处理 的 对齐maxline调整
+                                    /// 就当是个念想算了。。
+                            
+                                    child: RichText(  // 使用 RichText 合并文本
+                                      text: TextSpan(
+                                        style: TextStyle(
+                                          fontFamilyFallback: convertSystemFontFamily(),
+                                          fontSize: AppFontSize.s16,
+                                        ),
+                                        children: [
+                            
+                                          if (quoteContent.isNotEmpty) ...[
+                                            WidgetSpan(
+                                              child: DecoratedBox(
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(),
+                                                  borderRadius: BorderRadius.circular(6),
+                                                ),
+                                                child: Padding(
+                                                  padding: Padding6,
+                                                  child: ScalableText(
+                                                    quoteContent.length > 30 
+                                                    ? "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}...\n"
+                                                    : "${quoteContent.replaceAll(bbcodeRegexp, '')}\n",
+                                                    maxLines: 1,
+                                                    style: TextStyle(color: judgeCurrentThemeColor(context).withValues(alpha: 0.8)),
                                                   ),
-                                                  child: Padding(
-                                                    padding: Padding6,
-                                                    child: ScalableText(
-                                                      quoteContent.length > 30 
-                                                      ? "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}...\n"
-                                                      : "${quoteContent.replaceAll(bbcodeRegexp, '')}\n",
-                                                      maxLines: 1,
-                                                      style: TextStyle(color: judgeCurrentThemeColor(context).withValues(alpha: 0.8)),
-                                                    ),
-                                                  )
                                                 )
-                                              ),
-                                            ],
-
-                                            //WidgetSpan(
-                                            //  child: AdapterBBCodeText(
-                                            //    data: mainContent,
-                                            //    stylesheet: appDefaultStyleSheet(context,richless: true,selectableText: true),
-                                            //    maxLine: 3,
-                                            //  ),
-                                            //),
-
-                                            TextSpan( 
-                                              text: mainContent,
-                                              style: TextStyle(
-                                                color: judgeDarknessMode(context) ? Colors.white : Colors.black,
                                               )
                                             ),
-                                            
-                                            
                                           ],
-                                        ),
-                                        maxLines: 4,  // 引用1行 + 内容3行
-                                        overflow: TextOverflow.ellipsis,
+                            
+                                          //WidgetSpan(
+                                          //  child: AdapterBBCodeText(
+                                          //    data: mainContent,
+                                          //    stylesheet: appDefaultStyleSheet(context,richless: true,selectableText: true),
+                                          //    maxLine: 3,
+                                          //  ),
+                                          //),
+                            
+                                          TextSpan( 
+                                            text: mainContent,
+                                            style: TextStyle(
+                                              color: judgeDarknessMode(context) ? Colors.white : Colors.black,
+                                            )
+                                          ),
+                                          
+                                          
+                                        ],
                                       ),
-
+                                      maxLines: 4,  // 引用1行 + 内容3行
+                                      overflow: TextOverflow.ellipsis,
                                     ),
+                            
                                   ),
-                                ],
-                              ),
+                                ),
+                              
+                              ],
                             ),
                           ),
                         );

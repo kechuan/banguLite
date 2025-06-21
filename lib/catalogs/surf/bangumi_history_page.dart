@@ -474,12 +474,19 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
           final item = rangeData[index];
           final itemID = item.detailID;
           final isDeleting = deletingItems.contains(itemID);
-        //  final isSelected = selectedItems.contains(itemID);
+          // final isSelected = selectedItems.contains(itemID);
+
+          final currentTime = DateTime.fromMillisecondsSinceEpoch(item.updatedAt ?? 0);
+
+          // 15分钟为节点
+          if (currentTime.difference(recordTime).inMinutes.abs() > 15) {
+            recordTime = currentTime;
+          }
 
           // 如果有删除动画，使用动画包装
           Widget itemWidget = buildHistoryItem(
             item,
-            recordTime,
+            recordTime == currentTime,
           );
 
           if (isDeleting && deleteAnimations.containsKey(itemID)) {
@@ -487,8 +494,8 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
               animation: deleteAnimations[itemID]!,
               builder: (context, child) {
                 return SizeTransition(
-					sizeFactor: deleteAnimations[itemID]!,
-					child: FadeTransition(
+                  sizeFactor: deleteAnimations[itemID]!,
+                  child: FadeTransition(
 						opacity: deleteAnimations[itemID]!,
 						child: child,
 					),
@@ -507,15 +514,10 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
   // 构建单个历史记录项
   Widget buildHistoryItem(
     SurfTimelineDetails item,
-    DateTime recordTime,
+    bool isNearlyTime,
   ) {
 
     final currentTime = DateTime.fromMillisecondsSinceEpoch(item.updatedAt ?? 0);
-    
-    // 15分钟为节点
-    if (currentTime.difference(recordTime).inMinutes.abs() > 15) {
-      recordTime = currentTime;
-    }
 
     return GestureDetector(
 
@@ -543,12 +545,12 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
     				),
     			),
     
-    		    Row(
-    				spacing: 6,
-    				children: [
+          Row(
+            spacing: 6,
+            children: [
     		    	// 多选模式下显示复选框
     		    	
-					AnimatedBuilder(
+					    AnimatedBuilder(
 						animation: bottomBarController,
 						builder: (_,child) {
 
@@ -587,7 +589,7 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
     		    		child: ScalableText(
     		    			'${convertDigitNumString(currentTime.hour)}:${convertDigitNumString(currentTime.minute)}',
     		    			style: TextStyle(
-    		    			color: recordTime == currentTime ? Colors.grey : Colors.transparent,
+    		    			color: isNearlyTime ? Colors.grey : Colors.transparent,
     		    			fontWeight: FontWeight.bold
     		    			),
     		    		),
@@ -619,18 +621,18 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
     		    	// 删除按钮（非多选模式下显示）
     		    	
     		    	ValueListenableBuilder(
-						valueListenable: multiSelectModeNotifier,
-						builder: (_,multiSelectModeNotifier,child) {
-							if(multiSelectModeNotifier) return child!;
-							return const SizedBox.shrink();
-    		    	  },
-					  child: IconButton(
+                valueListenable: multiSelectModeNotifier,
+                builder: (_,multiSelectModeNotifier,child) {
+                  if(multiSelectModeNotifier) return child!;
+                  return const SizedBox.shrink();
+                    },
+                child: IconButton(
 							onPressed: () => deleteSingleItem(item.detailID!),
 							icon: const Icon(Icons.close),
 						),
     		    	),
     		    ],
-    		    ),
+          ),
     
     		],
     	),

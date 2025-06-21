@@ -55,6 +55,14 @@ enum CommentState {
   final String reason;
 
   const CommentState(this.reason);
+
+  bool isNotAvaliable(){
+    return [
+      CommentState.adminCloseTopic,
+      CommentState.userDelete,
+      CommentState.adminDelete
+    ].contains(this);
+  }
 }
 
 enum ScoreRank{

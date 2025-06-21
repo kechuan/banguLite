@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
-import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
@@ -52,14 +51,8 @@ class _EpCommentTileState extends State<EpCommentTile> {
 
     bool commentBlockStatus = false;
 
-    
-
     if(
-      widget.epCommentData.state != null &&
-      ( widget.epCommentData.state == CommentState.adminCloseTopic.index ||
-        widget.epCommentData.state == CommentState.userDelete.index ||
-        widget.epCommentData.state == CommentState.adminDelete.index
-      )
+      widget.epCommentData.state != null && (widget.epCommentData.state?.isNotAvaliable() ?? true)
     ){
       commentBlockStatus = true;
     }
@@ -237,7 +230,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const ScalableText("发言已隐藏"),
-                  ScalableText("原因: ${CommentState.values[widget.epCommentData.state!].reason}")
+                  ScalableText("原因: ${widget.epCommentData.state?.reason}")
                 ],
               )
             ] : null,

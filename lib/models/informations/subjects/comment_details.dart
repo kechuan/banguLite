@@ -53,7 +53,7 @@ class EpCommentDetails extends BaseComment{
 
   String? epCommentIndex;
 
-  int? state;
+  CommentState? state;
 
 
   factory EpCommentDetails.empty() => EpCommentDetails(commentID: 0);
@@ -125,7 +125,9 @@ List<EpCommentDetails> loadEpCommentDetails(
         ..contentID = currentEpCommentMap["mainID"]
         ..commentID = currentEpCommentMap["id"]
         ..comment = currentEpCommentMap["content"]
-        ..state = currentEpCommentMap["state"]
+        ..state = CommentState.values.firstWhere((currentState){
+          return currentState.index == currentEpCommentMap["state"];
+        }) 
         ..commentTimeStamp = currentEpCommentMap["createdAt"]
 
         //user => epComment / creator => topicComment
