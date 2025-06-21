@@ -111,6 +111,12 @@ class BangumiDetailRecentReview extends StatelessWidget {
                           itemBuilder: (context, index) {
                                     
                             final reviewTime = DateTime.fromMillisecondsSinceEpoch(reviewModel.contentListData[index].createdTime!*1000);
+
+
+                            final previewContent = reviewModel.contentListData[index].summary
+                              ?.split(quoteBBcodeRegexp)
+                              .last
+                              .replaceAll(bbcodeRegexp, '') ?? "";
                                         
                             return ListTile(
                               
@@ -134,7 +140,7 @@ class BangumiDetailRecentReview extends StatelessWidget {
 
 										                    //summary 被api限制在最大 120 长度之中
                                         ScalableText(
-                                          "${reviewModel.contentListData[index].summary}",
+                                          previewContent,
                                           style: const TextStyle(fontSize: 14),
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 6, //兼顾移动端

@@ -23,7 +23,8 @@ class AirDateSortStrategy implements SortStrategy {
 	final DateTime convertTime = DateTime.fromMillisecondsSinceEpoch(airTimestamp.toInt());
 
     final season = judgeSeasonRange(convertTime.month);
-    return '${convertTime.year}年 ${season.seasonText}';
+
+    return '${convertTime.month < 4 ? convertTime.year - 1 : convertTime.year }年 ${season.seasonText}';
   }
 
   @override
@@ -91,7 +92,7 @@ class JoinTimeSortStrategy implements SortStrategy {
 
 		final DateTime convertTime = DateTime.fromMillisecondsSinceEpoch(joinms.toInt());
 
-		final season = judgeSeasonRange(convertTime.month);
+		final season = judgeSeasonRange(convertTime.month,currentTime:true);
 		return '${convertTime.year}年 ${season.seasonText}';
 	}
 

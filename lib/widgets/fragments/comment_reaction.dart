@@ -69,6 +69,8 @@ class _CommentReactionState extends State<CommentReaction> {
 
     widget.reactDataLikeNotifier.addListener((){
       //很蠢 但是有用 initState 监听到变化了 但却无法响应 ValueListenableBuilder
+      //这到底是怎么回事?
+
       //debugPrint("[Listener] value change: ${widget.reactDataLikeNotifier.value}");
 
       if(selectedRecordDataLike == widget.reactDataLikeNotifier.value) return;
@@ -96,12 +98,8 @@ class _CommentReactionState extends State<CommentReaction> {
         );
       }
 
-
-
       selectedRecordDataLike = widget.reactDataLikeNotifier.value;
 
-
-      
       setState(() {});
     });
     
