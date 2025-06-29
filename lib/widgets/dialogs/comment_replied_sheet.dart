@@ -37,18 +37,21 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
         //和回帖评论的 Divider作区分 才这么写 
         //因为 其divider长度 受padding影响 不一致区分
         if(index == 0){
+
             return Column(  
               children: [
+            
                 EpCommentTile(
                   contentID: contentID,
                   postCommentType: postCommentType,
                   epCommentData: currentComment,
-                  themeColor:themeColor
+                  themeColor:themeColor,
                 ),
+
                 const Divider(height: 1),
               ],
             );
-         }
+        }
 
         if(currentComment.repliedComment!.isNotEmpty){
           return EpCommentTile(

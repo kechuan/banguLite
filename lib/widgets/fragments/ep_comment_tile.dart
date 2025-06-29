@@ -23,7 +23,7 @@ class EpCommentTile extends StatefulWidget {
 	  required this.postCommentType,
     this.themeColor, 
     this.onUpdateComment,
-    this.authorType
+    this.authorType,
   });
 
   final int contentID;
@@ -217,74 +217,77 @@ class _EpCommentTileState extends State<EpCommentTile> {
         ],
       ),
 
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 16),
-        child: Column(
-          spacing: 12,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            ...?commentBlockStatus ?
-            [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const ScalableText("发言已隐藏"),
-                  ScalableText("原因: ${widget.epCommentData.state?.reason}")
-                ],
-              )
-            ] : null,
-
-
-            ...?(!commentBlockStatus && widget.epCommentData.comment?.isNotEmpty == true) ? 
-            [
-               AdapterBBCodeText(
-                data: convertBangumiCommentSticker(widget.epCommentData.comment ?? ""),
-                stylesheet: appDefaultStyleSheet(context,selectableText: true),
-                errorBuilder: (context, error, stackTrace) {
-                  debugPrint("renderError: ${widget.epCommentData.epCommentIndex} err:$error ");
-                  return ScalableText("${widget.epCommentData.comment}");
-                },
-              ) 
-            
-            ] : null,
-            
-            //commentReaction Area
-  
-
-            Builder(
-              builder: (_) {
-                        
-                int? commentIndex = int.tryParse(widget.epCommentData.epCommentIndex?.split('-').first ?? '');
-                int? replyIndex = int.tryParse(widget.epCommentData.epCommentIndex?.split('-').length == 1 ? '' : widget.epCommentData.epCommentIndex?.split('-').last ?? '');
-                        
-                return Align(
-                  alignment: Alignment.centerRight,
-                  child: CommentReaction(
-                    animatedReactionsListKey: animatedTagsListKey,
-                    themeColor: widget.themeColor,
-                    postCommentType: widget.postCommentType,
-                    commentID: widget.epCommentData.commentID,
-                    commentIndex: commentIndex,
-                    replyIndex: replyIndex,
-                    commentReactions: widget.epCommentData.commentReactions,
-                    reactDataLikeNotifier: reactDataLikeNotifier
-                  ),
-                );
-              }
-            ),
+      subtitle: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Column(
+            spacing: 12,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
         
-            //commentAction Area
-
-
-            // 楼主: null 
-            // 层主: 3
-            // 回帖: 3-1(详情界面特供)
-            ...?widget.epCommentData.epCommentIndex?.contains("-") ?? false ? 
-            [const Divider()] :
-            null,
+              ...?commentBlockStatus ?
+              [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const ScalableText("发言已隐藏"),
+                    ScalableText("原因: ${widget.epCommentData.state?.reason}")
+                  ],
+                )
+              ] : null,
         
-          ],
+        
+              ...?(!commentBlockStatus && widget.epCommentData.comment?.isNotEmpty == true) ? 
+              [
+                 AdapterBBCodeText(
+                  data: convertBangumiCommentSticker(widget.epCommentData.comment ?? ""),
+                  stylesheet: appDefaultStyleSheet(context,selectableText: true),
+                  errorBuilder: (context, error, stackTrace) {
+                    debugPrint("renderError: ${widget.epCommentData.epCommentIndex} err:$error ");
+                    return ScalableText("${widget.epCommentData.comment}");
+                  },
+                ) 
+              
+              ] : null,
+              
+              //commentReaction Area
+          
+        
+              Builder(
+                builder: (_) {
+                          
+                  int? commentIndex = int.tryParse(widget.epCommentData.epCommentIndex?.split('-').first ?? '');
+                  int? replyIndex = int.tryParse(widget.epCommentData.epCommentIndex?.split('-').length == 1 ? '' : widget.epCommentData.epCommentIndex?.split('-').last ?? '');
+                          
+                  return Align(
+                    alignment: Alignment.centerRight,
+                    child: CommentReaction(
+                      animatedReactionsListKey: animatedTagsListKey,
+                      themeColor: widget.themeColor,
+                      postCommentType: widget.postCommentType,
+                      commentID: widget.epCommentData.commentID,
+                      commentIndex: commentIndex,
+                      replyIndex: replyIndex,
+                      commentReactions: widget.epCommentData.commentReactions,
+                      reactDataLikeNotifier: reactDataLikeNotifier
+                    ),
+                  );
+                }
+              ),
+          
+              //commentAction Area
+        
+        
+              // 楼主: null 
+              // 层主: 3
+              // 回帖: 3-1(详情界面特供)
+              ...?widget.epCommentData.epCommentIndex?.contains("-") ?? false ? 
+              [const Divider()] :
+              null,
+          
+            ],
+          ),
         ),
       ),
     );

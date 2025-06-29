@@ -88,8 +88,7 @@ class EpRepliedTile extends ListTile {
                             commentIndex: index,
                             child: Row(
                               spacing: 12,
-                              //mainAxisAlignment: MainAxisAlignment.center,
-                              //crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 ScalableText("${repliedComment.userInformation?.nickName}:"),
 

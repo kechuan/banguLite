@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/bangumi_define/response_status_code.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +68,8 @@ Future<dynamic> generalRequest(
 
   /// 由外部控制 completer 的返回数据 与 时机
   try{
-    contentFuture().then((response){
+    //try 无法处理 异步的错误
+    await contentFuture().then((response){
       if(response.statusCode == 200){
         generalCompleteLoadAction?.call(response,generalCompleter);
       }
@@ -77,7 +79,15 @@ Future<dynamic> generalRequest(
 
   on DioException catch (e){
     debugPrint('[generalRequest - ${userContentActionType?.name}]: request error: $e');
-    generalFallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}',generalCompleter);
+
+    if(e.response?.statusCode == BangumiResponseStatusCode.unauthorized.code){
+      generalFallbackAction?.call('${e.response?.statusCode} 登录会话已过期 请重新登录',generalCompleter);
+    }
+    
+    else{
+      generalFallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}',generalCompleter);
+    }
+
   }
 
   

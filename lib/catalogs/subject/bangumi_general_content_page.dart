@@ -27,11 +27,11 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 abstract class BangumiContentPageState<
-  T extends StatefulWidget,
+  W extends StatefulWidget,
   M extends BaseModel,
   I extends ContentInfo,
   D extends ContentDetails
-> extends LifecycleRouteState<T> with RouteLifecycleMixin {
+> extends LifecycleRouteState<W> with RouteLifecycleMixin {
 
   //widget.*信息获取
   M getContentModel();
@@ -81,6 +81,7 @@ abstract class BangumiContentPageState<
     final contentInfo = getContentInfo();
     
     return ChangeNotifierProvider.value(
+      //因为下方的 Selector 需求 使用 带有contentModel 的context环境
       value: contentModel,
       builder: (context, child) {
 
@@ -167,8 +168,7 @@ abstract class BangumiContentPageState<
                           
                           // 首先 主楼也 依赖 至少 1个 count 来显示
                           // 因此保底 +1
-                          // 然后 Topic系内容 天生回复就少1(主楼内容不算入) Blog则保持正常
-                          // 因此 Topic系保持不变
+                          // 然后 Topic系内容 天生回复就少1(主楼内容不算入) 因此 Topic系保持不变
                           int resultCommentCount = 
                             isTopicContent() ?
                             commentListCount :
@@ -317,11 +317,14 @@ abstract class BangumiContentPageState<
 
       case PostCommentType.replyTopic:
       case PostCommentType.replyBlog:
-      case PostCommentType.replyGroupTopic:{
+    //  case PostCommentType.replyGroupTopic:
+	  {
 
         final accessID = getSubContentID() ?? contentInfo.id ?? 0;
 
-        subjectTitle = getPostCommentType() == PostCommentType.replyTopic ? '帖子' : '博客';
+		
+		
+        subjectTitle ??= getPostCommentType() == PostCommentType.replyTopic ? '帖子' : '博客';
 
         if(accessID == 0) break;
 
@@ -329,7 +332,9 @@ abstract class BangumiContentPageState<
 
           MyHive.historySurfDataBase.put(
             accessID,
-            MyHive.historySurfDataBase.get(accessID)!..updatedAt = DateTime.now().millisecondsSinceEpoch
+            MyHive.historySurfDataBase.get(accessID)!
+				..updatedAt = DateTime.now().millisecondsSinceEpoch
+				..replies = contentDetail?.contentRepliedComment?.length ?? 0
           );
 
         }
@@ -363,9 +368,6 @@ abstract class BangumiContentPageState<
 
 
       }
-
-  
-
 
       default:{}
       

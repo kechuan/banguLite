@@ -142,7 +142,7 @@ class BangumiContentAppbar extends StatelessWidget {
                     }
 
                     else{
-                      invokeToaster(message: "因错误未能发送 已保留至草稿纸");
+                      invokeToaster(message: "因错误未能发送 内容已保留至草稿纸");
 
                       indexModel.draftContent.addAll({
                         contentID : ("",content)

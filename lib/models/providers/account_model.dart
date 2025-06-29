@@ -113,9 +113,7 @@ class AccountModel extends ChangeNotifier {
 
           return await generalRequest(
             BangumiAPIUrls.me,
-            options: Options(
-              headers: BangumiQuerys.bearerTokenAccessQuery(accessToken)
-            ),
+            options: BangumiAPIUrls.bangumiAccessOption(),
             generalCompleteLoadAction:(response, completer) {
               debugPrint("accessToken: Valid, ${DateTime.now().millisecondsSinceEpoch ~/ 1000} / ${loginedUserInformations.expiredTime}");
               loginedUserInformations.userInformation = loadUserInformations(response.data);
@@ -586,12 +584,17 @@ class AccountModel extends ChangeNotifier {
       }
       
       try{
+
+        int? responseID;
+
         await commentFuture().then((response) {
           if (response.statusCode == 200) {
             debugPrint("response id:${response.data["id"]}");
-            return response.data["id"] ?? 1;
+            responseID = response.data["id"] ?? 1;
           }
         });
+
+        return responseID ?? 1;
       }
 
       on DioException catch (e){

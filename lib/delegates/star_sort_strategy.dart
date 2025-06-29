@@ -24,7 +24,7 @@ class AirDateSortStrategy implements SortStrategy {
 
     final season = judgeSeasonRange(convertTime.month);
 
-    return '${convertTime.month < 4 ? convertTime.year - 1 : convertTime.year }年 ${season.seasonText}';
+    return '${convertTime.year}年 ${season.seasonText}';
   }
 
   @override
@@ -46,7 +46,7 @@ class UpdateTimeSortStrategy implements SortStrategy {
     WeekDay.values.any((currentDay){
 
       if(currentDay.dayText == details.airWeekday?.substring(2,3)){
-		resultWeekDate = currentDay.dayIndex; //覆盖才有用 太奇怪了
+		    resultWeekDate = currentDay.dayIndex; //覆盖才有用 太奇怪了
         return true;
       }
 
