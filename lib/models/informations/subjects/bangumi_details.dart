@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/models/informations/local/star_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +45,7 @@ class BangumiDetails {
 
 }
 
-Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarResponse,{bool? animeFliter}){
+Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarResponse,{bool? animeFilter}){
 
     Map<String,List<BangumiDetails>> weekCalender = {};
     List<BangumiDetails> popularInSeasonBangumis = [];
@@ -64,8 +65,8 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
 
           BangumiDetails bangumiDetails = BangumiDetails();
 
-          if(animeFliter==true){
-            if(animationFliter(currentBangumi)) continue;
+          if(animeFilter==true){
+            if(!animationFilter(currentBangumi)) continue;
           }
 
           bangumiDetails = loadDetailsData(currentBangumi);
@@ -101,7 +102,7 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
     return weekCalender;
   }
 
-List<BangumiDetails> loadSearchData(Map<String,dynamic> bangumiData,{bool? animateFliter}){
+List<BangumiDetails> loadSearchData(Map<String,dynamic> bangumiData,{bool? animateFilter}){
 
   List<BangumiDetails> searchResult = [];
 
@@ -109,8 +110,10 @@ List<BangumiDetails> loadSearchData(Map<String,dynamic> bangumiData,{bool? anima
 
     for(Map currentBangumi in bangumiList){
 
-      if(animateFliter==true){
-        if(animationFliter(currentBangumi)) continue;
+      if(animateFilter==true){
+        if(!animationFilter(currentBangumi)){
+           continue;
+        }
       }
 
       BangumiDetails bangumiDetail = BangumiDetails();
@@ -146,7 +149,9 @@ List<BangumiDetails> loadSearchData(Map<String,dynamic> bangumiData,{bool? anima
 
 }
 
-Map<String,List<BangumiDetails>> searchDataAdapter(List<BangumiDetails> bangumiSearchDetailsList){
+Map<String,List<BangumiDetails>> searchDataAdapter(
+  List<BangumiDetails> bangumiSearchDetailsList,
+){
 
   final Map<String,List<BangumiDetails>> searchWeekList = {
     "星期一":[],
@@ -161,7 +166,6 @@ Map<String,List<BangumiDetails>> searchDataAdapter(List<BangumiDetails> bangumiS
 
 
   for(BangumiDetails currentBangumi in bangumiSearchDetailsList){
-    
     
   int weekday = DateTime.tryParse(currentBangumi.informationList["air_date"] ?? "")?.weekday ?? 0;
 
@@ -306,22 +310,27 @@ BangumiDetails loadStarDetailsData(StarBangumiDetails starBangumiData){
 }
 
 
-bool animationFliter(Map currentBangumi){
-  //一刀切
-  if(currentBangumi["name_cn"].isEmpty) {
+bool animationFilter(Map currentBangumi){
 
-    //calendar 数据不包含 ["tags"]
-    if(currentBangumi["tags"] == null){
-      return true;
-    }
-
-    else{
-      return currentBangumi["tags"].any((currentTag) => currentTag["name"] == "国产");
-    }
-    
+  //calendar 数据不包含 ["tags"]
+  if(currentBangumi["tags"] == null){
+    return true;
   }
 
-  return false;
+  if(
+    currentBangumi["name_cn"].isEmpty ||
+    currentBangumi["tags"].any((currentTag) => animeFilterTag.contains(currentTag["name"])) ||
+    currentBangumi["tags"].length < 6
+  ){
+    //debugPrint("[Denied]: ${currentBangumi["name"]}");
+    return false;
+  }
+
+  else{
+    //debugPrint("[Allow]: ${currentBangumi["name"]}");
+    return true;
+  }
+
   
 }
 

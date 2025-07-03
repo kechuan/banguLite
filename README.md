@@ -62,7 +62,7 @@
 
 | 深色模式                             | 搜索                                            | 筛选                                            |
 | ------------------------------------ | ----------------------------------------------- | ----------------------------------------------- |
-| ![](./images/dark_detail_mobile.png) | ![image-20240918102318110](./images/search.png) | ![image-20240918102704952](./images/fliter.png) |
+| ![](./images/dark_detail_mobile.png) | ![image-20240918102318110](./images/search.png) | ![image-20240918102704952](./images/filter.png) |
 
 
 

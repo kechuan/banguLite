@@ -9,6 +9,15 @@ final bbcodeRegexp = RegExp(r'\[/?[a-z]+(?:=[^\]]+)?\]');
 final quoteBBcodeRegexp = RegExp(r'\[\/?quote\]');
 final quoteBBcodeContentRegexp = RegExp(r'\[quote\](.*?)\[\/quote\]',multiLine: true,dotAll: true);
 
+const animeFilterTag = [
+  "国产",
+  "中国",
+  "欧美",
+  "美国",
+  "MV",
+  "PV"
+];
+
 enum WeekDay{
 
   mon("一",1),

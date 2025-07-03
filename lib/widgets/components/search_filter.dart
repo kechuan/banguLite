@@ -11,14 +11,14 @@ import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/widgets/fragments/date_range_select.dart';
 
-class Searchfliter extends StatefulWidget {
-  const Searchfliter({super.key});
+class Searchfilter extends StatefulWidget {
+  const Searchfilter({super.key});
 
   @override
-  State<Searchfliter> createState() => _SearchfliterState();
+  State<Searchfilter> createState() => _SearchfilterState();
 }
 
-class _SearchfliterState extends State<Searchfliter> {
+class _SearchfilterState extends State<Searchfilter> {
 
   RangeValues ratingRange = const RangeValues(0, 1);
 
@@ -32,7 +32,7 @@ class _SearchfliterState extends State<Searchfliter> {
 
   final GlobalKey<AnimatedListState> animatedTagsListKey = GlobalKey<AnimatedListState>();
 
-  Map<String,dynamic> searchFliter = BangumiDatas.sortData;
+  Map<String,dynamic> searchFilter = BangumiDatas.sortData;
   Map<int,int> monthSelect = {};
   final List<String> tagsList = [];
 
@@ -312,7 +312,7 @@ class _SearchfliterState extends State<Searchfliter> {
               ),
             ),
             
-            kDebugMode ? ScalableText("[kDebugMode Show] AllData:${searchFliter.toString()}") : const SizedBox.shrink(),
+            kDebugMode ? ScalableText("[kDebugMode Show] AllData:${searchFilter.toString()}") : const SizedBox.shrink(),
       
             //Submit
             Row(
@@ -326,7 +326,7 @@ class _SearchfliterState extends State<Searchfliter> {
                     fadeToaster(context: context, message: "开始搜索");
       
                     bus.emit('sortSubmit',
-                      searchFliter['filter'] = {
+                      searchFilter['filter'] = {
                         "rank": [
                           ">=${int.tryParse(rankEditingControllerStart.text) ?? 2}",
                           "<${int.tryParse(rankEditingControllerEnd.text) ?? 99999}"
@@ -344,7 +344,7 @@ class _SearchfliterState extends State<Searchfliter> {
                     );
       
                     setState(() {
-                        searchFliter['filter'] = {
+                        searchFilter['filter'] = {
                           "rank": [
                             ">=${int.tryParse(rankEditingControllerStart.text) ?? 2}",
                             "<${int.tryParse(rankEditingControllerEnd.text) ?? 99999}"

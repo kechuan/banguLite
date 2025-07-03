@@ -463,19 +463,18 @@ class AccountModel extends ChangeNotifier {
         try{
 
           int resultCode = 0;
-            await contentFuture().then((response) {
-                if (response.statusCode == 200) {
 
-                    //目前只有 subjectComment 返回的 data 是空的 {}
-                    //应该说是PUT行为是不返回的
-                    //debugPrint("postID:${response.data["id"]}");
-                    //contentCompleter.complete(response.data["id"] ?? 200);
-                    
-                    //那没办法 给它特殊一个返回值吧
-                    resultCode = response.data["id"] ?? 1;
+             await contentFuture().then((response) {
+                if (response.statusCode == 200) {
+                  //目前只有 subjectComment 返回的 data 是空的 {}
+                  //应该说是PUT行为是不返回的
+                  //debugPrint("postID:${response.data["id"]}");
+                  //contentCompleter.complete(response.data["id"] ?? 200);
+
+                  //那没办法 给它特殊一个返回值吧
+                  resultCode = response.data["id"] ?? 1;
                 }
             });
-
 
             return resultCode;
 
@@ -483,8 +482,8 @@ class AccountModel extends ChangeNotifier {
         }
 
         on DioException catch (e){
-            debugPrint("[PostContent] DioException:${e.response?.data}");
-            fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
+          debugPrint("[PostContent] DioException:${e.response?.data}");
+          fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
         }
 
         return 0;

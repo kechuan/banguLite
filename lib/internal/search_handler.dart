@@ -78,7 +78,10 @@ Future<Response> sortSearchHandler(
 
 }
 
-Future<List<BangumiDetails>> bangumiTimeRangeSearch({required int totalBangumiLength, required List<String> airDateRange}) async {
+Future<List<BangumiDetails>> bangumiTimeRangeSearch({
+  required int totalBangumiLength,
+  required List<String> airDateRange
+}) async {
 
   final List<BangumiDetails> searchResultList = [];
 
@@ -95,7 +98,7 @@ Future<List<BangumiDetails>> bangumiTimeRangeSearch({required int totalBangumiLe
           searchLimit: 20,
           searchOffset: index*20
         ).then((response){
-          if(response.data!=null) searchResultList.addAll(loadSearchData(response.data,animateFliter: true));
+          if(response.data!=null) searchResultList.addAll(loadSearchData(response.data,animateFilter: true));
           completeFlag-=1;
           if(completeFlag == 0) searchCompleter.complete(searchResultList);
           //存在最后一个加载完之后直接抛出List的风险 因此使用completer

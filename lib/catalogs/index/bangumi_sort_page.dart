@@ -15,7 +15,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
-import 'package:bangu_lite/widgets/components/search_fliter.dart';
+import 'package:bangu_lite/widgets/components/search_filter.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_sort_selector.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -39,7 +39,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
   final ValueNotifier<SortType> browserSortTypeNotifier = ValueNotifier<SortType>(SortType.rank);
 
   final ValueNotifier<String> appBarTitleNotifier = ValueNotifier<String>("");
-  final ValueNotifier<bool> fliterShowNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> filterShowNotifier = ValueNotifier<bool>(false);
   final ValueNotifier<int> loadCountNotifier = ValueNotifier<int>(0);
 
   final List<BangumiDetails> messageList = [];
@@ -118,7 +118,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                     Icon(Icons.filter_list,size: min(35,MediaQuery.sizeOf(context).width/20)),
                                   ],
                                 ),
-                                onTap: () => fliterShowNotifier.value = !fliterShowNotifier.value,
+                                onTap: () => filterShowNotifier.value = !filterShowNotifier.value,
                               ),
                            
                               
@@ -211,11 +211,11 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                 ),
           
                 ValueListenableBuilder(
-                  valueListenable: fliterShowNotifier,
-                  builder: (_,fliterShow,child) {
+                  valueListenable: filterShowNotifier,
+                  builder: (_,filterShow,child) {
                     return SliverToBoxAdapter(
                       child: AnimatedContainer(
-                        height: fliterShow ? (kDebugMode ? 400 : 300) : 0,
+                        height: filterShow ? (kDebugMode ? 400 : 300) : 0,
                         duration: const Duration(milliseconds: 300),
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),
@@ -225,7 +225,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                               child: child,
                             );
                           },
-                          child: fliterShow ? const Searchfliter() : const SizedBox.shrink()
+                          child: filterShow ? const Searchfilter() : const SizedBox.shrink()
                           
                         ),
                       ),
