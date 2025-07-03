@@ -79,6 +79,8 @@ class _StarButtonState extends State<StarButton> {
               ,
               themeColor:judgeDetailRenderColor(context, bangumiModel.imageColor)
             ).then((result){
+
+              
               starInformationNotifier.value += 1;
               localStarType = result;
             });

@@ -333,8 +333,8 @@ abstract class BangumiContentPageState<
           MyHive.historySurfDataBase.put(
             accessID,
             MyHive.historySurfDataBase.get(accessID)!
-				..updatedAt = DateTime.now().millisecondsSinceEpoch
-				..replies = contentDetail?.contentRepliedComment?.length ?? 0
+      				..updatedAt = DateTime.now().millisecondsSinceEpoch
+      				..replies = contentDetail?.contentRepliedComment?.length ?? 0
           );
 
         }

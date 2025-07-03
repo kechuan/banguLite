@@ -113,7 +113,10 @@ class AccountModel extends ChangeNotifier {
 
           return await generalRequest(
             BangumiAPIUrls.me,
-            options: BangumiAPIUrls.bangumiAccessOption(),
+            options:Options(
+              headers: BangumiQuerys.bearerTokenAccessQuery(accessToken)
+            ),
+            //options: BangumiAPIUrls.bangumiAccessOption(),
             generalCompleteLoadAction:(response, completer) {
               debugPrint("accessToken: Valid, ${DateTime.now().millisecondsSinceEpoch ~/ 1000} / ${loginedUserInformations.expiredTime}");
               loginedUserInformations.userInformation = loadUserInformations(response.data);
@@ -384,7 +387,7 @@ class AccountModel extends ChangeNotifier {
 
         switch (postContentType){
 
-            case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.actionSubjectComment(subjectID);
+            case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.actionSubjectComment(int.parse(subjectID));
             case PostCommentType.postTopic: requestUrl = BangumiAPIUrls.postTopic(subjectID);
             case PostCommentType.postBlog:{
                 //缺失中
@@ -458,6 +461,8 @@ class AccountModel extends ChangeNotifier {
         }
 
         try{
+
+          int resultCode = 0;
             await contentFuture().then((response) {
                 if (response.statusCode == 200) {
 
@@ -465,9 +470,16 @@ class AccountModel extends ChangeNotifier {
                     //应该说是PUT行为是不返回的
                     //debugPrint("postID:${response.data["id"]}");
                     //contentCompleter.complete(response.data["id"] ?? 200);
-                    return response.data["id"] ?? 1;
+                    
+                    //那没办法 给它特殊一个返回值吧
+                    resultCode = response.data["id"] ?? 1;
                 }
             });
+
+
+            return resultCode;
+
+
         }
 
         on DioException catch (e){

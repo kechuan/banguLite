@@ -83,7 +83,7 @@ class CommentModel extends ChangeNotifier {
         BangumiAPIUrls.userSubjectComment(currentUserInformation.userName!,subjectID)
       );
 
-      if(userStarInformation.data != null && userStarInformation.data["comment"] != null){
+      if(userStarInformation.data != null){
         userCommentDetails = CommentDetails()
           ..userInformation = currentUserInformation
           ..commentTimeStamp = DateTime.parse(userStarInformation.data["updated_at"]).toLocal().millisecondsSinceEpoch
@@ -93,6 +93,8 @@ class CommentModel extends ChangeNotifier {
             (element) => element.starTypeIndex == userStarInformation.data["type"]
           )
         ;
+
+        debugPrint("用户收藏了该条目: $subjectID, ${userCommentDetails?.type?.starTypeName}");
 
         notifyListeners();
       }
