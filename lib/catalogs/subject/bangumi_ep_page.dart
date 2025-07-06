@@ -1,5 +1,6 @@
 
 import 'dart:math';
+import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
@@ -7,6 +8,7 @@ import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 
 @FFAutoImport()
@@ -14,6 +16,7 @@ import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
+import 'package:bangu_lite/widgets/fragments/comment_filter.dart';
 
 import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comments_progress_slider.dart';
@@ -35,10 +38,12 @@ class BangumiEpPage extends StatefulWidget {
     super.key,
     required this.epModel,
     this.bangumiThemeColor,
+    this.referCommentID
   });
 
   final EpModel epModel;
   final Color? bangumiThemeColor;
+  final int? referCommentID;
 
 
   @override
@@ -322,18 +327,13 @@ class EpInfo extends StatelessWidget {
             stylesheet: appDefaultStyleSheet(context,selectableText: true),
           ),
         )
-    
-        //ListTile(
-        //  title: ScalableText("${epsInfo[selectedEp]?.description}"),
-        //),
-    
-       
+     
       ],
     );
   }
 }
 
-class EpCommentPageDetails extends StatelessWidget {
+class EpCommentPageDetails extends StatefulWidget {
 	const EpCommentPageDetails({
 		super.key,
     this.sliverListKey,
@@ -342,8 +342,29 @@ class EpCommentPageDetails extends StatelessWidget {
 
   final GlobalKey? sliverListKey;
 
+  @override
+  State<EpCommentPageDetails> createState() => _EpCommentPageDetailsState();
+}
+
+class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
+
+  late final ValueNotifier<BangumiCommentRelatedType> commentSurfTypeNotifier;
+
+  List<EpCommentDetails> resultFilterCommentList = [];
+  bool isInitaled = false;
+
+  
+
+  @override
+  void initState() {
+    commentSurfTypeNotifier = ValueNotifier(BangumiCommentRelatedType.normal);
+    super.initState();
+  }
+
 	@override
 	Widget build(BuildContext context) {
+
+    
 
 		return Selector<EpModel,List?>(
 			selector: (_, epModel) => epModel.epCommentData[epModel.selectedEp],
@@ -368,53 +389,83 @@ class EpCommentPageDetails extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 50),
               sliver: Skeletonizer.sliver(
                 enabled: isCommentLoading,
-                child: SliverList.separated(
-                  key: sliverListKey,
-                  itemCount: isCommentLoading ? 3 : epModel.epCommentData[currentEp]!.length+1,
-                  itemBuilder: (_,epCommentIndex){
-                    //Loading...
-                    if(isCommentLoading){
-                      return const SkeletonListTileTemplate(scaleType: ScaleType.medium);
+                child: ValueListenableBuilder(
+                  valueListenable: commentSurfTypeNotifier,
+                  builder: (_, commentSurfType, __) {
+
+                    if(!isInitaled){
+                      final originCommentList = epModel.epCommentData[currentEp]!;
+                      resultFilterCommentList = [...originCommentList];
+                      isInitaled = true;
                     }
 
-                    if(epCommentIndex == 0){
-                      int commentCount = 0;
+                    return SliverList.separated(
+                      key: widget.sliverListKey,
+                      itemCount: isCommentLoading ? 3 : resultFilterCommentList.length+1,
+                      itemBuilder: (_,epCommentIndex){
+                        //Loading...
+                        if(isCommentLoading){
+                          return const SkeletonListTileTemplate(scaleType: ScaleType.medium);
+                        }
+                    
+                        if(epCommentIndex == 0){
+                          int commentCount = 0;
+                    
+                          if(epModel.epCommentData[epModel.selectedEp]![0].userInformation?.userID != 0){
+                            commentCount = resultFilterCommentList.length;
+                          }
+                    
+                          return Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  spacing: 12,
+                                  children: [
+                                    const ScalableText("吐槽箱",style: TextStyle(fontSize: 24)),
+                                    ScalableText("$commentCount",style: const TextStyle(color: Colors.grey)),
+                                  ],
+                                ),
+                    
+                                CommentFilter(
+                                  
+                                  commentSurfTypeNotifier: commentSurfTypeNotifier,
+                                  onCommentFilter: (selectFilter) {
+                                    resultFilterCommentList = filterCommentList(selectFilter,resultFilterCommentList);
+                                  },
+                                )
+                    
+                              ],
+                            ),
+                          );
+                        }
+                      
+                        //无评论的显示状态
+                        if(epModel.epCommentData[currentEp]![0].userInformation?.userID == 0){
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(top:64),
+                              child: ScalableText("该集数暂无人评论..."),
+                            ),
+                          );
+                        }
+                    
+                        //return EpCommentView(
+                        //  contentID: epModel.injectEpID != 0 ? epModel.injectEpID : (epModel.epsData[epModel.selectedEp]?.epID ?? 0) ,
+                        //  postCommentType: PostCommentType.replyEpComment,
+                        //  epCommentData: epModel.epCommentData[currentEp]![epCommentIndex-1]
+                        //);
 
-                      if(epModel.epCommentData[epModel.selectedEp]![0].userInformation?.userID != 0){
-                        commentCount = epModel.epCommentData[epModel.selectedEp]!.length;
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          spacing: 12,
-                          children: [
-                            const ScalableText("吐槽箱",style: TextStyle(fontSize: 24)),
-                                      
-                            ScalableText("$commentCount",style: const TextStyle(color: Colors.grey)),
-
-                          ],
-                        ),
-                      );
-                    }
-                  
-                    //无评论的显示状态
-                    if(epModel.epCommentData[currentEp]![0].userInformation?.userID == 0){
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.only(top:64),
-                          child: ScalableText("该集数暂无人评论..."),
-                        ),
-                      );
-                    }
-
-                    return EpCommentView(
-                      contentID: epModel.injectEpID != 0 ? epModel.injectEpID : (epModel.epsData[epModel.selectedEp]?.epID ?? 0) ,
-                      postCommentType: PostCommentType.replyEpComment,
-                      epCommentData: epModel.epCommentData[currentEp]![epCommentIndex-1]
+                        return EpCommentView(
+                          contentID: epModel.injectEpID != 0 ? epModel.injectEpID : (epModel.epsData[epModel.selectedEp]?.epID ?? 0) ,
+                          postCommentType: PostCommentType.replyEpComment,
+                          epCommentData: resultFilterCommentList[epCommentIndex-1]
+                        );
+                      },
+                      separatorBuilder: (_,__,) => const Divider(height: 1), 
                     );
-                  },
-                  separatorBuilder: (_,__,) => const Divider(height: 1), 
+                  }
                 ),
               ),
             );

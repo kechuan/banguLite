@@ -12,7 +12,7 @@ class EpCommentView extends StatelessWidget {
     required this.contentID,
     required this.epCommentData,
     this.postCommentType,
-    this.onUpdateComment, 
+    this.onUpdateComment,
     this.authorID, 
     
   });

@@ -51,6 +51,7 @@ class EpCommentDetails extends BaseComment{
 
   List<EpCommentDetails>? repliedComment;
 
+  //为了子楼层的兼容表达性(1-1) 直接设立为 String 而非 num
   String? epCommentIndex;
 
   CommentState? state;

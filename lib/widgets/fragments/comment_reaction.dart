@@ -46,8 +46,6 @@ class CommentReaction extends StatefulWidget {
 
 class _CommentReactionState extends State<CommentReaction> {
 
-  //late final ValueNotifier<int> reactDataLikeNotifier;
-
   late final Map<int, Set<String>> localCommentReactions;
 
   int selectedRecordDataLike = -1;
@@ -56,7 +54,6 @@ class _CommentReactionState extends State<CommentReaction> {
   void initState() {
     localCommentReactions = widget.commentReactions ?? {};
     
-
     localCommentReactions.entries.any((userList){
       if(userList.value.contains(AccountModel.loginedUserInformations.userInformation?.getName())){
         widget.reactDataLikeNotifier.value = userList.key;
@@ -68,12 +65,158 @@ class _CommentReactionState extends State<CommentReaction> {
     });
 
     widget.reactDataLikeNotifier.addListener((){
-      //很蠢 但是有用 initState 监听到变化了 但却无法响应 ValueListenableBuilder
-      //这到底是怎么回事?
+      updateReactionList();
+    });
+    
+    //reactDataLikeNotifiers
+    super.initState();
+  }
 
-      //debugPrint("[Listener] value change: ${widget.reactDataLikeNotifier.value}");
+  @override
+  void dispose() {
+    widget.reactDataLikeNotifier.removeListener(updateReactionList);
+    super.dispose();
+  }
 
-      if(selectedRecordDataLike == widget.reactDataLikeNotifier.value) return;
+  @override
+  Widget build(BuildContext context) {
+
+    final accountModel = context.read<AccountModel>();
+    bool isReactAble = accountModel.isLogined() && widget.commentID != null;
+
+    if(localCommentReactions.isEmpty){
+      return const SizedBox.shrink();
+    }
+
+    return SizedBox(
+      height: 40,
+      child: AnimatedList.separated(
+        key: widget.animatedReactionsListKey,
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        physics: const ClampingScrollPhysics(),
+        initialItemCount: localCommentReactions.length,
+        separatorBuilder: (_, index_,animation) => const Padding(padding: PaddingH6),
+        removedSeparatorBuilder:  (_, index, animation) => const SizedBox.shrink(),
+        itemBuilder: (_, index,animation) {
+      
+          //AnimatedList 策略
+          if(localCommentReactions.isEmpty && widget.reactDataLikeNotifier.value == -1) return const SizedBox.shrink();
+          //个人的改变最多会+1 绝对不会再多
+          if(index >= localCommentReactions.length ) return const SizedBox.shrink();
+          
+          int dataLikeIndex = localCommentReactions.keys.elementAt(index);
+          int stickerIndex = convertStickerDatalike(dataLikeIndex);
+      
+          //localCommentReactions[dataLikeIndex]!.add(AccountModel.loginedUserInformations.userInformation!.getName()); 
+      
+          Color? buttonColor = 
+            isReactAble ? 
+            (widget.reactDataLikeNotifier.value == dataLikeIndex ? widget.themeColor?.withValues(alpha: 0.8) : widget.themeColor?.withValues(alpha: 0.3)) : 
+            Colors.grey.withValues(alpha: 0.8)
+          ;
+      
+          return SlideTransition(
+            position: animation.drive(Tween<Offset>(begin: const Offset(-1, 0),end: Offset.zero)),
+            child: FadeTransition(
+              opacity: animation,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: judgeDarknessMode(context) ? Colors.white : buttonColor ?? Colors.grey.withValues(alpha: 0.8),
+                  ),
+                  borderRadius: BorderRadius.circular(20)
+                ),
+                width: 80,
+                child: Row(
+                  children: [
+                  
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(buttonColor),
+                        padding: const WidgetStatePropertyAll(EdgeInsets.all(0)),
+                      ),
+                      onPressed:  () {
+                  
+                        if(!isReactAble) return;
+                  
+                        invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
+                          message: message,
+                          requestStatus: requestStatus,
+                          backgroundColor: judgeCurrentThemeColor(context)
+                        );
+                  
+                        debugPrint("widget.reactDataLikeNotifier.value:$widget.reactDataLikeNotifier.value, dataLikeIndex:$dataLikeIndex, subject:${widget.commentID}");
+                  
+                        //invokeRequestSnackBar(message: "UI贴条成功",requestStatus: true);
+                  
+                        invokeRequestSnackBar();
+                  
+                          accountModel.toggleCommentLike(
+                            widget.commentID,
+                            dataLikeIndex,
+                            widget.postCommentType,
+                            actionType: widget.reactDataLikeNotifier.value == dataLikeIndex ? UserContentActionType.delete : UserContentActionType.post,
+                            fallbackAction: (message){
+                              invokeRequestSnackBar(message: message,requestStatus: false);
+                            }
+                          ).then((result){
+                            if(result){
+                  
+                              if(widget.reactDataLikeNotifier.value == dataLikeIndex){
+                                widget.reactDataLikeNotifier.value = -1;
+                              }
+                  
+                              else{
+                                widget.reactDataLikeNotifier.value = dataLikeIndex;
+                              }
+                  
+                              invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
+                            
+                            }
+                  
+                  
+                          });
+                  
+                                  
+                        debugPrint("postCommentType:${widget.postCommentType}, id: ${widget.commentID}");
+                                  
+                      },
+                
+                      child: Image.asset(
+                        "assets/bangumiSticker/bgm$stickerIndex.gif",
+                        scale: 0.8,
+                      ),
+                    ),
+                    
+                    Tooltip(
+                       triggerMode: TooltipTriggerMode.tap,
+                        message: 
+                          "${localCommentReactions[dataLikeIndex]?.take(6).join("、")}等"
+                          "${(localCommentReactions[dataLikeIndex]?.length ?? 0)}人",
+                        textStyle: TextStyle(
+                          color: judgeDarknessMode(context) ? Colors.black : Colors.white
+                        ),
+                      
+                        child: ScalableText(
+                          "${localCommentReactions[dataLikeIndex]?.length ?? 0}"
+                        )
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+      
+        },
+      
+        
+      ),
+    );
+  }
+
+  void updateReactionList(){
+    if(selectedRecordDataLike == widget.reactDataLikeNotifier.value) return;
 
       if(selectedRecordDataLike != -1){
 
@@ -101,163 +244,5 @@ class _CommentReactionState extends State<CommentReaction> {
       selectedRecordDataLike = widget.reactDataLikeNotifier.value;
 
       setState(() {});
-    });
-    
-    //reactDataLikeNotifiers
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    final accountModel = context.read<AccountModel>();
-    bool isReactAble = accountModel.isLogined() && widget.commentID != null;
-
-    if(localCommentReactions.isEmpty){
-      return const SizedBox.shrink();
-    }
-
-    return SizedBox(
-      height: 40,
-      child: ValueListenableBuilder(
-        valueListenable: widget.reactDataLikeNotifier,
-        builder: (_,reactDataLike,child){
-
-          //debugPrint("[Rebuild] value change: ${widget.reactDataLikeNotifier.value}");
-
-          //AnimatedList 策略 只增不删 允许显示出 0 
-          return AnimatedList.separated(
-            key: widget.animatedReactionsListKey,
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            physics: const ClampingScrollPhysics(),
-            initialItemCount: localCommentReactions.length,
-            separatorBuilder: (_, index_,animation) => const Padding(padding: PaddingH6),
-            removedSeparatorBuilder:  (_, index, animation) => const SizedBox.shrink(),
-            itemBuilder: (_, index,animation) {
-
-              
-
-              //AnimatedList 策略
-              if(localCommentReactions.isEmpty && reactDataLike == -1) return const SizedBox.shrink();
-              //个人的改变最多会+1 绝对不会再多
-              if(index >= localCommentReactions.length ) return const SizedBox.shrink();
-          
-              //恐怕 需要变成 reactDataLikeNotifier 驱动了
-              
-              int dataLikeIndex = localCommentReactions.keys.elementAt(index);
-              int stickerIndex = convertStickerDatalike(dataLikeIndex);
-
-              //localCommentReactions[dataLikeIndex]!.add(AccountModel.loginedUserInformations.userInformation!.getName()); 
-
-              Color? buttonColor = 
-                isReactAble ? 
-                (reactDataLike == dataLikeIndex ? widget.themeColor?.withValues(alpha: 0.8) : widget.themeColor?.withValues(alpha: 0.3)) : 
-                Colors.grey.withValues(alpha: 0.8)
-              ;
-
-              return SlideTransition(
-                position: animation.drive(Tween<Offset>(begin: const Offset(-1, 0),end: Offset.zero)),
-                child: FadeTransition(
-                  opacity: animation,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: judgeDarknessMode(context) ? Colors.white : buttonColor ?? Colors.grey.withValues(alpha: 0.8),
-                      ),
-                      borderRadius: BorderRadius.circular(20)
-                    ),
-                    width: 80,
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(buttonColor),
-                        padding: const WidgetStatePropertyAll(PaddingH6),
-                      ),
-                      onPressed:  () {
-                  
-                        if(!isReactAble) return;
-                  
-                        invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
-                          message: message,
-                          requestStatus: requestStatus,
-                          backgroundColor: judgeCurrentThemeColor(context)
-                        );
-                  
-                        debugPrint("reactDataLike:$reactDataLike, dataLikeIndex:$dataLikeIndex, subject:${widget.commentID}");
-                  
-                       
-                  
-                        //invokeRequestSnackBar(message: "UI贴条成功",requestStatus: true);
-                  
-                        invokeRequestSnackBar();
-                  
-                          accountModel.toggleCommentLike(
-                            widget.commentID,
-                            dataLikeIndex,
-                            widget.postCommentType,
-                            actionType: reactDataLike == dataLikeIndex ? UserContentActionType.delete : UserContentActionType.post,
-                            fallbackAction: (message){
-                              invokeRequestSnackBar(message: message,requestStatus: false);
-                            }
-                          ).then((result){
-                            if(result){
-                  
-                              if(reactDataLike == dataLikeIndex){
-                                widget.reactDataLikeNotifier.value = -1;
-                              }
-                  
-                              else{
-                                widget.reactDataLikeNotifier.value = dataLikeIndex;
-                              }
-                  
-                              invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
-
-                            }
-                  
-                  
-                          });
-                  
-                                  
-                        debugPrint("postCommentType:${widget.postCommentType}, id: ${widget.commentID}");
-                                  
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                        
-                          Image.asset(
-                            "assets/bangumiSticker/bgm$stickerIndex.gif",
-                            scale: 0.8,
-                          ),
-                          
-                          Tooltip(
-                             triggerMode: TooltipTriggerMode.tap,
-                              message: 
-                                "${localCommentReactions[dataLikeIndex]?.take(6).join("、")}等"
-                                "${(localCommentReactions[dataLikeIndex]?.length ?? 0)}人",
-                              textStyle: TextStyle(
-                                color: judgeDarknessMode(context) ? Colors.black : Colors.white
-                              ),
-
-                              child: ScalableText(
-                                "${localCommentReactions[dataLikeIndex]?.length ?? 0}"
-                              )
-                          ),
-                        ],
-                      ),
-                        
-                    ),
-                  ),
-                ),
-              );
-          
-            },
-          
-            
-          );
-        },
-        
-      ),
-    );
   }
 }

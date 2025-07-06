@@ -18,6 +18,22 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
+List<SortType> valueList = const [
+  SortType.joinTime,
+  SortType.updateTime,
+  SortType.airDate,
+  SortType.score,
+  SortType.rank,
+];
+
+List<Icon> iconList =  [
+  Icon(MdiIcons.calendarImport),
+  const Icon(Icons.history),
+  const Icon(Icons.calendar_month),
+  const Icon(Icons.numbers),
+  const Icon(Icons.leaderboard_outlined),
+];
+
 class BangumiStarPage extends StatelessWidget {
   const BangumiStarPage({super.key});
 
@@ -43,46 +59,9 @@ class BangumiStarPage extends StatelessWidget {
         
         actions: [
 
-          //ValueListenableBuilder(
-          //  valueListenable: starNetworkTypeNotifier,
-          //  builder: (_,starNetworkType,child) {
-              
-          //    return SegmentedButton(
-          //      multiSelectionEnabled: false,
-          //      onSelectionChanged: (selection)=> starNetworkTypeNotifier.value = selection.first,
-          //      segments: List.generate(
-          //        StarNetworkType.values.length,
-          //          (index) => ButtonSegment(
-          //            value: StarNetworkType.values[index],
-          //            label: Text(StarNetworkType.values[index].typeName)
-          //          )
-          //        ),
-          //      selected: {starNetworkType},
-          //    );
-          //  }
-          //),
-
-          //const Padding(padding: PaddingH6),
-
           ValueListenableBuilder(
             valueListenable: sortTypeNotifier,
              builder: (_,currentSortType,child) {
-
-                List<SortType> valueList = const [
-                  SortType.joinTime,
-                  SortType.updateTime,
-                  SortType.airDate,
-                  SortType.score,
-                  SortType.rank,
-                ];
-
-                List<Icon> iconList =  [
-                  Icon(MdiIcons.calendarImport),
-                  const Icon(Icons.history),
-                  const Icon(Icons.calendar_month),
-                  const Icon(Icons.numbers),
-                  const Icon(Icons.leaderboard_outlined),
-                ];
 
                return SizedBox(
                 width: 60,
@@ -182,6 +161,8 @@ class BangumiStarPage extends StatelessWidget {
         selector: (_, indexModel) => indexModel.starUpdateFlag,
         shouldRebuild: (previous, next) => previous!=next,
         builder: (_,__,___){
+
+
           return EasyRefresh(
             child: ValueListenableBuilder(
               valueListenable: reversedSortNotifer,

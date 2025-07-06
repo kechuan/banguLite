@@ -13,10 +13,23 @@ enum BangumiCommentAuthorType{
   const BangumiCommentAuthorType(this.typeName);
 }
 
+enum BangumiCommentRelatedType{
+  normal('正序浏览',Icons.history),
+  reversed('倒序浏览',Icons.history_toggle_off),
+  involved('自己参与',Icons.reply),
+  friend('朋友回复',Icons.account_circle_outlined),
+  id('精准回复',Icons.numbers)
+  ;
+
+  final String typeName;
+  final IconData icon;
+
+  const BangumiCommentRelatedType(this.typeName,this.icon);
+}
+
 enum BangumiPrivateHubType{
 
   trend("个人动态",Icons.trending_up_outlined),
-  //user("个人中心",Icons.account_circle_outlined),
   email("消息提醒",Icons.email_outlined),
   ;
 
@@ -87,8 +100,6 @@ enum BangumiTimelineSortType{
   const BangumiTimelineSortType(this.typeName);
 
 }
-
-
 
 enum BangumiSurfGroupType {
 
