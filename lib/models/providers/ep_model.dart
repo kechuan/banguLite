@@ -207,8 +207,7 @@ class EpModel extends ChangeNotifier{
         //空处理 userName = 0 代表为空
         if(epCommentData[selectedEp]!.isEmpty){
           epCommentData[selectedEp] = [
-            EpCommentDetails()
-              ..userInformation = UserInformation.empty()
+            EpCommentDetails.empty()
           ];
         }
 

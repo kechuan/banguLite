@@ -17,6 +17,7 @@ import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_filter.dart';
+import 'package:bangu_lite/widgets/fragments/general_replied_line.dart';
 
 import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comments_progress_slider.dart';
@@ -348,23 +349,14 @@ class EpCommentPageDetails extends StatefulWidget {
 
 class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
 
-  late final ValueNotifier<BangumiCommentRelatedType> commentSurfTypeNotifier;
+  late final ValueNotifier<BangumiCommentRelatedType> commentSurfTypeNotifier = ValueNotifier(BangumiCommentRelatedType.normal);
 
   List<EpCommentDetails> resultFilterCommentList = [];
   bool isInitaled = false;
 
-  
-
-  @override
-  void initState() {
-    commentSurfTypeNotifier = ValueNotifier(BangumiCommentRelatedType.normal);
-    super.initState();
-  }
 
 	@override
 	Widget build(BuildContext context) {
-
-    
 
 		return Selector<EpModel,List?>(
 			selector: (_, epModel) => epModel.epCommentData[epModel.selectedEp],
@@ -378,10 +370,8 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
 					future: epModel.loadEpComment(),
 					builder: (_,snapshot) {
 
-						
 						num currentEp = epModel.selectedEp;
-				
-						debugPrint("currentEp:$currentEp");
+						//debugPrint("currentEp:$currentEp");
 
 						bool isCommentLoading = epModel.epCommentData[currentEp] == null || epModel.epCommentData[currentEp]!.isEmpty;
 
@@ -393,10 +383,17 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                   valueListenable: commentSurfTypeNotifier,
                   builder: (_, commentSurfType, __) {
 
+                    final originalCommentList = epModel.epCommentData[currentEp]!;
+
                     if(!isInitaled){
-                      final originCommentList = epModel.epCommentData[currentEp]!;
-                      resultFilterCommentList = [...originCommentList];
-                      isInitaled = true;
+
+                      if(epModel.epCommentData[currentEp]?.isNotEmpty == true){
+                        if(epModel.epCommentData[currentEp]?.first.epCommentIndex == "1"){
+                          resultFilterCommentList = [...originalCommentList];
+                        }
+
+                        isInitaled = true;
+                      }
                     }
 
                     return SliverList.separated(
@@ -414,35 +411,20 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                           if(epModel.epCommentData[epModel.selectedEp]![0].userInformation?.userID != 0){
                             commentCount = resultFilterCommentList.length;
                           }
-                    
-                          return Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  spacing: 12,
-                                  children: [
-                                    const ScalableText("吐槽箱",style: TextStyle(fontSize: 24)),
-                                    ScalableText("$commentCount",style: const TextStyle(color: Colors.grey)),
-                                  ],
-                                ),
-                    
-                                CommentFilter(
-                                  
-                                  commentSurfTypeNotifier: commentSurfTypeNotifier,
-                                  onCommentFilter: (selectFilter) {
-                                    resultFilterCommentList = filterCommentList(selectFilter,resultFilterCommentList);
-                                  },
-                                )
-                    
-                              ],
-                            ),
+
+                          return GeneralRepliedLine(
+                            repliedCount: commentCount,
+                            commentFilterTypeNotifier: commentSurfTypeNotifier,
+                            onCommentFilter: (selectFilter) {
+                              resultFilterCommentList = filterCommentList(selectFilter,originalCommentList);
+                            },
                           );
+                    
+                          
                         }
                       
                         //无评论的显示状态
-                        if(epModel.epCommentData[currentEp]![0].userInformation?.userID == 0){
+                        if(originalCommentList.first == EpCommentDetails.empty()){
                           return const Center(
                             child: Padding(
                               padding: EdgeInsets.only(top:64),
@@ -451,12 +433,6 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                           );
                         }
                     
-                        //return EpCommentView(
-                        //  contentID: epModel.injectEpID != 0 ? epModel.injectEpID : (epModel.epsData[epModel.selectedEp]?.epID ?? 0) ,
-                        //  postCommentType: PostCommentType.replyEpComment,
-                        //  epCommentData: epModel.epCommentData[currentEp]![epCommentIndex-1]
-                        //);
-
                         return EpCommentView(
                           contentID: epModel.injectEpID != 0 ? epModel.injectEpID : (epModel.epsData[epModel.selectedEp]?.epID ?? 0) ,
                           postCommentType: PostCommentType.replyEpComment,

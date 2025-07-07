@@ -84,27 +84,43 @@ List<EpCommentDetails> filterCommentList(
   List<EpCommentDetails> commentListData,
 ){
 
+  List<EpCommentDetails> resultFilterCommentList = [];
+  if(commentListData.isEmpty) return resultFilterCommentList;
+
   switch(selectFilter){
     case BangumiCommentRelatedType.normal:{
-      if(commentListData.first.epCommentIndex != "1") break;
-      commentListData = commentListData.reversed.toList();
+      return commentListData;
     }
     case BangumiCommentRelatedType.reversed:{
-      if(commentListData.first.epCommentIndex == "1") break;
-      commentListData = commentListData.reversed.toList();
-
+      return commentListData.reversed.toList();
     }
 
     //不仅是自己回帖 还有自己楼中楼回帖
     case BangumiCommentRelatedType.involved:{
-      commentListData.where((currentComment)=>currentComment.userInformation == AccountModel.loginedUserInformations.userInformation);
+      resultFilterCommentList = [...commentListData];
+
+      final String? matchName = AccountModel.loginedUserInformations.userInformation?.userName;
+
+      resultFilterCommentList = commentListData.where(
+        (currentComment){
+          return 
+            currentComment.userInformation?.userName == matchName ||
+            (currentComment.repliedComment?.any(
+              (repliedComment){
+                return repliedComment.userInformation?.userName == matchName;
+              }
+            ) ?? false)
+          ;
+        }
+      ).toList();
     }
+    
     //case BangumiCommentRelatedType.friend:{
 
     //}
     default:{}
   }
 
-  return commentListData;
+  return resultFilterCommentList;
 
 }
