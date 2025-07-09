@@ -16,8 +16,10 @@ enum BangumiCommentAuthorType{
 enum BangumiCommentRelatedType{
   normal('正序浏览',Icons.history),
   reversed('倒序浏览',Icons.history_toggle_off),
-  involved('自己参与',Icons.reply),
-  friend('朋友回复',Icons.account_circle_outlined),
+  involved('自身参与',Icons.reply),
+
+  //等待评估
+  //friend('朋友回复',Icons.account_circle_outlined),
   id('精准回复',Icons.numbers)
   ;
 

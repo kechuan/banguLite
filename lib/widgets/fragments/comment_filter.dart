@@ -96,8 +96,9 @@ List<EpCommentDetails> filterCommentList(
     }
 
     //不仅是自己回帖 还有自己楼中楼回帖
+    //但滤掉自己的主楼帖(Topic)
     case BangumiCommentRelatedType.involved:{
-      resultFilterCommentList = [...commentListData];
+      //resultFilterCommentList = [...commentListData];
 
       final String? matchName = AccountModel.loginedUserInformations.userInformation?.userName;
 

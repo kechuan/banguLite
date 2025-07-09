@@ -9,6 +9,7 @@ import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -62,23 +63,20 @@ class BangumiContentAppbar extends StatelessWidget {
             ),
           ),
 
-        //  IconButton(
-        //    onPressed: (){
-        //      final userModel = context.read<UserModel>();
-              
-        //      fadeToaster(context: context, message: "删除user信息");
 
-        //      userModel.userData.remove('1000000');
-        //    }, 
-        //    icon: const Icon(Icons.abc)
-        //  ),
+          if(kDebugMode)
+            IconButton(
+              onPressed: (){
+                debugPrint('new replied in UI');
+                onSendMessage?.call("一个回帖测试");
+              }, 
+              icon: const Icon(Icons.download_outlined)
+            ),
             
           IconButton(
             onPressed: (){
 
               invokeToaster({String? message})=> fadeToaster(context: context, message: message ?? "请求中");
-
-              
 
               if(postCommentType == PostCommentType.postBlog){
                 invokeToaster(message: '暂不支持发送长评');
@@ -109,12 +107,11 @@ class BangumiContentAppbar extends StatelessWidget {
               );
 
               if(accountModel.isLogined() == false){
-                invokeToaster(message: "评论功能需求登录用户");
+                invokeToaster(message: "评论功能需要先经过登录");
                 return;
               }
 
                 
-
               Navigator.of(context).pushNamed(
                 Routes.sendComment,
                 arguments: {

@@ -16,6 +16,7 @@ import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_filter.dart';
+import 'package:bangu_lite/widgets/components/general_replied_line.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
@@ -62,22 +63,22 @@ abstract class BangumiContentPageState<
 
   BangumiCommentRelatedType? referCommentRelatedType;
 
-  //blog日志里面的内容
+  //子内容加载(评论)
   Future? contentFuture;
-  final ScrollController scrollController = ScrollController();
 
+  final ScrollController scrollController = ScrollController();
   final GlobalKey<SliverAnimatedListState> animatedSliverListKey = GlobalKey();
 
   final ValueNotifier<int> refreshNotifier = ValueNotifier(0);
-  late final ValueNotifier<BangumiCommentRelatedType> commentSurfTypeNotifier = ValueNotifier(referCommentRelatedType ?? BangumiCommentRelatedType.normal);
+  late final ValueNotifier<BangumiCommentRelatedType> commentFilterTypeNotifier = ValueNotifier(referCommentRelatedType ?? BangumiCommentRelatedType.normal);
+
+  bool isInitaled = false;
+  // For Record Comment Type List
+  List<EpCommentDetails> resultFilterCommentList = [];
 
   // For record Local comment Change.
   final Map<int,String> userCommentMap = {};
-
-  List<EpCommentDetails> resultFilterCommentList = [];
-  bool isInitaled = false;
-
-
+  
 
   @override
   Widget build(BuildContext context) {
@@ -170,16 +171,9 @@ abstract class BangumiContentPageState<
                       
                           final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
                           final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
-                          final int commentListCount = (getCommentCount(contentDetail, isCommentLoading) ?? 0);
+                          //final int commentListCount = (getCommentCount(contentDetail, isCommentLoading) ?? 0);
                           
-                          // 首先 主楼也 依赖 至少 1个 count 来显示
-                          // 因此保底 +1
-                          // 然后 Topic系内容 天生回复就少1(主楼内容不算入) 因此 Topic系保持不变
-                          int resultCommentCount = 
-                            isTopicContent() ?
-                            commentListCount :
-                            commentListCount+1
-                          ;
+                          
                       
                           /// 载入失败
                           if(snapshot.data == false && contentDetail?.detailID == 0){
@@ -207,97 +201,104 @@ abstract class BangumiContentPageState<
                           }
                           
                           /// 载入成功 开始记录 与 显示页面
-                          recordHistorySurf(contentInfo,contentDetail);
+                          final currentEpCommentDetails = contentDetail!.contentRepliedComment!;
+
+                          if(!isInitaled){
+                            if(currentEpCommentDetails.isNotEmpty == true){
+                              if(currentEpCommentDetails.first.epCommentIndex == "1"){
+                                resultFilterCommentList = [...currentEpCommentDetails];
+                              }
+                              recordHistorySurf(contentInfo,contentDetail);
+                              isInitaled = true;
+                            }
+                          }
+
+                          // 首先 主楼也 依赖 至少 1个 count 来显示
+                          // 因此保底 +1
+                          // 然后 Topic系内容 天生回复就少1(主楼内容不算入) 因此 Topic系保持不变
+                          int resultCommentCount = 
+                            isTopicContent() ?
+                            resultFilterCommentList.length :
+                            resultFilterCommentList.length+1
+                          ;
                       
                           return SliverSafeArea(
-                            sliver: SliverAnimatedList(
-                              key: animatedSliverListKey,
-                              //rebuild不会影响内部 initialItemCount 只能分离逻辑了
-                              initialItemCount: resultCommentCount,
-                              itemBuilder: (_,contentCommentIndex,animation){
-                            
-                                debugPrint("$contentCommentIndex/$resultCommentCount ${getPostCommentType()}");
-                            
-                                if(contentCommentIndex == 0){
-                                  return authorContent(contentInfo, contentDetail);
-                                }
-                      
-                                /// 用户添加回复时:
-                                if( 
-                                  isTopicContent() ? 
-                                  contentCommentIndex >= commentListCount :
-                                  contentCommentIndex > commentListCount
-                                ){
-                      
-                                  
-                                  // 但因为 animatedList 的 特质 
-                                  // 会出现 相等甚至是超越 initialItemCount 的 index(明明没insert)
-                                  if(contentCommentIndex < resultCommentCount){
-                                    return const SizedBox.shrink();
-                                  }
+                            sliver: ValueListenableBuilder(
+                              valueListenable: commentFilterTypeNotifier,
+                              builder: (_, commentFilterType, __) {
 
-                                  final int newFloor = isTopicContent() ? 
-                                    contentCommentIndex+1 :
-                                    contentCommentIndex
-                                  ;
-                      
-                                  final currentEpCommentDetails = EpCommentDetails()
-                                    ..userInformation = AccountModel.loginedUserInformations.userInformation
+								bool isTopicCommentFiltered = resultFilterCommentList.elementAtOrNull(0)?.epCommentIndex != "1";
 
-                                    //..userInformation = 
-                                    //(
-                                    //  AccountModel.loginedUserInformations.userInformation?..userName = "shironegi"
-                                    //)
-                      
-                                    //刚刚评论的ID理应无法被Action操作
-                                    ..contentID = null
-                                    ..commentID = null
-                                    ..comment = userCommentMap[newFloor]
-                                    ..epCommentIndex = "$newFloor"
-                                    ..commentTimeStamp = DateTime.now().millisecondsSinceEpoch~/1000
-                                  ;
-                            
-                                  return fadeSizeTransition(
-                                    animation: animation,
-                                    child: Column(
-                                      children: [
-                                        
-                                        
-                                          EpCommentView(
-                                            contentID: contentInfo.id ?? 0,
-                                            postCommentType: getPostCommentType(),
-                                            
-                                            //刚添加的内容理应无法做任何操作
-                                            onUpdateComment: (content) {
-                                              //if(content == null){
-                                              //  userCommentMap.remove(contentCommentIndex - resultCommentCount);
-                                              //  removeCommentAction(contentCommentIndex,currentEpCommentDetails);
-                                              //}
-                      
-                                              //else{
-                                              //  //刚添加的回复 无法被编辑
-                                              //}      
-                                            },
-                                            epCommentData: currentEpCommentDetails
-                                          ),
-                                                    
-                                        if(contentCommentIndex != resultCommentCount+userCommentMap.length-1)
-                                          const Divider(),
-                                      ],
-                                    )
-                                            
-                                  );
-                                }
-                      
-                                /// 常规内容
-                                return repliedContent(
-                                  isTopicContent() ? contentCommentIndex : contentCommentIndex-1,
-                                  contentInfo,
-                                  contentDetail
+                                return SliverAnimatedList(
+                                  key: animatedSliverListKey,
+                                  //rebuild不会影响内部 initialItemCount 只能分离逻辑了
+                                  initialItemCount: resultCommentCount,
+                                  itemBuilder: (_,contentCommentIndex,animation){
+                                
+                                    //该内容理应不受筛选影响
+                                    if(contentCommentIndex == 0){
+                                      return authorContent(contentInfo, contentDetail);
+                                    }
+                                                      
+                                    /// 用户添加回复时:
+                                    if( 
+                                      	isTopicContent() ? 
+                                    //  contentCommentIndex >= resultCommentCount - (isTopicContent()&&isTopicCommentFiltered ? 1 : 0):
+										contentCommentIndex >= resultCommentCount + (isTopicContent()&&isTopicCommentFiltered ? 1 : 0):
+                                      	contentCommentIndex > resultCommentCount
+                                    ){
+     
+                                      
+                                      // 但因为 animatedList 的 特质 
+                                      // 会出现 相等甚至是超越 initialItemCount 的 index(明明没insert)
+                                      if(
+                                        //contentCommentIndex < resultCommentCount
+                                        contentCommentIndex >= resultCommentCount + userCommentMap.length
+                                      ){
+                                        return const SizedBox.shrink();
+                                      }
+                                
+                                      return newRepliedContent(
+                                        contentCommentIndex,
+                                        contentInfo,
+                                        animation
+                                      );
+
+                                    }
+                                
+                                    //return Text("${resultFilterCommentList[contentCommentIndex].epCommentIndex}");
+
+
+									//return Text("${resultFilterCommentList[
+									//	isTopicCommentFiltered ? contentCommentIndex - 1 : contentCommentIndex
+									//].epCommentIndex}");
+                                                      
+                                    /// 常规内容
+                                    return Builder(
+                                      builder: (_) {
+                                        //[Topoic限定]倒装过后 原本 记录 Topic 楼主的[0] 也被一起倒装
+                                        //所带来的后果就是 倒装的 第二项 变成了 显示的第一项 以此少显示一项内容
+                                        //[Blog]的楼层显示是正常的 不受影响
+
+										//debugPrint("contentCommentIndex: $contentCommentIndex");
+
+										//return Text("${resultFilterCommentList[
+										//	isTopicCommentFiltered ? contentCommentIndex - 1 : contentCommentIndex
+										//].epCommentIndex}");
+
+                                        return repliedContent(
+                                          (isTopicContent() ? contentCommentIndex : contentCommentIndex-1) - (isTopicContent()&&isTopicCommentFiltered ? 1 : 0),
+                                          contentInfo,
+                                          //contentDetail
+                                        );
+
+                                      }
+                                    );
+                                      
+                                  },
+                                
                                 );
-                                  
-                              },
-                            
+                              }
                             ),
                           );
                                 
@@ -382,13 +383,7 @@ abstract class BangumiContentPageState<
 
   Widget authorContent(I contentInfo, D? contentDetail){
 
-    final int commentListCount = (getCommentCount(contentDetail, false) ?? 0);
-
-    final int resultCommentCount = 
-      isTopicContent() ?
-      commentListCount-1 :
-      commentListCount
-    ;
+	late EpCommentDetails authorEPCommentData;
 
       return Column(
         spacing: 12,
@@ -400,28 +395,34 @@ abstract class BangumiContentPageState<
 
           Builder(
             builder: (_){
-              if(
-                getPostCommentType() == PostCommentType.replyTopic ||
-                getPostCommentType() == PostCommentType.replyGroupTopic
-              ){
-                return EpCommentView(
-                  contentID: contentInfo.id ?? 0,
-                  postCommentType: getPostCommentType(),
-                  epCommentData: contentDetail!.contentRepliedComment?[0] ?? EpCommentDetails()
-                );
-              }
-              
-              return EpCommentView(
-                contentID: contentInfo.id ?? 0,
-                postCommentType: getPostCommentType(),
-                epCommentData: EpCommentDetails()
-                  ..comment = contentDetail?.content
-                  ..commentReactions = contentDetail?.contentReactions
 
-                  ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
-                  ..commentID = getSubContentID() ?? contentInfo.id
-                  ..commentTimeStamp = contentDetail?.createdTime ?? contentInfo.createdTime
-              );
+				if(isTopicContent()){
+
+					authorEPCommentData = contentDetail!.contentRepliedComment?[0] ?? EpCommentDetails();
+					
+					return EpCommentView(
+					contentID: contentInfo.id ?? 0,
+					postCommentType: getPostCommentType(),
+					epCommentData: authorEPCommentData
+					);
+
+					
+				}
+
+				authorEPCommentData = EpCommentDetails()
+					..comment = contentDetail?.content
+					..commentReactions = contentDetail?.contentReactions
+					..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
+					..commentID = getSubContentID() ?? contentInfo.id
+					..commentTimeStamp = contentDetail?.createdTime ?? contentInfo.createdTime
+				;
+				
+				return EpCommentView(
+					contentID: contentInfo.id ?? 0,
+					postCommentType: getPostCommentType(),
+					epCommentData: authorEPCommentData
+				);
+
               
             }
           ),
@@ -438,33 +439,35 @@ abstract class BangumiContentPageState<
             }
           ),
 
-          
 
-          
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              spacing: 12,
-              children: [
-                const ScalableText("回复",style: TextStyle(fontSize: 24)),
-                                            
-                ScalableText("${max(0,resultCommentCount) + userCommentMap.length}",style: const TextStyle(color: Colors.grey)),
+          GeneralRepliedLine(
+            repliedCount: max(0,(resultFilterCommentList.length - (isTopicContent() ? 1 : 0) ) ) + userCommentMap.length,
+            commentFilterTypeNotifier: commentFilterTypeNotifier,
+            onCommentFilter: (filterCommentType) {
+				if(filterCommentType == BangumiCommentRelatedType.involved){
+					resultFilterCommentList = 
+						filterCommentList(filterCommentType,contentDetail!.contentRepliedComment!) +
+						List.generate(
+							userCommentMap.length,
+							(currentCommentIndex)=> EpCommentDetails()..comment = userCommentMap.values.elementAt(currentCommentIndex),
+						)
+					;
 
+					//if(resultFilterCommentList.isEmpty) resultFilterCommentList.add(authorEPCommentData);
+				}
 
-                //CommentFilter(
-                //  commentSurfTypeNotifier: commentSurfTypeNotifier,
-                //  onCommentFilter: (selectFilter) {
-                //    resultFilterCommentList = filterCommentList(selectFilter,originalCommentList);
-                //  },
-                //)
-              ],
-            ),
+				else{
+					resultFilterCommentList = filterCommentList(filterCommentType,contentDetail!.contentRepliedComment!);  
+				}
+              
+              commentFilterTypeNotifier.value = filterCommentType;
+            },
           ),
 
           const Divider(),
         
           //无评论的显示状态
-          if(resultCommentCount == 0 && userCommentMap.isEmpty)
+          if(resultFilterCommentList.isEmpty && userCommentMap.isEmpty)
             const SizedBox(
               height: 64,
               child: Center(
@@ -478,11 +481,10 @@ abstract class BangumiContentPageState<
 
   Widget repliedContent(
     int contentCommentIndex,
-    I contentInfo,
-    D? contentDetail
+    I contentInfo
   ){
 
-    final int commentListCount = (getCommentCount(contentDetail, false) ?? 0);
+    final int commentListCount = resultFilterCommentList.length;
 
     return Column(
       children: [
@@ -495,11 +497,12 @@ abstract class BangumiContentPageState<
 
             return ValueListenableBuilder(
               valueListenable: commentUpdateFlag,
-              builder: (_,__,child){
+              builder: (_,__,___){
             
-                final currentEpCommentDetails = contentDetail!.contentRepliedComment?[contentCommentIndex] ?? EpCommentDetails();
+                //final currentEpCommentDetails = contentDetail!.contentRepliedComment?[contentCommentIndex] ?? EpCommentDetails();
+                final currentEpCommentDetails = resultFilterCommentList[contentCommentIndex];
             
-                if(userCommentMap[contentCommentIndex] != null){
+                if(userCommentMap.isNotEmpty && userCommentMap[contentCommentIndex] != null){
                   currentEpCommentDetails.comment = userCommentMap[contentCommentIndex];
                 }
             
@@ -508,7 +511,6 @@ abstract class BangumiContentPageState<
                   postCommentType: getPostCommentType(),
                   /// 用户更改拥有的内容时
                   onUpdateComment: (content) {
-                  
                     if(content == null){
                       removeCommentAction(contentCommentIndex,currentEpCommentDetails);
                     }
@@ -517,7 +519,6 @@ abstract class BangumiContentPageState<
                       userCommentMap[contentCommentIndex] = content;
                       commentUpdateFlag.value += 1;
                     }
-                  
                   },
                   epCommentData: currentEpCommentDetails,
                   authorID: contentInfo.userInformation?.userID,
@@ -534,6 +535,76 @@ abstract class BangumiContentPageState<
       ],
     );
                              
+  }
+
+  Widget newRepliedContent(
+    int contentCommentIndex,
+    I contentInfo,
+    Animation<double> animation
+  ){
+
+	final D? contentDetail = getContentModel().contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
+	int commentListCount = getCommentCount(contentDetail, false) ?? 0;
+
+	final int resultCommentCount = 
+		isTopicContent() ?
+		resultFilterCommentList.length :
+		resultFilterCommentList.length+1
+	;
+
+
+	final int newFloor = isTopicContent() ? 
+		commentListCount + contentCommentIndex + 1 :
+		commentListCount + contentCommentIndex 
+	;
+
+	
+                      
+      final currentEpCommentDetails = EpCommentDetails()
+        ..userInformation = AccountModel.loginedUserInformations.userInformation
+
+        //..userInformation = 
+        //(
+        //  AccountModel.loginedUserInformations.userInformation?..userName = "shironegi"
+        //)
+                      
+        //刚刚评论的ID理应无法被Action操作
+        ..contentID = contentInfo.id
+        ..commentID = null
+        ..comment = userCommentMap[newFloor]
+        ..epCommentIndex = "$newFloor"
+        ..commentTimeStamp = DateTime.now().millisecondsSinceEpoch~/1000
+      ;
+
+      return fadeSizeTransition(
+        animation: animation,
+        child: Column(
+          children: [
+
+              EpCommentView(
+                contentID: contentInfo.id ?? 0,
+                postCommentType: getPostCommentType(),
+                
+                //刚添加的内容理应无法做任何操作
+                onUpdateComment: (content) {
+                  //if(content == null){
+                  //  userCommentMap.remove(contentCommentIndex - resultCommentCount);
+                  //  removeCommentAction(contentCommentIndex,currentEpCommentDetails);
+                  //}
+                      
+                  //else{
+                  //  //刚添加的回复 无法被编辑
+                  //}      
+                },
+                epCommentData: currentEpCommentDetails
+              ),
+                        
+            if(contentCommentIndex != resultCommentCount+userCommentMap.length-1)
+              const Divider(),
+          ],
+        )
+                
+      );
   }
 
   bool isTopicContent(){

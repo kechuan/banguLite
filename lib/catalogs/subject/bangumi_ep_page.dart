@@ -17,7 +17,7 @@ import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_filter.dart';
-import 'package:bangu_lite/widgets/fragments/general_replied_line.dart';
+import 'package:bangu_lite/widgets/components/general_replied_line.dart';
 
 import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comments_progress_slider.dart';
