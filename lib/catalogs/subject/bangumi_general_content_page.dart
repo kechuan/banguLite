@@ -44,7 +44,7 @@ abstract class BangumiContentPageState<
   String getWebUrl(int? contentID);
 
 
-  //同上理由 因为 reviewID 不与 blogID 相匹配
+  //因为 reviewID 不与 blogID 相匹配 需要额外适配
   int? getSubContentID() => null;
 
   Future<void> loadContent(int contentID,{bool isRefresh = false});
@@ -62,18 +62,26 @@ abstract class BangumiContentPageState<
   PostCommentType? getPostCommentType();
   Color? getcurrentSubjectThemeColor();
 
-  BangumiCommentRelatedType? referCommentRelatedType;
+  int? getReferPostContentID();
 
   //子内容加载(评论)
   Future? contentFuture;
 
-  final ScrollController scrollController = ScrollController();
-  final GlobalKey<SliverAnimatedListState> animatedSliverListKey = GlobalKey();
+  final scrollController = ScrollController();
+  GlobalKey<SliverAnimatedListState> animatedSliverListKey = GlobalKey();
+  final authorContentKey = GlobalKey();
 
-  final ValueNotifier<int> refreshNotifier = ValueNotifier(0);
-  late final ValueNotifier<BangumiCommentRelatedType> commentFilterTypeNotifier = ValueNotifier(referCommentRelatedType ?? BangumiCommentRelatedType.normal);
+  final refreshNotifier = ValueNotifier(0);
 
+  late final commentFilterTypeNotifier = ValueNotifier(
+	getReferPostContentID() != null ? 
+	BangumiCommentRelatedType.id :
+	BangumiCommentRelatedType.normal
+  );
+
+  //[Local Record]
   bool isInitaled = false;
+
   // For Record Comment Type List
   List<EpCommentDetails> resultFilterCommentList = [];
 
@@ -87,7 +95,7 @@ abstract class BangumiContentPageState<
     //widget.获取
     final contentModel = getContentModel();
     final contentInfo = getContentInfo();
-    
+
     return ChangeNotifierProvider.value(
       //因为下方的 Selector 需求 使用 带有contentModel 的context环境
       value: contentModel,
@@ -95,10 +103,13 @@ abstract class BangumiContentPageState<
 
         debugPrint('sub / id :${getSubContentID()} / ${contentInfo.id}');
 
-        contentFuture ??= loadContent(getSubContentID() ?? contentInfo.id ?? 0);
-        
+        //contentFuture ??= loadContent(getSubContentID() ?? contentInfo.id ?? 0);
+		contentFuture ??= loadContent(getSubContentID() ?? contentInfo.id ?? 0);
+
+
         return EasyRefresh.builder(
           scrollController: scrollController,
+
           //重新获取When...
           header: const MaterialHeader(),
           onRefresh: (){
@@ -118,6 +129,7 @@ abstract class BangumiContentPageState<
 
 					//final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
 
+					
                     return Scrollbar(
                       thumbVisibility: true,
                       interactive: true,
@@ -125,7 +137,7 @@ abstract class BangumiContentPageState<
                       controller: scrollController,
                       child: CustomScrollView(
                         controller: scrollController,
-                        physics: physics,
+                        physics: ClampingScrollPhysics(),
                         slivers: [
                           MultiSliver(
                             children: [
@@ -140,13 +152,8 @@ abstract class BangumiContentPageState<
 										postCommentType: getPostCommentType(),
 										surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
 										onSendMessage: (content) {
-
-											final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
-											int commentListCount = getCommentCount(contentDetail, false) ?? 0;
-																				
-											commentListCount += (userCommentMap.length + 1);
 																		
-											userCommentMap.addAll({commentListCount:content as String});
+											userCommentMap.addAll({content.$1 ?? 0:content.$2 as String});
 											
 											WidgetsBinding.instance.addPostFrameCallback((_){
 												animatedSliverListKey.currentState?.insertItem(0);
@@ -156,7 +163,6 @@ abstract class BangumiContentPageState<
 									),
 									)
 								),
-
 
 								FutureBuilder(
 									future: contentFuture,
@@ -168,15 +174,45 @@ abstract class BangumiContentPageState<
 										final currentEpCommentDetails = contentDetail?.contentRepliedComment;
 
 										/// 载入失败
-										if(snapshot.data == false && contentDetail?.detailID == 0){
-											return const Center(
-												child: ScalableText("加载失败"),
+										if(snapshot.hasError && contentDetail?.detailID == 0){
+
+											return SizedBox(
+												height: MediaQuery.sizeOf(context).height,
+												width: MediaQuery.sizeOf(context).width,
+												child: Center(
+													child: Column(
+														spacing: 12,
+														mainAxisAlignment: MainAxisAlignment.center,
+														
+														children: [
+															Row(
+																mainAxisAlignment: MainAxisAlignment.center,
+																spacing: 6,
+																children: [
+																	Icon(Icons.warning_amber_outlined),
+																	ScalableText("${snapshot.error}"),
+																],
+															),
+															
+															TextButton(
+																onPressed: ()=> loadContent(getSubContentID() ?? contentInfo.id ?? 0,isRefresh: true), 
+																child: Row(
+																	mainAxisAlignment: MainAxisAlignment.center,
+																	spacing: 6,
+																	children: [
+																		Icon(Icons.refresh_outlined),
+																		ScalableText("重试",style: TextStyle(fontSize: 16))
+																	],
+																)
+															)
+														],
+													),
+												),
 											);
 										}
 
 										if(!isInitaled){
 											if(currentEpCommentDetails?.isNotEmpty == true){
-
 												resultFilterCommentList = [...currentEpCommentDetails!];												
 
 												if(isTopicContent()){
@@ -189,6 +225,30 @@ abstract class BangumiContentPageState<
 
 												recordHistorySurf(contentInfo,contentDetail);
 												isInitaled = true;
+
+
+												if(commentFilterTypeNotifier.value == BangumiCommentRelatedType.id){
+
+													debugPrint("trigged referContentID: ${getReferPostContentID()}");
+
+													resultFilterCommentList = filterCommentList(
+														commentFilterTypeNotifier.value,
+														resultFilterCommentList,
+														referContentID: getReferPostContentID()
+													);
+
+													WidgetsBinding.instance.addPostFrameCallback((_){
+														debugPrint("measure height:${authorContentKey.currentContext?.size?.height},result:${(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - scrollController.offset}");
+														scrollController.animateTo(
+															max(0,(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - MediaQuery.sizeOf(context).height/3),
+															duration: const Duration(milliseconds: 500),
+															curve: Curves.easeOut,
+														);
+
+													});
+
+												}
+
 											}
 										}
 
@@ -253,31 +313,31 @@ abstract class BangumiContentPageState<
                                 return SliverAnimatedList(
                                   key: animatedSliverListKey,
                                   //rebuild不会影响内部 initialItemCount 只能分离逻辑了
-                                  initialItemCount: resultCommentCount,
-                                  itemBuilder: (_,contentCommentIndex,animation){
+									initialItemCount: (contentDetail!.contentRepliedComment!.length - (isTopicContent() ? 1 : 0)),
+                                  	itemBuilder: (_,contentCommentIndex,animation){
                                 
-                                    /// 用户添加回复时:
-                                    if( contentCommentIndex >= resultCommentCount){
-     
-                                      
-                                      // 但因为 animatedList 的 特质 
-                                      // 会出现 相等甚至是超越 initialItemCount 的 index(明明没insert)
-                                      if(
-                                        contentCommentIndex >= resultCommentCount + userCommentMap.length
-                                      ){
-                                        return const SizedBox.shrink();
-                                      }
-                                
-                                      return newRepliedContent(
-                                        contentCommentIndex,
-                                        contentInfo,
-                                        animation
-                                      );
+										/// 用户添加回复时:
+										if( contentCommentIndex >= resultCommentCount){
+		
+										
+										// 但因为 animatedList 的 特质 
+										// 会出现 相等甚至是超越 initialItemCount 的 index(明明没insert)
+										if(
+											contentCommentIndex >= resultCommentCount + userCommentMap.length
+										){
+											return const SizedBox.shrink();
+										}
+									
+										return newRepliedContent(
+											contentCommentIndex,
+											contentInfo,
+											animation
+										);
 
-                                    }
-                                                      
-                                    /// 常规内容
-                                    return repliedContent(
+										}
+														
+										/// 常规内容
+										return repliedContent(
 										contentCommentIndex,
                                       	contentInfo,
                                     );
@@ -373,6 +433,7 @@ abstract class BangumiContentPageState<
 	late EpCommentDetails authorEPCommentData;
 
       return Column(
+		key: authorContentKey,
         spacing: 12,
         children: [
 
@@ -426,14 +487,21 @@ abstract class BangumiContentPageState<
             repliedCount: max(0,resultFilterCommentList.length) + userCommentMap.length,
             commentFilterTypeNotifier: commentFilterTypeNotifier,
             onCommentFilter: (filterCommentType) {
+				
+				//RESET Aniamted SliverList State
+				//if(commentFilterTypeNotifier.value == BangumiCommentRelatedType.id){
+				//	//同时也会撤销掉所有的 insertItem/removeItem 毕竟直接重构了
+				//	animatedSliverListKey = GlobalKey();
+				//}
 
 				if(isTopicContent()){
 					resultFilterCommentList = filterCommentList(
 						filterCommentType,
 						[...contentDetail!.contentRepliedComment!].also((it){
 							it.removeAt(0);
-						})
+						}),
 					);
+
 				}
 
 				else{
@@ -443,9 +511,10 @@ abstract class BangumiContentPageState<
 					);
 				}
 
-				debugPrint("filter content resultFilterCommentList: $resultFilterCommentList");
+				debugPrint("filter content resultFilterCommentList: ${resultFilterCommentList.length}");
+
+				
               
-              	commentFilterTypeNotifier.value = filterCommentType;
             },
           ),
 
@@ -533,20 +602,22 @@ abstract class BangumiContentPageState<
 
 	if(resultFilterCommentList.length != commentListCount) isFiltered = true;
 
+	// Blog 第一个评论为 第一层, 而 Topic 则以 主楼 为 第一层
 	int newFloor = isFiltered ? 
-	userCommentMap.keys.elementAt(contentCommentIndex) : 
-	resultFilterCommentList.length + contentCommentIndex - (isTopicContent() ? 0 : 1);
+	commentListCount + contentCommentIndex + 1:
+	contentCommentIndex + (isTopicContent() ? 1 : 0) + 1
+	;
 
-	
-	
-    
+	int newCommentID = isFiltered ?
+	newFloor - (commentListCount + contentCommentIndex + 1) :
+	newFloor - (contentCommentIndex + (isTopicContent() ? 1 : 0) + 1)
+	;
+
 	final currentEpCommentDetails = EpCommentDetails()
         ..userInformation = AccountModel.loginedUserInformations.userInformation
-                      
-        //刚刚评论的ID理应无法被Action操作
         ..contentID = contentInfo.id
-        ..commentID = null
-        ..comment = userCommentMap[newFloor]
+        ..commentID = newCommentID
+        ..comment = userCommentMap[newCommentID]
         ..epCommentIndex = "$newFloor"
         ..commentTimeStamp = DateTime.now().millisecondsSinceEpoch~/1000
       ;
@@ -560,16 +631,15 @@ abstract class BangumiContentPageState<
                 contentID: contentInfo.id ?? 0,
                 postCommentType: getPostCommentType(),
                 
-                //刚添加的内容理应无法做任何操作
                 onUpdateComment: (content) {
-                  //if(content == null){
-                  //  userCommentMap.remove(contentCommentIndex - resultCommentCount);
-                  //  removeCommentAction(contentCommentIndex,currentEpCommentDetails);
-                  //}
+                  if(content == null){
+                    userCommentMap.remove(currentEpCommentDetails.commentID);
+                    removeCommentAction(contentCommentIndex,currentEpCommentDetails);
+                  }
                       
-                  //else{
-                  //  //刚添加的回复 无法被编辑
-                  //}      
+                  else{
+					userCommentMap[currentEpCommentDetails.commentID ?? 0] = content;
+                  }      
                 },
                 epCommentData: currentEpCommentDetails
               ),

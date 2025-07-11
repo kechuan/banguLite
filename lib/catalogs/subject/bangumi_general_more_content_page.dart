@@ -57,7 +57,7 @@ abstract class BangumiGeneralMoreContentPageState<
               postCommentType: postCommentType,
               webUrl: webUrl,
               onSendMessage: (content) {
-                onPostContent?.call(content as (String,String));
+                onPostContent?.call(content.$2 as (String,String));
               },
             ),
           ),

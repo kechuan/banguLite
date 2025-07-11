@@ -84,7 +84,7 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
           
           postCommentType: PostCommentType.replyTimeline,
           onSendMessage: (message) {
-            userCommentMap.addAll({userCommentMap.length:message as String});
+            userCommentMap.addAll({userCommentMap.length:message.$2 as String});
             animatedListKey.currentState?.insertItem(0);
           },
         ),

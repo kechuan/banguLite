@@ -1,7 +1,7 @@
 name: bangu_lite
 description: "Lite to Surf Bangumi"
 publish_to: 'none'
-version: 0.9.6
+version: 0.9.7
 
 environment:
   sdk: ^3.5.0
@@ -25,8 +25,6 @@ dependencies:
   #hive: ^2.2.3
   #hive_flutter: ^1.1.0
   github: ^9.24.0
-  #hive_ce: ^2.11.1
-  #hive_ce_flutter: ^2.3.0
   hive_ce: ^2.11.1
   hive_ce_flutter: ^2.3.0
   infinite_carousel: ^1.1.1

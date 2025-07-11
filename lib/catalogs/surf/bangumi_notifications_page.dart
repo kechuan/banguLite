@@ -81,7 +81,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
       body: EasyRefresh(
         header: const MaterialHeader(),
         footer: const MaterialFooter(),
-		refreshOnStart: accountModel.currentUserNotificaions.isEmpty,
+		    refreshOnStart: accountModel.currentUserNotificaions.isEmpty,
         onRefresh: () {
           notificationFuture = accountModel.getNotifications(
             limit: 40,
@@ -111,11 +111,11 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                   default: {}
                 }
 
-				final notificationList = accountModel.currentUserNotificaions.toList().also((it){
-					it.sort(
-						(prev,next) => next.createdTime!.compareTo(prev.createdTime!)
-					);
-				});
+                final notificationList = accountModel.currentUserNotificaions.toList().also((it){
+                  it.sort(
+                    (prev,next) => next.createdTime!.compareTo(prev.createdTime!)
+                  );
+                });
 				
                 return ListView.separated(
                   itemCount: accountModel.currentUserNotificaions.length,
@@ -123,7 +123,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                   itemBuilder: (_,index){
             
                     //final currentNotification = accountModel.currentUserNotificaions.elementAt(index);
-					final currentNotification = notificationList[index];
+					          final currentNotification = notificationList[index];
             
                     String referenceContent = "";
                     String referenceLink = "";
@@ -144,8 +144,8 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
             
                       case NotificationType.characterTopicReply:
                       case NotificationType.characterPostReply:
-					  case NotificationType.characterTopicCall:
-					  {
+                      case NotificationType.characterTopicCall:
+                      {
                         referenceLink = BangumiWebUrls.character(currentNotification.sourceID ?? 0);
                       }
             
@@ -188,14 +188,23 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
 
                       case NotificationType.requestFriend:
                       case NotificationType.acceptFriend:{}
-            
-            
+
                       default:{
                         referenceContent = '${currentNotification.contentTitle} id:${currentNotification.sourceID}' ;
                       }
                     }
             
                     if(referenceLink.isNotEmpty){
+
+                      if(
+                        currentNotification.relatedID != null &&
+                        currentNotification.relatedID != 0
+                      ){
+
+                        referenceLink += '#post_${currentNotification.relatedID}';
+                        
+                      }
+
                       referenceContent = '[url=$referenceLink]${currentNotification.contentTitle}[/url]';
                     }
                     
@@ -218,13 +227,13 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                           ){
                             bus.emit('AppRoute',referenceLink);
 
-							if(currentNotification.isUnRead == true){
-								accountModel.clearNotifications(notificationIDList: [currentNotification.notificationID ?? 0]).then((result){
-									if(result){
-										clearNotifier.value += 1;
-									}
-								});
-							}
+                            if(currentNotification.isUnRead == true){
+                              accountModel.clearNotifications(notificationIDList: [currentNotification.notificationID ?? 0]).then((result){
+                                if(result){
+                                  clearNotifier.value += 1;
+                                }
+                              });
+                            }
 
                           }
                         },

@@ -4,7 +4,6 @@ import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
-import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:flutter/material.dart';
 
 class EpModel extends ChangeNotifier{

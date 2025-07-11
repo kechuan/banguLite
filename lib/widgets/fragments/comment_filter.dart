@@ -4,7 +4,7 @@ import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:flutter/material.dart';
 
-class CommentFilter extends StatefulWidget {
+class CommentFilter extends StatelessWidget {
   const CommentFilter({
     super.key,
     required this.commentSurfTypeNotifier,
@@ -16,62 +16,57 @@ class CommentFilter extends StatefulWidget {
   final Function(BangumiCommentRelatedType)? onCommentFilter;
 
   @override
-  State<CommentFilter> createState() => _CommentFilterState();
-}
-
-class _CommentFilterState extends State<CommentFilter> {
-  @override
   Widget build(BuildContext context) {
 
     return SizedBox(
       width: 60,
         child: ValueListenableBuilder(
-          valueListenable: widget.commentSurfTypeNotifier,
+          valueListenable: commentSurfTypeNotifier,
           builder: (context, commentSurfType, child) {
-            return PopupMenuButton<BangumiCommentRelatedType>(
-              tooltip: "评论筛选",
-              initialValue: commentSurfType,
-              position:PopupMenuPosition.under,
-              itemBuilder: (_) {
-                return List.generate(
-                  BangumiCommentRelatedType.values.length - 1,
-                  (index) => PopupMenuItem(
-                    value: BangumiCommentRelatedType.values[index],
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(BangumiCommentRelatedType.values[index].icon),
-                        Text(BangumiCommentRelatedType.values[index].typeName)
-                      ],),
-                  ),
-                );
-              },
-                                
-              onSelected: (selectFilter){
-                //filterCommentList(selectFilter,commentListData);
-                widget.onCommentFilter?.call(selectFilter);
-                widget.commentSurfTypeNotifier.value = selectFilter;
-                
-              },
-                                
-              child: SizedBox(
-                height: 50,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: PaddingH6,
-                        child: Icon(widget.commentSurfTypeNotifier.value.icon)
-                      ),
-                    ),
-                
-                    const Icon(Icons.arrow_drop_down)
-                
-                  ],
-                ),
-              ),
-                                
-            );
+            return RepaintBoundary(
+			  child: PopupMenuButton<BangumiCommentRelatedType>(
+				tooltip: "评论筛选",
+				initialValue: commentSurfType,
+				position:PopupMenuPosition.under,
+				itemBuilder: (_) {
+				  return List.generate(
+					BangumiCommentRelatedType.values.length - 1,
+					(index) => PopupMenuItem(
+					  value: BangumiCommentRelatedType.values[index],
+					  child: Row(
+						mainAxisAlignment: MainAxisAlignment.spaceBetween,
+						children: [
+						  Icon(BangumiCommentRelatedType.values[index].icon),
+						  Text(BangumiCommentRelatedType.values[index].typeName)
+						],),
+					),
+				  );
+				},
+								  
+				onSelected: (selectFilter){
+				  onCommentFilter?.call(selectFilter);
+				  commentSurfTypeNotifier.value = selectFilter;
+				},
+								  
+				child: SizedBox(
+				  height: 50,
+				  child: Row(
+					children: [
+					  Expanded(
+						child: Padding(
+						  padding: PaddingH6,
+						  child: Icon(commentSurfTypeNotifier.value.icon)
+						),
+					  ),
+				  
+					  const Icon(Icons.arrow_drop_down)
+				  
+					],
+				  ),
+				),
+								  
+			  ),
+			);
           }
         ),
       );
@@ -82,6 +77,7 @@ class _CommentFilterState extends State<CommentFilter> {
 List<EpCommentDetails> filterCommentList(
   BangumiCommentRelatedType selectFilter,
   List<EpCommentDetails> commentListData,
+  {int? referContentID}
 ){
 
   List<EpCommentDetails> resultFilterCommentList = [];
@@ -115,11 +111,23 @@ List<EpCommentDetails> filterCommentList(
         }
       ).toList();
     }
-    
-    //case BangumiCommentRelatedType.friend:{
 
-    //}
-    default:{}
+    case BangumiCommentRelatedType.id:{
+
+      resultFilterCommentList = commentListData.where(
+        (currentComment){
+          return 
+            currentComment.commentID == referContentID ||
+            (currentComment.repliedComment?.any(
+              (repliedComment){
+                return repliedComment.commentID == referContentID;
+              }
+            ) ?? false)
+          ;
+        }
+      ).toList();
+    }
+    
   }
 
   return resultFilterCommentList;

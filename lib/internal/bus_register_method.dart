@@ -15,7 +15,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-final pathRegExp = RegExp('^[^?]*');
+final pathRegExp = RegExp(r'^[^?]*');
+
+// 424493#post_3306858
+final anchorRegExp = RegExp(r'#post_\d+');
 
 void appRouteMethodListener(BuildContext context,String link){
 
@@ -31,7 +34,16 @@ void appRouteMethodListener(BuildContext context,String link){
 
     //example: https://bangumi.tv/ep/1471078?subjectID=1471078&selectedEp=2
     String? matchLink = pathRegExp.firstMatch(link)?.group(0);
-    final int resID = int.tryParse(matchLink?.split(RegExp('/')).last ?? "") ?? 0;
+    String? matchPath = matchLink?.split(RegExp('/')).last ?? "";
+
+    final matchResult = RegExp(r'\d+').allMatches(matchPath);
+
+    final int resID = int.tryParse(matchResult.first.group(0) ?? "") ?? 0;
+
+    final int? postReferID = 
+      int.tryParse(matchResult.last.group(0) ?? "") == resID ? 
+      null : 
+      int.tryParse(matchResult.last.group(0) ?? "");
 
       if(
         link == BangumiWebUrls.subject(resID) ||
@@ -63,6 +75,7 @@ void appRouteMethodListener(BuildContext context,String link){
                 selectedEp: selectedEp,
                 injectEpID: subjectID == 0 ? resID : 0,
               ),
+              "referPostContentID": postReferID,
             }
           );
 
@@ -86,8 +99,8 @@ void appRouteMethodListener(BuildContext context,String link){
             Routes.subjectTopic,
             arguments: {
               "topicModel":TopicModel(subjectID: 'topic'),
-              //"topicInfo":TopicInfo(id: resID,contentTitle: "topicID: $resID"),
-              "topicInfo":TopicInfo(id: resID,contentTitle: appRouteUri.queryParameters['topicTitle'] ??  "topicID: $resID"),
+              "topicInfo":TopicInfo(id: resID,contentTitle: appRouteUri.queryParameters['topicTitle'] ?? "topicID: $resID"),
+              "referPostContentID": postReferID,
             }
           );
 
@@ -103,6 +116,8 @@ void appRouteMethodListener(BuildContext context,String link){
           //那topic呢。。 一般的topic链接是不会拥有 subject/group 这种信息的
           //只有单独的 topic/postID
 
+          debugPrint("groupTopic link: $link");
+
           Navigator.pushNamed(
             context, 
             Routes.groupTopic,
@@ -112,6 +127,7 @@ void appRouteMethodListener(BuildContext context,String link){
                 GroupTopicInfo(id: resID)
                  ..contentTitle = appRouteUri.queryParameters['groupTitle']
               ,
+              "referPostContentID": postReferID,
             }
           );
 
@@ -130,6 +146,7 @@ void appRouteMethodListener(BuildContext context,String link){
           arguments: {
             "reviewModel":ReviewModel(subjectID: "blog"),
             "reviewInfo": ReviewInfo(id: resID),
+            "referPostContentID": postReferID,
           }
         );
         }
@@ -145,6 +162,7 @@ void appRouteMethodListener(BuildContext context,String link){
         debugPrint(
           "groupName:${groupNameRegexp.firstMatch(link)?.group(1)}"
           "groupTitle:${link.split('groupTitle=').last}"
+          "referPostContentID: $postReferID"
         );
 
 
@@ -158,6 +176,7 @@ void appRouteMethodListener(BuildContext context,String link){
               ..groupName = groupNameRegexp.firstMatch(link)?.group(1)
               ..groupTitle = link.split('groupTitle=').last
             ,
+            "referPostContentID": postReferID,
             }
           );
         }

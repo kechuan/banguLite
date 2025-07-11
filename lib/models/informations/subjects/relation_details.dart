@@ -6,11 +6,11 @@ class RelationDetails extends BaseInfo{
 
   BangumiDetails? subjectDetail;
 
-  int? relationID;
+  int? relatedID;
   String? name;
   String? description;
 
-  factory RelationDetails.empty() => RelationDetails()..relationID = 0;
+  factory RelationDetails.empty() => RelationDetails()..relatedID = 0;
 
 }
 
@@ -28,8 +28,8 @@ List<RelationDetails> loadRelationDetails(
 
 		currentRelationDetail
       ..subjectDetail = loadRelationsData(subejctRelationsMap["subject"])
-      ..relationID = subejctRelationsMap["relation"]["id"]
-      ..relationID = subejctRelationsMap["relation"]["id"]
+      ..relatedID = subejctRelationsMap["relation"]["id"]
+      ..relatedID = subejctRelationsMap["relation"]["id"]
       ..name = subejctRelationsMap["relation"]["cn"]
       ..description = subejctRelationsMap["relation"]["desc"]
     ;

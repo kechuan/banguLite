@@ -39,12 +39,12 @@ class BangumiEpPage extends StatefulWidget {
     super.key,
     required this.epModel,
     this.bangumiThemeColor,
-    this.referCommentID
+    this.referPostContentID
   });
 
   final EpModel epModel;
   final Color? bangumiThemeColor;
-  final int? referCommentID;
+  final int? referPostContentID;
 
 
   @override
@@ -312,6 +312,7 @@ class EpInfo extends StatelessWidget {
     
         ListTile(
           title: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
             spacing: 12,
             children: [
               ScalableText("${epsInfo[selectedEp]?.nameCN ?? epsInfo[selectedEp]?.name}"),
@@ -349,11 +350,10 @@ class EpCommentPageDetails extends StatefulWidget {
 
 class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
 
-  late final ValueNotifier<BangumiCommentRelatedType> commentSurfTypeNotifier = ValueNotifier(BangumiCommentRelatedType.normal);
+  final ValueNotifier<BangumiCommentRelatedType> commentSurfTypeNotifier = ValueNotifier(BangumiCommentRelatedType.normal);
 
   List<EpCommentDetails> resultFilterCommentList = [];
   bool isInitaled = false;
-
 
 	@override
 	Widget build(BuildContext context) {
@@ -439,8 +439,9 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                           epCommentData: resultFilterCommentList[epCommentIndex-1]
                         );
                       },
-                      separatorBuilder: (_,__,) => const Divider(height: 1), 
+                      separatorBuilder: (_,__) => const Divider(height: 1), 
                     );
+
                   }
                 ),
               ),

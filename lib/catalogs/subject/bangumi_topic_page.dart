@@ -17,12 +17,14 @@ class BangumiTopicPage extends StatefulWidget {
     super.key,
     required this.topicModel,
 	  required this.topicInfo,
-    this.themeColor
+    this.themeColor,
+    this.referPostContentID,
   });
 
   final TopicModel topicModel;
   final TopicInfo topicInfo;
   final Color? themeColor;
+  final int? referPostContentID;
 
   @override
   State<BangumiTopicPage> createState() => _BangumiTopicPageState();
@@ -86,5 +88,7 @@ class _BangumiTopicPageState extends BangumiContentPageState
     );
   }
 
+  @override
+  int? getReferPostContentID() => widget.referPostContentID;
   
 }

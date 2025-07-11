@@ -6,8 +6,6 @@ import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
-
-
 /// 抽象的内容模型基类
 /// [I] => Info / 入口
 /// [D] => Detail / 详情
@@ -102,7 +100,7 @@ abstract class BaseModel
   ) async {
 
     Completer<bool> contentDetailCompleter = Completer();
-
+ 
     if(getContentDetailUrl(contentID) == null) return false;
 
     if (contentDetailData[contentID] != null) {
@@ -117,10 +115,19 @@ abstract class BaseModel
     contentDetailData[contentID] = createEmptyDetails() as D;
 
     try {
-      await HttpApiClient.client.get(
+      await HttpApiClient.client
+      .get(
         getContentDetailUrl(contentID)!,
         queryParameters: queryParameters,
         options: BangumiAPIUrls.bangumiAccessOption(),
+      ).timeout(
+        Duration(seconds: isRefresh == true ? 15 : 5),
+        onTimeout:() {
+          throw DioException(
+            requestOptions:RequestOptions(),
+            error: TimeoutException("[Timeout] 加载时间超过5s, 请检查网络通畅状况,或可尝试重新加载(15s宽限)"),
+          );
+        },
       ).then((response) {
         if (response.data != null) {
           contentDetailData[contentID] = convertResponseToDetail(response.data) as D;
@@ -132,10 +139,10 @@ abstract class BaseModel
     } 
     
     on DioException catch (e) {
-      debugPrint("Request Error: ${e.toString()}");
+      debugPrint("[GeneralContentReceive] ${e.toString()}");
       
-      fallbackAction?.call('${e.response?.statusCode} ${e.response?.statusMessage}');
-      contentDetailCompleter.complete(false);
+      fallbackAction?.call('code: ${e.response?.statusCode} ${e.error}');
+      contentDetailCompleter.completeError(e.error!);
     }
 
     return contentDetailCompleter.future;

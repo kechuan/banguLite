@@ -32,7 +32,7 @@ class BangumiContentAppbar extends StatelessWidget {
   final PostCommentType? postCommentType;
   final Color? surfaceColor;
 
-  final Function(Object)? onSendMessage;
+  final Function((int?,Object))? onSendMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,7 @@ class BangumiContentAppbar extends StatelessWidget {
             IconButton(
               onPressed: (){
                 debugPrint('new replied in UI');
-                onSendMessage?.call("一个回帖测试");
+                onSendMessage?.call((null,"一个回帖测试"));
               }, 
               icon: const Icon(Icons.download_outlined)
             ),
@@ -135,7 +135,7 @@ class BangumiContentAppbar extends StatelessWidget {
                     //UI层 Callback
                     if(result != 0){
                       invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
-                      onSendMessage?.call(content);
+                      onSendMessage?.call((result,content));
                     }
 
                     else{
@@ -154,18 +154,18 @@ class BangumiContentAppbar extends StatelessWidget {
                 if(content is (String,String)){
 
                   //invokeRequestSnackBar(message: "UI回帖成功",requestStatus: true);
-                  //onSendMessage?.call(content);
+                  //onSendMessage?.call((result,content));
 
                   await invokePostContent(content).then((result){
                     debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
                     //UI层 Callback
                     if(result != 0){
                       invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
-                      onSendMessage?.call(content);
+                      onSendMessage?.call((result,content));
                     }
 
                     else{
-                      invokeToaster(message: "因错误未能发送 内容已保留至草稿纸");
+                      invokeToaster(message: "因错误而未能发送 内容已保留至草稿纸");
 
                       indexModel.draftContent.addAll({
                         contentID : (content.$1,content.$2)

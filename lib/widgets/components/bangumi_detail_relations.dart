@@ -21,7 +21,7 @@ class BangumiDetailRelations extends StatelessWidget {
 
           bool isRelationsEmpty =  
             relationModel.contentListData.isEmpty ||
-            relationModel.contentListData.first.relationID == 0
+            relationModel.contentListData.first.relatedID == 0
           ;
 
           return SizedBox(

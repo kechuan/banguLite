@@ -322,15 +322,15 @@ class AccountModel extends ChangeNotifier {
                 }
 
                 timeoutTimer ??= Timer(const Duration(seconds: 15), () {
-
                         //15s 仅限2次机会
                         if (errorReloadCount == 1) {
                             disposeTimer ??= Timer(const Duration(seconds: 5), () {
-                                    debugPrint("webview dispose");
-                                    controller.dispose();
-                                    getTrunsTileTokenCompleter.complete(false);
-                                    fallbackAction?.call("无法自动通过验证 发帖失败");
-                                });
+                              timeoutTimer?.cancel();
+                              debugPrint("webview dispose");
+                              controller.dispose();
+                              getTrunsTileTokenCompleter.complete(false);
+                              fallbackAction?.call("无法自动通过验证 发帖失败");
+                          });
                         }
 
                         else {

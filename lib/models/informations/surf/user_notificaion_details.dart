@@ -12,8 +12,8 @@ class UserNotificaion extends ContentInfo {
 
   NotificationType? notificationType;
 
-  //好友请求 relationID 为 0,否则即为消息回复提醒
-  int? relationID;
+  //好友请求 relatedID 为 0,否则即为消息回复提醒
+  int? relatedID;
   bool? isUnRead;
 
   @override
@@ -45,7 +45,7 @@ List<UserNotificaion> loadUserNotificaions(List<dynamic> bangumiNotificationsDat
       )
       ..contentTitle = currentNotificationMap["title"]
       ..sourceID = currentNotificationMap["mainID"]
-      ..relationID = currentNotificationMap["relationID"]
+      ..relatedID = currentNotificationMap["relatedID"]
       ..createdTime = currentNotificationMap["createdAt"]
       ..userInformation = loadUserInformations(currentNotificationMap['sender'])
       ..isUnRead = currentNotificationMap["unread"]

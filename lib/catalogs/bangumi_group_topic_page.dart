@@ -23,12 +23,15 @@ class BangumiGroupTopicPage extends StatefulWidget {
     required this.groupsModel,
     required this.groupTopicInfo,
     
-    this.themeColor
+    this.themeColor,
+    this.referPostContentID
   });
 
   final GroupsModel groupsModel;
   final GroupTopicInfo groupTopicInfo;
   final Color? themeColor;
+
+  final int? referPostContentID;
 
   @override
   State<BangumiGroupTopicPage> createState() => _BangumiGroupTopicPageState();
@@ -78,5 +81,8 @@ class _BangumiGroupTopicPageState extends BangumiContentPageState
       fallbackAction: (message) => showRequestSnackBar(message:message,requestStatus: false,backgroundColor: judgeCurrentThemeColor(context)),
     );
   }
+
+  @override
+  int? getReferPostContentID() => widget.referPostContentID;
   
 }

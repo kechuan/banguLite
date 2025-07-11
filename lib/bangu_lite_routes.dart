@@ -42,7 +42,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiBlogPage : [ReviewModel(required) reviewModel, ReviewInfo(required) reviewInfo, Color? themeColor]
+  /// BangumiBlogPage : [ReviewModel(required) reviewModel, ReviewInfo(required) reviewInfo, Color? themeColor, int? referPostContentID]
   static const String blog = '/Blog';
 
   /// '/Groups'
@@ -83,7 +83,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiGroupTopicPage : [GroupsModel(required) groupsModel, GroupTopicInfo(required) groupTopicInfo, Color? themeColor]
+  /// BangumiGroupTopicPage : [GroupsModel(required) groupsModel, GroupTopicInfo(required) groupTopicInfo, Color? themeColor, int? referPostContentID]
   static const String groupTopic = '/groupTopic';
 
   /// '/history'
@@ -166,7 +166,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiEpPage : [EpModel(required) epModel, Color? bangumiThemeColor]
+  /// BangumiEpPage : [EpModel(required) epModel, Color? bangumiThemeColor, int? referPostContentID]
   static const String subjectEp = '/subjectEp';
 
   /// '/subjectTopic'
@@ -175,7 +175,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiTopicPage : [TopicModel(required) topicModel, TopicInfo(required) topicInfo, Color? themeColor]
+  /// BangumiTopicPage : [TopicModel(required) topicModel, TopicInfo(required) topicInfo, Color? themeColor, int? referPostContentID]
   static const String subjectTopic = '/subjectTopic';
 
   /// '/webview'

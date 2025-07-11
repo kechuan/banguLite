@@ -22,14 +22,15 @@ class BangumiBlogPage extends StatefulWidget {
     required this.reviewInfo,
     
     this.themeColor,
+    this.referPostContentID,
   });
 
   
   final ReviewModel reviewModel;
   final ReviewInfo reviewInfo;
   
-
   final Color? themeColor;
+  final int? referPostContentID;
 
   @override
   State<BangumiBlogPage> createState() => _BangumiBlogPageState();
@@ -92,5 +93,9 @@ class _BangumiBlogPageState extends BangumiContentPageState
       isRefresh: isRefresh,
       fallbackAction: (message) => showRequestSnackBar(message:message,requestStatus: false,backgroundColor: judgeCurrentThemeColor(context)));
   }
+
+  @override
+  int? getReferPostContentID() => widget.referPostContentID;
+  
 
 }

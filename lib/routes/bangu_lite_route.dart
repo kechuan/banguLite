@@ -70,6 +70,9 @@ FFRouteSettings getRouteSettings({
           themeColor: asT<Color?>(
             safeArguments['themeColor'],
           ),
+          referPostContentID: asT<int?>(
+            safeArguments['referPostContentID'],
+          ),
         ),
       );
     case '/Groups':
@@ -149,6 +152,9 @@ FFRouteSettings getRouteSettings({
           )!,
           themeColor: asT<Color?>(
             safeArguments['themeColor'],
+          ),
+          referPostContentID: asT<int?>(
+            safeArguments['referPostContentID'],
           ),
         ),
       );
@@ -332,6 +338,9 @@ FFRouteSettings getRouteSettings({
           bangumiThemeColor: asT<Color?>(
             safeArguments['bangumiThemeColor'],
           ),
+          referPostContentID: asT<int?>(
+            safeArguments['referPostContentID'],
+          ),
         ),
       );
     case '/subjectTopic':
@@ -350,6 +359,9 @@ FFRouteSettings getRouteSettings({
           )!,
           themeColor: asT<Color?>(
             safeArguments['themeColor'],
+          ),
+          referPostContentID: asT<int?>(
+            safeArguments['referPostContentID'],
           ),
         ),
       );
