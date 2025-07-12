@@ -18,6 +18,7 @@ import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_filter.dart';
 import 'package:bangu_lite/widgets/components/general_replied_line.dart';
+import 'package:bangu_lite/widgets/fragments/error_load_prompt.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
@@ -107,17 +108,15 @@ abstract class BangumiContentPageState<
 		contentFuture ??= loadContent(getSubContentID() ?? contentInfo.id ?? 0);
 
 
-        return EasyRefresh.builder(
+        return EasyRefresh(
           scrollController: scrollController,
-
           //重新获取When...
           header: const MaterialHeader(),
           onRefresh: (){
             contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0,isRefresh: true);
             refreshNotifier.value += 1;
           },
-          childBuilder: (_, physics) {
-            return Theme(
+          child: Theme(
               data: Theme.of(context).copyWith(
                 scaffoldBackgroundColor: judgeDarknessMode(context) ? null : getcurrentSubjectThemeColor(),
               ),
@@ -127,9 +126,6 @@ abstract class BangumiContentPageState<
                   shouldRebuild: (previous, next) => true,
                   builder: (_, contentDetailData, contentComment) {
 
-					//final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
-
-					
                     return Scrollbar(
                       thumbVisibility: true,
                       interactive: true,
@@ -137,7 +133,6 @@ abstract class BangumiContentPageState<
                       controller: scrollController,
                       child: CustomScrollView(
                         controller: scrollController,
-                        physics: ClampingScrollPhysics(),
                         slivers: [
                           MultiSliver(
                             children: [
@@ -179,35 +174,11 @@ abstract class BangumiContentPageState<
 											return SizedBox(
 												height: MediaQuery.sizeOf(context).height,
 												width: MediaQuery.sizeOf(context).width,
-												child: Center(
-													child: Column(
-														spacing: 12,
-														mainAxisAlignment: MainAxisAlignment.center,
-														
-														children: [
-															Row(
-																mainAxisAlignment: MainAxisAlignment.center,
-																spacing: 6,
-																children: [
-																	Icon(Icons.warning_amber_outlined),
-																	ScalableText("${snapshot.error}"),
-																],
-															),
-															
-															TextButton(
-																onPressed: ()=> loadContent(getSubContentID() ?? contentInfo.id ?? 0,isRefresh: true), 
-																child: Row(
-																	mainAxisAlignment: MainAxisAlignment.center,
-																	spacing: 6,
-																	children: [
-																		Icon(Icons.refresh_outlined),
-																		ScalableText("重试",style: TextStyle(fontSize: 16))
-																	],
-																)
-															)
-														],
-													),
+												child: ErrorLoadPrompt(
+													message: snapshot.error,
+													onRetryAction: ()=>loadContent(getSubContentID() ?? contentInfo.id ?? 0,isRefresh: true),
 												),
+												
 											);
 										}
 
@@ -355,8 +326,8 @@ abstract class BangumiContentPageState<
                   ),
                 )
               ),
-            );
-          }
+            )
+          
         );
       },
     );
@@ -609,8 +580,8 @@ abstract class BangumiContentPageState<
 	;
 
 	int newCommentID = isFiltered ?
-	newFloor - (commentListCount + contentCommentIndex + 1) :
-	newFloor - (contentCommentIndex + (isTopicContent() ? 1 : 0) + 1)
+	userCommentMap.keys.elementAt(newFloor - (commentListCount + contentCommentIndex + 1)) :
+	userCommentMap.keys.elementAt(newFloor - (contentCommentIndex + (isTopicContent() ? 1 : 0) + 1))
 	;
 
 	final currentEpCommentDetails = EpCommentDetails()

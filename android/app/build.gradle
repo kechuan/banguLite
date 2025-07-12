@@ -11,7 +11,10 @@ plugins {
 
 ext.abiCodes = ["armeabi-v7a": 1, "arm64-v8a": 2]
 
-
+def signProperties = rootProject.file("sign/keystore.properties")
+def props = new Properties()
+props.load(new FileInputStream(signProperties))
+def keyStoreFile = file(props['storeFile'])
 
 android {
 	//Your project is configured with Android NDK 23.1.7779620, but the following plugin(s) depend on a different Android NDK version:
@@ -68,6 +71,17 @@ android {
 		}
 	}
 
+	signingConfigs {
+        release {
+			if (keyStoreFile.exists() && signProperties.exists()) {
+                keyAlias props['keyAlias']
+                keyPassword props['keyPassword']
+                storeFile keyStoreFile
+                storePassword props['storePassword']
+            }
+        }
+    }
+
 
 
 
@@ -77,7 +91,9 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
 
 			minifyEnabled true
+			shrinkResources true
 			splits.abi.universalApk = false
+			signingConfig signingConfigs.release
         }
 
 		debug{
@@ -111,21 +127,28 @@ android {
 			// release时必须为true，打包才会为不同的abi生成不同的apk
 			// 否则就没必要打包 因此属性跟随 universalApk 就好
 			// 只要不为 universal 即可打包
-			enable !splits.abi.universalApk
+			//enable !splits.abi.universalApk
+			//enable false
+
+			if(splits.abi.universalApk){
+				enable false
+			}
+
+			else{
+				reset()
+				include "arm64-v8a","armeabi-v7a"
+			}
 			
 			// 默认情况下，包含了所有的ABI。
 			// 所以使用reset()清空所有的ABI，再使用include指定我们想要生成的架构armeabi-v7a、arm-v8a
-			reset()
+			//reset()
 
 			// 逗号分隔列表的形式指定 Gradle 应针对哪些 ABI 生成 APK。只与 reset() 结合使用，以指定确切的 ABI 列表。
 			// include "armeabi-v7a", "arm64-v8a"
 
 			//noinspection ChromeOsAbiSupport
-			include "arm64-v8a","armeabi-v7a"
-		  
+			//include "arm64-v8a","armeabi-v7a"
 
-			//属性交由上层 buildType 控制
-			//universalApk splits.abi.universalApk
         }
     }
 }

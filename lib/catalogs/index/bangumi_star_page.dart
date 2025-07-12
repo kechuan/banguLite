@@ -189,7 +189,8 @@ class BangumiStarPage extends StatelessWidget {
                         context:context,
                         sortStrategy: currentStrategy,
                         isReversed: reversedStatus
-                      )
+                      ),
+                      physics: ClampingScrollPhysics(),
                     );
                   },
                   

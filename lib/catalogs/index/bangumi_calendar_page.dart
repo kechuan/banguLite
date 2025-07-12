@@ -170,7 +170,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                   final calendarBangumis = indexModel.calendarBangumis;
             
                   return CustomScrollView(
-                    physics: physic, //需要传递physic进去触发easyRefresh的回调
+                    physics: ClampingScrollPhysics(),
                     slivers: [
           
                       MultiSliver(

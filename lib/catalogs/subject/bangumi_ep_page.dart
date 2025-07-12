@@ -18,6 +18,7 @@ import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_filter.dart';
 import 'package:bangu_lite/widgets/components/general_replied_line.dart';
+import 'package:bangu_lite/widgets/fragments/error_load_prompt.dart';
 
 import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comments_progress_slider.dart';
@@ -110,7 +111,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                               Positioned.fill(
                                 child: CustomScrollView(
                                   controller: scrollViewController,
-                                  physics:physics,
+                                  physics: physics,
                                   slivers: [
                                               
                                     Selector<EpModel,EpsInfo?>(
@@ -355,8 +356,12 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
   List<EpCommentDetails> resultFilterCommentList = [];
   bool isInitaled = false;
 
+  Future? epCommentFuture;
+
 	@override
 	Widget build(BuildContext context) {
+
+    
 
 		return Selector<EpModel,List?>(
 			selector: (_, epModel) => epModel.epCommentData[epModel.selectedEp],
@@ -365,10 +370,24 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
 			builder: (_,currentEpCommentData,child){
 
         final epModel = context.read<EpModel>();
+
+        epCommentFuture ??= epModel.loadEpComment();
 				
 				return FutureBuilder(
-					future: epModel.loadEpComment(),
+					future: epCommentFuture,
 					builder: (_,snapshot) {
+
+            if(snapshot.hasError){
+
+              return Center(
+                child: ErrorLoadPrompt(
+                  message: snapshot.error,
+                  onRetryAction: (){
+                    epCommentFuture = epModel.loadEpComment();
+                  },
+                ),
+              );
+            }
 
 						num currentEp = epModel.selectedEp;
 						//debugPrint("currentEp:$currentEp");

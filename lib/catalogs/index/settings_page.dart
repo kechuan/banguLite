@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -747,12 +749,14 @@ class TestTile extends ListTile{
       child: Center(
         child: ListTile(
           onTap: () async {
-          
-            debugPrint("callAndroidFunction");
 
-            await DocMan.perms.list().then((result){
-              debugPrint("list: $result");
-            });
+            bus.emit('AppRoute','${BangumiAPIUrls.timelineReply(52089780)}?timelineID=52089780&comment=我难道喜欢看厕纸？');
+          
+            //debugPrint("callAndroidFunction");
+
+            //await DocMan.perms.list().then((result){
+            //  debugPrint("list: $result");
+            //});
 
             //DocMan.perms.releaseAll();
 

@@ -86,7 +86,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
             
             child: CustomScrollView(
               controller: sortScrollController,
-              physics: physic,
+              physics: ClampingScrollPhysics(),
               slivers: [
           
                 SliverPadding(

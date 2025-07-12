@@ -4,6 +4,7 @@ import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class EpModel extends ChangeNotifier{
@@ -195,35 +196,56 @@ class EpModel extends ChangeNotifier{
 
 		//初始化占位
 		epCommentData[selectedEp] = [];
-		
-		await HttpApiClient.client.get(
-			BangumiAPIUrls.epComment(requestID),
-		).then((response){
-			if(response.statusCode == 200){
 
-        epCommentData[selectedEp] = loadEpCommentDetails(response.data);
 
-        //空处理 userName = 0 代表为空
-        if(epCommentData[selectedEp]!.isEmpty){
-          epCommentData[selectedEp] = [
-            EpCommentDetails.empty()
-          ];
+    try{
+      await HttpApiClient.client.get(
+        BangumiAPIUrls.epComment(requestID),
+      )
+      .timeout(
+        Duration(seconds: 10),
+        //DEBUG Duration(microseconds: isRefresh == true ? 30 : 10),
+        onTimeout:() {
+          throw DioException(
+            requestOptions:RequestOptions(),
+            error: TimeoutException("[Timeout] 加载时间超过10s, 请检查网络通畅状况,或可尝试重新加载"),
+          );
+        },
+      )
+      .then((response){
+        if(response.statusCode == 200){
+
+          epCommentData[selectedEp] = loadEpCommentDetails(response.data);
+
+          //空处理 userName = 0 代表为空
+          if(epCommentData[selectedEp]!.isEmpty){
+            epCommentData[selectedEp] = [
+              EpCommentDetails.empty()
+            ];
+          }
+
+          epCommentCompleter.complete(true);
+          
+          debugPrint("$subjectID load Ep.$selectedEp detail done");
+
+          notifyListeners();
+
         }
 
-        epCommentCompleter.complete(true);
+        else{
+          debugPrint("$subjectID load Ep.$selectedEp detail error: ${response.data["message"]}");
+          epCommentCompleter.complete(false);
+        }
         
-        debugPrint("$subjectID load Ep.$selectedEp detail done");
+      });
 
-        notifyListeners();
+    }
 
-			}
-
-      else{
-        debugPrint("$subjectID load Ep.$selectedEp detail error: ${response.data["message"]}");
-        epCommentCompleter.complete(false);
-      }
-      
-		});
+    on DioException catch (e){
+      debugPrint("[EPComment Load] $selectedEp ${e.toString()}");
+      epCommentCompleter.completeError(e.error!);
+    }
+		
 
 
     return epCommentCompleter.future;

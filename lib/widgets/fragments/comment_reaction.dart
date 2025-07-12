@@ -128,84 +128,88 @@ class _CommentReactionState extends State<CommentReaction> {
                   borderRadius: BorderRadius.circular(20)
                 ),
                 width: 80,
-                child: Row(
-                  children: [
-                  
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(buttonColor),
-                        padding: const WidgetStatePropertyAll(EdgeInsets.all(0)),
-                      ),
-                      onPressed:  () {
-                  
-                        if(!isReactAble) return;
-                  
-                        invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
-                          message: message,
-                          requestStatus: requestStatus,
-                          backgroundColor: judgeCurrentThemeColor(context)
-                        );
-                  
-                        debugPrint("widget.reactDataLikeNotifier.value:$widget.reactDataLikeNotifier.value, dataLikeIndex:$dataLikeIndex, subject:${widget.commentID}");
-                  
-                        //invokeRequestSnackBar(message: "UI贴条成功",requestStatus: true);
-                  
-                        invokeRequestSnackBar();
-                  
-                          accountModel.toggleCommentLike(
-                            widget.commentID,
-                            dataLikeIndex,
-                            widget.postCommentType,
-                            actionType: widget.reactDataLikeNotifier.value == dataLikeIndex ? UserContentActionType.delete : UserContentActionType.post,
-                            fallbackAction: (message){
-                              invokeRequestSnackBar(message: message,requestStatus: false);
-                            }
-                          ).then((result){
-                            if(result){
-                  
-                              if(widget.reactDataLikeNotifier.value == dataLikeIndex){
-                                widget.reactDataLikeNotifier.value = -1;
-                              }
-                  
-                              else{
-                                widget.reactDataLikeNotifier.value = dataLikeIndex;
-                              }
-                  
-                              invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
-                            
-                            }
-                  
-                  
-                          });
-                  
-                                  
-                        debugPrint("postCommentType:${widget.postCommentType}, id: ${widget.commentID}");
-                                  
-                      },
+                child: TextButton(
+                  style: ButtonStyle(
+                    padding: const WidgetStatePropertyAll(EdgeInsets.all(0)),
+                  ),
+                  onPressed:  () {
+                      debugPrint("dataLikeIndex:$dataLikeIndex, stickerIndex:$stickerIndex");
+              
+                      if(!isReactAble) return;
                 
-                      child: Image.asset(
+                      invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
+                        message: message,
+                        requestStatus: requestStatus,
+                        backgroundColor: judgeCurrentThemeColor(context)
+                      );
+                
+                      debugPrint("widget.reactDataLikeNotifier.value:$widget.reactDataLikeNotifier.value, dataLikeIndex:$dataLikeIndex, subject:${widget.commentID}");
+                
+                      //invokeRequestSnackBar(message: "UI贴条成功",requestStatus: true);
+                
+                      invokeRequestSnackBar();
+                
+                        accountModel.toggleCommentLike(
+                          widget.commentID,
+                          dataLikeIndex,
+                          widget.postCommentType,
+                          actionType: widget.reactDataLikeNotifier.value == dataLikeIndex ? UserContentActionType.delete : UserContentActionType.post,
+                          fallbackAction: (message){
+                            invokeRequestSnackBar(message: message,requestStatus: false);
+                          }
+                        ).then((result){
+                          if(result){
+                
+                            if(widget.reactDataLikeNotifier.value == dataLikeIndex){
+                              widget.reactDataLikeNotifier.value = -1;
+                            }
+                
+                            else{
+                              widget.reactDataLikeNotifier.value = dataLikeIndex;
+                            }
+                
+                            invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
+                          
+                          }
+                
+                
+                        });
+                
+                                
+                      debugPrint("postCommentType:${widget.postCommentType}, id: ${widget.commentID}");
+                              
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Image.asset(
                         "assets/bangumiSticker/bgm$stickerIndex.gif",
                         scale: 0.8,
                       ),
-                    ),
-                    
-                    Tooltip(
-                       triggerMode: TooltipTriggerMode.tap,
-                        message: 
-                          "${localCommentReactions[dataLikeIndex]?.take(6).join("、")}等"
-                          "${(localCommentReactions[dataLikeIndex]?.length ?? 0)}人",
-                        textStyle: TextStyle(
-                          color: judgeDarknessMode(context) ? Colors.black : Colors.white
+
+
+                        Tooltip(
+                          triggerMode: TooltipTriggerMode.tap,
+                          message: 
+                            "${localCommentReactions[dataLikeIndex]?.take(6).join("、")}等"
+                            "${(localCommentReactions[dataLikeIndex]?.length ?? 0)}人",
+                          textStyle: TextStyle(
+                            color: judgeDarknessMode(context) ? Colors.black : Colors.white
+                          ),
+                        
+                          child: ScalableText(
+                            "${localCommentReactions[dataLikeIndex]?.length ?? 0}"
+                          )
                         ),
-                      
-                        child: ScalableText(
-                          "${localCommentReactions[dataLikeIndex]?.length ?? 0}"
-                        )
-                    ),
-                  ],
+
+
+                    ],
+                  )
+                ),
+                  
                 ),
               ),
-            ),
+            
           );
       
         },

@@ -121,11 +121,12 @@ abstract class BaseModel
         queryParameters: queryParameters,
         options: BangumiAPIUrls.bangumiAccessOption(),
       ).timeout(
-        Duration(seconds: isRefresh == true ? 15 : 5),
+        Duration(seconds: isRefresh == true ? 30 : 10),
+        //DEBUG Duration(microseconds: isRefresh == true ? 30 : 10),
         onTimeout:() {
           throw DioException(
             requestOptions:RequestOptions(),
-            error: TimeoutException("[Timeout] 加载时间超过5s, 请检查网络通畅状况,或可尝试重新加载(15s宽限)"),
+            error: TimeoutException("[Timeout] 加载时间超过10s, 请检查网络通畅状况,或可尝试重新加载"),
           );
         },
       ).then((response) {

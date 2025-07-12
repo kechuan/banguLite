@@ -160,6 +160,10 @@ class NewUpdateDialog extends StatelessWidget {
 
                         if(UpdateClient.updateClient.speedTimer != null){
                           fadeToaster(context: context,message: "已存在进行中的任务");
+                          //初次授权取消后的处理
+                          if(Platform.isAndroid){
+                            installApk(File("${MyHive.downloadDir!.path}${Platform.pathSeparator}${latestRelease.assets![index].name}"));
+                          }
                           return;
                         }
 

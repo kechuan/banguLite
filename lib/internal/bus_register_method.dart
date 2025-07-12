@@ -38,12 +38,17 @@ void appRouteMethodListener(BuildContext context,String link){
 
     final matchResult = RegExp(r'\d+').allMatches(matchPath);
 
-    final int resID = int.tryParse(matchResult.first.group(0) ?? "") ?? 0;
+    final int resID = matchResult.isEmpty ? 0 :
+      int.tryParse(
+        matchResult.first.group(0) ?? ""
+      ) ?? 0
+    ;
 
-    final int? postReferID = 
+    final int? postReferID = matchResult.isEmpty ? null :
       int.tryParse(matchResult.last.group(0) ?? "") == resID ? 
       null : 
-      int.tryParse(matchResult.last.group(0) ?? "");
+      int.tryParse(matchResult.last.group(0) ?? "")
+    ;
 
       if(
         link == BangumiWebUrls.subject(resID) ||
