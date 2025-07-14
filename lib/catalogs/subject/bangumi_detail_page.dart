@@ -206,88 +206,87 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                         BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails; //dependenc
         
                         return EasyRefresh(
-                        header: const MaterialHeader(),
-                        onRefresh: (){
-                          //bangumiModel.loadDetails(isRefresh:true);
-                          context.read<CommentModel>().loadComments(isReloaded: true);
-                          context.read<TopicModel>().loadSubjectSubContentList(isReloaded: true);
-                          context.read<ReviewModel>().loadSubjectSubContentList(isReloaded: true);
-                        },
-                        
-                        child:CustomScrollView(
-                          slivers: [
-                            Skeletonizer.sliver(
-                            enabled: currentSubjectDetail==null,
-                            child: Selector<BangumiModel,Color?>(
-                              selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
-                              shouldRebuild: (previous, next) => previous!=next,
-                              builder: (_,linearColor,detailChild) {
-        
-                              return TweenAnimationBuilder<Color?>(
-                                tween: ColorTween(
-                                  begin: judgeCurrentThemeColor(context),
-                                  end: judgeDarknessMode(context) ? Colors.black : judgeDetailRenderColor(context,linearColor),
-                                ),
-                                duration: const Duration(milliseconds: 500),
-                                builder: (_, linearColor, __) {
-        
-                                return DecoratedSliver(
-                                  decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      judgeDarknessMode(context) ? Colors.black : Colors.white,
-                                      linearColor!.withValues(alpha: 0.8),
-                                    ]
-                                  )
+                          header: const MaterialHeader(),
+                          onRefresh: (){
+                            //bangumiModel.loadDetails(isRefresh:true);
+                            context.read<CommentModel>().loadComments(isReloaded: true);
+                            context.read<TopicModel>().loadSubjectSubContentList(isReloaded: true);
+                            context.read<ReviewModel>().loadSubjectSubContentList(isReloaded: true);
+                          },
+                          
+                          child:CustomScrollView(
+                            slivers: [
+                              Skeletonizer.sliver(
+                              enabled: currentSubjectDetail==null,
+                              child: Selector<BangumiModel,Color?>(
+                                selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
+                                shouldRebuild: (previous, next) => previous!=next,
+                                builder: (_,linearColor,detailChild) {
+          
+                                return TweenAnimationBuilder<Color?>(
+                                  tween: ColorTween(
+                                    begin: judgeCurrentThemeColor(context),
+                                    end: judgeDarknessMode(context) ? Colors.black : judgeDetailRenderColor(context,linearColor),
                                   ),
-                                  sliver: detailChild,
+                                  duration: const Duration(milliseconds: 500),
+                                  builder: (_, linearColor, __) {
+          
+                                  return DecoratedSliver(
+                                    decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        judgeDarknessMode(context) ? Colors.black : Colors.white,
+                                        linearColor!.withValues(alpha: 0.8),
+                                      ]
+                                    )
+                                    ),
+                                    sliver: detailChild,
+                                    
+                                  );
+          
+                                  },
                                   
                                 );
-        
+          
                                 },
-                                
-                              );
-        
-                              },
-                              child: SliverPadding(
-                              padding: Padding16,
-                              sliver: SliverList(
-                                delegate: SliverChildListDelegate(
-                                [
-                                  BangumiDetailIntro(bangumiDetails: currentSubjectDetail ?? BangumiDetails()),
-        
-                                  BangumiSummary(summary: currentSubjectDetail?.summary),
-                                  
-                                  BangumiDetailRecentReview(
-                                    name: bangumiModel.bangumiDetails?.name,
-                                    collapseStatusNotifer:reviewsCollaspeStatusNotifier
-                                  ),
-        
-                                  const BangumiDetailRelations(),
-        
-                                  BangumiDetailTopics(
-                                    name: bangumiModel.bangumiDetails?.name,
-                                    collapseStatusNotifer:topicsCollaspeStatusNotifier
+                                child: SliverPadding(
+                                padding: Padding16,
+                                sliver: SliverList(
+                                  delegate: SliverChildListDelegate(
+                                  [
+                                    BangumiDetailIntro(bangumiDetails: currentSubjectDetail ?? BangumiDetails()),
+          
+                                    BangumiSummary(summary: currentSubjectDetail?.summary),
                                     
-                                  ),
-                                  
-                                  NotificationListener<ScrollNotification>(
-                                  onNotification: (_) => true,
-                                  child: BangumiHotComment(id: widget.subjectID,name: bangumiModel.bangumiDetails?.name,) 
-                                  ),
-                                ]
+                                    BangumiDetailRecentReview(
+                                      name: bangumiModel.bangumiDetails?.name,
+                                      collapseStatusNotifer:reviewsCollaspeStatusNotifier
+                                    ),
+          
+                                    const BangumiDetailRelations(),
+          
+                                    BangumiDetailTopics(
+                                      name: bangumiModel.bangumiDetails?.name,
+                                      collapseStatusNotifer:topicsCollaspeStatusNotifier
+                                    ),
+                                    
+                                    NotificationListener<ScrollNotification>(
+                                      onNotification: (_) => true,
+                                      child: BangumiHotComment(id: widget.subjectID,name: bangumiModel.bangumiDetails?.name,) 
+                                    ),
+                                  ]
+                                  )
+                                ),
                                 )
-                              ),
-                              )
-                              
-                            
                                 
-                            ),
-                                    
-                            ),
-                          ],
+                              
+                                  
+                              ),
+                                      
+                              ),
+                            ],
                           )
                         );
                     

@@ -80,7 +80,6 @@ class _CommentReactionState extends State<CommentReaction> {
 
   @override
   Widget build(BuildContext context) {
-
     final accountModel = context.read<AccountModel>();
     bool isReactAble = accountModel.isLogined() && widget.commentID != null;
 
