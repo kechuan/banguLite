@@ -109,11 +109,11 @@ class _CommentReactionState extends State<CommentReaction> {
       
           //localCommentReactions[dataLikeIndex]!.add(AccountModel.loginedUserInformations.userInformation!.getName()); 
       
-          Color? buttonColor = 
-            isReactAble ? 
-            (widget.reactDataLikeNotifier.value == dataLikeIndex ? widget.themeColor?.withValues(alpha: 0.8) : widget.themeColor?.withValues(alpha: 0.3)) : 
-            Colors.grey.withValues(alpha: 0.8)
-          ;
+          //Color? buttonColor = 
+          //  isReactAble ? 
+          //  (widget.reactDataLikeNotifier.value == dataLikeIndex ? widget.themeColor?.withValues(alpha: 0.8) : widget.themeColor?.withValues(alpha: 0.3)) : 
+          //  Colors.grey.withValues(alpha: 0.8)
+          //;
       
           return SlideTransition(
             position: animation.drive(Tween<Offset>(begin: const Offset(-1, 0),end: Offset.zero)),
@@ -122,7 +122,7 @@ class _CommentReactionState extends State<CommentReaction> {
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: judgeDarknessMode(context) ? Colors.white : buttonColor ?? Colors.grey.withValues(alpha: 0.8),
+                    color: judgeDarknessMode(context) ? Colors.white : Colors.grey.withValues(alpha: 0.8),
                   ),
                   borderRadius: BorderRadius.circular(20)
                 ),
@@ -182,7 +182,7 @@ class _CommentReactionState extends State<CommentReaction> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Image.asset(
-                        "assets/bangumiSticker/bgm$stickerIndex.gif",
+                        convertBangumiStickerPath(stickerIndex),
                         scale: 0.8,
                       ),
 

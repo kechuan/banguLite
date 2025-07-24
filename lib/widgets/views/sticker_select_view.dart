@@ -51,7 +51,7 @@ class StickerSelectView extends StatelessWidget {
                                                     return UnVisibleResponse(
                                                         onTap: () => insertBgmSticker(index),
                                                         child: Image.asset(
-                                                            './assets/bangumiSticker/bgm${convertDigitNumString(index + 1)}.gif',
+                                                            convertBangumiStickerPath(index + 1),
                                                             scale: 0.8,
                                                         )
                                                     );
@@ -70,8 +70,8 @@ class StickerSelectView extends StatelessWidget {
                                                     return UnVisibleResponse(
                                                         onTap: () => insertBgmSticker(index + 23),
                                                         child: Image.asset(
-                                                            './assets/bangumiSticker/bgm${convertDigitNumString(index + 24)}.gif',
-                                                            scale: 0.8,
+                                                          convertBangumiStickerPath(index + 24),
+                                                          scale: 0.8,
                                                         )
                                                     );
                                                 })

@@ -91,8 +91,10 @@ class MainApp extends StatelessWidget {
                 darkTheme: ThemeData(
                   brightness: Brightness.dark,
                   fontFamilyFallback:convertSystemFontFamily(),
+                  //colorScheme: ColorScheme.fromSeed(seedColor: currentColor),
                   
                   colorScheme: ColorScheme.dark(
+                    
                     primary: currentColor,
                     onPrimary: Colors.white, //unSelected颜色
                     secondary: currentColor.withValues(alpha: 0.8), // Selected 底色颜色(Button 一类)

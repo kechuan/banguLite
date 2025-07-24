@@ -72,6 +72,8 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
 
     invokeShowUpdateDialog(latestRelease) => showUpdateDialog(context,latestRelease);
 
+    getContext() => context;
+
     carouselSpinTimer();
     calendarLoadFuture = context.read<IndexModel>().loadCalendar();
 
@@ -95,18 +97,18 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
       if(APPInformationRepository.version == latestRelease.tagName){
         return;
       }
-      
+
       Future.delayed(
-        const Duration(seconds: 5), 
+        const Duration(seconds: 3), 
         ()=> showRequestSnackBar(
           message: "检测到新版本",
           trailingWidget: TextButton(
             onPressed: ()=> invokeShowUpdateDialog(latestRelease),
-            child: const Text('去更新')
+            child: const Text('去更新',style: TextStyle(color: Colors.black))
+            
           ),
-          //如果这里的context都能出问题 这就已经不是 info 的级别了
-          // ignore: use_build_context_synchronously
-          backgroundColor: judgeCurrentThemeColor(context)
+          
+          backgroundColor: judgeCurrentThemeColor(getContext())
         )
       );
     });
@@ -126,9 +128,10 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
 
   @override
   void onResume() {
-    debugPrint("caleandar resume");
-    carouselSpinTimer();
-    super.onResume();
+	debugPrint("caleandar resume");
+	carouselSpinTimer();
+	super.onResume();
+
   }
 
 

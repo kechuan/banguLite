@@ -214,19 +214,19 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
 
     return Scaffold(
       appBar: AppBar(
-		title: const ScalableText('历史记录'),
-        leading: ValueListenableBuilder(
-			valueListenable: multiSelectModeNotifier,
-			builder: (_,multiSelectModeNotifier,child) {
-				return IconButton(
-					onPressed: (){
-						multiSelectModeNotifier ? toggleMultiSelectMode() : Navigator.of(context).pop();
-					},
-					icon: multiSelectModeNotifier ? const Icon(Icons.close) : const Icon(Icons.arrow_back),
-				);
-			}
-        ),
-        actions: buildAppBarActions(),
+		  title: const ScalableText('历史记录'),
+      leading: ValueListenableBuilder(
+        valueListenable: multiSelectModeNotifier,
+        builder: (_,multiSelectModeNotifier,child) {
+      return IconButton(
+        onPressed: (){
+          multiSelectModeNotifier ? toggleMultiSelectMode() : Navigator.of(context).pop();
+        },
+        icon: multiSelectModeNotifier ? const Icon(Icons.close) : const Icon(Icons.arrow_back),
+      );
+    }
+      ),
+      actions: buildAppBarActions(),
       ),
       body: EasyRefresh(
         onRefresh: () => setState(() {}),
@@ -247,142 +247,144 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
   ///但这也让我明白有些写法的意义究竟会在哪里
   List<Widget> buildAppBarActions() {
 
-	return [
-		ValueListenableBuilder(
-			valueListenable: multiSelectModeNotifier,
-			builder: (_,multiSelectMode,child){
-				return Row(
-					spacing: 6,
-					children: [
-						if (multiSelectMode) 
-							IconButton(
-								onPressed: ()=> toggleSelectAll(),
-								icon: Icon(
-									selectedItems.length == MyHive.historySurfDataBase.length
-									? Icons.deselect
-									: Icons.select_all
-								),
-							),
-				
-						if(!multiSelectMode) 
-							
-							...[
-								IconButton(
-								onPressed: ()=> toggleMultiSelectMode(),
-									icon: const Icon(Icons.checklist),
-									tooltip: '多选模式',
-								),
-								IconButton(
-								onPressed: (){
-									showTransitionAlertDialog(
-										context,
-										title: "清空全部历史记录",
-										content: "确定要清空全部历史记录吗？",
-										confirmAction: (){
+	  return [
+      ValueListenableBuilder(
+        valueListenable: multiSelectModeNotifier,
+        builder: (_,multiSelectMode,child){
+          return Row(
+            spacing: 6,
+            children: [
+              if (multiSelectMode) 
+                IconButton(
+                  onPressed: ()=> toggleSelectAll(),
+                  icon: Icon(
+                    selectedItems.length == MyHive.historySurfDataBase.length
+                    ? Icons.deselect
+                    : Icons.select_all
+                  ),
+                ),
+          
+              if(!multiSelectMode) 
+                
+                ...[
+                  IconButton(
+                  onPressed: ()=> toggleMultiSelectMode(),
+                    icon: const Icon(Icons.checklist),
+                    tooltip: '多选模式',
+                  ),
+                  IconButton(
+                  onPressed: (){
+                    showTransitionAlertDialog(
+                      context,
+                      title: "清空全部历史记录",
+                      content: "确定要清空全部历史记录吗？",
+                      confirmAction: (){
 
-											setState(() {
-												toggleMultiSelectMode(isOpen: false);
-												MyHive.historySurfDataBase.clear();
-											});
-				
-											fadeToaster(context: context, message: '历史记录已清空');
-										}
-				
-									);
-				
-								},
-								icon: const Icon(Icons.delete_sweep),
-								tooltip: '清空全部',
-								),
-							]
-							
-				
-					],
-				);
-			},
-		)
-	];
+                        setState(() {
+                          toggleMultiSelectMode(isOpen: false);
+                          MyHive.historySurfDataBase.clear();
+                        });
+          
+                        fadeToaster(context: context, message: '历史记录已清空');
+                      }
+          
+                    );
+          
+                  },
+                  icon: const Icon(Icons.delete_sweep),
+                  tooltip: '清空全部',
+                  ),
+                ]
+                
+          
+            ],
+          );
+        },
+      )
+    ];
 
 
-    
   }
 
   // 构建底部操作栏
   Widget buildBottomActionBar() {
 	
-    return AnimatedBuilder(
-		animation: bottomBarController,
-      	builder: (_,child) {
-
-			if(bottomBarController.value < 0.1) return const SizedBox.shrink();
-			if(bottomBarController.value > 0.9) return child!;
-
-			return Offstage(
-				offstage: bottomBarController.value == 0,
-				child: Opacity(
-					opacity: bottomBarController.value,
-					child: Transform.translate(
-					offset: Offset(0, 60 - bottomBarController.value*60),
-					child: child!,
-					),
-				),
-			);
-		},
-		
-		child: Container(
-			padding: PaddingH16V12,
-			decoration: BoxDecoration(
-				color: Theme.of(context).colorScheme.surface,
-				border: Border(
-				top: BorderSide(
-				color: Theme.of(context).dividerColor,
-				width: 0.5,
-				),
-			),
-			),
-			child: SafeArea(
-				child: Row(
-				children: [
-					
-					Expanded(
-						child: ValueListenableBuilder(
-							valueListenable: multiSelectCountNotifier,
-							builder: (_,multiSelectCount,__) {
-								return ScalableText(
-									'已选择 $multiSelectCount 项',
-								);
-							}
-						),
-					),
-					
-					ElevatedButton.icon(
-					onPressed: (){
-
-						if (selectedItems.isEmpty) return;
-
-						showTransitionAlertDialog(
-							context,
-							title: '历史记录删除',
-							content: '确定要删除选中的 ${selectedItems.length} 条记录吗？',
-							confirmAction: () {
-								deleteSelectedItems();
-							},
-						);
-						
-						
-					},
-					icon: const Icon(Icons.delete),
-					label: const ScalableText('删除'),
-					style: ElevatedButton.styleFrom(
-					foregroundColor: Theme.of(context).colorScheme.error,
-					),
-				),
-				],
-			),
-			),
-		)
-	
+    return Padding(
+      padding: PaddingH12V16,
+      child: AnimatedBuilder(
+        animation: bottomBarController,
+        builder: (_,child) {
       
+          if(bottomBarController.value < 0.1) return const SizedBox.shrink();
+          if(bottomBarController.value > 0.9) return child!;
+      
+          return Offstage(
+            offstage: bottomBarController.value == 0,
+            child: Opacity(
+              opacity: bottomBarController.value,
+              child: Transform.translate(
+              offset: Offset(0, 60 - bottomBarController.value*60),
+              child: child!,
+              ),
+            ),
+          );
+        },
+          
+        child: Container(
+          
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            border: Border(
+            top: BorderSide(
+            color: Theme.of(context).dividerColor,
+            width: 0.5,
+            ),
+          ),
+          ),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  
+                  Expanded(
+                    child: ValueListenableBuilder(
+                      valueListenable: multiSelectCountNotifier,
+                      builder: (_,multiSelectCount,__) {
+                        return ScalableText(
+                          '已选择 $multiSelectCount 项',
+                        );
+                      }
+                    ),
+                  ),
+                  
+                  ElevatedButton.icon(
+                  onPressed: (){
+      
+                    if (selectedItems.isEmpty) return;
+      
+                    showTransitionAlertDialog(
+                      context,
+                      title: '历史记录删除',
+                      content: '确定要删除选中的 ${selectedItems.length} 条记录吗？',
+                      confirmAction: () {
+                        deleteSelectedItems();
+                      },
+                    );
+                    
+                    
+                  },
+                  icon: const Icon(Icons.delete),
+                  label: const ScalableText('删除'),
+                  style: ElevatedButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+                ],
+            ),
+          ),
+        )
+        
+        
+      ),
     );
   }
 

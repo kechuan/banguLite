@@ -150,20 +150,21 @@ class _EpCommentTileState extends State<EpCommentTile> {
                     bool isReactionExist = commentReactions.keys.every(
                       (currentDataLike) => currentDataLike == datalikeIndex
                     );
+
+                    commentReactions.entries.any((userList){
+                      if(
+                        userList.value.any((currentName)=> currentName == (AccountModel.loginedUserInformations.userInformation?.getName() ?? ""))
+                      ){
+                        repeatIndex = userList.key;
+                        return true;
+                      }
+
+                      return false;
+                    });
         
                     if(!isReactionExist){
 
-                      commentReactions.entries.any((userList){
-                        if(
-                          userList.value.first == (AccountModel.loginedUserInformations.userInformation?.getName() ?? "")
-                        ){
-                          repeatIndex = userList.key;
-                          return true;
-                        }
-
-                        return false;
-                      });
-
+                      //如果已经存在，则删除然后等待后续重新 insert 以更新的 数值
                       if(repeatIndex != -1){
                         commentReactions.remove(repeatIndex);
 
@@ -173,26 +174,32 @@ class _EpCommentTileState extends State<EpCommentTile> {
                         );
                       }
 
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        animatedTagsListKey.currentState?.insertItem(
+                          repeatIndex == -1 ? max(0,commentReactions.length-1) : 0,
+                          duration: const Duration(milliseconds: 300)
+                        );
+                      });
+
+                    }
+
+
+                    else{
+                      if(repeatIndex == datalikeIndex){
+                        commentReactions[datalikeIndex]!.remove(AccountModel.loginedUserInformations.userInformation?.getName() ?? "");
+                        reactDataLikeNotifier.value = -1;
+                        return;
+                      }
                     }
 
                     reactDataLikeNotifier.value = datalikeIndex;
 
                     commentReactions[datalikeIndex] = {
+                      ...commentReactions[datalikeIndex] ?? {},
                       AccountModel.loginedUserInformations.userInformation?.getName() ?? ""
                     };
 
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-
-                      
-                      
-                      //无法理解。。。
-                      animatedTagsListKey.currentState?.insertItem(
-                        repeatIndex == -1 ? max(0,commentReactions.length-1) : 0,
-                        duration: const Duration(milliseconds: 300)
-                      );
-
-                      
-                    });
+                    
 
 
                   });

@@ -44,7 +44,7 @@ class BangumiTimelineChatPage extends StatefulWidget {
 
 class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
 
-  Future? timelineFuture;
+  //Future? timelineFuture;
   Future? timelineChatFuture;
 
   final GlobalKey<AnimatedListState> animatedListKey = GlobalKey();
@@ -55,16 +55,16 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
 
     if(widget.timelineID == 0) return const SizedBox.shrink();
 
-    timelineFuture ??= HttpApiClient.client.get(
-      BangumiAPIUrls.timeline(),
-      queryParameters: {
-        "mode" : 'all',
-        "limit" : 1,
-        "until" : (widget.timelineID+1)
-      },
-      options: BangumiAPIUrls.bangumiAccessOption()
+    //timelineFuture ??= HttpApiClient.client.get(
+    //  BangumiAPIUrls.timeline(),
+    //  queryParameters: {
+    //    "mode" : 'all',
+    //    "limit" : 1,
+    //    "until" : (widget.timelineID+1)
+    //  },
+    //  options: BangumiAPIUrls.bangumiAccessOption()
 
-    );
+    //);
 
     timelineChatFuture ??= HttpApiClient.client.get(
       BangumiAPIUrls.timelineReply(widget.timelineID)

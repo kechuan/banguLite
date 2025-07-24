@@ -92,6 +92,10 @@ int convertStickerDatalike(int dataLikeIndex){
   return stickerIndex;
 }
 
+String convertBangumiStickerPath(int stickerIndex){
+  return "assets/bangumiSticker/bgm${convertDigitNumString(stickerIndex)}.gif";
+}
+
 String convertBangumiCommentSticker(String originalComment){
   RegExp stickerMatch = RegExp(r'(\()+bgm+(\d{2,3})(\))');
   

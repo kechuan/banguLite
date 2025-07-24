@@ -188,7 +188,7 @@ class StickerSelectOverlay{
                         
                                         },
                                         child: Image.asset(
-                                          "assets/bangumiSticker/bgm${convertStickerDatalike(stickerDataLike[index])}.gif",
+                                          convertBangumiStickerPath(convertStickerDatalike(stickerDataLike[index])),
                                           scale: 0.8,
                                         ),
                                       )

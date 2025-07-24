@@ -20,68 +20,63 @@ class CommentFilter extends StatelessWidget {
 
     return SizedBox(
       width: 60,
-        child: ValueListenableBuilder(
-          valueListenable: commentSurfTypeNotifier,
-          builder: (context, commentSurfType, child) {
-            return RepaintBoundary(
-			  child: PopupMenuButton<BangumiCommentRelatedType>(
-				tooltip: "评论筛选",
-				initialValue: commentSurfType,
-				position:PopupMenuPosition.under,
-				itemBuilder: (_) {
-				  return List.generate(
-					BangumiCommentRelatedType.values.length - 1,
-					(index) => PopupMenuItem(
-					  value: BangumiCommentRelatedType.values[index],
-					  child: Row(
-						mainAxisAlignment: MainAxisAlignment.spaceBetween,
-						children: [
-						  Icon(BangumiCommentRelatedType.values[index].icon),
-						  Text(BangumiCommentRelatedType.values[index].typeName)
-						],),
-					),
-				  );
-				},
-								  
-				onSelected: (selectFilter){
-				  onCommentFilter?.call(selectFilter);
-				  commentSurfTypeNotifier.value = selectFilter;
-				},
-								  
-				child: SizedBox(
-				  height: 50,
-				  child: Row(
-					children: [
-					  Expanded(
-						child: Padding(
-						  padding: PaddingH6,
-						  child: Icon(commentSurfTypeNotifier.value.icon)
-						),
-					  ),
-				  
-					  const Icon(Icons.arrow_drop_down)
-				  
-					],
-				  ),
-				),
-								  
-			  ),
-			);
-          }
+      child: PopupMenuButton<BangumiCommentRelatedType>(
+        tooltip: "评论筛选",
+        initialValue: commentSurfTypeNotifier.value,
+        position:PopupMenuPosition.under,
+        itemBuilder: (_) {
+          return List.generate(
+          BangumiCommentRelatedType.values.length - 1,
+          (index) => PopupMenuItem(
+            value: BangumiCommentRelatedType.values[index],
+            child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(BangumiCommentRelatedType.values[index].icon),
+              Text(BangumiCommentRelatedType.values[index].typeName)
+            ],),
+          ),
+          );
+        },
+                  
+        onSelected: (selectFilter){
+          onCommentFilter?.call(selectFilter);
+          commentSurfTypeNotifier.value = selectFilter;
+        },
+                  
+        child: SizedBox(
+          height: 50,
+          child: Row(
+          children: [
+            Expanded(
+            child: Padding(
+              padding: PaddingH6,
+              child: Icon(commentSurfTypeNotifier.value.icon)
+            ),
+            ),
+          
+            const Icon(Icons.arrow_drop_down)
+          
+          ],
+          ),
         ),
-      );
+                        
+      ),
+    );
+
+   
              
   }
 }
 
 List<EpCommentDetails> filterCommentList(
   BangumiCommentRelatedType selectFilter,
-  List<EpCommentDetails> commentListData,
+  List<EpCommentDetails>? commentListData,
   {int? referContentID}
 ){
 
   List<EpCommentDetails> resultFilterCommentList = [];
-  if(commentListData.isEmpty) return resultFilterCommentList;
+  if(commentListData == null || commentListData.isEmpty) return resultFilterCommentList;
 
   switch(selectFilter){
     case BangumiCommentRelatedType.normal:{

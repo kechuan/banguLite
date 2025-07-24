@@ -105,7 +105,7 @@ abstract class BangumiContentPageState<
         debugPrint('sub / id :${getSubContentID()} / ${contentInfo.id}');
 
         //contentFuture ??= loadContent(getSubContentID() ?? contentInfo.id ?? 0);
-		contentFuture ??= loadContent(getSubContentID() ?? contentInfo.id ?? 0);
+		    contentFuture ??= loadContent(getSubContentID() ?? contentInfo.id ?? 0);
 
 
         return EasyRefresh.builder(
@@ -163,92 +163,92 @@ abstract class BangumiContentPageState<
                                 ),
 
                                 FutureBuilder(
-                  future: contentFuture,
-                  builder: (_, snapshot) {
-                      
-                    final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
-                    final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
+                                  future: contentFuture,
+                                  builder: (_, snapshot) {
+                                      
+                                    final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
+                                    final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
 
-                    final currentEpCommentDetails = contentDetail?.contentRepliedComment;
+                                    final currentEpCommentDetails = contentDetail?.contentRepliedComment;
 
-                    /// 载入失败
-                    if(snapshot.hasError && contentDetail?.detailID == 0){
+                                    /// 载入失败
+                                    if(snapshot.hasError && contentDetail?.detailID == 0){
 
-                      return SizedBox(
-                        height: MediaQuery.sizeOf(context).height,
-                        width: MediaQuery.sizeOf(context).width,
-                        child: ErrorLoadPrompt(
-                          message: snapshot.error,
-                          onRetryAction: ()=>loadContent(getSubContentID() ?? contentInfo.id ?? 0,isRefresh: true),
-                        ),
-                        
-                      );
-                    }
+                                      return SizedBox(
+                                        height: MediaQuery.sizeOf(context).height,
+                                        width: MediaQuery.sizeOf(context).width,
+                                        child: ErrorLoadPrompt(
+                                          message: snapshot.error,
+                                          onRetryAction: ()=>loadContent(getSubContentID() ?? contentInfo.id ?? 0,isRefresh: true),
+                                        ),
+                                        
+                                      );
+                                    }
 
-                    if(!isInitaled){
-                      if(currentEpCommentDetails?.isNotEmpty == true){
-                        resultFilterCommentList = [...currentEpCommentDetails!];												
+                                    if(!isInitaled){
+                                      if(currentEpCommentDetails?.isNotEmpty == true){
+                                        resultFilterCommentList = [...currentEpCommentDetails!];												
 
-                        if(isTopicContent()){
-                          resultFilterCommentList.removeAt(0);
+                                        if(isTopicContent()){
+                                          resultFilterCommentList.removeAt(0);
 
-                          debugPrint(
-                            "isTopicContent: ${resultFilterCommentList.first.epCommentIndex} rawData: ${currentEpCommentDetails.first.epCommentIndex}"
-                          );
-                        }
+                                          debugPrint(
+                                            "isTopicContent: ${resultFilterCommentList.first.epCommentIndex} rawData: ${currentEpCommentDetails.first.epCommentIndex}"
+                                          );
+                                        }
 
-                        recordHistorySurf(contentInfo,contentDetail);
-                        isInitaled = true;
+                                        recordHistorySurf(contentInfo,contentDetail);
+                                        isInitaled = true;
 
 
-                        if(commentFilterTypeNotifier.value == BangumiCommentRelatedType.id){
+                                        if(commentFilterTypeNotifier.value == BangumiCommentRelatedType.id){
 
-                          debugPrint("trigged referContentID: ${getReferPostContentID()}");
+                                          debugPrint("trigged referContentID: ${getReferPostContentID()}");
 
-                          resultFilterCommentList = filterCommentList(
-                            commentFilterTypeNotifier.value,
-                            resultFilterCommentList,
-                            referContentID: getReferPostContentID()
-                          );
+                                          resultFilterCommentList = filterCommentList(
+                                            commentFilterTypeNotifier.value,
+                                            resultFilterCommentList,
+                                            referContentID: getReferPostContentID()
+                                          );
 
-                          WidgetsBinding.instance.addPostFrameCallback((_){
-                            debugPrint("measure height:${authorContentKey.currentContext?.size?.height},result:${(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - scrollController.offset}");
-                            scrollController.animateTo(
-                              max(0,(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - MediaQuery.sizeOf(context).height/3),
-                              duration: const Duration(milliseconds: 500),
-                              curve: Curves.easeOut,
-                            );
+                                          WidgetsBinding.instance.addPostFrameCallback((_){
+                                            debugPrint("measure height:${authorContentKey.currentContext?.size?.height},result:${(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - scrollController.offset}");
+                                            scrollController.animateTo(
+                                              max(0,(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - MediaQuery.sizeOf(context).height/3),
+                                              duration: const Duration(milliseconds: 500),
+                                              curve: Curves.easeOut,
+                                            );
 
-                          });
+                                          });
 
-                        }
+                                        }
 
-                      }
-                    }
+                                      }
+                                    }
 
-                    return isCommentLoading ?
-                    Skeletonizer.sliver(
-                      enabled: true,
-                      child: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                        (_,index){
-                          if(index == 0){
-                            return Padding(
-                              padding: EdgeInsetsGeometry.only(top: 50, bottom: 125),
-                              child: const SkeletonListTileTemplate(scaleType: ScaleType.medium),
-                            );
-                          }
-                          return const SkeletonListTileTemplate(scaleType: ScaleType.min);
-                        }
-                        ),
-                        
-                      ),
-                    ) :
+                                    return isCommentLoading ?
+                                    Skeletonizer.sliver(
+                                      enabled: true,
+                                      child: SliverList(
+                                        delegate: SliverChildBuilderDelegate(
+                                        (_,index){
+                                          if(index == 0){
+                                            return Padding(
+                                              padding: EdgeInsetsGeometry.only(top: 50, bottom: 125),
+                                              child: const SkeletonListTileTemplate(scaleType: ScaleType.medium),
+                                            );
+                                          }
+                                          return const SkeletonListTileTemplate(scaleType: ScaleType.min);
+                                        }
+                                        ),
+                                        
+                                      ),
+                                    ) :
 
-                    authorContent(contentInfo,contentDetailData);
-                
-                  }
-                ),
+                                    authorContent(contentInfo,contentDetailData);
+                                
+                                  }
+                                ),
 
                                 contentComment!
 
@@ -406,107 +406,108 @@ abstract class BangumiContentPageState<
 
   Widget authorContent(I contentInfo, D? contentDetail){
 
-	late EpCommentDetails authorEPCommentData;
+	  late EpCommentDetails authorEPCommentData;
 
-      return Column(
-		key: authorContentKey,
+    return Column(
+      key: authorContentKey,
         spacing: 12,
         children: [
 
-          Builder(
-            builder: (_){
+            Builder(
+              builder: (_){
 
-				if(isTopicContent()){
+          if(isTopicContent()){
 
-					authorEPCommentData = contentDetail!.contentRepliedComment?[0] ?? EpCommentDetails();
-					
-					return EpCommentView(
-						contentID: contentInfo.id ?? 0,
-						postCommentType: getPostCommentType(),
-						epCommentData: authorEPCommentData
-					);
+            authorEPCommentData = contentDetail!.contentRepliedComment?[0] ?? EpCommentDetails();
+            
+            return EpCommentView(
+              contentID: contentInfo.id ?? 0,
+              postCommentType: getPostCommentType(),
+              epCommentData: authorEPCommentData
+            );
 
-				}
+          }
 
-				authorEPCommentData = EpCommentDetails()
-					..comment = contentDetail?.content
-					..commentReactions = contentDetail?.contentReactions
-					..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
-					..commentID = getSubContentID() ?? contentInfo.id
-					..commentTimeStamp = contentDetail?.createdTime ?? contentInfo.createdTime
-				;
-				
-				return EpCommentView(
-					contentID: contentInfo.id ?? 0,
-					postCommentType: getPostCommentType(),
-					epCommentData: authorEPCommentData
-				);
+          authorEPCommentData = EpCommentDetails()
+            ..comment = contentDetail?.content
+            ..commentReactions = contentDetail?.contentReactions
+            ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
+            ..commentID = getSubContentID() ?? contentInfo.id
+            ..commentTimeStamp = contentDetail?.createdTime ?? contentInfo.createdTime
+          ;
+          
+          return EpCommentView(
+            contentID: contentInfo.id ?? 0,
+            postCommentType: getPostCommentType(),
+            epCommentData: authorEPCommentData
+          );
 
-              
-            }
-          ),
+                
+              }
+            ),
 
-          ...List.generate(
-            getTrailingPhotosUri()?.length ?? 0,
-            (index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: CachedNetworkImage(
-                  imageUrl: getTrailingPhotosUri()![index],
+            ...List.generate(
+              getTrailingPhotosUri()?.length ?? 0,
+              (index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: CachedNetworkImage(
+                    imageUrl: getTrailingPhotosUri()![index],
+                  ),
+                );
+              }
+            ),
+
+
+            GeneralRepliedLine(
+              repliedCount: max(0,resultFilterCommentList.length) + userCommentMap.length,
+              commentFilterTypeNotifier: commentFilterTypeNotifier,
+              onCommentFilter: (filterCommentType) {
+          
+          //RESET Aniamted SliverList State
+          //if(commentFilterTypeNotifier.value == BangumiCommentRelatedType.id){
+          //	//同时也会撤销掉所有的 insertItem/removeItem 毕竟直接重构了
+          //	animatedSliverListKey = GlobalKey();
+          //}
+
+          if(isTopicContent()){
+            resultFilterCommentList = filterCommentList(
+              filterCommentType,
+              [...contentDetail!.contentRepliedComment!].also((it){
+                it.removeAt(0);
+              }),
+            );
+
+          }
+
+          else{
+            resultFilterCommentList = filterCommentList(
+              filterCommentType,
+              contentDetail!.contentRepliedComment!
+            );
+          }
+
+          debugPrint("filter content resultFilterCommentList: ${resultFilterCommentList.length}");
+
+          
+                
+              },
+            ),
+
+            const Divider(),
+          
+            //无评论的显示状态
+            if(resultFilterCommentList.isEmpty && userCommentMap.isEmpty)
+              const SizedBox(
+                height: 64,
+                child: Center(
+                  child: ScalableText("暂无评论..."),
                 ),
-              );
-            }
-          ),
-
-
-          GeneralRepliedLine(
-            repliedCount: max(0,resultFilterCommentList.length) + userCommentMap.length,
-            commentFilterTypeNotifier: commentFilterTypeNotifier,
-            onCommentFilter: (filterCommentType) {
-				
-				//RESET Aniamted SliverList State
-				//if(commentFilterTypeNotifier.value == BangumiCommentRelatedType.id){
-				//	//同时也会撤销掉所有的 insertItem/removeItem 毕竟直接重构了
-				//	animatedSliverListKey = GlobalKey();
-				//}
-
-				if(isTopicContent()){
-					resultFilterCommentList = filterCommentList(
-						filterCommentType,
-						[...contentDetail!.contentRepliedComment!].also((it){
-							it.removeAt(0);
-						}),
-					);
-
-				}
-
-				else{
-					resultFilterCommentList = filterCommentList(
-						filterCommentType,
-						contentDetail!.contentRepliedComment!
-					);
-				}
-
-				debugPrint("filter content resultFilterCommentList: ${resultFilterCommentList.length}");
-
-				
-              
-            },
-          ),
-
-          const Divider(),
-        
-          //无评论的显示状态
-          if(resultFilterCommentList.isEmpty && userCommentMap.isEmpty)
-            const SizedBox(
-              height: 64,
-              child: Center(
-                child: ScalableText("暂无评论..."),
-              ),
-            )
-        
-        ],
-      );
+              )
+          
+          ],
+    );
+    
   }
 
   Widget repliedContent(

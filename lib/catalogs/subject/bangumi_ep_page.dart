@@ -402,13 +402,13 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                   valueListenable: commentSurfTypeNotifier,
                   builder: (_, commentSurfType, __) {
 
-                    final originalCommentList = epModel.epCommentData[currentEp]!;
+                    final originalCommentList = epModel.epCommentData[currentEp];
 
                     if(!isInitaled){
 
                       if(epModel.epCommentData[currentEp]?.isNotEmpty == true){
                         if(epModel.epCommentData[currentEp]?.first.epCommentIndex == "1"){
-                          resultFilterCommentList = [...originalCommentList];
+                          resultFilterCommentList = [...?originalCommentList];
                         }
 
                         isInitaled = true;
@@ -435,7 +435,7 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                             repliedCount: commentCount,
                             commentFilterTypeNotifier: commentSurfTypeNotifier,
                             onCommentFilter: (selectFilter) {
-                              resultFilterCommentList = filterCommentList(selectFilter,originalCommentList);
+                              resultFilterCommentList = filterCommentList(selectFilter,originalCommentList!);
                             },
                           );
                     
@@ -443,7 +443,7 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                         }
                       
                         //无评论的显示状态
-                        if(originalCommentList.first == EpCommentDetails.empty()){
+                        if(originalCommentList?.first == EpCommentDetails.empty()){
                           return const Center(
                             child: Padding(
                               padding: EdgeInsets.only(top:64),
