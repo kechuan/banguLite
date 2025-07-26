@@ -172,8 +172,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                             splashColor: const Color.fromARGB(255, 117, 117, 117),
                             highlightColor: Colors.transparent,
                             hoverColor: Colors.transparent,
-                            onTap: (){
-                              debugPrint("change timeSort way");                              
+                            onTap: (){                           
                           
                               isOldCommentSort.value = !isOldCommentSort.value;
                           
@@ -203,7 +202,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                               builder: (_,isOldCommentSort,child) {
                                 return Icon(
                                   Icons.history_outlined,
-                                  color: isOldCommentSort ? Colors.black : Colors.grey,
+                                  color: isOldCommentSort ? judgeDarknessMode(context) ? Colors.white : Colors.black : Colors.grey,
                                   semanticLabel: "从旧到新排序",
                                   size: 32,
                                 );

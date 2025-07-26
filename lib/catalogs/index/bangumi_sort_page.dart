@@ -63,7 +63,6 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
 
     return EasyRefresh.builder(
       scrollController: sortScrollController,
-      //header: const MaterialHeader(),
       footer: const MaterialFooter(),
 
       onLoad: () {
@@ -86,7 +85,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
             
             child: CustomScrollView(
               controller: sortScrollController,
-              physics: ClampingScrollPhysics(),
+              physics: physic,
               slivers: [
           
                 SliverPadding(

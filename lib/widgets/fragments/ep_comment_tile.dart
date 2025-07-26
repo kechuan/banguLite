@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
@@ -143,7 +144,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
                 onUpdateComment: widget.onUpdateComment,
                 onSticker: (datalikeIndex){
 
-                  int repeatIndex = -1;
+                  int repeatIndex = unExistID;
 
                   widget.epCommentData.commentReactions?.let((commentReactions){
 
@@ -187,7 +188,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
                     else{
                       if(repeatIndex == datalikeIndex){
                         commentReactions[datalikeIndex]!.remove(AccountModel.loginedUserInformations.userInformation?.getName() ?? "");
-                        reactDataLikeNotifier.value = -1;
+                        reactDataLikeNotifier.value = unExistID;
                         return;
                       }
                     }

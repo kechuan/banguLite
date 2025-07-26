@@ -166,7 +166,7 @@ abstract class BangumiContentPageState<
                                   future: contentFuture,
                                   builder: (_, snapshot) {
                                       
-                                    final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
+                                    final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != unExistID;
                                     final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
 
                                     final currentEpCommentDetails = contentDetail?.contentRepliedComment;
@@ -265,7 +265,7 @@ abstract class BangumiContentPageState<
                         future: contentFuture,
                         builder: (_, snapshot) {
                       
-                          final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != -1;
+                          final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != unExistID;
                           final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
 
                           /// 载入失败

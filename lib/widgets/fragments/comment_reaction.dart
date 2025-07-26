@@ -48,7 +48,7 @@ class _CommentReactionState extends State<CommentReaction> {
 
   late final Map<int, Set<String>> localCommentReactions;
 
-  int selectedRecordDataLike = -1;
+  int selectedRecordDataLike = unExistID;
 
   @override
   void initState() {
@@ -160,7 +160,7 @@ class _CommentReactionState extends State<CommentReaction> {
                           if(result){
                 
                             if(widget.reactDataLikeNotifier.value == dataLikeIndex){
-                              widget.reactDataLikeNotifier.value = -1;
+                              widget.reactDataLikeNotifier.value = unExistID;
                             }
                 
                             else{
@@ -223,9 +223,13 @@ class _CommentReactionState extends State<CommentReaction> {
 
       if(selectedRecordDataLike != -1){
 
-        localCommentReactions[selectedRecordDataLike]!.remove(
-          AccountModel.loginedUserInformations.userInformation!.getName()
-        );
+        if(localCommentReactions[selectedRecordDataLike] != null){
+          localCommentReactions[selectedRecordDataLike]!.remove(
+            AccountModel.loginedUserInformations.userInformation!.getName()
+          );
+        }
+
+
 
         if(widget.reactDataLikeNotifier.value != -1){
           localCommentReactions[widget.reactDataLikeNotifier.value]!.add(

@@ -224,7 +224,7 @@ List<Widget> seasonTypeSort({
     dataSource.length,
     (index){
 
-      int matchID = -1;
+      int matchID = unExistID;
       
       indexModel.starsUpdateRating.keys.any((currentID){
         if(dataSource[index].bangumiID == currentID){
