@@ -99,6 +99,8 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
 
           debugPrint("contentID: ${widget.contentID}, reply:${widget.commentData.commentID}, action:${widget.postCommentType}");
 
+          debugPrint("${currentRoute.runtimeType}");
+
           invokeSendComment(String message)=> accountModel.toggleComment(
             /// widget.commentData.contentID 并不可靠 因为部分获取的字段并不包含它
             contentID: widget.contentID,
@@ -111,6 +113,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
               debugPrint("[ToggleContent] ${widget.contentID} SendContent: $errorMessage");
 
               if (currentRoute is ModalBottomSheetRoute) {
+                
                 invokeToaster(message: errorMessage);
               }
 

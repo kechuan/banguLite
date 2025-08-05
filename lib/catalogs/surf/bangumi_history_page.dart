@@ -1,21 +1,25 @@
  
 
+import 'dart:async';
+
 import 'package:bangu_lite/delegates/star_sort_strategy.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 
-///依赖省略
+///TODO TOO HEAVY
 
 @FFRoute(name: '/history')
 
@@ -34,7 +38,7 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
 	final ValueNotifier<int> multiSelectCountNotifier = ValueNotifier(0);
 	final ValueNotifier<bool> multiSelectModeNotifier = ValueNotifier(false);
 
-  	final Set<int> selectedItems = <int>{};
+  final Set<int> selectedItems = <int>{};
   
 	// 删除动画控制器
 	final Map<int, AnimationController> deleteControllers = {};
@@ -42,6 +46,8 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
 	
 	// 正在删除的项目
 	final Set<int> deletingItems = <int>{};
+
+  Completer dataCompleter = Completer();
 
   @override
   void initState() {
@@ -166,51 +172,52 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
 
   // 切换多选模式
   void toggleMultiSelectMode({bool? isOpen}) async {
-	
-	multiSelectModeNotifier.value = isOpen ?? !multiSelectModeNotifier.value;
+    
+    multiSelectModeNotifier.value = isOpen ?? !multiSelectModeNotifier.value;
 
-	multiSelectModeNotifier.value ? 
-	await bottomBarController.forward() : 
-	await bottomBarController.reverse();
+    multiSelectModeNotifier.value ? 
+    await bottomBarController.forward() : 
+    await bottomBarController.reverse();
 
-	selectedItems.clear();
+    selectedItems.clear();
 
   }
 
   // 切换项目选中状态
   void toggleItemSelection(int itemID) {
-	if (selectedItems.contains(itemID)) {
-		selectedItems.remove(itemID);
-	} 
-	
-	else {
-		selectedItems.add(itemID);
-	}
+    if (selectedItems.contains(itemID)) {
+      selectedItems.remove(itemID);
+    } 
+    
+    else {
+      selectedItems.add(itemID);
+    }
 
-	multiSelectCountNotifier.value = selectedItems.length;
+    multiSelectCountNotifier.value = selectedItems.length;
   }
 
   // 全选/取消全选
   void toggleSelectAll() {
     final dataSource = MyHive.historySurfDataBase.values.toList();
 
-	if (multiSelectCountNotifier.value == dataSource.length) {
-		selectedItems.clear();
-	}
+    if (multiSelectCountNotifier.value == dataSource.length) {
+      selectedItems.clear();
+    }
 
-	else{
-		selectedItems.clear();
-        selectedItems.addAll(dataSource.map((item) => item.detailID!));
-	}
+    else{
+      
+      selectedItems.clear();
+      selectedItems.addAll(dataSource.map((item) => item.detailID!));
+    }
 
-	multiSelectCountNotifier.value = selectedItems.length;
+    multiSelectCountNotifier.value = selectedItems.length;
 
   }
 
   @override
   Widget build(BuildContext context) {
 
-	debugPrint("bangumi_history_page build");
+	  debugPrint("bangumi_history_page build");
 
     return Scaffold(
       appBar: AppBar(
@@ -218,24 +225,26 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
       leading: ValueListenableBuilder(
         valueListenable: multiSelectModeNotifier,
         builder: (_,multiSelectModeNotifier,child) {
-      return IconButton(
-        onPressed: (){
-          multiSelectModeNotifier ? toggleMultiSelectMode() : Navigator.of(context).pop();
-        },
-        icon: multiSelectModeNotifier ? const Icon(Icons.close) : const Icon(Icons.arrow_back),
-      );
-    }
+          return IconButton(
+            onPressed: (){
+              multiSelectModeNotifier ? toggleMultiSelectMode() : Navigator.of(context).pop();
+            },
+            icon: multiSelectModeNotifier ? const Icon(Icons.close) : const Icon(Icons.arrow_back),
+          );
+        }
       ),
       actions: buildAppBarActions(),
       ),
       body: EasyRefresh(
         onRefresh: () => setState(() {}),
         header: const MaterialHeader(),
+
         child: SafeArea(
           child: CustomScrollView(
             slivers: buildSection(context)
-          ),
+          )
         ),
+
       ),
       bottomNavigationBar: buildBottomActionBar()
 
@@ -254,6 +263,40 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
           return Row(
             spacing: 6,
             children: [
+
+              if(kDebugMode)
+                IconButton(
+                  onPressed: (){
+
+                    Map<dynamic,SurfTimelineDetails> patchedDetails = {};
+
+                    
+                    debugPrint("execute fix detailID null issue.");
+
+
+                    patchedDetails.addEntries(
+                      MyHive.historySurfDataBase.toMap().entries.where((currentItem){
+                        if(currentItem.value.detailID == null) return true;
+                        return false;
+                      })
+                    );
+
+
+                    patchedDetails.updateAll((key,value){
+                      debugPrint("Before Patch: ${patchedDetails.keys} ${patchedDetails.values.map((it)=>it.detailID)}");
+                      value.detailID = key;
+                      return value;
+                    });
+                    
+
+                    debugPrint("After Patch: ${patchedDetails.keys} ${patchedDetails.values.map((it)=>it.detailID)}");
+
+                    MyHive.historySurfDataBase.putAll(patchedDetails);
+
+                  },
+                  icon: Icon(Icons.auto_fix_high),
+                ),
+
               if (multiSelectMode) 
                 IconButton(
                   onPressed: ()=> toggleSelectAll(),
@@ -409,6 +452,8 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
 
     final List<int> groupCounts = calculateGroupCounts(groupIndices, dataSource.length);
 
+
+
     return List.generate(groupIndices.length, (index) {
       String headerText = "";
       int startIndex = 0;
@@ -429,12 +474,17 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
             itemCount: itemCount,
           ),
         ],
-      );
+      ).also((it){
+        //加载完毕 可以展示数据了
+        //dataCompleter.complete();
+        dataCompleter.isCompleted ? null : dataCompleter.complete();
+      });
     });
   }
 
   // 构建分区标题
-  Widget buildSectionHeader(BuildContext context, String text) {
+  Widget buildSectionHeader(BuildContext context, String dateTimeText) {
+    debugPrint("buildSectionHeader: $dateTimeText");
     return SliverPinnedHeader(
       child: Container(
         padding: PaddingH12,
@@ -446,7 +496,7 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
           height: 50,
           child: Align(
             alignment: Alignment.centerLeft,
-            child: ScalableText(text, style: const TextStyle(fontSize: 14))
+            child: ScalableText(dateTimeText, style: const TextStyle(fontSize: 14))
           )
         ),
       ),

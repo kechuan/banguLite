@@ -56,7 +56,6 @@ class EpCommentDetails extends BaseComment{
 
   CommentState? state;
 
-
   factory EpCommentDetails.empty() => EpCommentDetails(commentID: 0);
 }
 

@@ -8,10 +8,12 @@ class CommentFilter extends StatelessWidget {
   const CommentFilter({
     super.key,
     required this.commentSurfTypeNotifier,
+    this.isUserContent = false,
     this.onCommentFilter
   });
 
   final ValueNotifier<BangumiCommentRelatedType> commentSurfTypeNotifier;
+  final bool isUserContent;
 
   final Function(BangumiCommentRelatedType)? onCommentFilter;
 
@@ -28,6 +30,7 @@ class CommentFilter extends StatelessWidget {
           return List.generate(
           BangumiCommentRelatedType.values.length - 1,
           (index) => PopupMenuItem(
+            enabled: BangumiCommentRelatedType.values[index] == BangumiCommentRelatedType.author ? isUserContent : true,
             value: BangumiCommentRelatedType.values[index],
             child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -72,7 +75,7 @@ class CommentFilter extends StatelessWidget {
 List<EpCommentDetails> filterCommentList(
   BangumiCommentRelatedType selectFilter,
   List<EpCommentDetails>? commentListData,
-  {int? referContentID}
+  {int? referID}
 ){
 
   List<EpCommentDetails> resultFilterCommentList = [];
@@ -107,15 +110,24 @@ List<EpCommentDetails> filterCommentList(
       ).toList();
     }
 
+    //只看楼主(这里只指主楼是楼主发的)
+    case BangumiCommentRelatedType.author:{
+
+      resultFilterCommentList = commentListData.where(
+        (currentComment) => currentComment.userInformation?.userID == referID
+      ).toList();
+
+    }
+
     case BangumiCommentRelatedType.id:{
 
       resultFilterCommentList = commentListData.where(
         (currentComment){
           return 
-            currentComment.commentID == referContentID ||
+            currentComment.commentID == referID ||
             (currentComment.repliedComment?.any(
               (repliedComment){
-                return repliedComment.commentID == referContentID;
+                return repliedComment.commentID == referID;
               }
             ) ?? false)
           ;

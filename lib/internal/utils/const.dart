@@ -132,7 +132,6 @@ enum AppThemeColor{
 
 }
 
-
 const PaddingH6 = EdgeInsetsDirectional.symmetric(horizontal: 6);
 const PaddingH12 = EdgeInsetsDirectional.symmetric(horizontal: 12);
 const PaddingH16 = EdgeInsetsDirectional.symmetric(horizontal: 16);

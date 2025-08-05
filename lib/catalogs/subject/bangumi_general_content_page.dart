@@ -109,7 +109,6 @@ abstract class BangumiContentPageState<
 
 
         return EasyRefresh.builder(
-			
           scrollController: scrollController,
           //重新获取When...
           header: const MaterialHeader(),
@@ -193,7 +192,7 @@ abstract class BangumiContentPageState<
                                           resultFilterCommentList.removeAt(0);
 
                                           debugPrint(
-                                            "isTopicContent: ${resultFilterCommentList.first.epCommentIndex} rawData: ${currentEpCommentDetails.first.epCommentIndex}"
+                                            "rawData: ${currentEpCommentDetails.first.epCommentIndex}"
                                           );
                                         }
 
@@ -208,7 +207,7 @@ abstract class BangumiContentPageState<
                                           resultFilterCommentList = filterCommentList(
                                             commentFilterTypeNotifier.value,
                                             resultFilterCommentList,
-                                            referContentID: getReferPostContentID()
+                                            referID: getReferPostContentID()
                                           );
 
                                           WidgetsBinding.instance.addPostFrameCallback((_){
@@ -361,8 +360,8 @@ abstract class BangumiContentPageState<
           MyHive.historySurfDataBase.put(
             accessID,
             MyHive.historySurfDataBase.get(accessID)!
-				..updatedAt = DateTime.now().millisecondsSinceEpoch
-				..replies = contentDetail?.contentRepliedComment?.length ?? 0
+              ..updatedAt = DateTime.now().millisecondsSinceEpoch
+              ..replies = contentDetail?.contentRepliedComment?.length ?? 0
           );
 
         }
@@ -462,32 +461,35 @@ abstract class BangumiContentPageState<
             GeneralRepliedLine(
               repliedCount: max(0,resultFilterCommentList.length) + userCommentMap.length,
               commentFilterTypeNotifier: commentFilterTypeNotifier,
+              isUserContent: true,
               onCommentFilter: (filterCommentType) {
           
-          //RESET Aniamted SliverList State
-          //if(commentFilterTypeNotifier.value == BangumiCommentRelatedType.id){
-          //	//同时也会撤销掉所有的 insertItem/removeItem 毕竟直接重构了
-          //	animatedSliverListKey = GlobalKey();
-          //}
+                //RESET Aniamted SliverList State
+                //if(commentFilterTypeNotifier.value == BangumiCommentRelatedType.id){
+                //	//同时也会撤销掉所有的 insertItem/removeItem 毕竟直接重构了
+                //	animatedSliverListKey = GlobalKey();
+                //}
 
-          if(isTopicContent()){
-            resultFilterCommentList = filterCommentList(
-              filterCommentType,
-              [...contentDetail!.contentRepliedComment!].also((it){
-                it.removeAt(0);
-              }),
-            );
+                if(isTopicContent()){
+                  resultFilterCommentList = filterCommentList(
+                    filterCommentType,
+                    [...contentDetail!.contentRepliedComment!].also((it){
+                      it.removeAt(0);
+                    }),
+                    referID: contentDetail.contentRepliedComment?.first.userInformation?.userID
+                  );
 
-          }
+                }
 
-          else{
-            resultFilterCommentList = filterCommentList(
-              filterCommentType,
-              contentDetail!.contentRepliedComment!
-            );
-          }
+                else{
+                  resultFilterCommentList = filterCommentList(
+                    filterCommentType,
+                    contentDetail!.contentRepliedComment!,
+                    referID: contentDetail.userInformation?.userID
+                  );
+                }
 
-          debugPrint("filter content resultFilterCommentList: ${resultFilterCommentList.length}");
+                debugPrint("filter content resultFilterCommentList: ${resultFilterCommentList.length}");
 
           
                 

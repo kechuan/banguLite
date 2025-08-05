@@ -20,6 +20,7 @@ enum BangumiCommentRelatedType{
 
   //等待评估
   //friend('朋友回复',Icons.account_circle_outlined),
+  author('只看楼主',Icons.account_circle_outlined),
   id('精准回复',Icons.numbers)
   ;
 

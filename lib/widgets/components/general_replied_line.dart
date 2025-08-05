@@ -11,12 +11,15 @@ class GeneralRepliedLine extends StatelessWidget {
     required this.repliedCount,
     required this.commentFilterTypeNotifier,
     this.descHeadline,
-    this.onCommentFilter
+    this.onCommentFilter,
+    this.isUserContent = false
   });
 
   final int repliedCount;
   final String? descHeadline;
   final ValueNotifier<BangumiCommentRelatedType> commentFilterTypeNotifier;
+
+  final bool isUserContent;
 
   final Function(BangumiCommentRelatedType)? onCommentFilter;
 
@@ -38,7 +41,8 @@ class GeneralRepliedLine extends StatelessWidget {
 
           CommentFilter(
             commentSurfTypeNotifier: commentFilterTypeNotifier,
-            onCommentFilter: onCommentFilter
+            onCommentFilter: onCommentFilter,
+            isUserContent: isUserContent
           )
         ],
       ),

@@ -5,7 +5,7 @@ abstract class BaseDetails {
 
   BaseDetails({this.detailID});
 
-  final int? detailID; // 通用ID字段
+   int? detailID; // 通用ID字段
   
   // 工厂方法，创建空对象
   factory BaseDetails.empty() {

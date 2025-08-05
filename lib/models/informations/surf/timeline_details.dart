@@ -137,62 +137,56 @@ String convertTimelineDescription(
   String suffixText = "";
 
   /// 那么首先 划定 action 字段 行为
-  switch(currentTimeline.catType){
-   
-    //人物/日志/目录
-    case 6: { actionText+="发布日志 "; }
-    case 7: { actionText+="添加了 "; }
+  {
+    if (currentTimeline.catType == TimelineCat.Blog.value) {
+      actionText+="发布日志 ";
+    } 
+    
+    else if (currentTimeline.catType == TimelineCat.Index.value) {
+      actionText+="添加了 ";
+    } 
+    
+    else {
+      List currentType = timelineEnums.elementAt(currentTimeline.catType!-1);
 
-    default: { 
-
-        List currentType = timelineEnums.elementAt(currentTimeline.catType!-1);
-
-        for(var currentSegment in currentType){
-          if(currentSegment.value == currentTimeline.catAction){
-            actionText += '${currentSegment.actionName} ';
-            break;
-          }
+      for(var currentSegment in currentType){
+        if(currentSegment.value == currentTimeline.catAction){
+          actionText += '${currentSegment.actionName} ';
+          break;
         }
-
+      }
     }
-
   }
 
   //然后是内容字段
-  switch(currentTimeline.catType){
-
-    case 3: {
-      contentText += convertSubjectTimeline(currentTimeline.objectIDSet,currentTimeline.objectNameSet);
-      break;
-    }
-
-    case 4:{
-      //牵扯到 epsUpdate
-      contentText += convertSubjectTimeline(
-        currentTimeline.objectIDSet,
-        currentTimeline.objectNameSet,
-        ep: currentTimeline.epsUpdate,
-        cat: currentTimeline.catType,
-        action: currentTimeline.catAction
-      ) ;
-    }
-
-    default :{
-      contentText += convertDefaultTimeline(
-        currentTimeline.objectIDSet,
-        currentTimeline.objectNameSet,
-        cat: currentTimeline.catType,
-        action: currentTimeline.catAction
-      );
-    }
-
-
+  if (currentTimeline.catType == TimelineCat.Subject.value) {
+    contentText += convertSubjectTimeline(currentTimeline.objectIDSet,currentTimeline.objectNameSet);
+  } 
+  
+  else if (currentTimeline.catType == TimelineCat.Progress.value) {
+    //牵扯到 epsUpdate
+    contentText += convertSubjectTimeline(
+      currentTimeline.objectIDSet,
+      currentTimeline.objectNameSet,
+      ep: currentTimeline.epsUpdate,
+      cat: currentTimeline.catType,
+      action: currentTimeline.catAction
+    );
+  } 
+  
+  else {
+    contentText += convertDefaultTimeline(
+      currentTimeline.objectIDSet,
+      currentTimeline.objectNameSet,
+      cat: currentTimeline.catType,
+      action: currentTimeline.catAction
+    );
   }
 
-  if(contentText.isEmpty && !(currentTimeline.catType == 1 || currentTimeline.catType == 5)) undoActionText += "撤销了一项 ";
+  if(contentText.isEmpty && !(currentTimeline.catType == TimelineCat.Daily.value || currentTimeline.catType == TimelineCat.Status.value)) undoActionText += "撤销了一项 ";
 
   //时间线行为
-  if(isCommentDeclared && currentTimeline.catType == 5){
+  if(isCommentDeclared && currentTimeline.catType == TimelineCat.Status.value){
 
     if(
       currentTimeline.catAction == TimelineCatStatus.UpdateSignature.value
@@ -262,13 +256,13 @@ String convertSubjectTimeline(
   // single 时 则为 子夫 4/2
   // batch 则仅有 父 4/0
 
-  if(cat == 4 && action == 2){
+  if(cat == TimelineCat.Progress.value && action == TimelineCatProgress.Watched.value){
      subjectTimelineText += '[url=${BangumiWebUrls.subject(objectIDSet.last)}]${objectNameSet.last}[/url] ';
      subjectTimelineText += "( [url=${BangumiWebUrls.ep(objectIDSet.first)}?subjectID=${objectIDSet.last}&selectedEp=$ep]Ep.$ep ${objectNameSet.first}[/url] )";
   } 
 
-  else if(cat == 4 && action == 0){
-    subjectTimelineText += "( [url=${BangumiWebUrls.subject(objectIDSet.first)}]${objectNameSet.first}[/url]  Ep.$ep )";
+  else if(cat == TimelineCat.Progress.value && action == TimelineCatProgress.Completed.value){
+    subjectTimelineText += "[url=${BangumiWebUrls.subject(objectIDSet.first)}]${objectNameSet.first}[/url] Ep.$ep ";
   }
 
   else{

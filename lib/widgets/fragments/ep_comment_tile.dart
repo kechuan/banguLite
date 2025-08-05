@@ -25,6 +25,7 @@ class EpCommentTile extends StatefulWidget {
     this.themeColor, 
     this.onUpdateComment,
     this.authorType,
+    this.isEllipsis = false
   });
 
   final int contentID;
@@ -33,6 +34,7 @@ class EpCommentTile extends StatefulWidget {
   final PostCommentType? postCommentType;
   final BangumiCommentAuthorType? authorType;
   final Color? themeColor;
+  final bool isEllipsis;
 
   final Function(String?)? onUpdateComment;
 
@@ -249,7 +251,13 @@ class _EpCommentTileState extends State<EpCommentTile> {
               ...?(!commentBlockStatus && widget.epCommentData.comment?.isNotEmpty == true) ? 
               [
                  AdapterBBCodeText(
-                  data: convertBangumiCommentSticker(widget.epCommentData.comment ?? ""),
+                  data: 
+                    convertBangumiCommentSticker(
+                      widget.isEllipsis ? 
+                      "${widget.epCommentData.comment?.substring(0,160) ?? ""}...":
+                      widget.epCommentData.comment ?? ""
+                    )
+                  ,
                   stylesheet: appDefaultStyleSheet(context,selectableText: true),
                   errorBuilder: (context, error, stackTrace) {
                     debugPrint("renderError: ${widget.epCommentData.epCommentIndex} err:$error ");

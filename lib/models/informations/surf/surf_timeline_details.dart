@@ -37,6 +37,12 @@ class SurfTimelineDetails extends BaseDetails {
       ..updatedAt = DateTime.now().millisecondsSinceEpoch;
   }
 
+
+  SurfTimelineDetails copyWith(
+    SurfTimelineDetails Function(SurfTimelineDetails)? updateAction,
+  ) {
+    return updateAction?.call(this) ?? this;
+  }
 }
 
 

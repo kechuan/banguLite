@@ -82,16 +82,18 @@ class BangumiTimelineTile extends StatelessWidget {
 					
 				case BangumiSurfTimelineType.group:{
 
-					MyHive.historySurfDataBase.put(
-						surfTimelineDetails.detailID,
-						surfTimelineDetails.copyWithUpdateAt(surfTimelineDetails)
-					);
+          if(surfTimelineDetails.detailID != null){
+            MyHive.historySurfDataBase.put(
+              surfTimelineDetails.detailID!,
+              surfTimelineDetails.copyWithUpdateAt(surfTimelineDetails)
+            );
 
-
-					bus.emit(
-						"AppRoute",
-						'${BangumiWebUrls.groupTopic(surfTimelineDetails.detailID ?? 0)}?groupTitle=${surfTimelineDetails.title}'
-					);
+            bus.emit(
+              "AppRoute",
+              '${BangumiWebUrls.groupTopic(surfTimelineDetails.detailID!)}?groupTitle=${surfTimelineDetails.title}'
+            );
+          }
+					
 				}
 
 				default:{}
