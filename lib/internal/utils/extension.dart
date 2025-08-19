@@ -40,3 +40,13 @@ extension NumExtensions on num {
     return this >= min && this <= max;
   }
 }
+
+extension IterableExtension on Iterable<num>{
+	num sum(){
+		num sum = 0;
+		for(num i in this){
+			sum += i;
+		}
+		return sum;
+	}
+}

@@ -29,8 +29,6 @@ class BangumiNotificationsPage extends StatefulWidget {
 
 class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
 
-  final PageController notificationPageController = PageController();
-
   final ValueNotifier<int> updateNotifier = ValueNotifier(0);
   final ValueNotifier<int> clearNotifier = ValueNotifier(0);
 

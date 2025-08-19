@@ -193,8 +193,8 @@ class AccountModel extends ChangeNotifier {
             ).then((response) {
                         if (response.statusCode == 200) {
                             debugPrint(
-                                "update succ, ${DateTime.fromMillisecondsSinceEpoch((loginedUserInformations.expiredTime ?? 0) * 1000)} =>"
-                                "${DateTime.now().add(Duration(seconds: response.data["expires_in"]))} \n"
+                                "[LoginSession] session update succ, ${DateTime.fromMillisecondsSinceEpoch((loginedUserInformations.expiredTime ?? 0) * 1000)} => "
+                                "${DateTime.now().add(Duration(seconds: response.data["expires_in"]))}"
                             );
 
                             loginedUserInformations

@@ -22,9 +22,9 @@ import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/widgets.dart';
 
 import '../catalogs/about_page.dart';
-import '../catalogs/bangumi_group_topic_page.dart';
-import '../catalogs/bangumi_picture_view_page.dart';
-import '../catalogs/bangumi_webview_page.dart';
+import '../catalogs/surf/bangumi_group_topic_page.dart';
+import '../catalogs/surf/bangumi_picture_view_page.dart';
+import '../catalogs/surf/bangumi_webview_page.dart';
 import '../catalogs/index/bangumi_index_page.dart';
 import '../catalogs/index/settings_page.dart';
 import '../catalogs/subject/bangumi_blog_page.dart';
