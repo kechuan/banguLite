@@ -14,6 +14,7 @@ import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart'
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
 
 class EpCommentTile extends StatefulWidget {
@@ -47,6 +48,15 @@ class _EpCommentTileState extends State<EpCommentTile> {
   final GlobalKey<AnimatedListState> animatedTagsListKey = GlobalKey<AnimatedListState>();
 
   final ValueNotifier<int> reactDataLikeNotifier = ValueNotifier(-1);
+
+  late final ValueNotifier<bool?> expandedReplyNotifier;
+
+  @override
+  void initState() {
+    debugPrint("EpCommentTile initState: ${widget.epCommentData.epCommentIndex}: length: ${widget.epCommentData.comment?.length}");
+    expandedReplyNotifier = ValueNotifier(((widget.epCommentData.comment?.length ?? 0) > 300) ? false : null);
+    super.initState();
+  }
 
 
   @override
@@ -227,84 +237,177 @@ class _EpCommentTileState extends State<EpCommentTile> {
         ],
       ),
 
-      subtitle: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: Column(
-            spacing: 12,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-        
-              ...?commentBlockStatus ?
-              [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const ScalableText("发言已隐藏"),
-                    ScalableText("原因: ${widget.epCommentData.state?.reason}")
-                  ],
-                )
-              ] : null,
-        
-        
-              ...?(!commentBlockStatus && widget.epCommentData.comment?.isNotEmpty == true) ? 
-              [
-                 AdapterBBCodeText(
-                  data: 
-                    convertBangumiCommentSticker(
-                      widget.isEllipsis ? 
-                      "${widget.epCommentData.comment?.substring(0,160) ?? ""}...":
-                      widget.epCommentData.comment ?? ""
-                    )
-                  ,
-                  stylesheet: appDefaultStyleSheet(context,selectableText: true),
-                  errorBuilder: (context, error, stackTrace) {
-                    debugPrint("renderError: ${widget.epCommentData.epCommentIndex} err:$error ");
-                    return ScalableText("${widget.epCommentData.comment}");
-                  },
-                ) 
-              
-              ] : null,
-              
-              //commentReaction Area
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 12,
+        children: [
+
+          ValueListenableBuilder(
+            valueListenable: expandedReplyNotifier,
+            builder: (_, expandedStatus, child) {
           
-        
-              Builder(
-                builder: (_) {
-                          
-                  int? commentIndex = int.tryParse(widget.epCommentData.epCommentIndex?.split('-').first ?? '');
-                  int? replyIndex = int.tryParse(widget.epCommentData.epCommentIndex?.split('-').length == 1 ? '' : widget.epCommentData.epCommentIndex?.split('-').last ?? '');
-                          
-                  return Align(
-                    alignment: Alignment.centerRight,
-                    child: CommentReaction(
-                      animatedReactionsListKey: animatedTagsListKey,
-                      themeColor: widget.themeColor,
-                      postCommentType: widget.postCommentType,
-                      commentID: widget.epCommentData.commentID,
-                      commentIndex: commentIndex,
-                      replyIndex: replyIndex,
-                      commentReactions: widget.epCommentData.commentReactions,
-                      reactDataLikeNotifier: reactDataLikeNotifier
-                    ),
-                  );
-                }
-              ),
           
-              //commentAction Area
-        
-        
-              // 楼主: null 
-              // 层主: 3
-              // 回帖: 3-1(详情界面特供)
-              ...?widget.epCommentData.epCommentIndex?.contains("-") ?? false ? 
-              [const Divider()] :
-              null,
+              return Stack(
+				alignment: Alignment.bottomCenter,
+                children: [
           
-            ],
+					AnimatedContainer(
+						height: expandedStatus == false ? MediaQuery.sizeOf(context).height/3 : null,
+						duration: const Duration(milliseconds: 300),
+						child: Padding(
+						padding: const EdgeInsets.only(top: 16),
+						child: LayoutBuilder(
+							builder: (_,constraint) {
+
+							return Column(
+								spacing: 12,
+								crossAxisAlignment: CrossAxisAlignment.start,
+								children: [
+								
+									Column(
+										children: [
+									
+										...?(!commentBlockStatus && widget.epCommentData.comment?.isNotEmpty == true) ? 
+										[
+
+											SizedBox(
+												height: expandedStatus == false ? constraint.maxHeight - 12 : null,
+												child: AdapterBBCodeText(
+													data:convertBangumiCommentSticker(widget.epCommentData.comment ?? ""),
+													stylesheet: appDefaultStyleSheet(context,selectableText: true),
+													errorBuilder: (context, error, stackTrace) {
+														debugPrint("renderError: ${widget.epCommentData.epCommentIndex} err:$error ");
+														return ScalableText("${widget.epCommentData.comment}");
+													},
+												),
+											),
+									
+											
+											
+										] : null,
+									
+									],
+									),
+								
+									expandedStatus == true ?
+									Align(
+										alignment: const Alignment(1.0, 0),
+										child: DecoratedBox(
+										decoration: BoxDecoration(
+											border: Border.all(width: 1,color: Colors.green),
+											borderRadius: BorderRadius.circular(24),
+											
+										),
+										child: TextButton(
+											onPressed: ()=> expandedReplyNotifier.value = false, 
+											child: const ScalableText("收起")
+										),
+									)) :
+									const SizedBox.shrink()
+								
+								
+								]
+								);
+							}
+						)
+						),
+					),
+
+					
+
+					
+
+					Positioned.fill(
+						bottom: 0,
+						child: Offstage(
+						offstage: expandedStatus != false,
+							child: Stack(
+								alignment: Alignment.bottomCenter,
+								children: [
+
+									SizedBox(
+										height: 50,
+										child: Text("点击展开更多内容")
+									),
+
+									Positioned.fill(
+										bottom: 0,
+										child: UnVisibleResponse(
+										onTap: ()=> expandedReplyNotifier.value = true,
+										child: DecoratedBox(
+											decoration: BoxDecoration(
+											borderRadius: BorderRadius.circular(16),
+											gradient: LinearGradient(
+												begin: Alignment.bottomCenter,
+												end: Alignment(0,0.15),
+												colors: [
+
+													judgeDarknessMode(context) ? Colors.white : Color.fromRGBO(162, 167, 146, 0.329),
+													Colors.transparent
+												]
+											)
+											),
+										),
+										),
+									),
+								],
+							)
+						),
+					)
+
+                
+                ],
+              );
+            },
+            child: 
+				commentBlockStatus ?
+				Column(
+					crossAxisAlignment: CrossAxisAlignment.start,
+					children: [
+					const ScalableText("发言已隐藏"),
+					ScalableText("原因: ${widget.epCommentData.state?.reason}")
+					],
+				)
+				: null
+			,
           ),
-        ),
+
+
+          //commentReaction Area
+          Builder(
+            builder: (_) {
+                      
+              int? commentIndex = int.tryParse(widget.epCommentData.epCommentIndex?.split('-').first ?? '');
+              int? replyIndex = int.tryParse(widget.epCommentData.epCommentIndex?.split('-').length == 1 ? '' : widget.epCommentData.epCommentIndex?.split('-').last ?? '');
+                      
+              return Align(
+                alignment: Alignment.centerRight,
+                child: CommentReaction(
+                  animatedReactionsListKey: animatedTagsListKey,
+                  themeColor: widget.themeColor,
+                  postCommentType: widget.postCommentType,
+                  commentID: widget.epCommentData.commentID,
+                  commentIndex: commentIndex,
+                  replyIndex: replyIndex,
+                  commentReactions: widget.epCommentData.commentReactions,
+                  reactDataLikeNotifier: reactDataLikeNotifier
+                ),
+              );
+            }
+          ),
+      
+          //commentAction Area
+    
+    
+          // 楼主: null 
+          // 层主: 3
+          // 回帖: 3-1(详情界面特供)
+          ...?widget.epCommentData.epCommentIndex?.contains("-") ?? false ? 
+          [const Divider()] :
+          null,
+        
+        
+        ],
       ),
     );
              

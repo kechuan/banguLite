@@ -47,13 +47,11 @@ class BangumiSummary extends StatelessWidget {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 height: expandedStatus ? 300 : MediaQuery.sizeOf(context).height/4,
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.sizeOf(context).width,
-                ),
                 padding: Padding12,
                 child: LayoutBuilder(
                   builder: (_,constraint) {
                     return Column(
+                      spacing: 6,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                     
@@ -66,7 +64,7 @@ class BangumiSummary extends StatelessWidget {
                         Expanded(child: child!) : 
                         ConstrainedBox(
                           constraints: BoxConstraints(
-                            maxHeight: constraint.maxHeight - 50, // 16 + 34 => 50
+                            maxHeight: constraint.maxHeight - 50 - 6*2, // 16 + 34 => 50 + spacing*2
                           ),
                           child: child!,
                         ),
@@ -103,9 +101,10 @@ class BangumiSummary extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                         gradient: const LinearGradient(
                           begin: Alignment.bottomCenter,
-                          end: Alignment(0, 0.3),
+                          end: Alignment.topCenter,
                           colors: [
-                            Color.fromRGBO(162, 167, 146, 0.329),Colors.transparent
+                            Color.fromRGBO(162, 167, 146, 0.329),
+                            Colors.transparent
                           ]
                         )
                       ),
@@ -117,21 +116,11 @@ class BangumiSummary extends StatelessWidget {
             ],
           );
         },
-        child: 
-          SizedBox(
-            width: double.infinity,
-            child: ScalableText(
-              selectable: true,
-              summary ?? "no Data",
-              style: const TextStyle(overflow: TextOverflow.ellipsis),          
-            ),
-          )
-          
-            
-          //debugPrint("summary constriant:${constriant.maxHeight}, context:${MediaQuery.sizeOf(context).aspectRatio}");
-               
-            
-          
+        child: ScalableText(
+          selectable: true,
+          summary ?? "no Data",
+          style: const TextStyle(overflow: TextOverflow.ellipsis),          
+        )
         
       ),
     );

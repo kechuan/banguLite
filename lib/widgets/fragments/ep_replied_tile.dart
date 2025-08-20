@@ -92,7 +92,10 @@ class EpRepliedTile extends ListTile {
 							                 textBaseline: TextBaseline.alphabetic,
 							  
                               children: [
-                                ScalableText("${repliedComment.userInformation?.nickName}:"),
+                                ScalableText(
+                                  "${repliedComment.userInformation?.nickName}:",
+                                  style:TextStyle(fontWeight: FontWeight.w500)
+                                ),
 
                                 epCommentData.repliedComment![index].state?.isNotAvaliable() == true ?
                                 ScalableText("发言已隐藏",style: TextStyle(fontStyle: FontStyle.italic)) :
@@ -119,7 +122,7 @@ class EpRepliedTile extends ListTile {
                                                   ? "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}...\n"
                                                   : "${quoteContent.replaceAll(bbcodeRegexp, '')}\n",
                                                   maxLines: 1,
-                                                  style: TextStyle(color: judgeCurrentThemeColor(context).withValues(alpha: 0.8)),
+                                                  style: TextStyle(color: judgeCurrentThemeColor(context)),
                                                 ),
                                               )
                                             )

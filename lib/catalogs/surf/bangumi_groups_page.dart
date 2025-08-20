@@ -203,7 +203,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                                                                       
                                                             ValueListenableBuilder(
                                                                 valueListenable: groupTitleNotifier,
-                                                                builder: (_, groupTitle, __) => ScalableText(groupTitle ?? "小组话题列表")
+                                                                builder: (_, groupTitle, __) => ScalableText(groupTitle ?? "Bangumi小组话题列表")
                                                             ),
                                                                       
                                                         ],
