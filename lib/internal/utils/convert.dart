@@ -82,6 +82,9 @@ int convertStickerDatalike(int dataLikeIndex){
   //但唯有 0 dataLikeIndex 是需求增加 
   //而其他的 dataLikeIndex 都是 减少偏移数值
 
+  //而对于 200/500 的新版本 谢天谢地是直接数值
+  if(dataLikeIndex >= 200) return dataLikeIndex;
+
   int stickerIndex = dataLikeIndex - 39 + 23;
       
           
@@ -93,7 +96,33 @@ int convertStickerDatalike(int dataLikeIndex){
 }
 
 String convertBangumiStickerPath(int stickerIndex){
-  return "assets/bangumiSticker/bgm${convertDigitNumString(stickerIndex)}.gif";
+
+  String authorPath = "";
+
+  switch(stickerIndex){
+    case <= 23: {
+      authorPath = "01-23 dsm";
+      break;
+    }
+      
+    case <= 125: {
+      authorPath = "24-125 Cinnamor";
+      break;
+    }
+    
+    case <= 238: {
+      authorPath = "200-238 神戶小鳥";
+      break;
+    }
+
+    case <= 529: {
+      authorPath = "500-529 五行行行行行啊";
+      break;
+    }
+      
+  }
+
+  return "assets/bangumiSticker/$authorPath/bgm${convertDigitNumString(stickerIndex)}.gif";
 }
 
 String convertBangumiCommentSticker(String originalComment){
@@ -103,26 +132,20 @@ String convertBangumiCommentSticker(String originalComment){
     stickerMatch, 
     (match){
 
-      String resultText = "";
       String replaceTag = "sticker";
 
       List<String?> resultList = [];
       
-
       for(String? currentPattern in match.groups([1,2,3])){
         switch(currentPattern){
           case '(': resultList.add("[$replaceTag]"); break;
           case ')': resultList.add("[/$replaceTag]"); break;
-          default: resultList.add("assets/bangumiSticker/bgm${match.group(2)}.gif");
+          //default: resultList.add("assets/bangumiSticker/bgm${match.group(2)}.gif");
+          default: resultList.add(convertBangumiStickerPath(int.parse(match.group(2)!)));
         }
       }
 
-
-      resultText = resultList.join();
-
-      
-
-      return resultText;
+      return resultList.join();
 
       
     }

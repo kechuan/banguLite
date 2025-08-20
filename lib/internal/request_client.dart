@@ -432,7 +432,7 @@ class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.9.8",
+                      version = "0.9.10",
                       author = "kechuan"
   ;
 
@@ -447,27 +447,50 @@ class APPInformationRepository{
 
 
 
-void downloadSticker() async {  
-  await Future.wait(
-    List.generate(
-      126, (index){
+void downloadSticker({bool isOldType = true}) async {
+  
+  if(isOldType){
+      String authorPath = "";
 
-        if(index == 0) return Future((){});
+      await Future.wait(
+        List.generate(
+          126, (index){
 
-        String suffix = "gif"; 
-        
-        if(index < 24){
-          suffix = "png";
-          if(index == 11 || index == 23) suffix = "gif";
-        }
+            if(index == 0) return Future((){});
 
-        return HttpApiClient.client.download(
-          "https://bgm.tv/img/smiles/${index > 23 ? "tv" : "bgm"}/${convertDigitNumString(index > 23 ? index-23 : index)}.$suffix",
-          './assets/sticker/bangumiSticker/bgm${convertDigitNumString(index)}.gif',
-        );
-       
-      }
-    )
-  );
+            String suffix = "gif"; 
+            
+            if(index < 24){
+              authorPath = "01-23 dsm";
+              suffix = "png";
+              if(index == 11 || index == 23) suffix = "gif";
+            }
+
+            authorPath = "24-125 Cinnamor";
+
+            return HttpApiClient.client.download(
+              "https://bgm.tv/img/smiles/${index > 23 ? "tv" : "bgm"}/${convertDigitNumString(index > 23 ? index-23 : index)}.$suffix",
+              './assets/bangumiSticker/$authorPath/bgm${convertDigitNumString(index)}.gif',
+            );
+          
+          }
+        )
+      );
+
+  }
+
+  else{
+    await Future.wait(
+        List.generate(
+          39, (index){
+            return HttpApiClient.client.download(
+              "https://bgm.tv/img/smiles/tv_vs/bgm_${convertDigitNumString(index+200)}.png",
+              './assets/bangumiSticker/200-238 神戶小鳥/bgm${convertDigitNumString(index+200)}.gif',
+            );
+          
+          }
+        )
+      );
+  }
 
 }

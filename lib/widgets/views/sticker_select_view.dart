@@ -28,7 +28,7 @@ class StickerSelectView extends StatelessWidget {
                                     contentEditingController.text = 
                                     convertInsertContent(
                                         originalText: contentEditingController.text,
-                                        insertText: '(bgm${convertDigitNumString(index + 1)})',
+                                        insertText: '(bgm${convertDigitNumString(index)})',
                                         insertOffset: currentPostion
                                     );
 
@@ -38,62 +38,57 @@ class StickerSelectView extends StatelessWidget {
                                     );
                                 }
 
-                                return PageView(
+                                return PageView.builder(
                                     controller: stickerPageController,
-                                    children: [
-                                        GridView(
-                                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                                crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 16 : 8
-                                            ),
-                                            children: List.generate(
-                                                23,
-                                                ((index) {
-                                                    return UnVisibleResponse(
-                                                        onTap: () => insertBgmSticker(index),
-                                                        child: Image.asset(
-                                                            convertBangumiStickerPath(index + 1),
-                                                            scale: 0.8,
-                                                        )
-                                                    );
-                                                })
-                                            ),
-                                        ),
+                                    itemBuilder: (_, index) {
 
-                                        GridView(
+                                      int stickerLength = 0;
+                                      int stickerOffset = 0;
 
-                                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                                crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 16 : 8
-                                            ),
-                                            children: List.generate(
-                                                102,
-                                                ((index) {
-                                                    return UnVisibleResponse(
-                                                        onTap: () => insertBgmSticker(index + 23),
-                                                        child: Image.asset(
-                                                          convertBangumiStickerPath(index + 24),
+                                      switch(index){
+                                        case 0:{stickerLength = 23; stickerOffset += 1;}
+                                        case 1:{stickerLength = 102; stickerOffset += 24;}
+                                        case 2:{stickerLength = 39; stickerOffset += 200;}
+                                        case 3:{stickerLength = 30; stickerOffset += 500;}
+                                      }
+
+
+                                      return GridView(
+                                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape ? 16 : 8
+                                          ),
+                                          children: List.generate(
+                                              stickerLength,
+                                              ((index) {
+                                                  return UnVisibleResponse(
+                                                      onTap: () => insertBgmSticker(stickerOffset + index),
+                                                      child: Image.asset(
+                                                          convertBangumiStickerPath(stickerOffset + index),
                                                           scale: 0.8,
-                                                        )
-                                                    );
-                                                })
-                                            ),
-                                        ),
-
-                                    ],
+                                                      )
+                                                  );
+                                              })
+                                          ),
+                                      );
+                                    },
 
                                 );
+
                             }
                         ),
                     ),
                 ),
 
                 DefaultTabController(
-                    length: 2,
+                    length: 4,
                     child: TabBar(
                         onTap: (index) {stickerPageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
                         },
                         tabs: const[
                             Tab(text: 'bgm 01-23(dsm)'),
                             Tab(text: 'bgm 24-125(Cinnamor)'),
+                            Tab(text: 'bgm 200-238(神戶小鳥)'),
+                            Tab(text: 'bgm 500-529(五行行行行行啊)'),
                         ]
                     )
                 )

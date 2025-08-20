@@ -400,7 +400,8 @@ class BangumiStickerTag extends AdvancedTag{
             return [TextSpan(text: "[$tag]")];
         }
 
-        String imageUrl = element.children.first.textContent;
+        //String imageUrl = element.children.first.textContent;
+        String imageUrl = element.textContent;
 
         final image = Image.asset(
             imageUrl,

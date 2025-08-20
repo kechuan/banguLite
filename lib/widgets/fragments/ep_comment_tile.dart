@@ -274,6 +274,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
 												height: expandedStatus == false ? constraint.maxHeight - 12 : null,
 												child: AdapterBBCodeText(
 													data:convertBangumiCommentSticker(widget.epCommentData.comment ?? ""),
+													//data:widget.epCommentData.comment ?? "",
 													stylesheet: appDefaultStyleSheet(context,selectableText: true),
 													errorBuilder: (context, error, stackTrace) {
 														debugPrint("renderError: ${widget.epCommentData.epCommentIndex} err:$error ");
