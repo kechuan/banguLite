@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/event_bus.dart';
-import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';

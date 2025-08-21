@@ -22,11 +22,10 @@ class EpCommentTile extends StatefulWidget {
     super.key,
     required this.contentID,
     required this.epCommentData,
-	  required this.postCommentType,
+	required this.postCommentType,
     this.themeColor, 
     this.onUpdateComment,
     this.authorType,
-    this.isEllipsis = false
   });
 
   final int contentID;
@@ -35,7 +34,6 @@ class EpCommentTile extends StatefulWidget {
   final PostCommentType? postCommentType;
   final BangumiCommentAuthorType? authorType;
   final Color? themeColor;
-  final bool isEllipsis;
 
   final Function(String?)? onUpdateComment;
 
@@ -53,8 +51,26 @@ class _EpCommentTileState extends State<EpCommentTile> {
 
   @override
   void initState() {
-    debugPrint("EpCommentTile initState: ${widget.epCommentData.epCommentIndex}: length: ${widget.epCommentData.comment?.length}");
-    expandedReplyNotifier = ValueNotifier(((widget.epCommentData.comment?.length ?? 0) > 300) ? false : null);
+    debugPrint("EpCommentTile initState: ${widget.postCommentType} - ${widget.epCommentData.epCommentIndex}: length: ${widget.epCommentData.comment?.length}");
+
+	bool isCollapsable = false;
+
+	if(widget.epCommentData.epCommentIndex != null){
+
+		if(
+			widget.epCommentData.epCommentIndex != "1" && 
+			widget.postCommentType != PostCommentType.replyTopic){
+		}{
+			//300字折叠
+			if((widget.epCommentData.comment?.length ?? 0) > 300){
+				isCollapsable = true;
+			}
+		}
+
+		
+	}
+
+    expandedReplyNotifier = ValueNotifier(isCollapsable ? false : null);
     super.initState();
   }
 
@@ -314,44 +330,27 @@ class _EpCommentTileState extends State<EpCommentTile> {
 						),
 					),
 
-					
-
-					
 
 					Positioned.fill(
 						bottom: 0,
 						child: Offstage(
 						offstage: expandedStatus != false,
-							child: Stack(
-								alignment: Alignment.bottomCenter,
-								children: [
-
-									SizedBox(
-										height: 50,
-										child: Text("点击展开更多内容")
-									),
-
-									Positioned.fill(
-										bottom: 0,
-										child: UnVisibleResponse(
-										onTap: ()=> expandedReplyNotifier.value = true,
-										child: DecoratedBox(
-											decoration: BoxDecoration(
-											borderRadius: BorderRadius.circular(16),
-											gradient: LinearGradient(
-												begin: Alignment.bottomCenter,
-												end: Alignment(0,0.15),
-												colors: [
-
-													judgeDarknessMode(context) ? Colors.white : Color.fromRGBO(162, 167, 146, 0.329),
-													Colors.transparent
-												]
-											)
-											),
-										),
-										),
-									),
-								],
+							child: UnVisibleResponse(
+							onTap: ()=> expandedReplyNotifier.value = true,
+							child: DecoratedBox(
+								decoration: BoxDecoration(
+								borderRadius: BorderRadius.circular(16),
+								gradient: LinearGradient(
+									begin: Alignment.bottomCenter,
+									end: Alignment(0,0.15),
+									colors: [
+														
+										judgeDarknessMode(context) ? Colors.white : Color.fromRGBO(162, 167, 146, 0.329),
+										Colors.transparent
+									]
+								)
+								),
+							),
 							)
 						),
 					)

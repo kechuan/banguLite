@@ -45,7 +45,6 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
                   contentID: contentID,
                   postCommentType: postCommentType,
                   epCommentData: currentComment,
-                  isEllipsis: (currentComment.comment?.length ?? 0) > 160,
                 ),
 
                 const Divider(height: 1),
