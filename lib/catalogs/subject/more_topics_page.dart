@@ -59,7 +59,9 @@ class MoreTopicsPageState extends BangumiGeneralMoreContentPageState
         Routes.subjectTopic,
         arguments: {
           "topicModel":getContentModel(),
-          "topicInfo":getContentModel().contentListData[index]
+          "topicInfo":getContentModel().contentListData[index],
+
+          "sourceTitle":widget.title
         }
       );
   };
@@ -93,6 +95,7 @@ class MoreTopicsPageState extends BangumiGeneralMoreContentPageState
         "topicModel":getContentModel(),
         "topicInfo": getContentModel().contentListData.last,
         "themeColor": judgeDetailRenderColor(context,bangumiThemeColor),
+        "sourceTitle":widget.title
       }
     );
 

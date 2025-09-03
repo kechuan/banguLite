@@ -57,17 +57,27 @@ class BangumiTimelineTile extends StatelessWidget {
 
                         else {
 
-                            if (surfTimelineDetails.sourceTitle == "博客") {
+                            if (surfTimelineDetails.sourceTitle?.contains("[日志]") == true) {
+
+                                //目前唯一从这个渠道(timeline)打开 博客 的地方 只有历史记录了
                                 bus.emit(
                                     "AppRoute",
-                                    BangumiWebUrls.userBlog(surfTimelineDetails.detailID ?? 0)
+                                    '${BangumiWebUrls.userBlog(surfTimelineDetails.detailID ?? 0)}'
+                                    //'?topicTitle=${surfTimelineDetails.title}'
+                                    '?sourceID=${surfTimelineDetails.sourceID}'
+                                    '&sourceTitle=${surfTimelineDetails.sourceTitle}'
+                                    
                                 );
                             }
 
                             else {
                                 bus.emit(
                                     "AppRoute",
-                                    '${BangumiWebUrls.subjectTopic(surfTimelineDetails.detailID ?? 0)}?topicTitle=${surfTimelineDetails.title}'
+                                    '${BangumiWebUrls.subjectTopic(surfTimelineDetails.detailID ?? 0)}'
+                                    '?topicTitle=${surfTimelineDetails.title}'
+                                    '&sourceID=${surfTimelineDetails.sourceID}'
+                                    '&sourceTitle=${surfTimelineDetails.sourceTitle}'
+
                                 );
                             }
 

@@ -44,6 +44,7 @@ abstract class BangumiContentPageState<
 
   String getWebUrl(int? contentID);
 
+  String? sourceTitle() => null;
 
   //因为 reviewID 不与 blogID 相匹配 需要额外适配
   int? getSubContentID() => null;
@@ -185,15 +186,15 @@ abstract class BangumiContentPageState<
                                     }
 
                                     if(!isInitaled){
-                                      if(currentEpCommentDetails?.isNotEmpty == true){
-                                        resultFilterCommentList = [...currentEpCommentDetails!];												
+                                      debugPrint("contentDetail?.detailID: ${contentDetail?.detailID} currentEpCommentDetails:${currentEpCommentDetails?.length} ");
+
+                                      if(currentEpCommentDetails!=null){
+                                        resultFilterCommentList = [...currentEpCommentDetails];												
 
                                         if(isTopicContent()){
                                           resultFilterCommentList.removeAt(0);
 
-                                          debugPrint(
-                                            "rawData: ${currentEpCommentDetails.first.epCommentIndex}"
-                                          );
+                                          debugPrint("rawData: ${currentEpCommentDetails.first.epCommentIndex}");
                                         }
 
                                         recordHistorySurf(contentInfo,contentDetail);
@@ -311,7 +312,7 @@ abstract class BangumiContentPageState<
                                               
                                       /// 常规内容
                                       return repliedContent(
-                    contentCommentIndex,
+                                        contentCommentIndex,
                                         contentInfo,
                                     );
                                       
@@ -340,18 +341,19 @@ abstract class BangumiContentPageState<
   void recordHistorySurf(I contentInfo,D? contentDetail){
     if(contentDetail?.detailID != 0){
 
-    String? subjectTitle;
+    String? subjectTitle = 
+      getPostCommentType() == PostCommentType.replyBlog ? 
+      sourceTitle()!.contains('[日志]') ? sourceTitle() : '[日志] ${sourceTitle()}' : 
+      sourceTitle()
+    ;
 
     switch(getPostCommentType()){
 
       case PostCommentType.replyTopic:
       case PostCommentType.replyBlog:
-    //  case PostCommentType.replyGroupTopic:
 	  {
 
         final accessID = getSubContentID() ?? contentInfo.id ?? 0;
-
-        subjectTitle ??= getPostCommentType() == PostCommentType.replyTopic ? '帖子' : '博客';
 
         if(accessID == 0) break;
 
@@ -360,6 +362,8 @@ abstract class BangumiContentPageState<
           MyHive.historySurfDataBase.put(
             accessID,
             MyHive.historySurfDataBase.get(accessID)!
+              ..sourceID = getContentModel().subjectID
+              ..sourceTitle = subjectTitle
               ..updatedAt = DateTime.now().millisecondsSinceEpoch
               ..replies = contentDetail?.contentRepliedComment?.length ?? 0
           );

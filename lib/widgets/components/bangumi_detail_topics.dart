@@ -128,11 +128,11 @@ class BangumiDetailTopics extends StatelessWidget {
                                     arguments: {
                                       "topicModel":topicModel,
                                       "topicInfo":topicModel.contentListData[index],
-                                      "themeColor":judgeDetailRenderColor(context,bangumiModel.bangumiThemeColor)
+                                      "themeColor":judgeDetailRenderColor(context,bangumiModel.bangumiThemeColor),
+                                      "sourceTitle":bangumiModel.bangumiDetails?.name
                                     }
                                   );
                                     
-                                  
                                 },
                               ),
                             );

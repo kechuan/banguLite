@@ -51,7 +51,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
 
   @override
   void initState() {
-    debugPrint("EpCommentTile initState: ${widget.postCommentType} - ${widget.epCommentData.epCommentIndex}: length: ${widget.epCommentData.comment?.length}");
+    debugPrint("[Floor ${widget.epCommentData.epCommentIndex}] text length: ${widget.epCommentData.comment?.length}");
 
 	bool isCollapsable = false;
 
@@ -59,8 +59,8 @@ class _EpCommentTileState extends State<EpCommentTile> {
 
 		if(
 			widget.epCommentData.epCommentIndex != "1" && 
-			widget.postCommentType != PostCommentType.replyTopic){
-		}{
+			widget.postCommentType != PostCommentType.replyTopic)
+		{
 			//300字折叠
 			if((widget.epCommentData.comment?.length ?? 0) > 300){
 				isCollapsable = true;

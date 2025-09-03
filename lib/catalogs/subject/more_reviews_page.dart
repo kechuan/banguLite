@@ -61,6 +61,9 @@ class MoreReviewsPageState extends BangumiGeneralMoreContentPageState
           "reviewModel":getContentModel(),
           "reviewInfo": getContentModel().contentListData[index],
           "themeColor": judgeDetailRenderColor(context,bangumiThemeColor),
+
+          "sourceTitle":widget.title
+          
         }
       );
   };
@@ -96,6 +99,8 @@ class MoreReviewsPageState extends BangumiGeneralMoreContentPageState
         "reviewModel":getContentModel(),
         "reviewInfo": getContentModel().contentListData.last,
         "themeColor": judgeDetailRenderColor(context,bangumiThemeColor),
+
+        "sourceTitle":widget.title
       }
     );
 

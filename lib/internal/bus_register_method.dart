@@ -95,16 +95,15 @@ void appRouteMethodListener(BuildContext context,String link){
       ){
         if(context.mounted){
 
-          //那topic呢。。 一般的topic链接是不会拥有 subject/group 这种信息的
-          //只有单独的 topic/postID
           debugPrint("topic link: $link");
 
           Navigator.pushNamed(
             context, 
             Routes.subjectTopic,
             arguments: {
-              "topicModel":TopicModel(subjectID: 'topic'),
+              "topicModel":TopicModel(subjectID: appRouteUri.queryParameters['sourceID']),
               "topicInfo":TopicInfo(id: resID,contentTitle: appRouteUri.queryParameters['topicTitle'] ?? "topicID: $resID"),
+              'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
               "referPostContentID": postReferID,
             }
           );
@@ -127,13 +126,15 @@ void appRouteMethodListener(BuildContext context,String link){
             context, 
             Routes.groupTopic,
             arguments: {
-              "groupsModel":GroupsModel(subjectID: 'groups'),
+              "groupsModel":GroupsModel(subjectID: appRouteUri.queryParameters['sourceID']),
               "groupTopicInfo":
-                GroupTopicInfo(id: resID)
-                 ..contentTitle = appRouteUri.queryParameters['groupTitle']
+                  GroupTopicInfo(id: resID)
+                  ..contentTitle = appRouteUri.queryParameters['groupTitle']
               ,
+              'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
               "referPostContentID": postReferID,
             }
+
           );
 
         }
@@ -149,8 +150,9 @@ void appRouteMethodListener(BuildContext context,String link){
           context,
           Routes.blog,
           arguments: {
-            "reviewModel":ReviewModel(subjectID: "blog"),
+            "reviewModel":ReviewModel(subjectID: int.parse(appRouteUri.queryParameters['sourceID'] ?? "0")),
             "reviewInfo": ReviewInfo(id: resID),
+            'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
             "referPostContentID": postReferID,
           }
         );

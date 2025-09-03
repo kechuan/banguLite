@@ -23,6 +23,8 @@ class BangumiBlogPage extends StatefulWidget {
     
     this.themeColor,
     this.referPostContentID,
+
+    this.sourceTitle
   });
 
   
@@ -31,6 +33,8 @@ class BangumiBlogPage extends StatefulWidget {
   
   final Color? themeColor;
   final int? referPostContentID;
+
+  final String? sourceTitle;
 
   @override
   State<BangumiBlogPage> createState() => _BangumiBlogPageState();
@@ -46,13 +50,16 @@ class _BangumiBlogPageState extends BangumiContentPageState
 >{
 
   @override
+  String? sourceTitle() => widget.sourceTitle;
+
+  @override
   ReviewModel getContentModel() => widget.reviewModel;
 
   @override
   ReviewInfo getContentInfo() => widget.reviewInfo;
 
   @override 
-  int? getSubContentID() => getContentInfo().blogID;
+  int? getSubContentID() => getContentInfo().blogID ?? getContentInfo().id;
 
   //日志所关联的图片
   @override

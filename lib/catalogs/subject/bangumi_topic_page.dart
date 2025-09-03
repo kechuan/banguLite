@@ -19,12 +19,17 @@ class BangumiTopicPage extends StatefulWidget {
 	  required this.topicInfo,
     this.themeColor,
     this.referPostContentID,
+
+    //因为API数据返回 Topic/Blog 的时候并没有携带这种数据 只能自己手动传过来了..
+    this.sourceTitle
   });
 
   final TopicModel topicModel;
   final TopicInfo topicInfo;
   final Color? themeColor;
   final int? referPostContentID;
+
+  final String? sourceTitle;
 
   @override
   State<BangumiTopicPage> createState() => _BangumiTopicPageState();
@@ -37,6 +42,9 @@ class _BangumiTopicPageState extends BangumiContentPageState
 	TopicInfo,
 	TopicDetails
 >{
+
+  @override
+  String? sourceTitle() => widget.sourceTitle;
 
   @override
   TopicInfo getContentInfo() => widget.topicInfo;

@@ -42,7 +42,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiBlogPage : [ReviewModel(required) reviewModel, ReviewInfo(required) reviewInfo, Color? themeColor, int? referPostContentID]
+  /// BangumiBlogPage : [ReviewModel(required) reviewModel, ReviewInfo(required) reviewInfo, Color? themeColor, int? referPostContentID, String? sourceTitle]
   static const String blog = '/Blog';
 
   /// '/Groups'
@@ -175,7 +175,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiTopicPage : [TopicModel(required) topicModel, TopicInfo(required) topicInfo, Color? themeColor, int? referPostContentID]
+  /// BangumiTopicPage : [TopicModel(required) topicModel, TopicInfo(required) topicInfo, Color? themeColor, int? referPostContentID, String? sourceTitle]
   static const String subjectTopic = '/subjectTopic';
 
   /// '/webview'

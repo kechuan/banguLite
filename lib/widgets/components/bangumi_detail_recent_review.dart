@@ -15,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-
 class BangumiDetailRecentReview extends StatelessWidget {
   const BangumiDetailRecentReview({
     super.key,
@@ -28,8 +27,6 @@ class BangumiDetailRecentReview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    //final ValueNotifier<bool> reviewCollapseStatusNotifier = ValueNotifier(true);
 
     return Padding(
       padding: Padding16,
@@ -66,9 +63,6 @@ class BangumiDetailRecentReview extends StatelessWidget {
                       onPressed: (){
 
                         final bangumiModel = context.read<BangumiModel>();
-
-                        //if(reviewModel.contentListData.first.reviewID == 0) return;
-
 
                         Navigator.pushNamed(
                           context,
@@ -169,9 +163,8 @@ class BangumiDetailRecentReview extends StatelessWidget {
                                   Routes.blog,
                                    arguments: {
                                     "reviewModel":reviewModel,
-                                    //"selectedBlogIndex": index,
                                     "reviewInfo": reviewModel.contentListData[index],
-                                    //"themeColor": judgeDetailRenderColor(context,bangumiThemeColor),
+                                    "sourceTitle": name
                                   }
                                 );
  
