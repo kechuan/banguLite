@@ -1,0 +1,158 @@
+plugins {
+	//AGP
+    id "com.android.application"
+	//KGP
+    id "kotlin-android" 
+	
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+
+ext.abiCodes = ["armeabi-v7a": 1, "arm64-v8a": 2]
+
+def signProperties = rootProject.file("sign/keystore.properties")
+def props = new Properties()
+props.load(new FileInputStream(signProperties))
+def keyStoreFile = file(props['storeFile'])
+
+android {
+	//Your project is configured with Android NDK 23.1.7779620, but the following plugin(s) depend on a different Android NDK version:
+	//- path_provider_android requires Android NDK 27.0.12077973
+	//- sqflite requires Android NDK 27.0.12077973
+	//- url_launcher_android requires Android NDK 27.0.12077973
+    namespace = "io.flutter.banguLite"
+    compileSdk = flutter.compileSdkVersion    //ndkVersion = flutter.ndkVersion
+	ndkVersion = "27.0.12077973"
+	//newest LTS ndkVersion "27.2.12479018"
+
+	compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+		encoding="UTF-8"
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "io.flutter.banguLite"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+		
+    }
+
+	// gradle 工具默认 识别的名称 : app-development-debug.apk
+
+	applicationVariants.all { variant ->
+		variant.outputs.all { output ->
+			def abi = output.getFilter(com.android.build.OutputFile.ABI)
+			//def abi = output.filters.find { it.filterType == com.android.build.OutputFile.ABI }
+
+			if (abi != null) {
+				outputFileName = "banguLite-${variant.versionName}-${abi}.apk"
+				def abiVersionCode = project.ext.abiCodes.get(abi)
+				if (abiVersionCode != null) {
+					versionCodeOverride = variant.versionCode * 10 + abiVersionCode
+				}
+			} 
+			
+			else {
+				outputFileName = "banguLite-${variant.versionName}.apk"
+				versionCodeOverride = variant.versionCode * 10
+			}
+
+		}
+	}
+
+	signingConfigs {
+        release {
+			if (keyStoreFile.exists() && signProperties.exists()) {
+                keyAlias props['keyAlias']
+                keyPassword props['keyPassword']
+                storeFile keyStoreFile
+                storePassword props['storePassword']
+            }
+        }
+    }
+
+
+
+
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+
+			minifyEnabled true
+			shrinkResources true
+			splits.abi.universalApk = false
+			signingConfig signingConfigs.release
+        }
+
+		debug{
+			splits.abi.universalApk = true
+		}
+
+    }
+
+	flavorDimensions = ["environment"]
+
+	//原来 gradle 也能 透过这种方式来传递 @string/app_name 给 xml
+    productFlavors{
+        development{
+            dimension "environment"
+			applicationId "io.flutter.banguLite.dev"  
+			resValue "string", "app_name", "BanguLite-dev"
+        }
+        production{
+            dimension "environment"
+			applicationId "io.flutter.banguLite"
+			resValue "string", "app_name", "BanguLite"
+			splits.abi.universalApk = false
+        }
+    }
+
+
+    splits{
+        // 基于不同的abi架构配置不同的apk
+        abi {
+
+			// release时必须为true，打包才会为不同的abi生成不同的apk
+			// 否则就没必要打包 因此属性跟随 universalApk 就好
+			// 只要不为 universal 即可打包
+			//enable !splits.abi.universalApk
+			//enable false
+
+			if(splits.abi.universalApk){
+				enable false
+			}
+
+			else{
+				reset()
+				include "arm64-v8a","armeabi-v7a"
+			}
+			
+			// 默认情况下，包含了所有的ABI。
+			// 所以使用reset()清空所有的ABI，再使用include指定我们想要生成的架构armeabi-v7a、arm-v8a
+			//reset()
+
+			// 逗号分隔列表的形式指定 Gradle 应针对哪些 ABI 生成 APK。只与 reset() 结合使用，以指定确切的 ABI 列表。
+			// include "armeabi-v7a", "arm64-v8a"
+
+			//noinspection ChromeOsAbiSupport
+			//include "arm64-v8a","armeabi-v7a"
+
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
