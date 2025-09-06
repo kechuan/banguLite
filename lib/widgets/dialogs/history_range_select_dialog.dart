@@ -58,13 +58,15 @@ class _HistoryRangeSelectDialogState extends State<HistoryRangeSelectDialog> {
                           controller: historyPageSelectorController,
                           physics: const FixedExtentScrollPhysics(),
                           childDelegate: ListWheelChildBuilderDelegate(
+                            // 因为 localHistoryMap 记录的是 终点 
+                            // 而因为最终的数值需要额外一个空间记录 隐藏在范围显示 其实是应该扣除的
                           childCount: historyModel.localHistoryMap.length,
                           builder: (_,index){
                             return Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                              ScalableText("${historyModel.groupIndices.keys.elementAt(historyModel.convertHistoryPageStartIndex(index))} ~ ${historyModel.groupIndices.keys.elementAt(historyModel.convertHistoryPageEndIndex(index))}"),
-                              const Divider(height: 1)
+                                ScalableText("${historyModel.groupIndices.keys.elementAt(historyModel.convertHistoryPageStartIndex(index))} ~ ${historyModel.groupIndices.keys.elementAt(historyModel.convertHistoryPageEndIndex(index))}"),
+                                const Divider(height: 1)
                               ],
                             );
                           }

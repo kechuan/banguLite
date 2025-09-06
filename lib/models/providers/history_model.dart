@@ -89,14 +89,14 @@ class HistoryModel {
     // 切换多选模式 -> onToggleSelectionMode
     void toggleMultiSelectMode({bool? isOpen}) async {
 
-      selectedItems.clear();
-      multiSelectCountNotifier.value = 0;
+		selectedItems.clear();
+		multiSelectCountNotifier.value = 0;
 
-          multiSelectModeNotifier.value = isOpen ?? !multiSelectModeNotifier.value;
-      
-          multiSelectModeNotifier.value ? 
-      await bottomBarController.forward() : 
-      await bottomBarController.reverse() ;
+		multiSelectModeNotifier.value = isOpen ?? !multiSelectModeNotifier.value;
+	
+		multiSelectModeNotifier.value ? 
+		await bottomBarController.forward() : 
+		await bottomBarController.reverse() ;
 
     }
 
@@ -118,12 +118,23 @@ class HistoryModel {
     void toggleSelectCurrentPage(int pageIndex) {
 
 
-      int startIndex = convertHistoryPageStartIndex(pageIndex);
+      	int startIndex = convertHistoryPageStartIndex(pageIndex);
 
-      //因为记录的 index 实际上是 停止的 index 如果需要把这部分也囊括进去的话 就需要额外加1
-      int endIndex = convertHistoryPageEndIndex(pageIndex) + 1;
+		//因为 groupIndices 记录的 EndIndex 实际上是指代这个组 的 startIndex
+		//这也就意味着 如果需要把这部分也囊括进去的话 就需要额外加1 把下一个的 index 囊括上才行
+    	  int endIndex = convertHistoryPageEndIndex(pageIndex) + (pageIndex != (localHistoryMap.length - 1) ? 1 : 0);
+		//int endIndex = convertHistoryPageEndIndex(pageIndex) + 1;
 
-      final rangeData = dataSource.sublist(groupIndices.values.elementAt(startIndex), groupIndices.values.elementAt(endIndex));
+	  debugPrint("page: $pageIndex/${localHistoryMap.length - 1} startIndex: $startIndex, endIndex: $endIndex localHistoryMap:${localHistoryMap}");
+
+      final rangeData = dataSource.sublist(
+		groupIndices.values.elementAt(startIndex), 
+		(
+			pageIndex != (localHistoryMap.length - 1) ? 
+			groupIndices.values.elementAt(endIndex) : 
+			dataSource.length
+		)
+	  );
 
       for(var currentItem in rangeData){
         if(selectedItems.contains(currentItem.detailID)){
@@ -153,24 +164,24 @@ class HistoryModel {
       groupIndices.clear();
     }
 
-  int getCurrentHistoryPageSize(int pageIndex){
-    return pageIndex == 0 ? 
-    localHistoryMap.keys.elementAt(pageIndex) : 
-    localHistoryMap.keys.elementAt(pageIndex) - localHistoryMap.keys.elementAt(pageIndex - 1) + 1;
-  }
+	int getCurrentPageGroupCount(int pageIndex){
+		return pageIndex == 0 ? 
+		localHistoryMap.keys.elementAt(pageIndex) : 
+		//localHistoryMap.keys.elementAt(pageIndex) - localHistoryMap.keys.elementAt(pageIndex - 1) + 1;
+		localHistoryMap.keys.elementAt(pageIndex) - localHistoryMap.keys.elementAt(pageIndex - 1);
+	}
 
 	int convertHistoryPageStartIndex(int pageIndex){
 		return pageIndex == 0 ? 
 		0 : 
-		localHistoryMap.keys.elementAt(pageIndex - 1);
+		convertHistoryPageEndIndex(pageIndex-1) + 1;
 	}
 
 	int convertHistoryPageEndIndex(int pageIndex){
 		return pageIndex == 0 ? 
 		localHistoryMap.keys.elementAt(pageIndex) - 1 : 
-		localHistoryMap.keys.elementAt(pageIndex);
+		localHistoryMap.keys.elementAt(pageIndex) ;
 	}
-
 
 }
 

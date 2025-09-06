@@ -216,6 +216,17 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
                         spacing: 6,
                         children: [
 
+                          if(kDebugMode)
+                            IconButton(
+                                onPressed: () {
+
+                                  debugPrint("localHistoryMap:${historyModel.localHistoryMap} totalCount:${historyModel.dataSource.length}");
+
+                                },
+                                icon: Icon(Icons.date_range),
+                            ),
+
+
                             if(kDebugMode)
                             IconButton(
                                 onPressed: () {
@@ -406,15 +417,18 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
 
         int currentPageloadStartIndex = historyModel.convertHistoryPageStartIndex(pageIndex);
 
-        int currentPageGroupSize = historyModel.getCurrentHistoryPageSize(pageIndex);
+        int currentPageGroupSize = historyModel.getCurrentPageGroupCount(pageIndex);
         
         final List<int> groupCounts = calculateGroupCounts(historyModel.groupIndices, historyModel.dataSource.length);
 
         return List.generate(
             currentPageGroupSize, (index) {
-                String headerText = historyModel.groupIndices.keys.elementAt(currentPageloadStartIndex + index);
-                int startIndex = historyModel.groupIndices.values.elementAt(currentPageloadStartIndex + index);
-                int itemCount = groupCounts[currentPageloadStartIndex + index];
+
+              String headerText = historyModel.groupIndices.keys.elementAt(currentPageloadStartIndex + index);
+              int startIndex = historyModel.groupIndices.values.elementAt(currentPageloadStartIndex + index);
+              int itemCount = groupCounts[currentPageloadStartIndex + index];
+
+
 
                 return MultiSliver(
                     pushPinnedChildren: true,
