@@ -1,5 +1,4 @@
 
-import 'package:bangu_lite/hive/config_model.dart';
 import 'package:bangu_lite/internal/utils/callback.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';

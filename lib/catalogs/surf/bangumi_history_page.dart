@@ -220,7 +220,10 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
                             IconButton(
                                 onPressed: () {
 
-                                  debugPrint("localHistoryMap:${historyModel.localHistoryMap} totalCount:${historyModel.dataSource.length}");
+                                  debugPrint(
+									"totalCount:${historyModel.dataSource.length}\n"
+									"localHistoryPageMap:${historyModel.localHistoryPageMap}"
+								  );
 
                                 },
                                 icon: Icon(Icons.date_range),
@@ -416,17 +419,19 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
     List<Widget> buildPageSection(BuildContext context, int pageIndex) {
 
         int currentPageloadStartIndex = historyModel.convertHistoryPageStartIndex(pageIndex);
-
-        int currentPageGroupSize = historyModel.getCurrentPageGroupCount(pageIndex);
+		int currentPageGroupSize = historyModel.getCurrentPageGroupCount(pageIndex);
         
         final List<int> groupCounts = calculateGroupCounts(historyModel.groupIndices, historyModel.dataSource.length);
 
         return List.generate(
             currentPageGroupSize, (index) {
 
-              String headerText = historyModel.groupIndices.keys.elementAt(currentPageloadStartIndex + index);
+              
               int startIndex = historyModel.groupIndices.values.elementAt(currentPageloadStartIndex + index);
               int itemCount = groupCounts[currentPageloadStartIndex + index];
+
+			  String headerText = 
+			  	"${historyModel.groupIndices.keys.elementAt(currentPageloadStartIndex + index)}${kDebugMode ? '\t[index:$startIndex]' : '' }";
 
 
 
@@ -783,7 +788,7 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                         Expanded(
                             child: PageView(
                                 controller: historyModel.historyPageController,
-                                children: List.generate(historyModel.localHistoryMap.length, (index) => CustomScrollView(
+                                children: List.generate(historyModel.localHistoryPageMap.length, (index) => CustomScrollView(
                                   slivers: buildPageSection(context, index)
                                 )),
                             )

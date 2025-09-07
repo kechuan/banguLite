@@ -13,8 +13,12 @@ class HistoryModel {
 
     List<SurfTimelineDetails> dataSource = [];
 
-    final Map<int, int> localHistoryMap = {};
+    ///示例 groupIndices.key / currentPageSize : {	5: 26, 10: 26, ... }
+    //final Map<int, int> localHistoryMap = {};
     final Map<String, int> groupIndices = {};
+
+    //示例:
+    final Map<int,List<int>> localHistoryPageMap = {};
 
     late AnimationController bottomBarController;
     late PageController historyPageController;
@@ -56,18 +60,40 @@ class HistoryModel {
                 int currentCount = groupCounts[currentGroupIndex];
                 //方案一: 最多30个记录为一页
 
+                int previousHistoryIndexRecord = 
+                  localHistoryPageMap.isEmpty ? 
+                  0 : 
+                  localHistoryPageMap.values.elementAt(localHistoryPageMap.length-1).last + 1
+                    
+                ;
+
                 if (itemCount + currentCount >= pageCount) {
 
+
+
+                    //单独一组数据已经超过30个的情况 单开一页并跳过
                     if (currentCount >= pageCount) {
                         currentGroupIndex += 1;
-                        localHistoryMap[currentGroupIndex] = itemCount;
+                        
+
+                        localHistoryPageMap[currentGroupIndex] = [
+                          previousHistoryIndexRecord,
+                          localHistoryPageMap.isEmpty ? (itemCount - 1) : previousHistoryIndexRecord+itemCount,
+                        ];
+
+
                         itemCount = 0;
                         continue;
                     }
 
                     else {
-                        localHistoryMap[currentGroupIndex] = itemCount;
-                        //已有的数据 需要额外加入上一个信息的偏移
+
+                        localHistoryPageMap[currentGroupIndex] = [
+                          previousHistoryIndexRecord,
+                          localHistoryPageMap.isEmpty ? (itemCount - 1) : previousHistoryIndexRecord+itemCount,
+                        ];
+
+
                         itemCount = currentCount;
                     }
 
@@ -76,14 +102,19 @@ class HistoryModel {
                 else {
                     itemCount += currentCount;
                     if (currentGroupIndex == groupCounts.length - 1) {
-                        localHistoryMap[currentGroupIndex] = itemCount;
+
+                      localHistoryPageMap[currentGroupIndex] = [
+                        previousHistoryIndexRecord,
+                        dataSource.length-1,
+                      ];
+
                     }
                 }
 
             }
 
 
-        debugPrint("localHistoryMap EndOffset/Size: $localHistoryMap");
+        debugPrint("localHistoryPageMap: $localHistoryPageMap");
     }
 
     // 切换多选模式 -> onToggleSelectionMode
@@ -117,35 +148,30 @@ class HistoryModel {
     // 全选/取消全选
     void toggleSelectCurrentPage(int pageIndex) {
 
+      int startIndex = convertHistoryPageStartIndex(pageIndex);
+      int endIndex = convertHistoryPageEndIndex(pageIndex) + (pageIndex != (localHistoryPageMap.length - 1) ? 1 : 0);
 
-      	int startIndex = convertHistoryPageStartIndex(pageIndex);
+      //debugPrint("page: $pageIndex/${localHistoryPageMap.length - 1} startIndex: $startIndex, endIndex: $endIndex localHistoryPageMap:$localHistoryPageMap");
 
-		//因为 groupIndices 记录的 EndIndex 实际上是指代这个组 的 startIndex
-		//这也就意味着 如果需要把这部分也囊括进去的话 就需要额外加1 把下一个的 index 囊括上才行
-    	  int endIndex = convertHistoryPageEndIndex(pageIndex) + (pageIndex != (localHistoryMap.length - 1) ? 1 : 0);
-		//int endIndex = convertHistoryPageEndIndex(pageIndex) + 1;
+        final rangeData = dataSource.sublist(
+          groupIndices.values.elementAt(startIndex), 
+          (
+            pageIndex != (localHistoryPageMap.length - 1) ? 
+            groupIndices.values.elementAt(endIndex) : 
+            dataSource.length
+          )
+        );
 
-	  debugPrint("page: $pageIndex/${localHistoryMap.length - 1} startIndex: $startIndex, endIndex: $endIndex localHistoryMap:${localHistoryMap}");
+        for(var currentItem in rangeData){
+          if(selectedItems.contains(currentItem.detailID)){
+            selectedItems.remove(currentItem.detailID);
+          }
+          
 
-      final rangeData = dataSource.sublist(
-		groupIndices.values.elementAt(startIndex), 
-		(
-			pageIndex != (localHistoryMap.length - 1) ? 
-			groupIndices.values.elementAt(endIndex) : 
-			dataSource.length
-		)
-	  );
-
-      for(var currentItem in rangeData){
-        if(selectedItems.contains(currentItem.detailID)){
-          selectedItems.remove(currentItem.detailID);
+          else {
+            selectedItems.add(currentItem.detailID!);
+          }
         }
-        
-
-        else {
-          selectedItems.add(currentItem.detailID!);
-        }
-      }
 
 
         multiSelectCountNotifier.value = selectedItems.length;
@@ -160,27 +186,41 @@ class HistoryModel {
     }
 
     void disposeData(){
-      localHistoryMap.clear();
+      localHistoryPageMap.clear();
       groupIndices.clear();
     }
 
-	int getCurrentPageGroupCount(int pageIndex){
-		return pageIndex == 0 ? 
-		localHistoryMap.keys.elementAt(pageIndex) : 
-		//localHistoryMap.keys.elementAt(pageIndex) - localHistoryMap.keys.elementAt(pageIndex - 1) + 1;
-		localHistoryMap.keys.elementAt(pageIndex) - localHistoryMap.keys.elementAt(pageIndex - 1);
+  int getCurrentPageGroupCount(int pageIndex){
+
+    if(pageIndex == 0){
+      return localHistoryPageMap.keys.elementAt(pageIndex);
+    }
+
+    else{
+      //在最后的范围判定时 
+      return 
+        localHistoryPageMap.keys.elementAt(pageIndex) - 
+        localHistoryPageMap.keys.elementAt(pageIndex - 1) + 
+        (pageIndex == localHistoryPageMap.length - 1 ?  1 : 0)
+      ;
+
+   
+      
+    }
 	}
 
-	int convertHistoryPageStartIndex(int pageIndex){
+  int convertHistoryPageStartIndex(int pageIndex){
 		return pageIndex == 0 ? 
 		0 : 
 		convertHistoryPageEndIndex(pageIndex-1) + 1;
 	}
 
 	int convertHistoryPageEndIndex(int pageIndex){
-		return pageIndex == 0 ? 
-		localHistoryMap.keys.elementAt(pageIndex) - 1 : 
-		localHistoryMap.keys.elementAt(pageIndex) ;
+    return 
+      pageIndex == localHistoryPageMap.length - 1 ?
+      localHistoryPageMap.keys.last :
+      localHistoryPageMap.keys.elementAt(pageIndex) - 1
+    ;
 	}
 
 }
