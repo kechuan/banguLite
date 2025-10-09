@@ -26,7 +26,7 @@ class BangumiTabContentSelect extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    
+    final currentTime = DateTime.now();
 
     return ValueListenableBuilder(
       valueListenable: selectOffstageNotifier,
@@ -74,7 +74,16 @@ class BangumiTabContentSelect extends StatelessWidget {
             dividerColor: Colors.transparent,
             indicatorSize: TabBarIndicatorSize.label,
             tabs: List.generate(
-              WeekDay.values.length, (currentDay)=> Center(child: ScalableText(WeekDay.values[currentDay].dayText)),
+              WeekDay.values.length, 
+              (currentDay)=> Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ScalableText(WeekDay.values[currentDay].dayText),
+                    Text("${currentTime.add(Duration(days: currentDay-currentTime.weekday+1)).month}/${currentTime.add(Duration(days: currentDay-currentTime.weekday+1)).day}")
+                  ],
+                )
+              ),
             )
           ),
         ),

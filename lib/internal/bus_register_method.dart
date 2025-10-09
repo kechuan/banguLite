@@ -101,7 +101,7 @@ void appRouteMethodListener(BuildContext context,String link){
             context, 
             Routes.subjectTopic,
             arguments: {
-              "topicModel":TopicModel(subjectID: appRouteUri.queryParameters['sourceID']),
+              "topicModel":TopicModel(subjectID: int.parse(appRouteUri.queryParameters['sourceID'] ?? "0")),
               "topicInfo":TopicInfo(id: resID,contentTitle: appRouteUri.queryParameters['topicTitle'] ?? "topicID: $resID"),
               'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
               "referPostContentID": postReferID,
@@ -126,7 +126,7 @@ void appRouteMethodListener(BuildContext context,String link){
             context, 
             Routes.groupTopic,
             arguments: {
-              "groupsModel":GroupsModel(subjectID: appRouteUri.queryParameters['sourceID']),
+              "groupsModel":GroupsModel(),
               "groupTopicInfo":
                   GroupTopicInfo(id: resID)
                   ..contentTitle = appRouteUri.queryParameters['groupTitle']

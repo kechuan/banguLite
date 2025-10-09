@@ -29,6 +29,7 @@ const List<String> routeNames = <String>[
   '/webview',
   'about',
   'settings',
+  'test',
   'userPage',
 ];
 
@@ -196,6 +197,11 @@ class Routes {
   ///
   /// [name] : 'settings'
   static const String settings = 'settings';
+
+  /// 'test'
+  ///
+  /// [name] : 'test'
+  static const String test = 'test';
 
   /// 'userPage'
   ///

@@ -10,6 +10,7 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
+import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
@@ -77,8 +78,8 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
       ),
       
       body: EasyRefresh(
-        header: const MaterialHeader(),
-        footer: const MaterialFooter(),
+        header: const TextHeader(),
+        footer: const TextFooter(),
 		    refreshOnStart: accountModel.currentUserNotificaions.isEmpty,
         onRefresh: () {
           notificationFuture = accountModel.getNotifications(

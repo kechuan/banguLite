@@ -12,6 +12,7 @@ import 'package:bangu_lite/models/providers/history_model.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:bangu_lite/widgets/dialogs/history_range_select_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
+import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
@@ -192,7 +193,7 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
                 onRefresh: () => setState(() {
                         historyModel.initData();
                     }),
-                header: const MaterialHeader(),
+                header: const TextHeader(),
         
                 child: HistoryPageContent(
                   onDeleteSingleItem: deleteSingleItem,
@@ -419,7 +420,7 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
     List<Widget> buildPageSection(BuildContext context, int pageIndex) {
 
         int currentPageloadStartIndex = historyModel.convertHistoryPageStartIndex(pageIndex);
-		int currentPageGroupSize = historyModel.getCurrentPageGroupCount(pageIndex);
+		    int currentPageGroupSize = historyModel.getCurrentPageGroupCount(pageIndex);
         
         final List<int> groupCounts = calculateGroupCounts(historyModel.groupIndices, historyModel.dataSource.length);
 
@@ -430,26 +431,26 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
               int startIndex = historyModel.groupIndices.values.elementAt(currentPageloadStartIndex + index);
               int itemCount = groupCounts[currentPageloadStartIndex + index];
 
-			  String headerText = 
-			  	"${historyModel.groupIndices.keys.elementAt(currentPageloadStartIndex + index)}${kDebugMode ? '\t[index:$startIndex]' : '' }";
+              String headerText = 
+                "${historyModel.groupIndices.keys.elementAt(currentPageloadStartIndex + index)}${kDebugMode ? '\t[index:$startIndex]' : '' }";
 
 
 
-                return MultiSliver(
-                    pushPinnedChildren: true,
-                    children: [
-                        buildSectionHeader(context, headerText),
-                        buildSectionList(
-                            context,
-                            data: historyModel.dataSource,
-                            startIndex: startIndex,
-                            itemCount: itemCount,
-                        ),
-                    ],
-                );
+                      return MultiSliver(
+                          pushPinnedChildren: true,
+                          children: [
+                              buildSectionHeader(context, headerText),
+                              buildSectionList(
+                                  context,
+                                  data: historyModel.dataSource,
+                                  startIndex: startIndex,
+                                  itemCount: itemCount,
+                              ),
+                          ],
+                      );
 
-            }
-        );
+                  }
+              );
     }
 
     // 构建分区列表

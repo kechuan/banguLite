@@ -19,7 +19,7 @@ import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class BangumiTimelineTile extends StatelessWidget {
+class BangumiTimelineTile extends StatelessWidget{
 
     const BangumiTimelineTile({
         super.key,
@@ -32,6 +32,7 @@ class BangumiTimelineTile extends StatelessWidget {
     final SurfTimelineDetails surfTimelineDetails;
     final bool? isRecordMode;
     final bool Function()? onTap;
+
 
     @override
     Widget build(BuildContext context) {
@@ -198,7 +199,7 @@ class BangumiTimelineTile extends StatelessWidget {
                                             child: UnVisibleResponse(
                                                 onTap: () {
 
-                                                    debugPrint("sourceID: ${surfTimelineDetails.sourceID}");
+                                                    //debugPrint("sourceID: ${surfTimelineDetails.sourceID}");
 
                                                     switch (surfTimelineDetails.bangumiSurfTimelineType) {
 

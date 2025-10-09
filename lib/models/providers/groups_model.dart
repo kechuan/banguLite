@@ -19,16 +19,11 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
     super.subjectID = 'groups',
     this.selectedGroupInfo
   }){
-    //if(subjectID == 'groups') return;
-
-    //loadGroups();
 
     if(selectedGroupInfo?.groupName == null){
        loadGroups();
     }
 
-
-    
   }
 
   GroupInfo? selectedGroupInfo;

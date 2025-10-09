@@ -160,10 +160,10 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                     IconButton(
                         onPressed: () {
 
-                            //if (turnsTileTokenNotifier.value == false) {
-                            //  fadeToaster(context: context, message: '请通过验证以发布内容');
-                            //  return;
-                            //}
+                            if (!kDebugMode && turnsTileTokenNotifier.value == false) {
+                              fadeToaster(context: context, message: '请通过验证以发布内容');
+                              return;
+                            }
 
                             if (
                               [
@@ -443,7 +443,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                             },
                                             child: DecoratedBox(
                                                 decoration: BoxDecoration(
-                                                    color: judgeCurrentThemeColor(context).withValues(alpha: 0.6),
+                                                    color: judgeCurrentThemeColor(context).withValues(alpha: 0.9),
                                                     borderRadius: const BorderRadius.vertical(top: Radius.circular(16))
                                                 ),
                                                 child: Column(

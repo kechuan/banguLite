@@ -103,9 +103,10 @@ class TimelineFlowModel extends ChangeNotifier {
 
     await timelineFuture().then(
       (response){
-
+      
+      //All状态
       if(response.length>1){
-
+        
         for(int responseIndex = 0; responseIndex < response.length; responseIndex++){
           if(response[responseIndex].statusCode == 200){
 
@@ -113,6 +114,13 @@ class TimelineFlowModel extends ChangeNotifier {
               responseIndex != response.length-1 ?
               response[responseIndex].data["data"] :
               response[responseIndex].data ;
+
+            //数据返回为空——指定的时间线ID返回被服务器清空
+            if(response[responseIndex].data.isEmpty){ 
+              
+              requestTimelineCompleter.complete(false);
+              return;
+            }
 
 
             timelinesData[BangumiSurfTimelineType.values[responseIndex+1]] = loadSurfTimelineDetails(
@@ -126,22 +134,67 @@ class TimelineFlowModel extends ChangeNotifier {
           }
         }
 
-        timelinesData[BangumiSurfTimelineType.all]!.addAll(
-          timelinesData[BangumiSurfTimelineType.subject]! +
-          timelinesData[BangumiSurfTimelineType.group]! +
+        //新数据合并环节
 
-          //对于Timeline类型 则需筛选无Comment数据 
-          //这也导致 数据并不完整 不打算实现onLoad逻辑 只实现onRefresh逻辑
-          timelinesData[BangumiSurfTimelineType.timeline]!.where((currentTimeline){
-            return currentTimeline.commentDetails?.comment != null;
-          }).toList()
-        );
+        if(isAppend == true){
+          for( int index = BangumiSurfTimelineType.subject.index ; index < BangumiSurfTimelineType.values.length; index++){
+            //新获得的数据的最慢ID如果存在于All列表内 则不应该进行任何处理
+            if(timelinesData[BangumiSurfTimelineType.all]!.any((element)=>element.detailID == timelinesData.values.elementAt(index).last.detailID)){
+              continue;
+            }
+
+            else{
+              //否则开始以最末尾的数据开始进行合并 如果寻找到数据 则从这个下标开始合并数据
+              int combineIndex = timelinesData.values.elementAt(index).indexWhere(
+                (element)=> timelinesData[BangumiSurfTimelineType.all]!.any((allListElement)=>allListElement.detailID == element.detailID)
+              );
+
+              if(combineIndex != -1){
+                timelinesData[BangumiSurfTimelineType.all]!.addAll(
+                  timelinesData.values.elementAt(index).skip(combineIndex-1)
+                );
+              }
+
+              else{
+
+                timelinesData[BangumiSurfTimelineType.all]!.addAll(
+                  index == BangumiSurfTimelineType.timeline.index ?
+                  timelinesData[BangumiSurfTimelineType.timeline]!.where((currentTimeline){
+                    return currentTimeline.commentDetails?.comment != null;
+                  }).toList() :
+                  timelinesData.values.elementAt(index)
+                );
+
+               
+                
+              }
+
+            }
+ 
+          }
+
+        }
+
+        //否则直接允许覆盖
+        else{
+          timelinesData[BangumiSurfTimelineType.all]!.addAll(
+            timelinesData[BangumiSurfTimelineType.subject]! +
+            timelinesData[BangumiSurfTimelineType.group]! +
+
+            //对于Timeline类型 则需筛选无Comment数据 
+            //这也导致 数据并不完整 不打算实现onLoad逻辑 只实现onRefresh逻辑
+            timelinesData[BangumiSurfTimelineType.timeline]!.where((currentTimeline){
+              return currentTimeline.commentDetails?.comment != null;
+            }).toList()
+          );
+        }
 
         timelinesData[BangumiSurfTimelineType.all]!.sort(
           (prev,next) => next.updatedAt?.compareTo(prev.updatedAt ?? 0) ?? 0
         );
       }
 
+      //单个项目
       else{
 
         if(response[0].statusCode != 200){
@@ -159,9 +212,9 @@ class TimelineFlowModel extends ChangeNotifier {
         if(isAppend == true){
           timelinesData[timelineType]?.addAll(
             loadSurfTimelineDetails(
-            extractResponseData,
-            bangumiSurfTimelineType: timelineType
-          ));
+				extractResponseData,
+				bangumiSurfTimelineType: timelineType
+			));
         }
 
         else{

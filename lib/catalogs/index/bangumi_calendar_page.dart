@@ -11,6 +11,7 @@ import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_tab_content_select.dart';
 import 'package:bangu_lite/widgets/dialogs/new_update_dialog.dart';
+import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -140,7 +141,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
     final indexModel = context.read<IndexModel>();
 
     return EasyRefresh.builder(
-      header: const MaterialHeader(),
+      header: const TextHeader(),
       onRefresh: (){
 
        if(
@@ -418,6 +419,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                   
                                                     
                                   child: Column(
+                                    
                                     children: [
                                   
                                       Padding(
@@ -434,6 +436,8 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                           ),
                                         ),
                                       ),
+
+                                      
 
                                       BangumiTabContentSelect(
                                         selectOffstageNotifier: weekdaySelectOffstageNotifier,

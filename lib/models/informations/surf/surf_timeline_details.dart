@@ -38,11 +38,6 @@ class SurfTimelineDetails extends BaseDetails {
   }
 
 
-  SurfTimelineDetails copyWith(
-    SurfTimelineDetails Function(SurfTimelineDetails)? updateAction,
-  ) {
-    return updateAction?.call(this) ?? this;
-  }
 }
 
 

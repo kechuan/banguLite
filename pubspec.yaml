@@ -1,7 +1,7 @@
 name: bangu_lite
 description: "Lite to Surf Bangumi"
 publish_to: 'none'
-version: 0.9.11
+version: 0.9.12
 
 environment:
   sdk: ^3.5.0
@@ -40,6 +40,7 @@ dependencies:
 
   #(Android)SAF存储
   docman: ^1.2.0
+  waterfall_flow: ^3.1.1
   
 
 dev_dependencies:

@@ -16,6 +16,7 @@ import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
+import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/views/groups_select_view.dart';
@@ -166,8 +167,8 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                         
                     ),
                     body: EasyRefresh(
-                      header: const MaterialHeader(),
-                      footer: const MaterialFooter(),
+                      header: const TextHeader(),
+                      footer: const TextFooter(),
                       callLoadOverOffset: 15,
                       //refreshOnStart: widget.selectedGroupInfo?.groupName == null,
                       refreshOnStart: true,

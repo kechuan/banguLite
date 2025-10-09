@@ -10,6 +10,7 @@ import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_recent_review.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_relations.dart';
+import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
@@ -203,12 +204,13 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
 
                         }
         
-                        BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails; //dependenc
+                        BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails; //dependency
         
                         return EasyRefresh(
-                          header: const MaterialHeader(),
+                          header: const TextHeader(),
+                          footer: const TextFooter(),
                           onRefresh: (){
-                            //bangumiModel.loadDetails(isRefresh:true);
+                            bangumiModel.loadDetails(isRefresh:true);
                             context.read<CommentModel>().loadComments(isReloaded: true);
                             context.read<TopicModel>().loadSubjectSubContentList(isReloaded: true);
                             context.read<ReviewModel>().loadSubjectSubContentList(isReloaded: true);

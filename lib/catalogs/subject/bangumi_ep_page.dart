@@ -19,6 +19,7 @@ import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_filter.dart';
 import 'package:bangu_lite/widgets/components/general_replied_line.dart';
 import 'package:bangu_lite/widgets/fragments/error_load_prompt.dart';
+import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 
 import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comments_progress_slider.dart';
@@ -76,7 +77,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
         epsInformationFuture ??= epModel.getEpsInformation(offset: epModel.selectedEp~/100 );
 
         return EasyRefresh.builder(
-          header: const MaterialHeader(),
+          header: const TextHeader(),
 
           childBuilder: (_,physics) {
             

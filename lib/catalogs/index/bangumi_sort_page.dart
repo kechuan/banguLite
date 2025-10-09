@@ -6,6 +6,7 @@ import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_wave_footer.dart';
+import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/foundation.dart';
@@ -63,7 +64,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
 
     return EasyRefresh.builder(
       scrollController: sortScrollController,
-      footer: const MaterialFooter(),
+      footer: const TextFooter(),
 
       onLoad: () {
         if(messageList.isEmpty) return;

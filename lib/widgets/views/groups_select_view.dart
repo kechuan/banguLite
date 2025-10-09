@@ -8,6 +8,7 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
+import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -102,7 +103,7 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
 
                   //EasyRefresh 配合 滚动 onPageChanged 冲突 
                   return EasyRefresh(
-                    footer: const MaterialFooter(),
+                    footer: const TextFooter(),
                     onLoad: () => loadGroupsContent(context, tabController.index,isAppend: true),
                     triggerAxis: Axis.vertical,
                     child: GridView.builder(

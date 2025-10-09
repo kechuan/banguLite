@@ -16,6 +16,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
 
+        <!-- SAF FileProvider config -->
 		<provider
 			android:name="androidx.core.content.FileProvider"
 			android:authorities="${applicationId}.fileprovider"

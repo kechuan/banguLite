@@ -748,6 +748,8 @@ class TestTile extends ListTile{
         child: ListTile(
           onTap: () async {
 
+            Navigator.pushNamed(context, Routes.test);
+
             //downloadSticker(isOldType: false);
 
             //bus.emit('AppRoute','${BangumiAPIUrls.timelineReply(52089780)}?timelineID=52089780&comment=我难道喜欢看厕纸？');

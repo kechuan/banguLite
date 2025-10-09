@@ -8,6 +8,7 @@ import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
+import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +65,7 @@ abstract class BangumiGeneralMoreContentPageState<
           
           body: EasyRefresh(
             scrollController: scrollController,
-            footer: const MaterialFooter(),
+            footer: const TextFooter(),
             onLoad: (){
 
               invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
