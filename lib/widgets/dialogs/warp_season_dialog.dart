@@ -285,7 +285,7 @@ class SelectSeasonPortrait extends StatelessWidget {
 
 void showSeasonDialog(
   BuildContext context,
-  Future? calendarLoadFuture,
+  {Future? calendarLoadFuture}
 ){
 
   invokeAsyncToasterExec() => fadeToaster(context: context, message: "正在切换季节番剧信息");

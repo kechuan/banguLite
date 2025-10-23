@@ -1,3 +1,6 @@
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+
 /// 任意扩展 仿kt语法糖
 extension ScopeFunctions<T> on T {
   /// 类似 Kotlin 的 let 函数
@@ -49,4 +52,60 @@ extension IterableExtension on Iterable<num>{
 		}
 		return sum;
 	}
+}
+
+extension ReportConvert on PostCommentType{
+
+  ReportSubjectType convertReportReason(){
+    switch(this){
+      
+      /// 不知道这个指的是不是 subjectComment 但是Web 没有举报入口 无法验证
+      case PostCommentType.subjectComment:{
+        return ReportSubjectType.subjectReply;
+      }
+        
+      case PostCommentType.replyEpComment:{
+        return ReportSubjectType.episodeReply;
+      }
+        
+      case PostCommentType.postBlog:{
+        return ReportSubjectType.blog;
+      }
+        
+      case PostCommentType.replyBlog:{
+        return ReportSubjectType.blogReply;
+      }
+        
+      case PostCommentType.postTopic:{
+        return ReportSubjectType.subjectTopic;
+      }
+      
+      ///TODO 暂时无法 举报replyTopic
+      case PostCommentType.replyTopic:{
+        return ReportSubjectType.subjectReply;
+      }
+        
+      case PostCommentType.postGroupTopic:{
+        return ReportSubjectType.groupTopic;
+      }
+        
+      case PostCommentType.replyGroupTopic:{
+        return ReportSubjectType.groupReply;
+      }
+        
+      case PostCommentType.postTimeline:{
+        return ReportSubjectType.timeline;
+      }
+        
+      case PostCommentType.replyTimeline:{
+        return ReportSubjectType.timelineReply;
+      }
+
+      //default:{
+      //  return ReportSubjectType.subjectReply;
+      //}
+        
+    }
+  
+  }
 }

@@ -5,6 +5,7 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -143,21 +144,26 @@ class _EpCommentTileState extends State<EpCommentTile> {
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 140),
                 //constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width/3),
-                //这个长度一般是 "YEAR-MO-DA HO:MI" 的长度
+                //这个长度一般是 "YEAR-MM-DD HH:MM" 的长度
                 //但如果设备上的字体是不一样的话。。我就不好说了
                 child: Wrap(
                   spacing: 6,
                   alignment: WrapAlignment.end,
                   children: [
                           
-                    ScalableText(widget.epCommentData.epCommentIndex== null ? "" : "#${widget.epCommentData.epCommentIndex}"),
+                    ScalableText(
+                      widget.epCommentData.epCommentIndex== null ? "" : "#${widget.epCommentData.epCommentIndex}",
+                      style:TextStyle(fontSize: AppFontSize.s14)
+                    ),
                           
                     ScalableText(
-                      "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)}"
+                      "${commentStamp.year}-${convertDigitNumString(commentStamp.month)}-${convertDigitNumString(commentStamp.day)}",
+                      style:TextStyle(fontSize: AppFontSize.s14)
                     ),
 
                     ScalableText(
                       "${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}",
+                      style:TextStyle(fontSize: AppFontSize.s14)
                     )
 
                   ],

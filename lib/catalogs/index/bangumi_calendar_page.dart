@@ -202,7 +202,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                   //const Spacer(),
                                   InkResponse(
                                     containedInkWell: true,
-									                  onTap: ()=> showSeasonDialog(context,calendarLoadFuture),
+									                  onTap: ()=> showSeasonDialog(context,calendarLoadFuture:calendarLoadFuture),
                                     focusColor: Colors.transparent,
                                     child: Row(
                                       children: [

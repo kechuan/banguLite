@@ -181,8 +181,6 @@ class AccountModel extends ChangeNotifier {
 
     }
 
-   
-
     Future<void> updateAccessToken(String? refreshToken) async {
         if (refreshToken == null) return;
 
@@ -218,7 +216,7 @@ class AccountModel extends ChangeNotifier {
         }
     }
 
-    //账户相关操作.. 实在是有点太多了 要不。。聚合一下?
+    //账户相关操作
     Future<bool> userRelationAction(
         String? username,
         {
@@ -269,568 +267,510 @@ class AccountModel extends ChangeNotifier {
 
     }
 
-  //@Deprecated("can't use in headless mode")
-  //Future<bool> getTrunsTileToken({
-    //    Function(String)? fallbackAction
-    //}) {
-    //    Completer<bool> getTrunsTileTokenCompleter = Completer();
-
-    //    int errorReloadCount = 0;
-
-    //    Timer? timeoutTimer;
-    //    Timer? disposeTimer;
-
-    //    headlessWebView = HeadlessInAppWebView(
-
-    //        initialUrlRequest: URLRequest(url: WebUri(BangumiWebUrls.trunstileAuth())),
-    //        initialSettings: InAppWebViewSettings(
-    //            isInspectable: kDebugMode,
-    //            userAgent: HttpApiClient.broswerHeader["User-Agent"],
-    //        ),
-
-    //        onWebViewCreated: (controller) async {
-    //            debugPrint("webview created");
-    //        },
-
-    //        shouldOverrideUrlLoading: (controller, navigationAction) async {
-
-    //            //似乎对Android 生效 对window难以拦截? window似乎并不会触发这个拦截
-    //            debugPrint("shouldOverrideUrlLoading url:${navigationAction.request.url}");
-
-    //            if (navigationAction.request.url.toString().startsWith(APPInformationRepository.bangumiTurnstileCallbackUri.toString())) {
-    //                navigationAction.request.url?.queryParameters["token"] != null ? 
-    //                    AccountModel.loginedUserInformations.turnsTileToken = navigationAction.request.url?.queryParameters["token"] : 
-    //                    null;
-
-    //                return NavigationActionPolicy.CANCEL;
-    //            }
-    //            return NavigationActionPolicy.ALLOW;
-
-    //        },
-
-    //        onLoadStart: (controller, url) async {
-
-    //            if (url.toString().contains(APPInformationRepository.bangumiTurnstileCallbackUri.toString())) {
-    //                if (url?.queryParameters["token"] != null) {
-    //                    loginedUserInformations.turnsTileToken = url?.queryParameters["token"];
-    //                    getTrunsTileTokenCompleter.complete(true);
-    //                    timeoutTimer?.cancel();
-    //                    disposeTimer?.cancel();
-    //                    headlessWebView?.dispose();
-    //                }
-
-    //            }
-
-    //            timeoutTimer ??= Timer(const Duration(seconds: 15), () {
-    //                    //15s 仅限2次机会
-    //                    if (errorReloadCount == 1) {
-    //                        disposeTimer ??= Timer(const Duration(seconds: 5), () {
-    //                          timeoutTimer?.cancel();
-    //                          debugPrint("webview dispose");
-    //                          controller.dispose();
-    //                          getTrunsTileTokenCompleter.complete(false);
-    //                          fallbackAction?.call("无法自动通过验证 发帖失败");
-    //                      });
-    //                    }
-
-    //                    else {
-    //                        errorReloadCount += 1;
-    //                        debugPrint("trigged $errorReloadCount time(s) reload");
-    //                        controller.reload();
-    //                        timeoutTimer = null;
-    //                    }
-
-    //                }
-    //            );
-
-    //            debugPrint("load start content:${url.toString()}");
-
-    //        },
-
-    //        onReceivedError: (controller, request, error) {
-    //            if (request.url.toString().contains(APPInformationRepository.bangumiTurnstileCallbackUri.toString())) {
-    //                extractFallbackToken(controller).then((result) {
-    //                        if (result != null) {
-    //                            AccountModel.loginedUserInformations.turnsTileToken = result;
-    //                        }
-    //                    });
-    //            }
-
-    //        },
-
-    //    );
-
-    //    headlessWebView?.run();
-
-    //    return getTrunsTileTokenCompleter.future;
-  //}
+  
 
 
-  Future<int> postContent({
-    dynamic subjectID,
-    String? title,
-    String? content,
-    PostCommentType? postContentType,
-    UserContentActionType actionType = UserContentActionType.post,
-    Map<String, dynamic>? subjectCommentQuery,
-    Function(String message)? fallbackAction
-  }) async {
+    Future<int> postContent({
+      dynamic subjectID,
+      String? title,
+      String? content,
+      PostCommentType? postContentType,
+      UserContentActionType actionType = UserContentActionType.post,
+      Map<String, dynamic>? subjectCommentQuery,
+      Function(String message)? fallbackAction
+    }) async {
 
-      String requestUrl = "";
+        String requestUrl = "";
 
-      late Future<Response<dynamic>> Function() contentFuture;
+        late Future<Response<dynamic>> Function() contentFuture;
 
-      if (loginedUserInformations.accessToken == null) {
-          debugPrint("账号未登录");
-          return 0;
-          //contentCompleter.complete(0);
-      }
+        if (loginedUserInformations.accessToken == null) {
+            debugPrint("账号未登录");
+            return 0;
+            //contentCompleter.complete(0);
+        }
 
-      switch (postContentType){
+        switch (postContentType){
 
-          case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.actionSubjectComment(int.parse(subjectID));
-          case PostCommentType.postTopic: requestUrl = BangumiAPIUrls.postTopic(subjectID);
-          case PostCommentType.postBlog:{
-              //缺失中
-          }
+            case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.actionSubjectComment(int.parse(subjectID));
+            case PostCommentType.postTopic: requestUrl = BangumiAPIUrls.postTopic(subjectID);
+            case PostCommentType.postBlog:{
+                //缺失中
+            }
 
-          case PostCommentType.postTimeline: {
+            case PostCommentType.postTimeline: {
 
-              if (actionType == UserContentActionType.post) {
-                  requestUrl = BangumiAPIUrls.postTimeline();
-              }
+                if (actionType == UserContentActionType.post) {
+                    requestUrl = BangumiAPIUrls.postTimeline();
+                }
 
-              else {
-                  requestUrl = '${BangumiAPIUrls.postTimeline()}/$subjectID';
-              }
+                else {
+                    requestUrl = '${BangumiAPIUrls.postTimeline()}/$subjectID';
+                }
 
-          }
+            }
 
-          case PostCommentType.postGroupTopic:{
-              requestUrl = BangumiAPIUrls.postGroupTopic(subjectID!);
-          }
+            case PostCommentType.postGroupTopic:{
+                requestUrl = BangumiAPIUrls.postGroupTopic(subjectID!);
+            }
 
-          default:{}
+            default:{}
 
-      }
+        }
 
-      if (postContentType == null || requestUrl.isEmpty) {
-          debugPrint(
-              "空数据错误:"
-              "postContentType:$postContentType / subjectID:$subjectID / requestUrl:$requestUrl"
-          );
-          fallbackAction?.call("发送失败");
-          return 0;
-      }
+        if (postContentType == null || requestUrl.isEmpty) {
+            debugPrint(
+                "空数据错误:"
+                "postContentType:$postContentType / subjectID:$subjectID / requestUrl:$requestUrl"
+            );
+            fallbackAction?.call("发送失败");
+            return 0;
+        }
+
+        switch (actionType){
+
+            case UserContentActionType.post:{
+
+                if (loginedUserInformations.turnsTileToken == null) return 0;
+
+                contentFuture = () => HttpApiClient.client.post(
+                    requestUrl,
+                    data: BangumiQuerys.postQuery(
+                        title: title,
+                        content: content,
+                        turnstileToken: loginedUserInformations.turnsTileToken,
+                    ),
+                    options: BangumiAPIUrls.bangumiAccessOption(),
+                );
+            }
+
+            //subjectComment 的 query 特殊
+            case UserContentActionType.edit:{
+                contentFuture = () => HttpApiClient.client.put(
+                    requestUrl,
+                    data: subjectCommentQuery ?? BangumiQuerys.editQuery(
+                            title: title,
+                            content: content,
+                        ),
+                    options: BangumiAPIUrls.bangumiAccessOption(),
+                );
+            }
+
+            case UserContentActionType.delete:{
+                contentFuture = () => HttpApiClient.client.delete(
+                    requestUrl,
+                    options: BangumiAPIUrls.bangumiAccessOption(),
+                );
+            }
+
+        }
+
+        try{
+
+          int resultCode = 0;
+
+              await contentFuture().then((response) {
+                if (response.statusCode == 200) {
+                  //目前只有 subjectComment 返回的 data 是空的 {}
+                  //应该说是PUT行为是不返回的
+                  //debugPrint("postID:${response.data["id"]}");
+                  //contentCompleter.complete(response.data["id"] ?? 200);
+
+                  //那没办法 给它特殊一个返回值吧
+                  resultCode = response.data["id"] ?? 1;
+                }
+            });
+
+            return resultCode;
+
+
+        }
+
+        on DioException catch (e){
+          debugPrint("[PostContent] DioException:${e.response?.data}");
+          fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
+        }
+
+        return 0;
+
+        //return contentCompleter.future;
+
+    }
+
+    Future<int> toggleComment({
+      int? contentID,
+      int? commentID,
+      String? commentContent,
+      PostCommentType? postCommentType,
+      UserContentActionType actionType = UserContentActionType.post,
+      Function(String message)? fallbackAction
+    }) async {
+
+        //Completer<int> commentCompleter = Completer();
+        String requestUrl = "";
+
+        late Future<Response<dynamic>> Function() commentFuture;
+
+        if (loginedUserInformations.accessToken == null) {
+            debugPrint("账号未登录");
+            return 0;
+        }
+
+        switch (postCommentType){
+
+            case PostCommentType.replyEpComment:{
+            requestUrl = actionType == UserContentActionType.post ?
+            BangumiAPIUrls.postEpComment(contentID!) :
+            BangumiAPIUrls.actionEpComment(commentID!);
+
+            }
+
+            case PostCommentType.replyTopic:{
+
+                requestUrl = actionType == UserContentActionType.post ?
+                BangumiAPIUrls.postTopicComment(contentID!) :
+                BangumiAPIUrls.actionTopicComment(commentID!);
+
+            }
+
+            case PostCommentType.replyGroupTopic:{
+
+                requestUrl = actionType == UserContentActionType.post ?
+                    BangumiAPIUrls.postGroupTopicComment(contentID!) :
+                    BangumiAPIUrls.actionTopicComment(commentID!);
+
+            }
+
+            case PostCommentType.replyBlog:{
+                requestUrl = actionType == UserContentActionType.post ?
+                BangumiAPIUrls.postBlogComment(contentID!) :
+                BangumiAPIUrls.actionBlogComment(commentID!);
+
+            }
+
+            case PostCommentType.replyTimeline:
+            case PostCommentType.postTimeline:
+            {
+                requestUrl = BangumiAPIUrls.timelineReply(contentID!);
+            }
+
+            default:{}
+
+        }
+
+        if (postCommentType == null || requestUrl.isEmpty) {
+            debugPrint(
+              "comment空数据错误:"
+              "postCommentType:$postCommentType/commentID:$commentID"
+            );
+            return 0;
+        }
 
       switch (actionType){
-
           case UserContentActionType.post:{
 
               if (loginedUserInformations.turnsTileToken == null) return 0;
 
-              contentFuture = () => HttpApiClient.client.post(
+              commentFuture = () => HttpApiClient.client.post(
                   requestUrl,
-                  data: BangumiQuerys.postQuery(
-                      title: title,
-                      content: content,
-                      turnstileToken: loginedUserInformations.turnsTileToken,
+                  data: BangumiQuerys.replyQuery(
+                  content: commentContent,
+                  replyTo: commentID ?? 0,
+                  turnstileToken: loginedUserInformations.turnsTileToken,
                   ),
                   options: BangumiAPIUrls.bangumiAccessOption(),
               );
           }
 
-          //subjectComment 的 query 特殊
           case UserContentActionType.edit:{
-              contentFuture = () => HttpApiClient.client.put(
-                  requestUrl,
-                  data: subjectCommentQuery ?? BangumiQuerys.editQuery(
-                          title: title,
-                          content: content,
-                      ),
-                  options: BangumiAPIUrls.bangumiAccessOption(),
+              commentFuture = () => HttpApiClient.client.put(
+              requestUrl,
+              data: BangumiQuerys.editQuery(content: commentContent),
+              options: BangumiAPIUrls.bangumiAccessOption(),
               );
           }
 
           case UserContentActionType.delete:{
-              contentFuture = () => HttpApiClient.client.delete(
+              commentFuture = () => HttpApiClient.client.delete(
                   requestUrl,
                   options: BangumiAPIUrls.bangumiAccessOption(),
               );
           }
 
       }
-
+      
       try{
 
-        int resultCode = 0;
+        int? responseID;
 
-            await contentFuture().then((response) {
-              if (response.statusCode == 200) {
-                //目前只有 subjectComment 返回的 data 是空的 {}
-                //应该说是PUT行为是不返回的
-                //debugPrint("postID:${response.data["id"]}");
-                //contentCompleter.complete(response.data["id"] ?? 200);
+        await commentFuture().then((response) {
+          if (response.statusCode == 200) {
+            debugPrint("response id:${response.data["id"]}");
+            responseID = response.data["id"] ?? 1;
+          }
+        });
 
-                //那没办法 给它特殊一个返回值吧
-                resultCode = response.data["id"] ?? 1;
-              }
-          });
-
-          return resultCode;
-
-
+        return responseID ?? 1;
       }
 
       on DioException catch (e){
-        debugPrint("[PostContent] DioException:${e.response?.data}");
+        debugPrint(
+          "[ToggleComment] '${e.response?.statusCode} ${e.response?.data["message"]}'\n"
+          "requestUrl: $requestUrl \n"
+          "Query: ${BangumiQuerys.replyQuery(
+            content: commentContent,
+            replyTo: commentID ?? 0,
+            turnstileToken: loginedUserInformations.turnsTileToken,
+          )}"
+
+        );
         fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
+      }
+
+      finally{
+        loginedUserInformations.turnsTileToken = null;
       }
 
       return 0;
 
-      //return contentCompleter.future;
+    }
 
-  }
-
-  Future<int> toggleComment({
-    int? contentID,
-    int? commentID,
-    String? commentContent,
-    PostCommentType? postCommentType,
-    UserContentActionType actionType = UserContentActionType.post,
-    Function(String message)? fallbackAction
-  }) async {
-
-      //Completer<int> commentCompleter = Completer();
-      String requestUrl = "";
-
-      late Future<Response<dynamic>> Function() commentFuture;
-
-      if (loginedUserInformations.accessToken == null) {
-          debugPrint("账号未登录");
-          return 0;
+    //目前缺乏反馈
+    Future<bool> toggleCommentLike(
+      int? commentID,
+      int stickerLikeIndex,
+      PostCommentType? postCommentType,
+      {
+          UserContentActionType actionType = UserContentActionType.post,
+          Function(String message)? fallbackAction
       }
+    ) async {
 
-      switch (postCommentType){
+        Completer<bool> likeCompleter = Completer();
 
-          case PostCommentType.replyEpComment:{
-          requestUrl = actionType == UserContentActionType.post ?
-          BangumiAPIUrls.postEpComment(contentID!) :
-          BangumiAPIUrls.actionEpComment(commentID!);
+        String requestUrl = "";
 
-          }
+        late Future<Response<dynamic>> Function() actionLikeFuture;
 
-          case PostCommentType.replyTopic:{
-
-              requestUrl = actionType == UserContentActionType.post ?
-              BangumiAPIUrls.postTopicComment(contentID!) :
-              BangumiAPIUrls.actionTopicComment(commentID!);
-
-          }
-
-          case PostCommentType.replyGroupTopic:{
-
-              requestUrl = actionType == UserContentActionType.post ?
-                  BangumiAPIUrls.postGroupTopicComment(contentID!) :
-                  BangumiAPIUrls.actionTopicComment(commentID!);
-
-          }
-
-          case PostCommentType.replyBlog:{
-              requestUrl = actionType == UserContentActionType.post ?
-              BangumiAPIUrls.postBlogComment(contentID!) :
-              BangumiAPIUrls.actionBlogComment(commentID!);
-
-          }
-
-          case PostCommentType.replyTimeline:
-          case PostCommentType.postTimeline:
-          {
-              requestUrl = BangumiAPIUrls.timelineReply(contentID!);
-          }
-
-          default:{}
-
-      }
-
-      if (postCommentType == null || requestUrl.isEmpty) {
-          debugPrint(
-            "comment空数据错误:"
-            "postCommentType:$postCommentType/commentID:$commentID"
-          );
-          return 0;
-      }
-
-    switch (actionType){
-        case UserContentActionType.post:{
-
-            if (loginedUserInformations.turnsTileToken == null) return 0;
-
-            commentFuture = () => HttpApiClient.client.post(
-                requestUrl,
-                data: BangumiQuerys.replyQuery(
-                content: commentContent,
-                replyTo: commentID ?? 0,
-                turnstileToken: loginedUserInformations.turnsTileToken,
-                ),
-                options: BangumiAPIUrls.bangumiAccessOption(),
-            );
+        if (loginedUserInformations.accessToken == null) {
+            debugPrint("账号未登录");
+            likeCompleter.complete(false);
         }
 
-        case UserContentActionType.edit:{
-            commentFuture = () => HttpApiClient.client.put(
-            requestUrl,
-            data: BangumiQuerys.editQuery(content: commentContent),
+        switch (postCommentType){
+
+            // lacking...
+            case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.toggleSubjectCommentLike(commentID!);
+            case PostCommentType.replyEpComment: requestUrl = BangumiAPIUrls.toggleEPCommentLike(commentID!);
+            case PostCommentType.replyTopic: requestUrl = BangumiAPIUrls.toggleTopicLike(commentID!);
+            case PostCommentType.replyGroupTopic: requestUrl = BangumiAPIUrls.toggleGroupTopicLike(commentID!);
+
+            //case PostCommentType.replyBlog:{
+            //	requestUrl = BangumiAPIUrls.toggleGroupLike(commentID!);
+            //}	
+
+            default:{
+            }
+
+        }
+
+        if (postCommentType == null || commentID == null || requestUrl.isEmpty) {
+            debugPrint("commentLike空数据错误");
+            return false;
+        }
+
+        switch (actionType){
+            case UserContentActionType.post:{
+
+                actionLikeFuture = () => HttpApiClient.client.put(
+                    requestUrl,
+                    options: BangumiAPIUrls.bangumiAccessOption(),
+                    data: {"value": stickerLikeIndex}
+                );
+
+            }
+
+            case UserContentActionType.delete:{
+                actionLikeFuture = () => HttpApiClient.client.delete(
+                    requestUrl,
+                    options: BangumiAPIUrls.bangumiAccessOption(),
+                );
+
+            }
+
+            default: {
+            }
+        }
+
+        await actionLikeFuture().then((response) {
+                if (response.statusCode == 200) {
+                    debugPrint("$actionType succ: commentID:$commentID / sticker:$stickerLikeIndex");
+                    likeCompleter.complete(true);
+                }
+
+                else {
+                    likeCompleter.complete(false);
+                    fallbackAction?.call("${response.statusCode} ${response.data["message"]}");
+                }
+
+            }
+        );
+
+        return likeCompleter.future;
+    }
+
+    Future<bool> getNotifications({
+        bool? unread,
+        int? limit,
+        Function(String)? fallbackAction
+    }) async {
+
+        Completer<bool> notficationCompleter = Completer();
+
+        if (loginedUserInformations.accessToken == null) {
+            fallbackAction?.call("401 - 账号未登录");
+            notficationCompleter.complete(false);
+        }
+
+        Map<String, dynamic> notificationsQuery = BangumiQuerys.notificationsQuery(limit: limit);
+
+        if (unread == true) notificationsQuery["unread"] = true;
+
+        await HttpApiClient.client.get(
+            BangumiAPIUrls.notify,
+            queryParameters: notificationsQuery,
             options: BangumiAPIUrls.bangumiAccessOption(),
-            );
+        ).then((response) {
+                    if (response.statusCode == 200) {
+
+                        if (unread == true) {
+
+                            final notificationsList = loadUserNotificaions(response.data["data"]);
+
+                            currentUserNotificaions.addAll(notificationsList);
+                            unreadNotifications += notificationsList.length;
+                        }
+
+                        else {
+
+                            unreadNotifications = 0;
+                            currentUserNotificaions = loadUserNotificaions(response.data["data"]).toSet();
+
+                            for (final currentNotification in currentUserNotificaions){
+                                if (currentNotification.isUnRead == true) {
+                                    unreadNotifications += 1;
+                                }
+                            }
+
+                        }
+
+                        notficationCompleter.complete(true);
+                        notifyListeners();
+
+                    }
+
+                    else {
+                        notficationCompleter.complete(false);
+
+                        fallbackAction?.call("${response.statusCode} ${response.data["message"]}");
+                    }
+
+                });
+
+        return notficationCompleter.future;
+    }
+
+    Future<bool> clearNotifications({
+        List<int>? notificationIDList,
+        Function(String)? fallbackAction
+    }) async {
+
+        Completer<bool> clearNotficationCompleter = Completer();
+
+        if (loginedUserInformations.accessToken == null) {
+            debugPrint("账号未登录");
+            clearNotficationCompleter.complete(false);
         }
 
-        case UserContentActionType.delete:{
-            commentFuture = () => HttpApiClient.client.delete(
-                requestUrl,
-                options: BangumiAPIUrls.bangumiAccessOption(),
-            );
-        }
+        await HttpApiClient.client.post(
+            BangumiAPIUrls.clearNotify,
+            options: BangumiAPIUrls.bangumiAccessOption(),
+            data: BangumiQuerys.clearNotificationsQuery(notificationIDList: notificationIDList)
+        )
+            .then((response) {
+                    if (response.statusCode == 200) {
 
-    }
-    
-    try{
+                        if (notificationIDList == null) {
+                            unreadNotifications = 0;
 
-      int? responseID;
+                        }
 
-      await commentFuture().then((response) {
-        if (response.statusCode == 200) {
-          debugPrint("response id:${response.data["id"]}");
-          responseID = response.data["id"] ?? 1;
-        }
-      });
+                        else {
+                            currentUserNotificaions = currentUserNotificaions.map((currentNotificaion) {
+                                    if (notificationIDList.contains(currentNotificaion.notificationID)) {
+                                        currentNotificaion.isUnRead = false;
+                                        unreadNotifications -= 1;
+                                    }
+                                    return currentNotificaion;
+                                }).toSet();
+                        }
 
-      return responseID ?? 1;
-    }
+                        clearNotficationCompleter.complete(true);
 
-    on DioException catch (e){
-      debugPrint(
-        "[ToggleComment] '${e.response?.statusCode} ${e.response?.data["message"]}'\n"
-        "requestUrl: $requestUrl \n"
-        "Query: ${BangumiQuerys.replyQuery(
-          content: commentContent,
-          replyTo: commentID ?? 0,
-          turnstileToken: loginedUserInformations.turnsTileToken,
-        )}"
+                        notifyListeners();
 
-      );
-      fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
-    }
+                    }
 
-    finally{
-      loginedUserInformations.turnsTileToken = null;
+                    else {
+                        clearNotficationCompleter.complete(false);
+                        fallbackAction?.call("${response.data["message"]}");
+                    }
+
+                });
+
+        return clearNotficationCompleter.future;
     }
 
-    return 0;
 
-  }
-
-  //目前缺乏反馈
-  Future<bool> toggleCommentLike(
-    int? commentID,
-    int stickerLikeIndex,
-    PostCommentType? postCommentType,
-    {
-        UserContentActionType actionType = UserContentActionType.post,
+    Future<bool> reportContent(
+      int contentID,
+      int type,
+      int value,
+      {
+        required String comment,
         Function(String message)? fallbackAction
+      }
+    ) async {
+
+        Completer<bool> reportCompleter = Completer();
+
+        await HttpApiClient.client.post(
+            BangumiAPIUrls.report(),
+            data: BangumiQuerys.reportQuery(
+                reportID: contentID,
+                reportType: type,
+                reportValue: value
+            ),
+            options: BangumiAPIUrls.bangumiAccessOption(),
+        ).then((response){
+          if (response.statusCode == 200) {
+            reportCompleter.complete(true);
+          }
+
+          else {
+            reportCompleter.complete(false);
+            fallbackAction?.call("${response.statusCode} ${response.data["message"]}");
+          }
+        });
+
+        return reportCompleter.future;
     }
-  ) async {
 
-      Completer<bool> likeCompleter = Completer();
 
-      String requestUrl = "";
-
-      late Future<Response<dynamic>> Function() actionLikeFuture;
-
-      if (loginedUserInformations.accessToken == null) {
-          debugPrint("账号未登录");
-          likeCompleter.complete(false);
-      }
-
-      switch (postCommentType){
-
-          // lacking...
-          case PostCommentType.subjectComment: requestUrl = BangumiAPIUrls.toggleSubjectCommentLike(commentID!);
-          case PostCommentType.replyEpComment: requestUrl = BangumiAPIUrls.toggleEPCommentLike(commentID!);
-          case PostCommentType.replyTopic: requestUrl = BangumiAPIUrls.toggleTopicLike(commentID!);
-          case PostCommentType.replyGroupTopic: requestUrl = BangumiAPIUrls.toggleGroupTopicLike(commentID!);
-
-          //case PostCommentType.replyBlog:{
-          //	requestUrl = BangumiAPIUrls.toggleGroupLike(commentID!);
-          //}	
-
-          default:{
-          }
-
-      }
-
-      if (postCommentType == null || commentID == null || requestUrl.isEmpty) {
-          debugPrint("commentLike空数据错误");
-          return false;
-      }
-
-      switch (actionType){
-          case UserContentActionType.post:{
-
-              actionLikeFuture = () => HttpApiClient.client.put(
-                  requestUrl,
-                  options: BangumiAPIUrls.bangumiAccessOption(),
-                  data: {"value": stickerLikeIndex}
-              );
-
-          }
-
-          case UserContentActionType.delete:{
-              actionLikeFuture = () => HttpApiClient.client.delete(
-                  requestUrl,
-                  options: BangumiAPIUrls.bangumiAccessOption(),
-              );
-
-          }
-
-          default: {
-          }
-      }
-
-      await actionLikeFuture().then((response) {
-              if (response.statusCode == 200) {
-                  debugPrint("$actionType succ: commentID:$commentID / sticker:$stickerLikeIndex");
-                  likeCompleter.complete(true);
-              }
-
-              else {
-                  likeCompleter.complete(false);
-                  fallbackAction?.call("${response.statusCode} ${response.data["message"]}");
-              }
-
-          }
-      );
-
-      return likeCompleter.future;
-  }
-
-  Future<bool> getNotifications({
-      bool? unread,
-      int? limit,
-      Function(String)? fallbackAction
-  }) async {
-
-      Completer<bool> notficationCompleter = Completer();
-
-      if (loginedUserInformations.accessToken == null) {
-          fallbackAction?.call("401 - 账号未登录");
-          notficationCompleter.complete(false);
-      }
-
-      Map<String, dynamic> notificationsQuery = BangumiQuerys.notificationsQuery(limit: limit);
-
-      if (unread == true) notificationsQuery["unread"] = true;
-
-      await HttpApiClient.client.get(
-          BangumiAPIUrls.notify,
-          queryParameters: notificationsQuery,
-          options: BangumiAPIUrls.bangumiAccessOption(),
-      ).then((response) {
-                  if (response.statusCode == 200) {
-
-                      if (unread == true) {
-
-                          final notificationsList = loadUserNotificaions(response.data["data"]);
-
-                          currentUserNotificaions.addAll(notificationsList);
-                          unreadNotifications += notificationsList.length;
-                      }
-
-                      else {
-
-                          unreadNotifications = 0;
-                          currentUserNotificaions = loadUserNotificaions(response.data["data"]).toSet();
-
-                          for (final currentNotification in currentUserNotificaions){
-                              if (currentNotification.isUnRead == true) {
-                                  unreadNotifications += 1;
-                              }
-                          }
-
-                      }
-
-                      notficationCompleter.complete(true);
-                      notifyListeners();
-
-                  }
-
-                  else {
-                      notficationCompleter.complete(false);
-
-                      fallbackAction?.call("${response.statusCode} ${response.data["message"]}");
-                  }
-
-              });
-
-      return notficationCompleter.future;
-  }
-
-  Future<bool> clearNotifications({
-      List<int>? notificationIDList,
-      Function(String)? fallbackAction
-  }) async {
-
-      Completer<bool> clearNotficationCompleter = Completer();
-
-      if (loginedUserInformations.accessToken == null) {
-          debugPrint("账号未登录");
-          clearNotficationCompleter.complete(false);
-      }
-
-      await HttpApiClient.client.post(
-          BangumiAPIUrls.clearNotify,
-          options: BangumiAPIUrls.bangumiAccessOption(),
-          data: BangumiQuerys.clearNotificationsQuery(notificationIDList: notificationIDList)
-      )
-          .then((response) {
-                  if (response.statusCode == 200) {
-
-                      if (notificationIDList == null) {
-                          unreadNotifications = 0;
-
-                      }
-
-                      else {
-                          currentUserNotificaions = currentUserNotificaions.map((currentNotificaion) {
-                                  if (notificationIDList.contains(currentNotificaion.notificationID)) {
-                                      currentNotificaion.isUnRead = false;
-                                      unreadNotifications -= 1;
-                                  }
-                                  return currentNotificaion;
-                              }).toSet();
-                      }
-
-                      clearNotficationCompleter.complete(true);
-
-                      notifyListeners();
-
-                  }
-
-                  else {
-                      clearNotficationCompleter.complete(false);
-                      fallbackAction?.call("${response.data["message"]}");
-                  }
-
-              });
-
-      return clearNotficationCompleter.future;
-  }
-
-  @override
-  void notifyListeners() {
-      super.notifyListeners();
-  }
+    @override
+    void notifyListeners() {
+        super.notifyListeners();
+    }
 
 }
 

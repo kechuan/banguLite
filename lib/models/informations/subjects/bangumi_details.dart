@@ -319,7 +319,7 @@ bool animationFilter(Map currentBangumi){
 
   if(
     currentBangumi["name_cn"].isEmpty ||
-    currentBangumi["tags"].any((currentTag) => animeFilterTag.contains(currentTag["name"])) ||
+    currentBangumi["tags"].any((currentTag) => notAnimeFilterTag.contains(currentTag["name"])) ||
     currentBangumi["tags"].length < 6
   ){
     //debugPrint("[Denied]: ${currentBangumi["name"]}");

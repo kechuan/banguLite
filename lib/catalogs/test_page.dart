@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -7,11 +5,6 @@ import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
-
-
-
-
-
 
 @FFRoute(name: 'test')
 

@@ -9,7 +9,6 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
-import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_slider_panel.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +36,7 @@ class StarSubjectDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-	final accountModel = context.read<AccountModel>();
+	  final accountModel = context.read<AccountModel>();
 
     final ValueNotifier<bool> commentExpandedStatusNotifier = ValueNotifier(commentDetails?.comment != null);
     final ValueNotifier<double> commentRankNotifier = ValueNotifier((commentDetails?.rate ?? 0).toDouble());
@@ -187,7 +186,7 @@ class StarSubjectDialog extends StatelessWidget {
 								child: const ScalableText("取消")
 								),
 								TextButton(
-									onPressed: () async {
+									onPressed: (){
 
 										invokeAsyncPop(StarType status)=> Navigator.of(context).pop(status);
 
@@ -251,10 +250,9 @@ Future<StarType?> showStarSubjectDialog(
 		barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
 		context: context,
 		pageBuilder: (_,inAnimation,outAnimation){
-			final bangumiModel = context.read<BangumiModel>();
 
 			return StarSubjectDialog(
-				subjectID: bangumiModel.subjectID,
+        subjectID: bangumiDetails?.id ?? 0,
 				commentDetails: commentDetails,
 				onUpdateLocalStar: onUpdateLocalStar,
         onUpdateBangumiStar: onUpdateBangumiStar,

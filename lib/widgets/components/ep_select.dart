@@ -157,10 +157,10 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
 							shrinkWrap: true,
 							itemCount: currentSegmentEps,
 							gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
-							crossAxisCount: widget.portialMode == true ? 1 : 3,
-							mainAxisExtent: 60,
-							mainAxisSpacing: 6,
-							crossAxisSpacing: 6
+                crossAxisCount: widget.portialMode == true ? 1 : 3,
+                mainAxisExtent: 60,
+                mainAxisSpacing: 6,
+                crossAxisSpacing: 6
 							),
 							
 							itemBuilder: (_,index){

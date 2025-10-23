@@ -21,9 +21,9 @@ enum PostCommentType{
 
   final String commentTypeString;
   
-
   const PostCommentType(this.commentTypeString);
 
+  ///存在 extension [convertReportReason()]
 
 }
 

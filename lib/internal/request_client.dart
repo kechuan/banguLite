@@ -126,7 +126,6 @@ class BangumiAPIUrls {
   
   /// 行为允许 POST blog目前API没有
   /// /p1/subjects/-/topics/{topicID}
-  /// 
 
   static String postEpComment(int epID) => epComment(epID);
   
@@ -165,6 +164,9 @@ class BangumiAPIUrls {
   static String toggleEPCommentLike(int commentID) => '${actionEpComment(commentID)}/like';
   static String toggleTopicLike(int commentID) => '${actionTopicComment(commentID)}/like';
   static String toggleGroupTopicLike(int commentID) => '${actiongroupTopicComment(commentID)}/like';
+
+  ///[POST]
+  static String report() => '$newUrl/report';
 
 
   //other
@@ -394,6 +396,23 @@ class BangumiQuerys {
 
     return defaultQuery;
 
+  }
+
+  ///Detail: [ReportSubjectType]/[ReportReasonType]
+  static Map<String,dynamic> reportQuery(
+    {
+      required int reportID,
+      required int reportType,
+      required int reportValue,
+      String? comment
+    }
+  ) {
+    return {
+      "id":reportID,
+      "type":reportType,
+      "value":reportValue,
+      "comment":comment ?? "",
+    };
   }
 
   static Map<String,int>  commentAccessQuery = {"limit":10,"offset":0},

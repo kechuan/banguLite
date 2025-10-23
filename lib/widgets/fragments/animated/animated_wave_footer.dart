@@ -102,8 +102,6 @@ class WavePainter extends CustomPainter {
   final double? offsetX;
   final double? offsetY;
 
-  static const double pi = 3.1415926;
-
   @override
   void paint(Canvas canvas, Size size) {
 
@@ -116,9 +114,12 @@ class WavePainter extends CustomPainter {
     double currentPharse = 0.0;
 
     //相位绘制法 对于缓和角度的采样精度 需求较低 所以3点采样一次
-    for (currentOffsetX; currentOffsetX < size.width; currentOffsetX += 3) {
+    while(currentOffsetX < size.width){
+      if(currentOffsetX + 3 > size.width){
+        currentOffsetX = size.width;
+      }
 
-      //if(currentOffsetX%3 != 0 && currentOffsetX!=1) continue;
+      currentOffsetX+=3;
 
       currentPharse = 
         sin(
@@ -126,39 +127,19 @@ class WavePainter extends CustomPainter {
           + (animationProgress!*pi) //让整个周期的相位跟随着Animation移动起来 代表速度
         );
 
-      wavePath.lineTo(
-        currentOffsetX,
-        centerOffset.dy +
-          waveHeight * 
-            (
-              currentPharse > 0 ? -currentPharse : currentPharse
-            ) //波峰翻倍
-          - (offsetY ?? 0), //基础位移高度(负值代表上)
-      );
-      
+        wavePath.lineTo(
+          currentOffsetX,
+          centerOffset.dy +
+            waveHeight * -(currentPharse.abs()) //波峰翻倍
+            - (offsetY ?? 0), //基础位移高度(负值代表上)
+        );
+
     }
-
-    //finally Linked 弥补最终的未到达的缺陷
-
-    wavePath.lineTo(
-      size.width,
-      centerOffset.dy +
-        //waveHeight * sin(2*pi * currentOffset / size.width + animationProgress! * pi * 4),
-        waveHeight * sin(
-          (4*pi*currentOffsetX / size.width) //获取整个周期 offset内的相对相位位置 32/600 => 0.05什么的
-          + (animationProgress!*4*pi) //让整个周期的相位跟随着Animation移动起来
-        )
-        - (offsetY ?? 0), //基础位移高度(负值代表上)
-    );
-
 
     wavePath.lineTo(size.width, waveHeight);  //闭合图形
     wavePath.lineTo(0, waveHeight); //闭合图形
     
     wavePath.close();
-
-
-
 
     canvas.drawPath(wavePath, wavePainter);
 

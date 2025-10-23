@@ -160,4 +160,55 @@ enum NotificationType{
 
 }
 
+enum ReportSubjectType{
+  
+  user("用户",6),
 
+  groupTopic("小组话题",7),
+  groupReply("小组回复",8),
+
+  subjectTopic("条目话题",9),
+  subjectReply("条目回复",10),
+
+  episodeReply("章节回复",11),
+  characterReply("角色回复",12),
+  personReply("人物回复",13),
+
+  blog("日志",14),
+  blogReply("日志回复",15),
+
+  timeline("时间线",16),
+  timelineReply("时间线回复",17),
+
+  //原本的名字是 index 但是这个名字和 默认定义冲突
+  catalog("目录",18),
+  catalogReply("目录回复",19);
+  
+
+
+  final String typeName;
+  final int typeIndex;
+
+  const ReportSubjectType(this.typeName,this.typeIndex);
+
+}
+
+enum ReportReasonType{
+
+  abuse("辱骂、人身攻击",1),
+  spam("刷屏、无关内容",2),
+  political("政治相关",3),
+  illegal("违法信息",4),
+  privacy("泄露隐私",5),
+  cheatScore("涉嫌刷分",6),
+  flame("引战",7),
+  advertisement("广告",8),
+  spoiler("剧透",9),
+  other("其他",99);
+
+  final String reasonName;
+  final int reasonIndex;
+
+  const ReportReasonType(this.reasonName,this.reasonIndex);
+
+}
