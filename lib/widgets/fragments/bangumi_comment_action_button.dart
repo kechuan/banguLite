@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
@@ -188,10 +187,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                             );
                         }
 
-                        case CommentActionType.report:{
-                            //Dialog reportReason 暂且不做
-                            debugPrint("report");
-                            
+                        case CommentActionType.report:{                            
                             showReportDialog(
                               context,
                               contentID: widget.contentID,

@@ -1,3 +1,15 @@
+enum LoginStatus{
+  logout("未登录"),
+  logining("登录中"),
+  failed("登录失败"),
+  logined("已登录");
+
+  final String statusName;
+
+  const LoginStatus(this.statusName);
+
+}
+
 enum PostCommentType{
   //subject不会拥有回复评论的选项
   subjectComment("番剧吐槽"),

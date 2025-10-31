@@ -106,14 +106,11 @@ abstract class BangumiContentPageState<
 
                 debugPrint('sub / id :${getSubContentID()} / ${contentInfo.id}');
 
-                //contentFuture ??= loadContent(getSubContentID() ?? contentInfo.id ?? 0);
                 contentFuture ??= loadContent(getSubContentID() ?? contentInfo.id ?? 0);
 
                 return EasyRefresh.builder(
                     scrollController: scrollController,
-                    //重新获取When...
                     header: const TextHeader(),
-                    //header: ClassicHeader(),
                     onRefresh: () {
                         contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0, isRefresh: true);
                         refreshNotifier.value += 1;
@@ -360,19 +357,19 @@ abstract class BangumiContentPageState<
                     if (MyHive.historySurfDataBase.keys.contains(accessID)) {
 
                         MyHive.historySurfDataBase.get(accessID)?.sourceTitle.let((sourceTitle) {
-                                if (sourceTitle == "帖子" || sourceTitle == "博客") {
+                            if (sourceTitle == "帖子" || sourceTitle == "博客") {
 
-                                    final historyModel = HistoryModel();
+                                final historyModel = HistoryModel.instance;
 
-                                    subjectTitle = historyModel.dataSource.firstWhere((surfTimelineDetails) {
-                                            return 
-                                            surfTimelineDetails.detailID == getContentModel().subjectID &&
-                                                surfTimelineDetails.sourceTitle == null
-                                            ;
-                                        }).title;
+                                subjectTitle = historyModel.dataSource.firstWhere((surfTimelineDetails) {
+                                  return 
+                                    surfTimelineDetails.detailID == getContentModel().subjectID &&
+                                    surfTimelineDetails.sourceTitle == null
+                                  ;
+                                }).title;
 
-                                }
-                            });
+                            }
+                        });
 
                         MyHive.historySurfDataBase.put(
                             accessID,

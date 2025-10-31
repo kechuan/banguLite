@@ -61,7 +61,7 @@ extension ReportConvert on PostCommentType{
       
       /// 不知道这个指的是不是 subjectComment 但是Web 没有举报入口 无法验证
       case PostCommentType.subjectComment:{
-        return ReportSubjectType.subjectReply;
+        return ReportSubjectType.none;
       }
         
       case PostCommentType.replyEpComment:{
@@ -80,9 +80,8 @@ extension ReportConvert on PostCommentType{
         return ReportSubjectType.subjectTopic;
       }
       
-      ///TODO 暂时无法 举报replyTopic
       case PostCommentType.replyTopic:{
-        return ReportSubjectType.subjectReply;
+        return ReportSubjectType.subjectTopicReply;
       }
         
       case PostCommentType.postGroupTopic:{
@@ -101,9 +100,6 @@ extension ReportConvert on PostCommentType{
         return ReportSubjectType.timelineReply;
       }
 
-      //default:{
-      //  return ReportSubjectType.subjectReply;
-      //}
         
     }
   

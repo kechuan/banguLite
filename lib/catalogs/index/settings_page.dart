@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -9,8 +8,6 @@ import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
 import 'package:bangu_lite/widgets/dialogs/inital_image_storage_dialog.dart';
-import 'package:bangu_lite/widgets/dialogs/report_dialog.dart';
-import 'package:bangu_lite/widgets/dialogs/star_subject_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:docman/docman.dart';

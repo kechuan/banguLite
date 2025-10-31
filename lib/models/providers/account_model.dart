@@ -13,7 +13,6 @@ import 'package:bangu_lite/models/informations/surf/user_notificaion_details.dar
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class AccountModel extends ChangeNotifier {
@@ -25,14 +24,14 @@ class AccountModel extends ChangeNotifier {
     Set<UserNotificaion> currentUserNotificaions = {};
     int unreadNotifications = 0;
 
-    HeadlessInAppWebView? headlessWebView;
+    //HeadlessInAppWebView? headlessWebView;
 
-    bool? isLogining;
+	LoginStatus accountLoginStatus = LoginStatus.logout;
 
     bool isLogined() => loginedUserInformations.accessToken != null;
 
     void restoreData(){
-      isLogining = null;
+      accountLoginStatus = LoginStatus.logout;
       loginedUserInformations = getDefaultLoginedUserInformations();
       updateLoginInformation(getDefaultLoginedUserInformations());
       currentUserNotificaions.clear();
@@ -84,7 +83,7 @@ class AccountModel extends ChangeNotifier {
     }
 
     void login() {
-        isLogining = true;
+		accountLoginStatus = LoginStatus.logining;
         launchUrlString(BangumiWebUrls.webAuthPage());
         notifyListeners();
     }
@@ -165,14 +164,14 @@ class AccountModel extends ChangeNotifier {
               }
 
               completer.complete(isValid);
-              isLogining = false;
+              accountLoginStatus = LoginStatus.logined;
               notifyListeners();
 
             });
           },
           generalFallbackAction: (String errorMessage,Completer<dynamic> completer){
             fallbackAction?.call('[AccessToken] $errorMessage');
-            isLogining = false;
+            accountLoginStatus = LoginStatus.failed;
             completer.complete(false);
             notifyListeners();
             
@@ -276,7 +275,7 @@ class AccountModel extends ChangeNotifier {
       String? content,
       PostCommentType? postContentType,
       UserContentActionType actionType = UserContentActionType.post,
-      Map<String, dynamic>? subjectCommentQuery,
+      Map<String, dynamic>? subjectCommentData,
       Function(String message)? fallbackAction
     }) async {
 
@@ -335,7 +334,7 @@ class AccountModel extends ChangeNotifier {
 
                 contentFuture = () => HttpApiClient.client.post(
                     requestUrl,
-                    data: BangumiQuerys.postQuery(
+                    data: BangumiDatas.postContentData(
                         title: title,
                         content: content,
                         turnstileToken: loginedUserInformations.turnsTileToken,
@@ -348,7 +347,7 @@ class AccountModel extends ChangeNotifier {
             case UserContentActionType.edit:{
                 contentFuture = () => HttpApiClient.client.put(
                     requestUrl,
-                    data: subjectCommentQuery ?? BangumiQuerys.editQuery(
+                    data: subjectCommentData ?? BangumiDatas.editContentData(
                             title: title,
                             content: content,
                         ),
@@ -473,7 +472,7 @@ class AccountModel extends ChangeNotifier {
 
               commentFuture = () => HttpApiClient.client.post(
                   requestUrl,
-                  data: BangumiQuerys.replyQuery(
+                  data: BangumiDatas.replyContentData(
                   content: commentContent,
                   replyTo: commentID ?? 0,
                   turnstileToken: loginedUserInformations.turnsTileToken,
@@ -485,7 +484,7 @@ class AccountModel extends ChangeNotifier {
           case UserContentActionType.edit:{
               commentFuture = () => HttpApiClient.client.put(
               requestUrl,
-              data: BangumiQuerys.editQuery(content: commentContent),
+              data: BangumiDatas.editContentData(content: commentContent),
               options: BangumiAPIUrls.bangumiAccessOption(),
               );
           }
@@ -517,7 +516,7 @@ class AccountModel extends ChangeNotifier {
         debugPrint(
           "[ToggleComment] '${e.response?.statusCode} ${e.response?.data["message"]}'\n"
           "requestUrl: $requestUrl \n"
-          "Query: ${BangumiQuerys.replyQuery(
+          "Query: ${BangumiDatas.replyContentData(
             content: commentContent,
             replyTo: commentID ?? 0,
             turnstileToken: loginedUserInformations.turnsTileToken,
@@ -746,7 +745,7 @@ class AccountModel extends ChangeNotifier {
 
         await HttpApiClient.client.post(
             BangumiAPIUrls.report(),
-            data: BangumiQuerys.reportQuery(
+            data: BangumiDatas.reportData(
                 reportID: contentID,
                 reportType: type,
                 reportValue: value

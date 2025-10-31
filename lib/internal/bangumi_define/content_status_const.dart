@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 
+/// 大部分来自于 API 的 types/common.ts 声明
+
 enum SubjectType {
   book(1,Icons.book_outlined,"书籍"), // 书籍
   anime(2,Icons.live_tv_rounded,"动画"), // 动画
@@ -161,6 +163,8 @@ enum NotificationType{
 }
 
 enum ReportSubjectType{
+
+  none("无法举报",0),
   
   user("用户",6),
 
@@ -168,7 +172,8 @@ enum ReportSubjectType{
   groupReply("小组回复",8),
 
   subjectTopic("条目话题",9),
-  subjectReply("条目回复",10),
+  /// 从网站的举报url得知 9对应楼主的举报入口 而10对应的回复的举报入口 并非直接条目回复
+  subjectTopicReply("条目话题回复",10),
 
   episodeReply("章节回复",11),
   characterReply("角色回复",12),

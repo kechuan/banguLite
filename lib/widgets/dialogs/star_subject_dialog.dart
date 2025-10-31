@@ -200,7 +200,7 @@ class StarSubjectDialog extends StatelessWidget {
 											subjectID:subjectID.toString(),
 											postContentType:PostCommentType.subjectComment,
 											actionType: UserContentActionType.edit,
-											subjectCommentQuery:BangumiQuerys.subjectCommentQuery(
+											subjectCommentData:BangumiDatas.subjectCommentData(
 												content: contentEditingController.text,
 												isPrivate: false,
 												starType:starTypeNotifier.value,

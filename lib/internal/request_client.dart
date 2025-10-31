@@ -267,7 +267,7 @@ class BangumiQuerys {
 		"client_id":APPInformationRepository.bangumiAPPID,
 		"client_secret":APPInformationRepository.bangumiAPPSecret,
 		"code":code,
-		"redirect_uri":'banguLite://oauth/bgm_login?client_id=bgm369067d8f39dea8d4',
+		"redirect_uri":'banguLite://oauth/bgm_login?client_id=${APPInformationRepository.bangumiAPPID}',
 		"accept": "application/json"
 	};
 
@@ -281,7 +281,7 @@ class BangumiQuerys {
 		"client_id":APPInformationRepository.bangumiAPPID,
 		"client_secret":APPInformationRepository.bangumiAPPSecret,
 		"refresh_token":refreshToken,
-		"redirect_uri":'banguLite://oauth/bgm_login?client_id=bgm369067d8f39dea8d4',
+		"redirect_uri":'banguLite://oauth/bgm_login?client_id=${APPInformationRepository.bangumiAPPID}',
 		
 		
 		"accept": "application/json",
@@ -294,22 +294,7 @@ class BangumiQuerys {
 		"max_results":10
 	};
 
-  static Map<String,dynamic> subjectCommentQuery({
-    String? content,
-    int rate = 0,
-    StarType starType = StarType.want,
-    bool isPrivate = false,
-    List<String>? tagList
-  }){
-    return {
-      "comment": "$content",
-      "type": starType.starTypeIndex,
-      "rate": rate,
-      "private": isPrivate,
-      "progress": true,
-      "tags": tagList ?? [],
-    };
-  }
+  
 
   static Map<String,dynamic> groupsQuery({
     String? modeName,
@@ -337,33 +322,6 @@ class BangumiQuerys {
 		"offset": offset ?? 0
 	};
 
-	static Map<String,dynamic> postQuery({
-		String? content,
-		String? title,
-		String? turnstileToken
-	}) => {
-		"title": title,
-		"content": content,
-		"turnstileToken": turnstileToken
-	};
-
-	static Map<String,dynamic> replyQuery({
-		String? content,
-		int? replyTo,
-		String? turnstileToken,
-	}) => {
-		"content": content,
-		"replyTo": replyTo,
-		"turnstileToken": turnstileToken
-	};
-
-	static Map<String,dynamic> editQuery({
-		String? title,
-		String? content,
-	}) => {
-		"title": title ?? "",
-		"content": content,
-	};
 
   static Map<String,dynamic> notificationsQuery({
 		int? limit,
@@ -398,22 +356,7 @@ class BangumiQuerys {
 
   }
 
-  ///Detail: [ReportSubjectType]/[ReportReasonType]
-  static Map<String,dynamic> reportQuery(
-    {
-      required int reportID,
-      required int reportType,
-      required int reportValue,
-      String? comment
-    }
-  ) {
-    return {
-      "id":reportID,
-      "type":reportType,
-      "value":reportValue,
-      "comment":comment ?? "",
-    };
-  }
+  
 
   static Map<String,int>  commentAccessQuery = {"limit":10,"offset":0},
                           sortQuery = {"limit":10,"offset":0},
@@ -432,7 +375,70 @@ class BangumiQuerys {
 
 class BangumiDatas {
 
-  //神奇的数据装载。。 rank方面的数据 还不如拆分成 minRank & maxRank 。。
+  static Map<String,dynamic> subjectCommentData({
+    String? content,
+    int rate = 0,
+    StarType starType = StarType.want,
+    bool isPrivate = false,
+    List<String>? tagList
+  }){
+    return {
+      "comment": "$content",
+      "type": starType.starTypeIndex,
+      "rate": rate,
+      "private": isPrivate,
+      "progress": true,
+      "tags": tagList ?? [],
+    };
+  }
+
+  static Map<String,dynamic> postContentData({
+		String? content,
+		String? title,
+		String? turnstileToken
+	}) => {
+		"title": title,
+		"content": content,
+		"turnstileToken": turnstileToken
+	};
+
+  static Map<String,dynamic> replyContentData({
+		String? content,
+		int? replyTo,
+		String? turnstileToken,
+	}) => {
+		"content": content,
+		"replyTo": replyTo,
+		"turnstileToken": turnstileToken
+	};
+
+  static Map<String,dynamic> editContentData({
+		String? title,
+		String? content,
+	}) => {
+		"title": title ?? "",
+		"content": content,
+	};
+
+  ///Detail: [ReportSubjectType]/[ReportReasonType]
+  static Map<String,dynamic> reportData(
+    {
+      required int reportID,
+      required int reportType,
+      required int reportValue,
+      String? comment
+    }
+  ) {
+    return {
+      "id":reportID,
+      "type":reportType,
+      "value":reportValue,
+      "comment":comment ?? "",
+    };
+  }
+
+
+
   static Map<String,dynamic> get sortData => {
     "keyword": '',
     "sort": 'rank',
@@ -445,13 +451,14 @@ class BangumiDatas {
       "nsfw": false,
     }
   };
+
 }
 
 class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.9.12",
+                      version = "0.10.0",
                       author = "kechuan"
   ;
 

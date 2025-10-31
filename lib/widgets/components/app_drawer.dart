@@ -1,6 +1,7 @@
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -33,10 +34,9 @@ class AppDrawer extends StatelessWidget {
         
             const ScalableText("账号区域",style: TextStyle(fontSize: 14,color: Colors.grey)),
         
-            Selector<AccountModel, ({bool? isLogining,bool loginedStatus})> (
-              selector: (_, accountModel) => (isLogining: accountModel.isLogining, loginedStatus: accountModel.isLogined()),
-              builder: (_, loginData, __) {
-                final loginedStatus = loginData.loginedStatus;
+            Selector<AccountModel, LoginStatus> (
+              selector: (_, accountModel) => accountModel.accountLoginStatus,
+              builder: (_, loginedStatus, __) {
         
                 return Column(
                   children: [
@@ -69,7 +69,7 @@ class AppDrawer extends StatelessWidget {
                         children: [
                       
                           Builder(builder: (_){
-                            if(!loginedStatus){
+                            if(loginedStatus != LoginStatus.logined){
                               return const SizedBox(
                                 height: 50,
                                 width: 50,
@@ -93,12 +93,12 @@ class AppDrawer extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 ScalableText(AccountModel.loginedUserInformations.userInformation?.nickName ?? "游客模式",maxLines: 3,overflow: TextOverflow.ellipsis),
-                                ScalableText(loginedStatus ? "@${AccountModel.loginedUserInformations.userInformation?.userID}" : "登录以解锁在线模式",style: const TextStyle(fontSize: 12,color: Colors.grey)),
+                                ScalableText(loginedStatus == LoginStatus.logined ? "@${AccountModel.loginedUserInformations.userInformation?.userID}" : "登录以解锁在线模式",style: const TextStyle(fontSize: 12,color: Colors.grey)),
                               ],
                             ),
                           ),
             
-                          if(loginedStatus)
+                          if(loginedStatus == LoginStatus.logined)
                             ElevatedButton(
                               onPressed: ()=> accountModel.logout(),
                               child: const Row(
@@ -116,7 +116,7 @@ class AppDrawer extends StatelessWidget {
                     ),
         
         
-                    if(loginedStatus)
+                    if(loginedStatus == LoginStatus.logined)
         
                       Column(
                         children: [

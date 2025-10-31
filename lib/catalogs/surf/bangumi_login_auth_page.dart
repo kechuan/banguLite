@@ -1,4 +1,5 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
@@ -32,7 +33,6 @@ class BangumiAuthPage extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           onPressed: (){
-            accountModel.isLogining = null;
             Navigator.pop(context);
           },
           icon: const Icon(Icons.arrow_back)
@@ -120,19 +120,17 @@ class BangumiAuthPage extends StatelessWidget {
               ),
             ),
         
-            Selector<AccountModel, ({bool? isLogining,bool loginedStatus})> (
-              selector: (_, accountModel) => (isLogining: accountModel.isLogining, loginedStatus: accountModel.isLogined()),
-              builder: (_, loginData, __) {
+            Selector<AccountModel, LoginStatus> (
+              selector: (_, accountModel) => accountModel.accountLoginStatus,
+              builder: (_, loginStatus, __) {
         
                 Widget? leadingWidget;
                 String resultText = '';
                 Widget resultIcon = const SizedBox.shrink();
         
-                switch(loginData.isLogining){
+                switch(loginStatus){
                   
-                  case null:{
-        
-                    if(loginData.loginedStatus){
+                  case LoginStatus.logined:{
         
                       leadingWidget = Row(
                         spacing: 12,
@@ -163,14 +161,12 @@ class BangumiAuthPage extends StatelessWidget {
                         ],
                       );
         
-        
-                    }
                     
                     resultIcon = const SizedBox.shrink();
                   }
                     
                     
-                  case true:{
+                  case LoginStatus.logining:{
                     resultText = '正在等待外部浏览器验证';
                     resultIcon = const SizedBox(
                       height: 25,
@@ -180,51 +176,20 @@ class BangumiAuthPage extends StatelessWidget {
                   }
                     
                     
-                  case false:{
-                    if(loginData.loginedStatus){
-        
-                      leadingWidget = Row(
-                        spacing: 12,
-                        children: [
-        
-                          SizedBox(
-                            height: 25,
-                            width: 25,
-                            child: CachedImageLoader(
-                              imageUrl: AccountModel.loginedUserInformations.userInformation?.avatarUrl
-                            ),
-                          ),
-        
-                          ScalableText('${AccountModel.loginedUserInformations.userInformation?.nickName} 已验证成功'),
-        
-                          ElevatedButton(
-                            onPressed: ()=> accountModel.logout(),
-                            child: const Row(
-                              children: [
-                                Icon(Icons.logout),
-                                Text("登出"),
-                              ],
-                            )
-                          )
-        
-        
-                        ],
-                      );
-        
-                    }
-        
-                    else{
-                      resultText = '验证会话已过期 请再次重试';
-                      resultIcon = IconButton(
-                        onPressed: (){
-                          launchUrlString(BangumiWebUrls.webAuthPage());
-                          accountModel.isLogining = true;
-                          accountModel.notifyListeners();
-                        }, 
-                        icon: const Icon(Icons.refresh)
-                      );
-                    }
+                  case LoginStatus.failed:{
+                    resultText = '验证会话已过期 请再次重试';
+                    resultIcon = IconButton(
+                      onPressed: (){
+                        launchUrlString(BangumiWebUrls.webAuthPage());
+                        accountModel.accountLoginStatus = LoginStatus.logining;
+                        accountModel.notifyListeners();
+                      }, 
+                      icon: const Icon(Icons.refresh)
+                    );
                   }
+        
+                  case LoginStatus.logout:{}
+                  
                 }
         
                 return Row(
@@ -247,13 +212,13 @@ class BangumiAuthPage extends StatelessWidget {
               
             ),
         
-            Selector<AccountModel, ({bool? isLogining,bool loginedStatus})> (
-              selector: (_, accountModel) => (isLogining: accountModel.isLogining, loginedStatus: accountModel.isLogined()),
-              builder: (_, loginData, __) {
+            Selector<AccountModel, LoginStatus> (
+              selector: (_, accountModel) => accountModel.accountLoginStatus,
+              builder: (_, loginStatus, __) {
         
-                final resultColor = loginData.isLogining == true ? Colors.grey : const Color.fromARGB(255, 238, 201, 226);
+                final resultColor = loginStatus == LoginStatus.logining ? Colors.grey : const Color.fromARGB(255, 238, 201, 226);
         
-                String resultText = loginData.loginedStatus ? "返回主页" : "登入";
+                String resultText = loginStatus == LoginStatus.logined ? "返回主页" : "登入";
         
                 return Container(
                   width: MediaQuery.sizeOf(context).width*2/3,
@@ -270,12 +235,12 @@ class BangumiAuthPage extends StatelessWidget {
                     ),
                     onPressed: (){
         
-                      if(loginData.loginedStatus){
+                      if(loginStatus == LoginStatus.logined){
                         Navigator.popAndPushNamed(context,Routes.index);
                       }
         
                       else{
-                        if(accountModel.isLogining == true) return;
+                        if(loginStatus == LoginStatus.logining) return;
                         accountModel.login();
                       }
         

@@ -1,4 +1,5 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -39,10 +40,10 @@ class AppUserAvatar extends StatelessWidget {
           );
 
         },
-        child: Selector<AccountModel,bool?>(
-          selector: (_, accountModel) => accountModel.isLogining,
+        child: Selector<AccountModel,LoginStatus>(
+          selector: (_, accountModel) => accountModel.accountLoginStatus,
           shouldRebuild: (pre,next)=> true,
-          builder: (_,isLogining,child){
+          builder: (_,__,child){
             if(AccountModel.loginedUserInformations.userInformation?.avatarUrl != null){
               return CachedImageLoader(imageUrl: AccountModel.loginedUserInformations.userInformation?.avatarUrl);
             }

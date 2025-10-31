@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -43,6 +42,8 @@ class ReportDialog extends StatelessWidget {
 
         final contentEditingController = TextEditingController();
         final commentExpansibleController = ExpansibleController();
+
+		debugPrint("[reportDialog] contentType: $reportSubjectType contentID: $contentID type:${reportTypeNotifier.value}");
 
         return Dialog(
             child: ValueListenableBuilder(
@@ -158,7 +159,7 @@ class ReportDialog extends StatelessWidget {
                                             });
 
 
-                                            debugPrint("[reportMessage] contentType: $reportSubjectType contentID: $contentID type:${reportTypeNotifier.value} message:${contentEditingController.text}");
+                                            
                                           }, 
                                           child: const ScalableText("确定")
                                         ),
