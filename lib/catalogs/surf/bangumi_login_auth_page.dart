@@ -241,7 +241,7 @@ class BangumiAuthPage extends StatelessWidget {
         
                       else{
                         if(loginStatus == LoginStatus.logining) return;
-                        accountModel.login();
+                        accountModel.loginWebAuth();
                       }
         
         

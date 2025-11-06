@@ -32,7 +32,7 @@ class BangumiHistoryPage extends StatefulWidget {
 class BangumiHistoryPageState extends State<BangumiHistoryPage>
     with TickerProviderStateMixin {
 
-    final historyModel = HistoryModel();
+    final historyModel = HistoryModel.instance;
     
 
     @override
@@ -413,7 +413,7 @@ class HistoryPageContent extends StatefulWidget {
 
 class _HistoryPageContentState extends State<HistoryPageContent> {
 
-    final historyModel = HistoryModel();
+    final historyModel = HistoryModel.instance;
 
     //final PageController historyPageController = PageController();
 

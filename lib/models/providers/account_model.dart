@@ -17,12 +17,12 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 class AccountModel extends ChangeNotifier {
 
-    AccountModel();
+  AccountModel();
 
-    static LoginedUserInformations loginedUserInformations = getDefaultLoginedUserInformations();
+  static LoginedUserInformations loginedUserInformations = getDefaultLoginedUserInformations();
 
-    Set<UserNotificaion> currentUserNotificaions = {};
-    int unreadNotifications = 0;
+  Set<UserNotificaion> currentUserNotificaions = {};
+  int unreadNotifications = 0;
 
     //HeadlessInAppWebView? headlessWebView;
 
@@ -43,7 +43,7 @@ class AccountModel extends ChangeNotifier {
     /// 因为 在 main 上面的 初始化时 无法获取到 materialAPP的 context 从而无法激活 [showRequestSnackBar]
     void initModel(BuildContext context) {
         loadUserDetail();
-
+        
         verifySessionValidity(
             loginedUserInformations.accessToken,
             fallbackAction: (message) {
@@ -53,6 +53,8 @@ class AccountModel extends ChangeNotifier {
 
           if (status) {
             debugPrint("expired at:${loginedUserInformations.expiredTime}");
+            
+
             //debugPrint("accessToken:${loginedUserInformations.accessToken}");
             getNotifications();
 
@@ -82,8 +84,8 @@ class AccountModel extends ChangeNotifier {
       notifyListeners();
     }
 
-    void login() {
-		accountLoginStatus = LoginStatus.logining;
+    void loginWebAuth() {
+		    accountLoginStatus = LoginStatus.logining;
         launchUrlString(BangumiWebUrls.webAuthPage());
         notifyListeners();
     }
@@ -108,6 +110,8 @@ class AccountModel extends ChangeNotifier {
 
         else {
 
+          
+
 
           return await generalRequest(
             BangumiAPIUrls.me,
@@ -118,6 +122,7 @@ class AccountModel extends ChangeNotifier {
             generalCompleteLoadAction:(response, completer) {
               debugPrint("accessToken: Valid, ${DateTime.now().millisecondsSinceEpoch ~/ 1000} / ${loginedUserInformations.expiredTime}");
               loginedUserInformations.userInformation = loadUserInformations(response.data);
+              accountLoginStatus = LoginStatus.logined;
               completer.complete(true);
             },
             generalFallbackAction: (String errorMessage,Completer<dynamic> completer){

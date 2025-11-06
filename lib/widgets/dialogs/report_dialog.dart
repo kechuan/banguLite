@@ -43,7 +43,7 @@ class ReportDialog extends StatelessWidget {
         final contentEditingController = TextEditingController();
         final commentExpansibleController = ExpansibleController();
 
-		debugPrint("[reportDialog] contentType: $reportSubjectType contentID: $contentID type:${reportTypeNotifier.value}");
+		    debugPrint("[reportDialog] contentType: $reportSubjectType contentID: $contentID type:${reportTypeNotifier.value}");
 
         return Dialog(
             child: ValueListenableBuilder(

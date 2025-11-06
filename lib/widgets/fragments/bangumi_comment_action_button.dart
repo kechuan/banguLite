@@ -102,7 +102,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
 
                     debugPrint("${currentRoute.runtimeType}");
 
-                    invokeSendComment(String message) => accountModel.toggleComment(
+                    invokeCommentToggle(String message) => accountModel.toggleComment(
                         /// widget.commentData.contentID 并不可靠 因为部分获取的字段并不包含它
                         contentID: widget.contentID,
                         commentID: widget.commentData.commentID,
@@ -156,7 +156,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                                             invokeRequestSnackBar();
 
                                             //网络层 Callback
-                                            await invokeSendComment(content).then((resultID) {
+                                            await invokeCommentToggle(content).then((resultID) {
 
                                                     if (resultID != 0) {
                                                         debugPrint("[PostContent] sendMessageresultID:$resultID SendContent: $content");
@@ -238,7 +238,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                                             //widget.onUpdateComment?.call(content);
 
                                             //网络层 Callback
-                                            await invokeSendComment(content).then((resultID) {
+                                            await invokeCommentToggle(content).then((resultID) {
                                                     debugPrint("[EditContent] sendMessageresultID:$resultID SendContent: $content");
 
                                                     if (resultID != 0) {
@@ -406,7 +406,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
             case CommentActionType.report:{
                 if (
                 [
-                    PostCommentType.subjectComment,
+                  PostCommentType.subjectComment,
                 ].contains(widget.postCommentType)
                 ) {
                     isActionAvaliable = false;
