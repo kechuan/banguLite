@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 
@@ -20,25 +21,40 @@ class RequestByteInformation{
 
 }
   
-int byteParse(String bytesRangeValue){
+int contentRangeByteParse(String bytesRangeValue){
   // "bytes 0-7/36" => "0-7/36" => "36"
   return int.parse(bytesRangeValue.split(" ")[1].split("/")[1]);
+}
+
+String avaliableImageUriFactory (Uri imageUrl){
+  String resultImageUrl = imageUrl.toString();
+
+  if(allowedImageForwardLinks.contains(imageUrl.host)){
+    resultImageUrl = "${APPInformationRepository.banguLiteImageForwardUri}${imageUrl.host}${imageUrl.path}";
+  }
+  
+  return resultImageUrl;
 }
 
 Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
   RequestByteInformation pictureRequestInformation = RequestByteInformation();
 
-  await HttpApiClient.client.get(
-    imageUrl,
+  String resultImageUrl = avaliableImageUriFactory(Uri.parse(imageUrl));
+
+  await HttpApiClient.client.head(
+    resultImageUrl,
     options: Options(
-      headers: {'range':'bytes=0-1'},
+      headers: HttpApiClient.broswerHeader,
     )).timeout(const Duration(seconds: 5)).then((response){
 
       if(response.data!=null){
           pictureRequestInformation
             ..fileName = response.headers.value("name")
             ..contentType = response.headers.value(HttpHeaders.contentTypeHeader)
-            ..contentLength = byteParse(response.headers.value(HttpHeaders.contentRangeHeader) ?? "0")
+            ..contentLength = 
+              resultImageUrl == imageUrl ? 
+              contentRangeByteParse(response.headers.value(HttpHeaders.contentRangeHeader) ?? "0") : 
+              int.parse(response.headers.value(HttpHeaders.contentLengthHeader) ?? "0")
             ..statusMessage = response.statusMessage
           ;
 

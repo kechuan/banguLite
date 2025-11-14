@@ -133,9 +133,13 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                       );
                     }
 
+                    
+
                     return CachedNetworkImage(
-                      imageUrl: widget.imageUrl,
+                      imageUrl: avaliableImageUriFactory(Uri.parse(widget.imageUrl)),
+                      //imageUrl: widget.imageUrl,
                       httpHeaders: HttpApiClient.broswerHeader,
+                      
                       progressIndicatorBuilder: (context, url, progress){ 
           
                         return LoadingCard(

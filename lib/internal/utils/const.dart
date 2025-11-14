@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 
 const unExistID = -1;
 
+const allowedImageForwardLinks = [
+  "i.postimg.cc"
+];
+
 const stickerDataLike = [0,79,54,140,62,122,104,80,141,88,85,90];
 
 final bbcodeRegexp = RegExp(r'\[/?[a-z]+(?:=[^\]]+)?\]');

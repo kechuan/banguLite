@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -464,6 +465,7 @@ abstract class BangumiContentPageState<
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: CachedNetworkImage(
                                 imageUrl: getTrailingPhotosUri()![index],
+                                httpHeaders: HttpApiClient.broswerHeader,
                             ),
                         );
                     }
