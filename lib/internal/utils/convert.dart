@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
@@ -367,5 +368,9 @@ String convertInsertContent({String originalText = '',String insertText = '',int
   return buffer.toString();
 }
 
+String convertProxyImageUri(String imageLink){ 
+  Uri imageUri = Uri.parse(imageLink);
+  return "${APPInformationRepository.banguLiteImageForwardUri}${imageUri.host}${imageUri.path}";
+}
 
 

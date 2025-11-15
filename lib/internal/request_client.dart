@@ -469,7 +469,7 @@ class APPInformationRepository{
   static final Uri bangumiOAuthCallbackUri = Uri.parse('bangulite://oauth/bgm_login?client_id=$bangumiAPPID');
   static final Uri bangumiTurnstileCallbackUri = Uri.parse('bangulite://turnstile/callback');
 
-  //cloudflare workers 托管 理论上应该比 github pages 部署效果会好。。
+  //cloudflare workers / github pages 都不行 一个 400 一个网络访问太太慢
   static const String banguLiteImageForwardUri = 'https://i1.wp.com/';
 
 }

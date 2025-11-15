@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bangu_lite/internal/bangumi_define/timeline_const.dart';
+import 'package:bangu_lite/internal/request_task_information.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -166,4 +169,14 @@ Future<String?> extractFallbackToken(InAppWebViewController webViewController) a
     return tokenCompleter.future;
 
 
+}
+
+RequestByteInformation extractPictureRequest(Response response,String imageUrl){
+  return RequestByteInformation()
+    ..contentLink = imageUrl
+    ..fileName = response.headers.value("name")
+    ..contentType = response.headers.value(HttpHeaders.contentTypeHeader)
+    ..contentLength = int.parse(response.headers.value(HttpHeaders.contentLengthHeader) ?? "0")
+    ..statusMessage = response.statusMessage
+  ;
 }

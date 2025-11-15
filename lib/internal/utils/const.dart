@@ -5,7 +5,11 @@ import 'package:flutter/material.dart';
 const unExistID = -1;
 
 const allowedImageForwardLinks = [
-  "i.postimg.cc"
+  "i.postimg.cc",
+  "i.meee.com.tw",
+  //not supported. 302
+  //"i.imgur.com",
+  
 ];
 
 const stickerDataLike = [0,79,54,140,62,122,104,80,141,88,85,90];

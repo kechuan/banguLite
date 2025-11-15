@@ -151,13 +151,13 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
                               height: 65,
                               child: Center(
                                               
-                              child: Text(
-                              "${groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].groupTitle}"
-                              "\n(${groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].membersCount}成员)",
-                              textAlign: TextAlign.center,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              ),
+                                child: Text(
+                                  "${groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].groupTitle}"
+                                  "\n(${groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].membersCount}成员)",
+                                  textAlign: TextAlign.center,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               
                             )
                             ),
@@ -182,7 +182,7 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
     BuildContext context,
     int index,
     {bool? isAppend}
-  ) async {
+  ) {
     invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
 
     final groupsModel = context.read<GroupsModel>();
@@ -197,31 +197,31 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
       }
     }
 
-    await groupsModel.loadGroups(
-        mode: BangumiSurfGroupType.values[index],
-        offset: isAppend == true ? selectedGroupData!.length : 0,
-        accessQuery: BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken ?? ""),
-        fallbackAction: (message){
-          invokeToaster(message: message);
-        },
-      ).then((result){
-        
-        List newSelectedGroupData = groupsModel.groupsData[BangumiSurfGroupType.values[index]]!;
+    groupsModel.loadGroups(
+      mode: BangumiSurfGroupType.values[index],
+      offset: isAppend == true ? selectedGroupData!.length : 0,
+      accessQuery: accountModel.isLogined() ? BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken) : null,
+      fallbackAction: (message){
+        invokeToaster(message: message);
+      },
+    ).then((result){
+      
+      List newSelectedGroupData = groupsModel.groupsData[BangumiSurfGroupType.values[index]]!;
 
-        final int receiveLength = max(0,newSelectedGroupData.length);
+      final int receiveLength = max(0,newSelectedGroupData.length);
 
-        animatedListAppendContentCallback(
-          result,
-          isAppend == true ? selectedGroupData!.length : 0,
-          receiveLength,
-          fallbackAction: invokeToaster,
-          animatedListController: animatedGroupListController
-        );
+      animatedListAppendContentCallback(
+        result,
+        isAppend == true ? selectedGroupData!.length : 0,
+        receiveLength,
+        fallbackAction: invokeToaster,
+        animatedListController: animatedGroupListController
+      );
 
-        groupsModel.notifyListeners();
+      groupsModel.notifyListeners();
 
 
-      });
+    });
     
   }
 

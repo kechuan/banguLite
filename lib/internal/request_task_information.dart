@@ -1,11 +1,15 @@
-import 'dart:io';
+import 'dart:async';
 
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 
 class RequestByteInformation{
+
+  String? contentLink;
   
   int? rangeStart;
   int? rangeEnd;
@@ -14,7 +18,6 @@ class RequestByteInformation{
   String? fileName = "pictureName";
   String? contentType;
 
-  
   String? statusMessage;
 
   void printInformation() => debugPrint("contentLength:$contentLength fileName:$fileName contentType:$contentType");
@@ -26,57 +29,64 @@ int contentRangeByteParse(String bytesRangeValue){
   return int.parse(bytesRangeValue.split(" ")[1].split("/")[1]);
 }
 
-String avaliableImageUriFactory (Uri imageUrl){
-  String resultImageUrl = imageUrl.toString();
-
-  if(allowedImageForwardLinks.contains(imageUrl.host)){
-    resultImageUrl = "${APPInformationRepository.banguLiteImageForwardUri}${imageUrl.host}${imageUrl.path}";
-  }
-  
-  return resultImageUrl;
-}
 
 Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
   RequestByteInformation pictureRequestInformation = RequestByteInformation();
 
-  String resultImageUrl = avaliableImageUriFactory(Uri.parse(imageUrl));
+  //二段流程
+  Completer<RequestByteInformation> byteInformationCompleter = Completer();
 
   await HttpApiClient.client.head(
-    resultImageUrl,
+    imageUrl,
     options: Options(
       headers: HttpApiClient.broswerHeader,
-    )).timeout(const Duration(seconds: 5)).then((response){
+    ))
+    //短时请求
+    .timeout(const Duration(seconds: 3))
+    .then((response){
 
       if(response.data!=null){
-          pictureRequestInformation
-            ..fileName = response.headers.value("name")
-            ..contentType = response.headers.value(HttpHeaders.contentTypeHeader)
-            ..contentLength = 
-              resultImageUrl == imageUrl ? 
-              contentRangeByteParse(response.headers.value(HttpHeaders.contentRangeHeader) ?? "0") : 
-              int.parse(response.headers.value(HttpHeaders.contentLengthHeader) ?? "0")
-            ..statusMessage = response.statusMessage
-          ;
-
+		byteInformationCompleter.complete(extractPictureRequest(response,imageUrl));
       }
 
-    }
-    ).catchError((error){
-      switch (error.type) {
-        case DioExceptionType.badResponse: {
-          debugPrint('$imageUrl 图片不存在或拒绝访问'); 
-          pictureRequestInformation.statusMessage = "图片不存在或拒绝访问";
-          break;
-        }
-        case DioExceptionType.connectionTimeout:
-        case DioExceptionType.sendTimeout:
-        case DioExceptionType.receiveTimeout: {
-          debugPrint('$imageUrl 超时');
-          pictureRequestInformation.statusMessage = "请求超时";
-          break;
-        }
-      }
+    }).catchError((error) async {
+		await HttpApiClient.client.head(
+			convertProxyImageUri(imageUrl),
+			options: Options(
+				headers: HttpApiClient.broswerHeader,
+			))
+			//最终请求
+			.timeout(const Duration(seconds: 10))
+			.then((response){
+				byteInformationCompleter.complete(extractPictureRequest(response,convertProxyImageUri(imageUrl)));
+			})
+			.catchError((error){
+
+				switch (error.type) {
+					case DioExceptionType.badResponse: {
+						debugPrint('${convertProxyImageUri(imageUrl)} 图片不存在或拒绝访问'); 
+						pictureRequestInformation.statusMessage = "图片不存在或拒绝访问";
+						break;
+					}
+					case DioExceptionType.connectionTimeout:
+					case DioExceptionType.sendTimeout:
+					case DioExceptionType.receiveTimeout: {
+						debugPrint('${convertProxyImageUri(imageUrl)} 超时');
+						pictureRequestInformation.statusMessage = "请求超时";
+						break;
+					}
+				}
+
+			
+			byteInformationCompleter.complete(pictureRequestInformation);
+
+
+        });
     });
 
-  return pictureRequestInformation;
+
+
+
+
+  return byteInformationCompleter.future;
 }

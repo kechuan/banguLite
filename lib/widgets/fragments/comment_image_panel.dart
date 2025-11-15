@@ -136,8 +136,7 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                     
 
                     return CachedNetworkImage(
-                      imageUrl: avaliableImageUriFactory(Uri.parse(widget.imageUrl)),
-                      //imageUrl: widget.imageUrl,
+                      imageUrl: convertProxyImageUri(widget.imageUrl),
                       httpHeaders: HttpApiClient.broswerHeader,
                       
                       progressIndicatorBuilder: (context, url, progress){ 
