@@ -2,9 +2,11 @@ import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comment_tile.dart';
 import 'package:bangu_lite/widgets/fragments/ep_replied_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class EpCommentView extends StatelessWidget {
   const EpCommentView({
@@ -14,6 +16,7 @@ class EpCommentView extends StatelessWidget {
     this.postCommentType,
     this.onUpdateComment,
     this.authorID, 
+    this.themeColor
     
   });
 
@@ -24,9 +27,13 @@ class EpCommentView extends StatelessWidget {
   final Function(String?)? onUpdateComment;
 
   final int? authorID;
+
+  final Color? themeColor;
   
   @override
   Widget build(BuildContext context) {
+
+    final bangumiModelThemeColor = context.read<EpModel>().bangumiThemeColor;
 
     BangumiCommentAuthorType? authorType;
 
@@ -43,12 +50,12 @@ class EpCommentView extends StatelessWidget {
     }
 
     return ListTile(
-      contentPadding: const EdgeInsets.all(0),
+      contentPadding: EdgeInsets.zero,
       title: EpCommentTile(
         contentID: contentID,
         epCommentData: epCommentData,
         postCommentType:postCommentType,
-        themeColor: Theme.of(context).scaffoldBackgroundColor,
+        themeColor: bangumiModelThemeColor,
         onUpdateComment: onUpdateComment,
         authorType: authorType,
       ),
@@ -56,7 +63,7 @@ class EpCommentView extends StatelessWidget {
         contentID: contentID,
         epCommentData: epCommentData,
         postCommentType:postCommentType,
-        themeColor: Theme.of(context).scaffoldBackgroundColor,
+        themeColor: bangumiModelThemeColor,
         onUpdateComment: onUpdateComment,
         authorType: authorType,
         

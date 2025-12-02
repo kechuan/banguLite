@@ -2,11 +2,13 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/dialogs/comment_replied_sheet.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
@@ -86,12 +88,12 @@ class EpRepliedTile extends ListTile {
                             postCommentType: postCommentType,
                             epCommentData: epCommentData,
                             commentIndex: index,
+                            themeColor: themeColor,
                             child: Row(
                               spacing: 12,
-                              crossAxisAlignment: CrossAxisAlignment.baseline,
-							                 textBaseline: TextBaseline.alphabetic,
-							  
+                              crossAxisAlignment: quoteContent.isNotEmpty ? CrossAxisAlignment.start : CrossAxisAlignment.center,
                               children: [
+
                                 ScalableText(
                                   "${repliedComment.userInformation?.nickName}:",
                                   style:TextStyle(fontWeight: FontWeight.w500)
@@ -104,7 +106,7 @@ class EpRepliedTile extends ListTile {
                                     text: TextSpan(
                                       style: TextStyle(
                                         fontFamilyFallback: convertSystemFontFamily(),
-                                        fontSize: AppFontSize.s16,
+                                        fontSize: AppFontSize.s14,
                                       ),
                                       children: [
                                                               
@@ -127,23 +129,27 @@ class EpRepliedTile extends ListTile {
                                               )
                                             )
                                           ),
-                                        ],
-                                                              
-                                        //WidgetSpan(
-                                        //  child: AdapterBBCodeText(
-                                        //    data: mainContent,
-                                        //    stylesheet: appDefaultStyleSheet(context,richless: true,selectableText: true),
-                                        //    maxLine: 3,
-                                        //  ),
-                                        //),
-                                                              
-                                        TextSpan( 
-                                          text: mainContent,
-                                          style: TextStyle(
-                                            color: judgeDarknessMode(context) ? Colors.white : Colors.black,
+                                  
+                                          TextSpan(
+                                            text: "\n",
                                           ),
-                                  											
-                                        ),
+                                  
+                                        ],
+                                  
+                                        WidgetSpan(
+                                          alignment: PlaceholderAlignment.middle,
+                                          child: AdapterBBCodeText(
+                                            data: convertBangumiCommentSticker(mainContent),
+                                            stylesheet: appDefaultStyleSheet(context,richless: true),
+                                          )
+                                        )
+                                  
+                                        //TextSpan( 
+                                        //  text: mainContent,
+                                        //  style: TextStyle(
+                                        //    color: judgeDarknessMode(context) ? Colors.white : Colors.black,
+                                        //  ),					
+                                        //),
                                         
                                         
                                       ],

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:dio/dio.dart';

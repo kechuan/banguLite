@@ -261,7 +261,7 @@ class BangumiTimelineTile extends StatelessWidget{
 
                                         if(isRecordMode != true)
                                         ScalableText(
-                                            covertPastDifferentTime(surfTimelineDetails.updatedAt),
+                                            covertPastedTime(surfTimelineDetails.updatedAt),
                                             style: const TextStyle(fontSize: 12, color: Colors.grey)
                                         ),
 

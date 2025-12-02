@@ -22,6 +22,8 @@ class BangumiRankBox extends StatefulWidget {
 
 class _BangumiRankBoxState extends State<BangumiRankBox> {
 
+  final scoreUpdateNotifier = ValueNotifier(false);
+
   @override
   void initState() {
     Future.delayed(const Duration(milliseconds: 300),(){
@@ -30,14 +32,8 @@ class _BangumiRankBoxState extends State<BangumiRankBox> {
     super.initState();
   }
 
-  final scoreUpdateNotifier = ValueNotifier(false);
-
-
   @override
   Widget build(BuildContext context) {
-
-    
-
     return Container(
       height: 150,
       width: widget.constraint.maxWidth,

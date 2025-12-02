@@ -60,7 +60,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
 
   final ScrollController scrollViewController = ScrollController();
 
-  final GlobalKey sliverListKey = GlobalKey();
+  //final GlobalKey sliverListKey = GlobalKey();
   final GlobalKey epInfoKey = GlobalKey();
 
   final List<double> itemOffsets = [];
@@ -260,7 +260,10 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
                         
                       },
               
-                      child: EpCommentPageDetails(sliverListKey: sliverListKey)
+                      child: EpCommentPageDetails(
+                        //sliverListKey: sliverListKey,
+                        bangumiThemeColor: widget.bangumiThemeColor,
+                      )
                 
                     )
               
@@ -340,11 +343,13 @@ class EpInfo extends StatelessWidget {
 class EpCommentPageDetails extends StatefulWidget {
 	const EpCommentPageDetails({
 		super.key,
-    this.sliverListKey,
+    //this.sliverListKey,
+    this.bangumiThemeColor
     
 	});
 
-  final GlobalKey? sliverListKey;
+  //final GlobalKey? sliverListKey;
+  final Color? bangumiThemeColor;
 
   @override
   State<EpCommentPageDetails> createState() => _EpCommentPageDetailsState();
@@ -359,11 +364,17 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
 
   Future? epCommentFuture;
 
+  @override
+  void initState() {
+    final epModel = context.read<EpModel>();
+
+    epModel.bangumiThemeColor = widget.bangumiThemeColor;
+
+    super.initState();
+  }
+
 	@override
 	Widget build(BuildContext context) {
-
-    
-
 		return Selector<EpModel,List?>(
 			selector: (_, epModel) => epModel.epCommentData[epModel.selectedEp],
 			shouldRebuild: (previous, next)=> previous!=next,
@@ -417,7 +428,6 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                     }
 
                     return SliverList.separated(
-                      key: widget.sliverListKey,
                       itemCount: isCommentLoading ? 3 : resultFilterCommentList.length+1,
                       itemBuilder: (_,epCommentIndex){
                         //Loading...
@@ -456,10 +466,12 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                         return EpCommentView(
                           contentID: epModel.injectEpID != 0 ? epModel.injectEpID : (epModel.epsData[epModel.selectedEp]?.epID ?? 0) ,
                           postCommentType: PostCommentType.replyEpComment,
-                          epCommentData: resultFilterCommentList[epCommentIndex-1]
+                          epCommentData: resultFilterCommentList[epCommentIndex-1],
                         );
                       },
-                      separatorBuilder: (_,__) => const Divider(height: 1), 
+                      separatorBuilder: (_,__) => Divider(
+                        color: widget.bangumiThemeColor
+                      ), 
                     );
 
                   }

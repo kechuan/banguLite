@@ -1,3 +1,4 @@
+//import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
@@ -8,10 +9,12 @@ class AdapterBBCodeText extends BBCodeText{
     super.key,
     super.stylesheet,
     super.errorBuilder,
-    this.maxLine
+    this.maxLine,
+    //this.contentIndex,
   });
 
   final int? maxLine;
+  //final String? contentIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +51,8 @@ class AdapterBBCodeText extends BBCodeText{
 
       return errorBuilder!(context, error!, stackTrace);
     }
+
+    //debugPrint("Floor $contentIndex raw Length: ${data.length}, Parsed Length: ${extractBBCodeSelectableContent(spans).length}}");
 
     // Improve accessibility, scale text with textScaleFactor.
     var textScaler = MediaQuery.of(context).textScaler;

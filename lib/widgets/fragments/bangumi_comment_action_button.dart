@@ -2,9 +2,11 @@ import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -15,6 +17,8 @@ import 'package:bangu_lite/widgets/dialogs/report_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:provider/provider.dart';
 
 class BangumiCommentActionButton extends StatefulWidget {
@@ -96,12 +100,19 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
         return CompositedTransformTarget(
             link: stickerLayerLink,
             child: PopupMenuButton<CommentActionType>(
+                constraints:BoxConstraints(
+                  maxHeight: 3*kToolbarHeight
+                ),
+                iconSize: 22,
+                style: ButtonStyle(
+                  alignment: Alignment.bottomCenter,
+                ),
                 onSelected: (commentAction) {
-
+            
                     debugPrint("contentID: ${widget.contentID}, reply:${widget.commentData.commentID}, action:${widget.postCommentType}");
-
+            
                     debugPrint("${currentRoute.runtimeType}");
-
+            
                     invokeCommentToggle(String message) => accountModel.toggleComment(
                         /// widget.commentData.contentID 并不可靠 因为部分获取的字段并不包含它
                         contentID: widget.contentID,
@@ -110,32 +121,48 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                         postCommentType: widget.postCommentType,
                         actionType: commentAction == CommentActionType.edit ? UserContentActionType.edit : UserContentActionType.post,
                         fallbackAction: (errorMessage) {
-
+            
                             debugPrint("[ToggleContent] ${widget.contentID} SendContent: $errorMessage");
-
+            
                             if (currentRoute is ModalBottomSheetRoute) {
-
+            
                                 invokeToaster(message: errorMessage);
                             }
-
+            
                             else {
                                 invokeRequestSnackBar(
                                     message: errorMessage,
                                     requestStatus: false,
                                 );
                             }
-
+            
                             indexModel.draftContent.addAll({
                                 widget.contentID : ("",message)
                             });
-
+            
                         }
                     ); 
-
+            
                     switch (commentAction){
-
+            
+                        case CommentActionType.copy:{
+            
+                            Clipboard.setData(
+                              ClipboardData(
+                                text:extractBBCodeSelectableContent(
+                                  parseBBCode(
+                                    widget.commentData.comment ?? "",
+                                    stylesheet: appDefaultStyleSheet(context)
+                                  )
+                                )
+                              )
+                            );
+            
+                        }
+            
+            
                         case CommentActionType.reply:{
-
+            
                             Navigator.pushNamed(
                                 context,
                                 Routes.sendComment,
@@ -148,45 +175,45 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                                     'preservationContent': indexModel.draftContent[widget.commentData.commentID]
                                 }
                             ).then((content) async {
-
+            
                                         /// 此处回复的内容应只有 content 也就是 String
-
+            
                                         if (content is String) {
-
+            
                                             invokeRequestSnackBar();
-
+            
                                             //网络层 Callback
                                             await invokeCommentToggle(content).then((resultID) {
-
+            
                                                     if (resultID != 0) {
                                                         debugPrint("[PostContent] sendMessageresultID:$resultID SendContent: $content");
                                                         //UI层 Callback
-
+            
                                                         widget.onReplyComment?.call(widget.commentData.commentID!, content);
-
+            
                                                         if (currentRoute is ModalBottomSheetRoute) {
                                                             invokeToaster(message: "回复成功");
                                                         }
-
+            
                                                         else {
                                                             invokeRequestSnackBar(requestStatus: true);
                                                         }
-
+            
                                                     }
-
+            
                                                 });
-
+            
                                         }
                                     });
-
+            
                         }
-
+            
                         case CommentActionType.sticker:{
                             stickerSelectOverlay.showStickerSelectOverlay(
                                 widget.commentData.commentID
                             );
                         }
-
+            
                         case CommentActionType.report:{                            
                             showReportDialog(
                               context,
@@ -194,25 +221,25 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                               postCommentType: widget.postCommentType!
                             );
                         }
-
+            
                         case CommentActionType.edit:{
-
+            
                             //invokeToaster({String? message})=> fadeToaster(context: context, message: message ?? "修改成功");
-
+            
                             final throwFlag = widget.commentData.takeCondition((it) {
                                     if (it is EpCommentDetails) {
                                         if (it.repliedComment?.isNotEmpty == true) {
                                             invokeToaster(message: "一般用户无法更改携带回复的评论");
-
+            
                                             return true;
                                         }
                                     }
-
+            
                                     return false;
                                 });
-
+            
                             if (throwFlag == true) return;
-
+            
                             Navigator.pushNamed(
                                 context,
                                 Routes.sendComment,
@@ -224,46 +251,46 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                                 }
                             ).then((content) async{
                                         if (content is String) {
-
+            
                                             if (currentRoute is ModalBottomSheetRoute) {
                                                 invokeToaster(message: "请求中",);
                                             }
-
+            
                                             else {
                                                 invokeRequestSnackBar();
                                             }
-
+            
                                             //invokeRequestSnackBar();
-
+            
                                             //widget.onUpdateComment?.call(content);
-
+            
                                             //网络层 Callback
                                             await invokeCommentToggle(content).then((resultID) {
                                                     debugPrint("[EditContent] sendMessageresultID:$resultID SendContent: $content");
-
+            
                                                     if (resultID != 0) {
                                                         //UI层 Callback
                                                         widget.onUpdateComment?.call(content);
-
+            
                                                         if (currentRoute is ModalBottomSheetRoute) {
                                                             invokeToaster(message: "发送成功");
                                                         }
-
+            
                                                         else {
                                                             invokeRequestSnackBar(requestStatus: true);
                                                         }
-
+            
                                                     }
-
+            
                                                 });
-
+            
                                         }
                                     });
-
+            
                         }
-
+            
                         case CommentActionType.delete:{
-
+            
                             showTransitionAlertDialog(
                                 context,
                                 title: "删除内容确认",
@@ -272,21 +299,22 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                                     widget.onUpdateComment?.call(null);
                                 },
                             );
-
+            
                         }
-
+            
                     }
-
+            
                 },
                 itemBuilder: (_) {
                     return List.generate(
-                        CommentActionType.values.length, (index) {
-
+                        accountModel.isLogined() ? CommentActionType.values.length : 1,
+                        //CommentActionType.values.length,
+                        (index) {
+            
                             CommentActionType currentCommentActionType = CommentActionType.values[index];
-
-                            bool isActionAvaliable = 
-                                widget.commentBlockStatus == true ? false : true;
-
+            
+                            bool isActionAvaliable = !(widget.commentBlockStatus ?? false);
+            
                             if (
                                 isActionAvaliable && 
                                 accountModel.isLogined() &&
@@ -294,26 +322,25 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                             ) {
                               isActionAvaliable = judgeActionAvaliable(currentCommentActionType);
                             }
-
+            
                             else {
-                                isActionAvaliable = false;
+                              isActionAvaliable = currentCommentActionType == CommentActionType.copy ? true : false;
                             }
-
+            
                             return PopupMenuItem(
-
                                 height: 50,
                                 enabled: isActionAvaliable,
                                 value: CommentActionType.values[index],
                                 child: Builder(
                                     builder: (_) {
-
+            
                                         if (CommentActionType.values[index] == CommentActionType.sticker) {
                                             return Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
-
+            
                                                     ScalableText(CommentActionType.values[index].actionTypeString),
-
+            
                                                     Transform.rotate(
                                                         angle: 90 * pi / 180,
                                                         child: const Icon(Icons.arrow_drop_up)
@@ -321,9 +348,9 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                                                 ]
                                             );
                                         }
-
+            
                                         return ScalableText(CommentActionType.values[index].actionTypeString);
-
+            
                                     }
                                 ),
                             );
@@ -413,7 +440,11 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                 }
 
             }
+
+            default:{}
         }
+
+          
 
         return isActionAvaliable;
     }

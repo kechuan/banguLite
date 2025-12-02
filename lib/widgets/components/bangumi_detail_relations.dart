@@ -3,6 +3,7 @@ import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/models/providers/relation_model.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -45,54 +46,58 @@ class BangumiDetailRelations extends StatelessWidget {
       
                       return NotificationListener<ScrollNotification>(
                         onNotification: (_) => true,
-                        child: ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemExtent: 200,
-                          itemCount: relationModel.contentListData.length,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (_,index){
-                              
-                            return Padding(
-                              padding: PaddingH6,
-                              child: Tooltip(
-                                message: "${relationModel.contentListData[index].description}",
-                                child: ListTile(
-                                  //注意 CachedImageLoader 需要明确的约束 而ListTile的约束不明确
-                                  onTap: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      Routes.subjectDetail,
-                                      arguments: {"subjectID":relationModel.contentListData[index].subjectDetail?.id},
-                                    );
-                                  },
-                                  title: SizedBox(
-                                    height: 180,
-                                    child: CachedImageLoader(
-                                      imageUrl: relationModel.contentListData[index].subjectDetail?.coverUrl,
+                        //避免被外界的全局 EasyRefresh 配置影响
+                        child: EasyRefresh(
+                          child: ListView.builder(
+                            //physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemExtent: 200,
+                            itemCount: relationModel.contentListData.length,
+                            scrollDirection: Axis.horizontal,
+                            
+                            itemBuilder: (_,index){
+                                
+                              return Padding(
+                                padding: PaddingH6,
+                                child: Tooltip(
+                                  message: "${relationModel.contentListData[index].description}",
+                                  child: ListTile(
+                                    //注意 CachedImageLoader 需要明确的约束 而ListTile的约束不明确
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        Routes.subjectDetail,
+                                        arguments: {"subjectID":relationModel.contentListData[index].subjectDetail?.id},
+                                      );
+                                    },
+                                    title: SizedBox(
+                                      height: 180,
+                                      child: CachedImageLoader(
+                                        imageUrl: relationModel.contentListData[index].subjectDetail?.coverUrl,
+                                      ),
                                     ),
-                                  ),
-                                  subtitle: Padding(
-                                    padding: PaddingV12,
-                                    child: Column(
-                                      spacing: 6,
-                                      children: [
-                                        SizedBox(
-                                          height: constraint.maxHeight - 200,
-                                          child: ScalableText(
-                                            "${relationModel.contentListData[index].subjectDetail?.name}",
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
+                                    subtitle: Padding(
+                                      padding: PaddingV12,
+                                      child: Column(
+                                        spacing: 6,
+                                        children: [
+                                          SizedBox(
+                                            height: constraint.maxHeight - 200,
+                                            child: ScalableText(
+                                              "${relationModel.contentListData[index].subjectDetail?.name}",
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
-                                        ),
-                                        ScalableText("${relationModel.contentListData[index].name}",style: const TextStyle(color: Colors.grey),),
-                                      ],
+                                          ScalableText("${relationModel.contentListData[index].name}",style: const TextStyle(color: Colors.grey),),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          }
+                              );
+                            }
+                          ),
                         ),
                       );
                     

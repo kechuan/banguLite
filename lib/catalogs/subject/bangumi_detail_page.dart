@@ -75,18 +75,23 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
     		  selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
     		  shouldRebuild: (previous, next) => previous!=next,
     		  
-    		  builder: (_,linearColor,detailScaffold) {          
+    		  builder: (innerProviderContext,linearColor,detailScaffold) {          
     
-    			debugPrint("linear color:$linearColor");
-    			return Theme(
-    			  data: ThemeData(
-    				brightness: Theme.of(context).brightness,
-    				primaryColor: judgeDetailRenderColor(context,linearColor),
-    				scaffoldBackgroundColor: judgeDetailRenderColor(context,linearColor),
-    				fontFamilyFallback: convertSystemFontFamily(),
-    			  ),
-    			  child:detailScaffold!,
-    			);
+              debugPrint("linear color:$linearColor");
+
+              //EPModel 同步跟随
+              final epModel = innerProviderContext.read<EpModel>();
+              epModel.bangumiThemeColor = linearColor;
+              
+              return Theme(
+                data: ThemeData(
+                  brightness: Theme.of(context).brightness,
+                  primaryColor: judgeDetailRenderColor(context,linearColor),
+                  scaffoldBackgroundColor: judgeDetailRenderColor(context,linearColor),
+                  fontFamilyFallback: convertSystemFontFamily(),
+                ),
+                child:detailScaffold!,
+              );
     		  },
     		  child: Builder(
             builder: (context) {

@@ -320,16 +320,16 @@ String convertRankBoxStandardDiffusion(int totalVotes, List<dynamic> scoreList,n
   return sqrt(standardDiffusion / totalVotes).toStringAsFixed(3);
 }
 
-String covertPastDifferentTime(int? timeStamp){
+String covertPastedTime(int? timeStamp){
 
-  
   String resultText = "";
 
   if(timeStamp == null) return resultText;
 
   final currentTime = DateTime.now();
+  final recordTime = DateTime.fromMillisecondsSinceEpoch(timeStamp*1000);
 
-  final int = currentTime.difference(DateTime.fromMillisecondsSinceEpoch(timeStamp*1000)).inMinutes;
+  final int = currentTime.difference(recordTime).inMinutes;
 
   if(int < 60){
     resultText = "$int分钟前";
@@ -338,22 +338,24 @@ String covertPastDifferentTime(int? timeStamp){
   else if(int < 60 * 24){
     resultText = "${int~/60}小时前";
   }
+
+  else if(int < 60 * 24 * 2){
+    resultText = "昨天 ${convertDigitNumString(recordTime.hour)}:${convertDigitNumString(recordTime.minute)}";
+  }
   
   else if(int < 60 * 24 * 7){
     resultText = "${int~/(60 * 24)}天前";
   }
   
-  else if(int < 60 * 24 * 30){
-    resultText = "${int~/(60 * 24 * 7)}周前";
-  }
-
   else if(int < 60 * 24 * 30 * 12){
-    resultText = "${int~/(60 * 24 * 30)}月前";
+    resultText = "${convertDigitNumString(recordTime.month)}-${convertDigitNumString(recordTime.day)}";
+  } 
+
+  else{
+    resultText = "${recordTime.year%100}-${convertDigitNumString(recordTime.hour)}-${convertDigitNumString(recordTime.minute)}";
   }
 
-  else if(int < 60 * 24 * 30 * 12 * 10){
-    resultText = "${int~/(60 * 24 * 30 * 12)}年前";
-  }
+ 
 
 
   return resultText;
@@ -372,5 +374,3 @@ String convertProxyImageUri(String imageLink){
   Uri imageUri = Uri.parse(imageLink);
   return "${APPInformationRepository.banguLiteImageForwardUri}${imageUri.host}${imageUri.path}";
 }
-
-

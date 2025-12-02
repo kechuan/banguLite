@@ -122,7 +122,9 @@ class _CommentReactionState extends State<CommentReaction> {
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: judgeDarknessMode(context) ? Colors.white : Colors.grey.withValues(alpha: 0.8),
+                    //color: judgeDarknessMode(context) ? Colors.white : Colors.grey.withValues(alpha: 0.8),
+                    color: widget.themeColor ?? Colors.grey.withValues(alpha: 0.8),
+                    width: 1.5
                   ),
                   borderRadius: BorderRadius.circular(20)
                 ),

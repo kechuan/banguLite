@@ -40,6 +40,8 @@ enum PostCommentType{
 }
 
 enum CommentActionType{
+  //任意
+  copy("复制"),
   //登录可操作
   reply("回复"),
   sticker("贴条"),

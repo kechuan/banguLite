@@ -28,7 +28,6 @@ BBStylesheet appDefaultStyleSheet(
         defaultText: TextStyle(
           overflow: TextOverflow.ellipsis,
           fontSize: AppFontSize.s16,
-          //fontSize: 16,
           fontFamilyFallback: convertSystemFontFamily(),
           color: judgeDarknessMode(context) ? Colors.white : Colors.black,
         )

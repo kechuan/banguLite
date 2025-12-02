@@ -45,9 +45,6 @@ class IntroPortrait extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    
-
     return Column(
       spacing: 12,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +86,6 @@ class IntroPortrait extends StatelessWidget {
                           child: ListTile(
                             onTap: () {
                               Clipboard.setData(ClipboardData(text: '${bangumiDetails.name}'));
-                              //showToast("标题已复制,长按复制alias",context:context);
                               fadeToaster(context: context,message: "标题已复制,长按复制别称");
                             },
                             onLongPress: () {
@@ -146,7 +142,7 @@ class IntroPortrait extends StatelessWidget {
             showModalBottomSheet(
               backgroundColor: judgeDetailRenderColor(context,context.read<BangumiModel>().bangumiThemeColor).withValues(alpha: 0.8),
               constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
-              context: context,
+              context: context, //拥有model的有效context
               
               builder: (_){
                 //因为showDialog/showModalBottomSheet 使用的context是独立在整个体系之外的

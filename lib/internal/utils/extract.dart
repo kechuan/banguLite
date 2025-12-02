@@ -5,7 +5,7 @@ import 'package:bangu_lite/internal/bangumi_define/timeline_const.dart';
 import 'package:bangu_lite/internal/request_task_information.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 String extractNameCNData(Map datafield){
@@ -179,4 +179,27 @@ RequestByteInformation extractPictureRequest(Response response,String imageUrl){
     ..contentLength = int.parse(response.headers.value(HttpHeaders.contentLengthHeader) ?? "0")
     ..statusMessage = response.statusMessage
   ;
+}
+
+String extractBBCodeSelectableContent(List<InlineSpan> spans) {
+  StringBuffer content = StringBuffer();
+
+  for (InlineSpan span in spans) {
+    if (span is TextSpan) {
+      
+      if (span.text != null) {
+        content.write(span.text);
+      }
+      
+      //递归计算子节点长度
+      if (span.children != null) {
+        for (final child in span.children!) {
+          content.write(extractBBCodeSelectableContent([child]));
+        }
+      }
+      
+    } 
+}
+  
+  return content.toString();
 }

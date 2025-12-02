@@ -20,7 +20,7 @@ class EpModel extends ChangeNotifier{
   EpModel({
     this.subjectID = 0,
     this.selectedEp = 0,
-    this.injectEpID = 0
+    this.injectEpID = 0,
   }){
     /// 一般来说 单EP模式的特征就是 [selectedEp],[subjectID] 皆为0(遇到EP.0的表示就算了)
     if(subjectID != 0) getEpsInformation();
@@ -35,7 +35,9 @@ class EpModel extends ChangeNotifier{
   int injectEpID;
   
   final Map<num,EpsInfo> epsData = {};
-  final Map<num,List<EpCommentDetails>> epCommentData = {}; 
+  final Map<num,List<EpCommentDetails>> epCommentData = {};
+
+  Color? bangumiThemeColor;
 
   void updateSelectedEp(num newEp){
     if(newEp == selectedEp) return;

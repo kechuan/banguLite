@@ -66,10 +66,10 @@ class ReportDialog extends StatelessWidget {
                                     shrinkWrap: true,
                                     itemCount: ReportReasonType.values.length,
                                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2,
-                                        mainAxisExtent: 30,
-                                        mainAxisSpacing: 6,
-                                        crossAxisSpacing: 6
+                                      crossAxisCount: 2,
+                                      mainAxisExtent: 45,
+                                      mainAxisSpacing: 3,
+                                      crossAxisSpacing: 3
                                     ),
                                     itemBuilder: (_, index) {
                                         return ValueListenableBuilder(
@@ -79,26 +79,39 @@ class ReportDialog extends StatelessWidget {
                                                   onTap: () {
                                                     reportTypeNotifier.value = ReportReasonType.values[index];
                                                   },
-                                                  child: Row(
-                                                      spacing: 6,
-                                                      children: [
-
-                                                          Radio(
-                                                            value: ReportReasonType.values[index],
-                                                            groupValue: reportType,
-                                                            onChanged: (reportReasonType){
-                                                              reportTypeNotifier.value = reportReasonType!;
-                                                            }
-                                                          ),
-                                                  
-                                                          textChild!
-                                                  
-                                                      ],
+                                                  child: LayoutBuilder(
+                                                    builder: (_,constraint) {
+                                                      return Row(
+                                                          spacing: 6,
+                                                          children: [
+                                                      
+                                                              Radio(
+                                                                value: ReportReasonType.values[index],
+                                                                groupValue: reportType,
+                                                                onChanged: (reportReasonType){
+                                                                  reportTypeNotifier.value = reportReasonType!;
+                                                                }
+                                                              ),
+                                                      
+                                                              ConstrainedBox(
+                                                                constraints: BoxConstraints(
+                                                                  maxWidth: constraint.maxWidth/2,
+                                                                ),
+                                                                child: textChild!
+                                                              )
+                                                      
+                                                          ],
+                                                      );
+                                                    }
                                                   ),
                                                 );
 
                                             },
-                                            child: ScalableText(ReportReasonType.values[index].reasonName, overflow: TextOverflow.ellipsis),
+                                            child: ScalableText(
+                                              ReportReasonType.values[index].reasonName,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis
+                                            ),
                                         );
                                     },
                                 ),

@@ -198,6 +198,7 @@ class AppFontSize {
 
   static double get s16 => 16 * scale.fontScale;
   static double get s14 => 14 * scale.fontScale;
+  static double get s12 => 12 * scale.fontScale;
   static double getScaledSize(double fontSize) => fontSize * scale.fontScale;
 
   static void init(){

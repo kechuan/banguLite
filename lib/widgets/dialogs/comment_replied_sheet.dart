@@ -45,9 +45,10 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
                   contentID: contentID,
                   postCommentType: postCommentType,
                   epCommentData: currentComment,
+                  themeColor: themeColor,
                 ),
 
-                const Divider(height: 1),
+                Divider(height: 2,color: themeColor),
               ],
             );
         }
