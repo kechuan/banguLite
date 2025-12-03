@@ -74,12 +74,18 @@ void appRouteMethodListener(BuildContext context,String link){
             Navigator.pushNamed(
             context, Routes.subjectEp,
             arguments: {
-              //暂定 随后会自动获取totalEp信息
+              /// 单EP模式
+              //'epModel': EpModel(
+              //  injectEpID: resID,
+              //),
+
+              // 正常模式
               'epModel': EpModel(
                 subjectID: subjectID,
                 selectedEp: selectedEp,
                 injectEpID: subjectID == 0 ? resID : 0,
               ),
+              
               "referPostContentID": postReferID,
             }
           );
@@ -105,6 +111,7 @@ void appRouteMethodListener(BuildContext context,String link){
               "topicInfo":TopicInfo(id: resID,contentTitle: appRouteUri.queryParameters['topicTitle'] ?? "topicID: $resID"),
               'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
               "referPostContentID": postReferID,
+              "themeColor":judgeCurrentThemeColor(context),
             }
           );
 
@@ -133,6 +140,7 @@ void appRouteMethodListener(BuildContext context,String link){
               ,
               'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
               "referPostContentID": postReferID,
+              "themeColor":judgeCurrentThemeColor(context),
             }
 
           );
@@ -154,6 +162,7 @@ void appRouteMethodListener(BuildContext context,String link){
             "reviewInfo": ReviewInfo(id: resID),
             'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
             "referPostContentID": postReferID,
+            "themeColor":judgeCurrentThemeColor(context),
           }
         );
         }

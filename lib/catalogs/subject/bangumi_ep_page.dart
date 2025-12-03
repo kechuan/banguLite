@@ -377,7 +377,15 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
 	Widget build(BuildContext context) {
 		return Selector<EpModel,List?>(
 			selector: (_, epModel) => epModel.epCommentData[epModel.selectedEp],
-			shouldRebuild: (previous, next)=> previous!=next,
+			shouldRebuild: (previous, next){
+        if(previous!=next){
+          isInitaled = false;
+          return true;
+        }
+
+        return false;
+        
+      },
 			
 			builder: (_,currentEpCommentData,child){
 
@@ -467,6 +475,7 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                           contentID: epModel.injectEpID != 0 ? epModel.injectEpID : (epModel.epsData[epModel.selectedEp]?.epID ?? 0) ,
                           postCommentType: PostCommentType.replyEpComment,
                           epCommentData: resultFilterCommentList[epCommentIndex-1],
+
                         );
                       },
                       separatorBuilder: (_,__) => Divider(

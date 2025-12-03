@@ -28,6 +28,16 @@ class GroupTopicInfo extends TopicInfo {
         ..groupName = surfTimelineData.sourceID
     );
   }
+
+  factory GroupTopicInfo.fromTopicInfo(TopicInfo topicInfo){
+    return GroupTopicInfo()
+      ..topicTitle = topicInfo.topicTitle
+      ..topicID = topicInfo.topicID
+      ..userInformation = topicInfo.userInformation
+      ..repliesCount = topicInfo.repliesCount
+      ..commentState = topicInfo.commentState
+    ;
+  }
 }
 
 List<GroupTopicInfo> loadGroupTopicInfo(
@@ -41,18 +51,8 @@ List<GroupTopicInfo> loadGroupTopicInfo(
 
       final TopicInfo currentTopicInfo = loadTopicsInfo([bangumiGroupTopicsListData[index]]).first;
 
-      return GroupTopicInfo(
-        //id: currentTopicInfo.topicID
-      )
-
-        ..topicTitle = currentTopicInfo.topicTitle
-        ..topicID = currentTopicInfo.topicID
-        ..userInformation = currentTopicInfo.userInformation
-        ..repliesCount = currentTopicInfo.repliesCount
-
-        /// /p1/groups/{groupName}/topics 数据来源不存在 groupInfo
+      return GroupTopicInfo.fromTopicInfo(currentTopicInfo)
         ..groupInfo = groupInfo ?? loadGroupsInfo([bangumiGroupTopicsListData[index]?["group"]]).first
-
       ;
     }
   );

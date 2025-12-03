@@ -91,7 +91,7 @@ class EpRepliedTile extends ListTile {
                             themeColor: themeColor,
                             child: Row(
                               spacing: 12,
-                              crossAxisAlignment: quoteContent.isNotEmpty ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
 
                                 ScalableText(
@@ -137,10 +137,10 @@ class EpRepliedTile extends ListTile {
                                         ],
                                   
                                         WidgetSpan(
-                                          alignment: PlaceholderAlignment.middle,
                                           child: AdapterBBCodeText(
                                             data: convertBangumiCommentSticker(mainContent),
                                             stylesheet: appDefaultStyleSheet(context,richless: true),
+                                            maxLine: 3,
                                           )
                                         )
                                   

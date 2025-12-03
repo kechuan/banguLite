@@ -62,12 +62,11 @@ abstract class BaseModel
         }
         
       });
-
-
     }
 
     on DioException catch(e){
-      fallbackAction?.call('${e.response?.statusCode} ${e.response?.statusMessage}');
+      fallbackAction?.call('内容加载错误');
+      completer.completeError('${e.response?.statusCode} ${e.response?.statusMessage}');
       return false;
     }
 

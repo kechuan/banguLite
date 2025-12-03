@@ -15,6 +15,8 @@ class EpModel extends ChangeNotifier{
   /// (虽然理论上这两个信息都能透过EP信息中补全 但这样我的设计水平恐怕不足以支撑得起还能让这个model保持精致...)
   /// 因此对于 [单EP模式] 来说 它将仅能访问该页面本身 无法访问相邻页面
   /// 该模式下 [selectedEp] 将被强制设置为 0
+  /// 
+  /// 该情况适用于浏览帖子时遇到一个超链接导向ep的情况 如果是用户动态依旧是遵循 [正常模式] 来运行的
   
   
   EpModel({
@@ -132,8 +134,6 @@ class EpModel extends ChangeNotifier{
 
   Future<bool> getSingleEPInformation() async {
 
-    if(injectEpID == 0) return false;
-
     Completer<bool> singleEPCompleter = Completer();
 
     await HttpApiClient.client.get(BangumiAPIUrls.ep(injectEpID)).then((singleEPResponse){
@@ -206,7 +206,6 @@ class EpModel extends ChangeNotifier{
       )
       .timeout(
         Duration(seconds: 10),
-        //DEBUG Duration(microseconds: isRefresh == true ? 30 : 10),
         onTimeout:() {
           throw DioException(
             requestOptions:RequestOptions(),
@@ -224,6 +223,8 @@ class EpModel extends ChangeNotifier{
             epCommentData[selectedEp] = [
               EpCommentDetails.empty()
             ];
+
+            debugPrint("$subjectID Ep.$selectedEp comment is Empty.");
           }
 
           epCommentCompleter.complete(true);

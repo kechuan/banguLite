@@ -123,7 +123,8 @@ class _EpCommentTileState extends State<EpCommentTile> {
                                                         style: TextStyle(
                                                             color: widget.epCommentData.userInformation?.getName() == AccountModel.loginedUserInformations.userInformation?.getName()
                                                                 ? judgeCurrentThemeColor(context)
-                                                                : Colors.blue,
+                                                                //: Colors.blue,
+                                                                : widget.themeColor,
 
                                                         ),
                                                         maxLines: 2,
@@ -138,11 +139,6 @@ class _EpCommentTileState extends State<EpCommentTile> {
                                                               covertPastedTime(commentStamp.millisecondsSinceEpoch ~/ 1000),
                                                               style: TextStyle(fontSize: AppFontSize.s12)
                                                             ),
-
-                                                            ScalableText(
-                                                              "${convertDigitNumString(commentStamp.hour)}:${convertDigitNumString(commentStamp.minute)}",
-                                                              style: TextStyle(fontSize: AppFontSize.s12)
-                                                            )
 
                                                         ],
                                                     ),

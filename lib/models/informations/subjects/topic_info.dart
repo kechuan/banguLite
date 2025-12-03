@@ -15,6 +15,11 @@ class TopicInfo extends ContentInfo {
   String? get topicTitle => contentTitle;
   set topicTitle(String? value) => contentTitle = value;
 
+  /// 原本它应该直接归类到 [ContentDetails] 中的 
+  /// 但是因为访问政策导致你都无法获取 [TopicDetails] 的内容就被返回404了
+  /// 只能在这里单开一个变量了
+  int? commentState;
+
   //int? get subjectID => sourceID;
   //set subjectID(int? value) => sourceID = value;
 
@@ -31,15 +36,16 @@ List<TopicInfo> loadTopicsInfo(List bangumiTopicsInfoData){
 		TopicInfo currentTopic = TopicInfo();
     	UserInformation currentUserInformation = loadUserInformations(currentTopicMap["creator"] ?? currentTopicMap["user"] );
 
-		currentTopic
-      ..sourceID = currentTopicMap["parentID"]
-      ..topicID = currentTopicMap["id"]
-      ..topicTitle = currentTopicMap["title"]
-      ..createdTime = currentTopicMap["createdAt"]
-      ..repliesCount = currentTopicMap["replyCount"]
-      ..lastRepliedTime = currentTopicMap["updatedAt"]
-      ..userInformation = currentUserInformation
-    ;
+      currentTopic
+        ..sourceID = currentTopicMap["parentID"]
+        ..topicID = currentTopicMap["id"]
+        ..topicTitle = currentTopicMap["title"]
+        ..createdTime = currentTopicMap["createdAt"]
+        ..repliesCount = currentTopicMap["replyCount"]
+        ..commentState = currentTopicMap["state"]
+        ..lastRepliedTime = currentTopicMap["updatedAt"]
+        ..userInformation = currentUserInformation
+      ;
 
     topicsList.add(currentTopic);
 	} 
@@ -47,3 +53,4 @@ List<TopicInfo> loadTopicsInfo(List bangumiTopicsInfoData){
 	 return topicsList;
 
 }
+
