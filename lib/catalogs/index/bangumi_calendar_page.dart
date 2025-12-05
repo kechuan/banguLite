@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/catalogs/about_page.dart';
+import 'package:bangu_lite/catalogs/subject/bangumi_detail_page.dart';
 import 'package:bangu_lite/internal/bus_register_method.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
@@ -10,6 +11,7 @@ import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_tab_content_select.dart';
+import 'package:bangu_lite/widgets/components/transition_container.dart';
 import 'package:bangu_lite/widgets/dialogs/new_update_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
@@ -20,7 +22,6 @@ import 'package:bangu_lite/widgets/dialogs/warp_season_dialog.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 
-import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
@@ -35,7 +36,7 @@ class BangumiCalendarPage extends StatefulWidget {
   State<BangumiCalendarPage> createState() => _BangumiCalendarPageState();
 }
 
-class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
+class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with AutomaticKeepAliveClientMixin{
 
   Future? calendarLoadFuture;
   Timer? carouselTimer;
@@ -138,6 +139,8 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+    
     final indexModel = context.read<IndexModel>();
 
     return EasyRefresh.builder(
@@ -250,95 +253,107 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
                                                 child: ScalableText("暂无热门番剧"),
                                               );
                                             }
-                                                              
-                                            return Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                                                child: UnVisibleResponse( 
 
-                                                  containedInkWell: true,
-                                                  
-                                                  onTap: (){
-                                                                    
-                                                    debugPrint("$currentIndex => ${weeklyBangumisRecommend[currentIndex].name} ");
+                                            return TransitionContainer(
+                                              builder: (_,openAciton){
+                                                return Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                  child: UnVisibleResponse( 
+
+                                                      containedInkWell: true,
                                                       
-                                                    Navigator.pushNamed(
-                                                      context,
-                                                      Routes.subjectDetail,
-                                                      arguments: {"subjectID":weeklyBangumisRecommend[currentIndex].id},
-                                                    );
+                                                      onTap: (){
+                                                                        
+                                                        debugPrint("$currentIndex => ${weeklyBangumisRecommend[currentIndex].name}");
+
+                                                        openAciton();
+                                                          
+                                                        //Navigator.pushNamed(
+                                                        //  context,
+                                                        //  Routes.subjectDetail,
+                                                        //  arguments: {"subjectID":weeklyBangumisRecommend[currentIndex].id},
+                                                        //);
+                                                                
+                                                      },
+                                                      child: DecoratedBox(
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(24),
+                                                          border: Border.all(width: 1)
+                                                        ),
+                                                        child: Stack(
+                                                                        
+                                                          children: [
                                                             
-                                                  },
-                                                  child: DecoratedBox(
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(24),
-                                                      border: Border.all(width: 1)
-                                                    ),
-                                                    child: Stack(
-                                                                    
-                                                      children: [
-                                                        
-                                                        Positioned.fill(
-                                                          child: CachedImageLoader(imageUrl: weeklyBangumisRecommend[currentIndex].coverUrl!)
-                                                        ),
-                                                        
-                                                        Positioned.fill(
-                                                          
-                                                            child: LayoutBuilder(
-                                                              builder: (_,constriant) {
-                                                                return DecoratedBox(
-                                                                  decoration: BoxDecoration(
-                                                                    borderRadius: BorderRadius.circular(16),
-                                                                    gradient: const LinearGradient(
-                                                                      begin:Alignment.bottomCenter,
-                                                                      end:Alignment(0, 0.2),
-                                                                      
-                                                                      colors:[Color.fromARGB(255, 35, 35, 35),Colors.transparent]
-                                                                    ),
-                                                                  ),
-                                                                  child: Row(
-                                                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                    children: [
-                                                                                                                          
-                                                                      SizedBox(
-                                                                        width: constriant.maxWidth,
-                                                                        child: ListTile(
-                                                                          title: ScalableText(
-                                                                            weeklyBangumisRecommend[currentIndex].name ?? "loading",
-                                                                            maxLines: 2,
-                                                                            style: const TextStyle(color: Colors.white),
-                                                                            overflow: TextOverflow.ellipsis,
-                                                                          ),
-                                                                          trailing: Container(
-                                                                            decoration: BoxDecoration(
-                                                                              borderRadius: BorderRadius.circular(12),
-                                                                              color: AppThemeColor.macha.color
-                                                                            ),
-                                                                            child: Padding(
-                                                                              padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 2),
-                                                                              child: ScalableText(
-                                                                                "${weeklyBangumisRecommend[currentIndex].ratingList["score"]?.toDouble() ?? "-.-"}",
-                                                                                style: const TextStyle(fontSize: 14,color: Colors.black)
-                                                                              ),
-                                                                            )
-                                                                          ),
-                                                                        ),
-                                                                      )
-                                                                                                                          
-                                                                    ],
-                                                                  ),
-                                                                );
-                                                              }
+                                                            Positioned.fill(
+                                                              child: CachedImageLoader(imageUrl: weeklyBangumisRecommend[currentIndex].coverUrl!)
                                                             ),
+                                                            
+                                                            Positioned.fill(
+                                                              
+                                                                child: LayoutBuilder(
+                                                                  builder: (_,constriant) {
+                                                                    return DecoratedBox(
+                                                                      decoration: BoxDecoration(
+                                                                        borderRadius: BorderRadius.circular(16),
+                                                                        gradient: const LinearGradient(
+                                                                          begin:Alignment.bottomCenter,
+                                                                          end:Alignment(0, 0.2),
+                                                                          
+                                                                          colors:[Color.fromARGB(255, 35, 35, 35),Colors.transparent]
+                                                                        ),
+                                                                      ),
+                                                                      child: Row(
+                                                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                                                                              
+                                                                          SizedBox(
+                                                                            width: constriant.maxWidth,
+                                                                            child: ListTile(
+                                                                              title: ScalableText(
+                                                                                weeklyBangumisRecommend[currentIndex].name ?? "loading",
+                                                                                maxLines: 2,
+                                                                                style: const TextStyle(color: Colors.white),
+                                                                                overflow: TextOverflow.ellipsis,
+                                                                              ),
+                                                                              trailing: Container(
+                                                                                decoration: BoxDecoration(
+                                                                                  borderRadius: BorderRadius.circular(12),
+                                                                                  color: AppThemeColor.macha.color
+                                                                                ),
+                                                                                child: Padding(
+                                                                                  padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 2),
+                                                                                  child: ScalableText(
+                                                                                    "${weeklyBangumisRecommend[currentIndex].ratingList["score"]?.toDouble() ?? "-.-"}",
+                                                                                    style: const TextStyle(fontSize: 14,color: Colors.black)
+                                                                                  ),
+                                                                                )
+                                                                              ),
+                                                                            ),
+                                                                          )
+                                                                                                                              
+                                                                        ],
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                ),
+                                                              
+                                                            ),
+                                                            
+                                                          ]
                                                           
                                                         ),
-                                                        
-                                                      ]
-                                                      
+                                                      )
                                                     ),
-                                                  )
-                                                ),
-                                              );
+                                                );  
+                                              },
+                                              next: BangumiDetailPage(
+                                                subjectID: weeklyBangumisRecommend[currentIndex].id ?? 0,
+                                                injectBangumiInfoDetail: weeklyBangumisRecommend[currentIndex],
+                                              ),
+                                            );
+                                                              
+                                            
                                           }
                                         ),
                                       ),
@@ -512,6 +527,9 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> {
       
     );
   }
+  
+  @override
+  bool get wantKeepAlive => true;
 }
 
 

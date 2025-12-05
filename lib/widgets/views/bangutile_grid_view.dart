@@ -1,5 +1,6 @@
-import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/catalogs/subject/bangumi_detail_page.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
+import 'package:bangu_lite/widgets/components/transition_container.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
 import 'package:flutter/material.dart';
 
@@ -54,19 +55,22 @@ class BanguTileGridView extends StatelessWidget {
             itemCount: bangumiLists.length,
             itemBuilder: (_,currentBangumiIndex){
 
-              return BangumiGridTile(
-                imageUrl: bangumiLists[currentBangumiIndex].coverUrl,
-                bangumiTitle: bangumiLists[currentBangumiIndex].name,
-                onTap: () {
-                    if(bangumiLists[currentBangumiIndex].name!=null){
-          
-                      Navigator.pushNamed(
-                        context,
-                        Routes.subjectDetail,
-                        arguments: {"subjectID":bangumiLists[currentBangumiIndex].id},
-                      );
-                    }
-                  },
+              return TransitionContainer(
+                builder: (_,openAction){
+                  return BangumiGridTile(
+                  imageUrl: bangumiLists[currentBangumiIndex].coverUrl,
+                  bangumiTitle: bangumiLists[currentBangumiIndex].name,
+                  onTap: () {
+                      if(bangumiLists[currentBangumiIndex].name!=null){
+                        openAction();
+                      }
+                    },
+                );
+                }, 
+                next: BangumiDetailPage(
+                  subjectID: bangumiLists[currentBangumiIndex].id ?? 0,
+                  injectBangumiInfoDetail: bangumiLists[currentBangumiIndex],
+                ),
               );
           }
         )

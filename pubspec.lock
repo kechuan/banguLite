@@ -30,6 +30,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "5.3.0"
+  animations:
+    dependency: "direct main"
+    description:
+      name: animations
+      sha256: "18938cefd7dcc04e1ecac0db78973761a01e4bc2d6bfae0cfa596bfeac9e96ab"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.1.1"
   app_links:
     dependency: "direct main"
     description:
@@ -1305,4 +1313,4 @@ packages:
     version: "2.1.0"
 sdks:
   dart: ">=3.8.0 <4.0.0"
-  flutter: ">=3.31.0-0.0.pre"
+  flutter: ">=3.32.0"

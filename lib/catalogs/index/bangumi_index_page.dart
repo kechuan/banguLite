@@ -11,14 +11,18 @@ import 'package:flutter/services.dart';
 
 @FFRoute(name: '/index')
 
-class BangumiIndexPage extends StatefulWidget {
+class BangumiIndexPage extends StatefulWidget{
   const BangumiIndexPage({super.key});
+
+
 
   @override
   State<BangumiIndexPage> createState() => _BangumiIndexPageState();
 }
 
-class _BangumiIndexPageState extends State<BangumiIndexPage> {
+class _BangumiIndexPageState extends State<BangumiIndexPage>{
+
+  
   final ValueNotifier<int> selectedPageIndexNotifier = ValueNotifier<int>(0);
 
   bool readyQuitFlag = false;
@@ -26,7 +30,7 @@ class _BangumiIndexPageState extends State<BangumiIndexPage> {
 
   @override
   Widget build(BuildContext context) {
-    
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (popStatus, result) async {
@@ -66,5 +70,10 @@ class _BangumiIndexPageState extends State<BangumiIndexPage> {
         }
       ),
     );
+
   }
+
+
+  @override
+  bool get wantKeepAlive => true; //Disactive == !wantKeepAlive
 }

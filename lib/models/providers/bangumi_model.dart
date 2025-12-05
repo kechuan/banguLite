@@ -9,7 +9,8 @@ import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 
 class BangumiModel extends ChangeNotifier {
   BangumiModel({
-    required this.subjectID
+    required this.subjectID,
+    this.bangumiDetails
   });
 
   int subjectID = 0;

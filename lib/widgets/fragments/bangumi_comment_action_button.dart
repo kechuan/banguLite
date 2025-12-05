@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -18,7 +17,6 @@ import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:provider/provider.dart';
 
 class BangumiCommentActionButton extends StatefulWidget {
@@ -149,12 +147,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
             
                             Clipboard.setData(
                               ClipboardData(
-                                text:extractBBCodeSelectableContent(
-                                  parseBBCode(
-                                    widget.commentData.comment ?? "",
-                                    stylesheet: appDefaultStyleSheet(context)
-                                  )
-                                )
+                                text: extractBBCodeSelectableContent(widget.commentData.comment ?? "")
                               )
                             );
             

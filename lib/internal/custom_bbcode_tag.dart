@@ -20,6 +20,7 @@ BBStylesheet appDefaultStyleSheet(
     BuildContext context, {
       bool selectableText = false,
       bool richless = false,
+      double? fontSize
     }
 ) {
     return BBStylesheet(
@@ -27,7 +28,7 @@ BBStylesheet appDefaultStyleSheet(
         selectableText: selectableText,
         defaultText: TextStyle(
           overflow: TextOverflow.ellipsis,
-          fontSize: AppFontSize.s16,
+          fontSize: fontSize ?? AppFontSize.s16,
           fontFamilyFallback: convertSystemFontFamily(),
           color: judgeDarknessMode(context) ? Colors.white : Colors.black,
         )

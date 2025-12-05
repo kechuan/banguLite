@@ -13,7 +13,6 @@ import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
-import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -105,8 +104,8 @@ abstract class BangumiContentPageState<
 
       debugPrint('[GenernalContent] ${contentInfo.runtimeType} ID / subContentID: ${contentInfo.id} / ${getSubContentID()}');
       
-      ///// TODO 加载预先拦截区域 迟早会封装到 BaseModel 中...
-      ///// 然后直接以 ?.call(contentFuture) 的形式调用
+      /// TODO 加载预先拦截区域 迟早会封装到 BaseModel 中...
+      /// 然后直接以 ?.call(contentFuture) 的形式调用
       
       if(contentInfo is TopicInfo){
         if(contentInfo.commentState == CommentState.adminCloseTopic.index){
@@ -127,14 +126,10 @@ abstract class BangumiContentPageState<
         final contentModel = getContentModel();
         final contentInfo = getContentInfo();
 
-        
-
         return ChangeNotifierProvider.value(
             //因为下方的 Selector 需求 使用 带有contentModel 的context环境
             value: contentModel,
             builder: (context, child) {
-
-                
 
                 return EasyRefresh.builder(
                     scrollController: scrollController,
@@ -545,7 +540,7 @@ abstract class BangumiContentPageState<
                     },
                 ),
 
-                const Divider(),
+                Divider(color: getcurrentSubjectThemeColor()),
 
                 //无评论的显示状态
                 if(resultFilterCommentList.isEmpty && userCommentMap.isEmpty)
@@ -576,12 +571,7 @@ abstract class BangumiContentPageState<
                     valueListenable: commentUpdateFlag,
                     builder: (_, __, ___) {
 
-                        //final currentEpCommentDetails = contentDetail!.contentRepliedComment?[contentCommentIndex] ?? EpCommentDetails();
                         final currentEpCommentDetails = resultFilterCommentList[contentCommentIndex];
-
-                        //if (userCommentMap.isNotEmpty && userCommentMap[contentCommentIndex] != null) {
-                        //    currentEpCommentDetails.comment = userCommentMap[contentCommentIndex];
-                        //}
 
                         return EpCommentView(
                             contentID: contentInfo.id ?? 0,
@@ -607,7 +597,7 @@ abstract class BangumiContentPageState<
                 ),
 
                 if(contentCommentIndex < max(0, resultFilterCommentList.length) + userCommentMap.length - 1)
-                const Divider()
+                Divider(color: getcurrentSubjectThemeColor())
             ],
         );
 
@@ -670,7 +660,7 @@ abstract class BangumiContentPageState<
                     ),
 
                     if(contentCommentIndex != resultFilterCommentList.length + userCommentMap.length - 1)
-                    const Divider(),
+                    Divider(color: getcurrentSubjectThemeColor())
                 ],
             )
 

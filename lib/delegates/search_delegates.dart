@@ -244,19 +244,16 @@ class CustomSearchDelegate extends SearchDelegate<String>{
                           WidgetsBinding.instance.addPostFrameCallback((timestamp){
                             isLoading.value = false;
                           });
-        
+
                           return BangumiListTile(
                             imageSize: const Size(100, 150),
                             bangumiDetails: searchData[index],
-                            
-        
                             onTap: () {
                               Navigator.popAndPushNamed(
                                 context,
                                 Routes.subjectDetail,
                                 arguments: {"subjectID":searchData[index].id}
                               );
-                              
                             },
                             
                           );

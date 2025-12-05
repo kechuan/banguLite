@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bangu_lite/internal/bangumi_define/timeline_const.dart';
 import 'package:bangu_lite/internal/request_task_information.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -181,25 +182,30 @@ RequestByteInformation extractPictureRequest(Response response,String imageUrl){
   ;
 }
 
-String extractBBCodeSelectableContent(List<InlineSpan> spans) {
-  StringBuffer content = StringBuffer();
+//String extractBBCodeSelectableContent(List<InlineSpan> spans) {
+//  StringBuffer content = StringBuffer();
 
-  for (InlineSpan span in spans) {
-    if (span is TextSpan) {
+//  for (InlineSpan span in spans) {
+//    if (span is TextSpan) {
       
-      if (span.text != null) {
-        content.write(span.text);
-      }
+//      if (span.text != null) {
+//        content.write(span.text);
+//      }
       
-      //递归计算子节点长度
-      if (span.children != null) {
-        for (final child in span.children!) {
-          content.write(extractBBCodeSelectableContent([child]));
-        }
-      }
+//      //递归计算子节点长度
+//      if (span.children != null) {
+//        for (final child in span.children!) {
+//          content.write(extractBBCodeSelectableContent([child]));
+//        }
+//      }
       
-    } 
-}
+//    } 
+//}
   
-  return content.toString();
+//  return content.toString();
+//}
+
+String extractBBCodeSelectableContent(String text) {
+  return text.replaceAll(bbcodeRegexp, '');
 }
+

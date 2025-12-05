@@ -28,25 +28,16 @@ class IndexModel extends ChangeNotifier {
 
   //除了 星期一-日之外 还有一个 最热门 的属性存放评分7.0+的番剧
   Map<String, List<BangumiDetails>> calendarBangumis = {
-    "星期一":[],
-    "星期二":[],
-    "星期三":[],
-    "星期四":[],
-    "星期五":[],
-    "星期六":[],
-    "星期日":[],
-    "最热门":[]
+    for(var weekday in WeekDay.values) '星期${weekday.dayText}' : [],
+    "最热门":[],
   }; 
 
   AppConfig userConfig = defaultAPPConfig();
   
-
-//  List<Map<String,num>> starsUpdateRating = [];
   Map<int,Map<String,num>> starsUpdateRating = {};
 
   // 草稿箱 [标题:内容]
   // 当然标题不一定会存在 如果不存在直接置为空就好
-
   
   //理论上这样做的话 会有发布内容会被互相覆盖的问题
   //但我不应该响应这种情况 毕竟是DAU没两位数的项目
@@ -57,7 +48,7 @@ class IndexModel extends ChangeNotifier {
 
   void initModel() async {
     loadConfigData();
-    await updateStarDetail();
+    //await updateStarDetail();
   }
 
   void loadConfigData(){

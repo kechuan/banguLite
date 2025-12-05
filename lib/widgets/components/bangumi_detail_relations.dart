@@ -1,6 +1,7 @@
-import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/catalogs/subject/bangumi_detail_page.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/models/providers/relation_model.dart';
+import 'package:bangu_lite/widgets/components/transition_container.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -61,37 +62,39 @@ class BangumiDetailRelations extends StatelessWidget {
                                 padding: PaddingH6,
                                 child: Tooltip(
                                   message: "${relationModel.contentListData[index].description}",
-                                  child: ListTile(
-                                    //注意 CachedImageLoader 需要明确的约束 而ListTile的约束不明确
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        Routes.subjectDetail,
-                                        arguments: {"subjectID":relationModel.contentListData[index].subjectDetail?.id},
+                                  child: TransitionContainer(
+                                    builder: (_,openAction){
+                                      return ListTile(
+                                        //注意 CachedImageLoader 需要明确的约束 而ListTile的约束不明确
+                                        onTap: openAction,
+                                        title: SizedBox(
+                                          height: 180,
+                                          child: CachedImageLoader(
+                                            imageUrl: relationModel.contentListData[index].subjectDetail?.coverUrl,
+                                          ),
+                                        ),
+                                        subtitle: Padding(
+                                          padding: PaddingV12,
+                                          child: Column(
+                                            spacing: 6,
+                                            children: [
+                                              SizedBox(
+                                                height: constraint.maxHeight - 200,
+                                                child: ScalableText(
+                                                  "${relationModel.contentListData[index].subjectDetail?.name}",
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              ScalableText("${relationModel.contentListData[index].name}",style: const TextStyle(color: Colors.grey),),
+                                            ],
+                                          ),
+                                        ),
                                       );
                                     },
-                                    title: SizedBox(
-                                      height: 180,
-                                      child: CachedImageLoader(
-                                        imageUrl: relationModel.contentListData[index].subjectDetail?.coverUrl,
-                                      ),
-                                    ),
-                                    subtitle: Padding(
-                                      padding: PaddingV12,
-                                      child: Column(
-                                        spacing: 6,
-                                        children: [
-                                          SizedBox(
-                                            height: constraint.maxHeight - 200,
-                                            child: ScalableText(
-                                              "${relationModel.contentListData[index].subjectDetail?.name}",
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          ScalableText("${relationModel.contentListData[index].name}",style: const TextStyle(color: Colors.grey),),
-                                        ],
-                                      ),
+                                    next: BangumiDetailPage(
+                                      subjectID: relationModel.contentListData[index].subjectDetail?.id ?? 0,
+                                      injectBangumiInfoDetail: relationModel.contentListData[index].subjectDetail,
                                     ),
                                   ),
                                 ),

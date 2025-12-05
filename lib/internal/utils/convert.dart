@@ -310,10 +310,28 @@ Future<int> getTotalSizeOfFilesInDir(final FileSystemEntity fileSystemEntity) as
   return 0;
 }
 
+Map convertRankList(dynamic scoreCollection){
+  if(scoreCollection is Map){
+    if(scoreCollection.keys.first == "1"){
+      return scoreCollection;
+    }
+
+    else if(scoreCollection.keys.first == "10"){
+      return Map.fromEntries(
+        scoreCollection.entries.toList().reversed
+      );
+    }
+  }
+
+  return Map.from({
+    for (int index = 0; index < scoreCollection.length; index++) "${index+1}":scoreCollection[index]
+  });
+}
+
 String convertRankBoxStandardDiffusion(int totalVotes, List<dynamic> scoreList,num score){
   double standardDiffusion = 0;
 
-  for (var (index, item) in scoreList.reversed.indexed) {
+  for (var (index, item) in scoreList.indexed) {
     standardDiffusion += (10 - index - score) * (10 - index - (score)) * item;
   }
 

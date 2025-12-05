@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/catalogs/test_page.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
+import 'package:bangu_lite/widgets/components/transition_container.dart';
 import 'package:bangu_lite/widgets/dialogs/inital_image_storage_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -723,37 +725,39 @@ class TestTile extends ListTile{
 
   @override
   Widget build(BuildContext context) {
-    
-    return SizedBox(
-      height: 80,
-      child: Center(
-        child: ListTile(
-          onTap: () async {
-
-            Navigator.pushNamed(context, Routes.test);
-
-            //showSeasonDialog(context);
-            //showStarSubjectDialog(context);
-
-            //downloadSticker(isOldType: false);
-
-            //bus.emit('AppRoute','${BangumiAPIUrls.timelineReply(52089780)}?timelineID=52089780&comment=我难道喜欢看厕纸？');
+    return TransitionContainer(
+      builder: (_, openAction){
+        return SizedBox(
+          height: 80,
+          child: Center(
+            child: ListTile(
+              onTap: (){
+                openAction();
+                //  //Navigator.pushNamed(context, Routes.test);
+        
+                //  //showSeasonDialog(context);
+                //  //showStarSubjectDialog(context);
           
-            //debugPrint("callAndroidFunction");
-
-            //await DocMan.perms.list().then((result){
-            //  debugPrint("list: $result");
-            //});
-
-            //DocMan.perms.releaseAll();
-
-            //await callAndroidFunction();
-
-			
-          },
-          title: ScalableText("测试触发工具",style: TextStyle(fontSize: AppFontSize.s16))
-        ),
-      ),
+                //  //downloadSticker(isOldType: false);
+          
+                //  //bus.emit('AppRoute','${BangumiAPIUrls.timelineReply(52089780)}?timelineID=52089780&comment=我难道喜欢看厕纸？');
+                
+                //  //debugPrint("callAndroidFunction");
+          
+                //  //await DocMan.perms.list().then((result){
+                //  //  debugPrint("list: $result");
+                //  //});
+          
+                //  //DocMan.perms.releaseAll();
+          
+                //  //await callAndroidFunction();
+              },
+              title: ScalableText("测试触发工具",style: TextStyle(fontSize: AppFontSize.s16))
+            ),
+          ),
+        );
+      },
+      next: const TestPage()
     );
 
     }

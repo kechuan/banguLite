@@ -46,7 +46,8 @@ class BangumiAPIUrls {
   static const String newUrl = "https://next.bgm.tv/p1";
   static const String baseResourceUrl = "https://lain.bgm.tv";
 
-  static const String calendar = '$baseUrl/calendar';   
+  //static const String calendar = '$baseUrl/calendar';
+  static const String calendar = '$baseUrl/calendar';
 
   static const String subject = '$baseUrl/v0/subjects';
   static const String eps = '$baseUrl/v0/episodes';

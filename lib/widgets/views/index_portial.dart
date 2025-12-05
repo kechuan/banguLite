@@ -11,7 +11,7 @@ import 'package:bangu_lite/catalogs/index/bangumi_sort_page.dart';
 import 'package:bangu_lite/delegates/search_delegates.dart';
 import 'package:provider/provider.dart';
 
-class IndexPortial extends StatelessWidget {
+class IndexPortial extends StatefulWidget {
   const IndexPortial({
     super.key,
     required this.selectedPageIndexNotifier,
@@ -20,12 +20,28 @@ class IndexPortial extends StatelessWidget {
   final ValueNotifier<int> selectedPageIndexNotifier;
 
   @override
+  State<IndexPortial> createState() => _IndexPortialState();
+}
+
+class _IndexPortialState extends State<IndexPortial> {
+
+  final PageController pageController = PageController();
+
+  @override
+  void initState() {
+    widget.selectedPageIndexNotifier.addListener(() {
+      pageController.animateToPage(widget.selectedPageIndexNotifier.value,duration: const Duration(milliseconds: 300),curve: Curves.easeOut);
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     final indexModel = context.read<IndexModel>();
 
     return ValueListenableBuilder(
-      valueListenable: selectedPageIndexNotifier,
+      valueListenable: widget.selectedPageIndexNotifier,
       builder: (_,currentPageIndex,railLeading) {
 
         return Scaffold(
@@ -85,14 +101,16 @@ class IndexPortial extends StatelessWidget {
                     return;
                   }
                 },
-                child: IndexedStack(
-                  index: currentPageIndex,
+                child:PageView(
+                  
+                  controller: pageController,
+                  physics: const NeverScrollableScrollPhysics(),
                   children: const [
                     BangumiCalendarPage(),
                     BangumiSortPage(),
                     BangumiStarPage()
                   ],
-                ),
+                )
               );
             }
           ),
@@ -122,7 +140,7 @@ class IndexPortial extends StatelessWidget {
               FocusScope.of(context).unfocus();
 
               
-              selectedPageIndexNotifier.value = newIndex;
+              widget.selectedPageIndexNotifier.value = newIndex;
             },
           ),
         );

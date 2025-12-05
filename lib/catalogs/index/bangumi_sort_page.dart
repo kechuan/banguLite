@@ -2,9 +2,12 @@
 
 import 'dart:math';
 
+
+import 'package:bangu_lite/catalogs/subject/bangumi_detail_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/widgets/components/transition_container.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_wave_footer.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -266,18 +269,15 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                         
                                   return FadeTransition(
                                     opacity: animation,
-                                    child: BangumiListTile(
-                                      bangumiDetails: messageList[index],
-                                      imageSize: const Size(100,150),
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                        context,
-                                        Routes.subjectDetail,
-                                        arguments: {"subjectID":messageList[index].id}
+                                    child: TransitionContainer(
+                                      builder:(_,openAction){
+                                        return BangumiListTile(
+                                          bangumiDetails: messageList[index],
+                                          imageSize: const Size(100,150),
+                                          onTap: openAction                      
                                         );
                                       },
-                                                
-                              
+                                      next: BangumiDetailPage(subjectID: messageList[index].id ?? 0),
                                     )
                               
                                   

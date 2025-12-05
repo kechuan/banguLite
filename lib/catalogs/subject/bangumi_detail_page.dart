@@ -40,283 +40,281 @@ import 'package:bangu_lite/widgets/components/bangumi_summary.dart';
 @FFRoute(name: '/subjectDetail')
 
 class BangumiDetailPage extends StatefulWidget {
-  const BangumiDetailPage({
-    super.key,
-    required this.subjectID
-  });
+    const BangumiDetailPage({
+        super.key,
+        required this.subjectID,
+        this.injectBangumiInfoDetail
+    });
 
-  final int subjectID;
+    final int subjectID;
 
-  @override
-  State<BangumiDetailPage> createState() => _BangumiDetailPageState();
+    //预先信息注入 只会在直接在首页等已拥有部分info信息的渠道触发
+    final BangumiDetails? injectBangumiInfoDetail;
+
+    @override
+    State<BangumiDetailPage> createState() => _BangumiDetailPageState();
 }
 
 
 class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> with RouteLifecycleMixin  {
 
-  ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
+    ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
 
-  ValueNotifier<bool> reviewsCollaspeStatusNotifier = ValueNotifier(false);
-  ValueNotifier<bool> topicsCollaspeStatusNotifier = ValueNotifier(false);
+    ValueNotifier<bool> reviewsCollaspeStatusNotifier = ValueNotifier(false);
+    ValueNotifier<bool> topicsCollaspeStatusNotifier = ValueNotifier(false);
 
-  @override
-  Widget build(BuildContext context) {
+    @override
+    Widget build(BuildContext context) {
 
-    return MultiProvider(
-    		providers: [
-    		  ChangeNotifierProvider(create: (_) => BangumiModel(subjectID: widget.subjectID)),
-    		  ChangeNotifierProvider(create: (_) => EpModel(subjectID: widget.subjectID,selectedEp: 1)),
-    		  ChangeNotifierProvider(create: (_) => RelationModel(subjectID: widget.subjectID)),
-    		  ChangeNotifierProvider(create: (_) => ReviewModel(subjectID: widget.subjectID)),
-    		  ChangeNotifierProvider(create: (_) => TopicModel(subjectID: widget.subjectID)),
-    		  ChangeNotifierProvider(create: (_) => CommentModel(subjectID: widget.subjectID)),
-    		],
-    		child: Selector<BangumiModel,Color?>(
-    		  selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
-    		  shouldRebuild: (previous, next) => previous!=next,
-    		  
-    		  builder: (innerProviderContext,linearColor,detailScaffold) {          
-    
-              debugPrint("linear color:$linearColor");
+        return MultiProvider(
+            providers: [
+                ChangeNotifierProvider(create: (_) => BangumiModel(subjectID: widget.subjectID)),
+                ChangeNotifierProvider(create: (_) => EpModel(subjectID: widget.subjectID, selectedEp: 1)),
+                ChangeNotifierProvider(create: (_) => RelationModel(subjectID: widget.subjectID)),
+                ChangeNotifierProvider(create: (_) => ReviewModel(subjectID: widget.subjectID)),
+                ChangeNotifierProvider(create: (_) => TopicModel(subjectID: widget.subjectID)),
+                ChangeNotifierProvider(create: (_) => CommentModel(subjectID: widget.subjectID)),
+            ],
+            child: Selector<BangumiModel, Color?>(
+                selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
+                shouldRebuild: (previous, next) => previous != next,
 
-              //EPModel 同步跟随
-              final epModel = innerProviderContext.read<EpModel>();
-              epModel.bangumiThemeColor = linearColor;
-              
-              return Theme(
-                data: ThemeData(
-                  brightness: Theme.of(context).brightness,
-                  primaryColor: judgeDetailRenderColor(context,linearColor),
-                  scaffoldBackgroundColor: judgeDetailRenderColor(context,linearColor),
-                  fontFamilyFallback: convertSystemFontFamily(),
-                ),
-                child:detailScaffold!,
-              );
-    		  },
-    		  child: Builder(
-            builder: (context) {
+                builder: (innerProviderContext, linearColor, detailScaffold) {          
 
-              //因为sliver的原因 commentModel 的 loadComments 会直到我触发了 HotComment 区域才开始加载。
-              //因此无法把用户评论获取放到那个页面 里 那么久只能直接放进这里了
-              
-              final bangumiModel = context.read<BangumiModel>();
-              final commentModel = context.read<CommentModel>();
+                    debugPrint("linear color:$linearColor");
 
-              commentModel.loadUserComment(
-                currentUserInformation: AccountModel.loginedUserInformations.userInformation
-              );
-      
-              return Scaffold(
-                appBar: AppBar(
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha:0.6),
-                  title: ValueListenableBuilder(
-                  valueListenable: appbarTitleNotifier, 
-                  builder: (_,appbarTitle,__)=>ScalableText(appbarTitle,style: const TextStyle(color: Colors.black,fontSize: 20))),
-                  leading: IconButton(
-                  onPressed: ()=>Navigator.of(context).pop(),
-                  icon: const Icon(Icons.arrow_back)
-                  ),
-                  actions: [
-        
-                    ToggleThemeModeButton(
-                      onThen: (){
-                      bangumiModel.getThemeColor(
-                        judgeDetailRenderColor(context,bangumiModel.imageColor),
-                        darkMode: !judgeDarknessMode(context) 
-                        //这里是为了 切换。是 target! 而不是状态 因此得取反向的值。
-                      );
-                      }
-                    ),
-          
-                    const Padding(padding: PaddingH6),
-          
-                    IconButton(
-                    onPressed: () async {
-                    if(await canLaunchUrlString(BangumiWebUrls.subject(widget.subjectID))){
-                      await launchUrlString(BangumiWebUrls.subject(widget.subjectID));
-                    }
-                    },
-                    icon: Transform.rotate(
-                    angle: -45,
-                    child: const Icon(Icons.link),
-                    )
-                  )
-                  ],
-                ),
-                
-                body: NotificationListener<ScrollNotification>(
-                  onNotification: (notification) {
+                    //EPModel 同步跟随
+                    final epModel = innerProviderContext.read<EpModel>();
+                    epModel.bangumiThemeColor = linearColor;
 
-                  final double offset = notification.metrics.pixels; //scrollview 的 offset : 注意不要让更内层的scrollView影响到它监听
+                    return Theme(
+                        data: ThemeData(
+                            brightness: Theme.of(context).brightness,
+                            primaryColor: judgeDetailRenderColor(context, linearColor),
+                            scaffoldBackgroundColor: judgeDetailRenderColor(context, linearColor),
+                            fontFamilyFallback: convertSystemFontFamily(),
+                        ),
+                        child: detailScaffold!,
+                    );
+                },
+                child: Builder(
+                    builder: (context) {
 
-                  if (offset >= 60) { 
+                        //因为sliver的原因 commentModel 的 loadComments 会直到我触发了 HotComment 区域才开始加载。
+                        //因此无法把用户评论获取放到那个页面 里 那么久只能直接放进这里了
 
-                    if(appbarTitleNotifier.value.isNotEmpty) return false;
-        
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      appbarTitleNotifier.value = bangumiModel.bangumiDetails?.name ?? "";
-                    });
-                  }
-                
-                  else{
+                        final bangumiModel = context.read<BangumiModel>();
+                        final commentModel = context.read<CommentModel>();
 
-                    if(appbarTitleNotifier.value.isEmpty) return false;
-        
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      appbarTitleNotifier.value = "";
-                    });
-                    
-                  }
-                  
-                  return false;
-                  },
-                  
-                  child: Selector<BangumiModel, int?>(
-                    selector:(_, bangumiModel) => bangumiModel.subjectID,
-                    shouldRebuild: (previous, next){
-                      if(next == null) return false;
-                      return previous!=next;
-                    },
-                    builder: (_,subjectID,child) {
-                  
-                      debugPrint("subjectID: $subjectID => ${widget.subjectID}");
-                    
-                      return FutureBuilder(
-                      future: bangumiModel.loadDetails(),
-                      builder: (_,snapshot){
-        
-                        if(snapshot.connectionState == ConnectionState.done){
-                          debugPrint("parse ${widget.subjectID} done ,builderStamp: ${DateTime.now()}");
-
-                          MyHive.historySurfDataBase.put(
-                            widget.subjectID,
-                            SurfTimelineDetails(
-                              detailID: widget.subjectID
-                            )
-                              ..updatedAt = DateTime.now().millisecondsSinceEpoch
-                              ..title = bangumiModel.bangumiDetails?.name ?? ""
-                              ..bangumiSurfTimelineType = BangumiSurfTimelineType.subject
-                              ..commentDetails = (
-                                CommentDetails()
-                                  ..userInformation = (
-                                    UserInformation()
-                                      ..avatarUrl = bangumiModel.bangumiDetails?.coverUrl
-                                  )
-                              )
-                              
-                          );
-
-
-                        }
-        
-                        BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails; //dependency
-        
-                        return EasyRefresh(
-                          header: const TextHeader(),
-                          footer: const TextFooter(),
-                          onRefresh: (){
-                            bangumiModel.loadDetails(isRefresh:true);
-                            context.read<CommentModel>().loadComments(isReloaded: true);
-                            context.read<TopicModel>().loadSubjectSubContentList(isReloaded: true);
-                            context.read<ReviewModel>().loadSubjectSubContentList(isReloaded: true);
-                          },
-                          
-                          child:CustomScrollView(
-                            slivers: [
-                              Skeletonizer.sliver(
-                              enabled: currentSubjectDetail==null,
-                              child: Selector<BangumiModel,Color?>(
-                                selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
-                                shouldRebuild: (previous, next) => previous!=next,
-                                builder: (_,linearColor,detailChild) {
-          
-                                return TweenAnimationBuilder<Color?>(
-                                  tween: ColorTween(
-                                    begin: judgeCurrentThemeColor(context),
-                                    end: judgeDarknessMode(context) ? Colors.black : judgeDetailRenderColor(context,linearColor),
-                                  ),
-                                  duration: const Duration(milliseconds: 500),
-                                  builder: (_, linearColor, __) {
-          
-                                  return DecoratedSliver(
-                                    decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        judgeDarknessMode(context) ? Colors.black : Colors.white,
-                                        linearColor!.withValues(alpha: 0.8),
-                                      ]
-                                    )
-                                    ),
-                                    sliver: detailChild,
-                                    
-                                  );
-          
-                                  },
-                                  
-                                );
-          
-                                },
-                                child: SliverPadding(
-                                padding: Padding16,
-                                sliver: SliverList(
-                                  delegate: SliverChildListDelegate(
-                                  [
-                                    BangumiDetailIntro(bangumiDetails: currentSubjectDetail ?? BangumiDetails()),
-          
-                                    BangumiSummary(summary: currentSubjectDetail?.summary),
-                                    
-                                    BangumiDetailRecentReview(
-                                      name: bangumiModel.bangumiDetails?.name,
-                                      collapseStatusNotifer:reviewsCollaspeStatusNotifier
-                                    ),
-          
-                                    const BangumiDetailRelations(),
-          
-                                    BangumiDetailTopics(
-                                      name: bangumiModel.bangumiDetails?.name,
-                                      collapseStatusNotifer:topicsCollaspeStatusNotifier
-                                    ),
-                                    
-                                    NotificationListener<ScrollNotification>(
-                                      onNotification: (_) => true,
-                                      child: BangumiHotComment(id: widget.subjectID,name: bangumiModel.bangumiDetails?.name,) 
-                                    ),
-                                  ]
-                                  )
-                                ),
-                                )
-                                
-                              
-                                  
-                              ),
-                                      
-                              ),
-                            ],
-                          )
+                        commentModel.loadUserComment(
+                            currentUserInformation: AccountModel.loginedUserInformations.userInformation
                         );
-                    
-                      
-                    
-                      },
-                      
-                      
-                      );
-                    
-                    },
-                    ),
+
+                        return Scaffold(
+                            appBar: AppBar(
+                                backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.6),
+                                title: ValueListenableBuilder(
+                                    valueListenable: appbarTitleNotifier, 
+                                    builder: (_, appbarTitle, __) => ScalableText(appbarTitle, style: const TextStyle(color: Colors.black, fontSize: 20))),
+                                leading: IconButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    icon: const Icon(Icons.arrow_back)
+                                ),
+                                actions: [
+
+                                    ToggleThemeModeButton(
+                                        onThen: () {
+                                            bangumiModel.getThemeColor(
+                                                judgeDetailRenderColor(context, bangumiModel.imageColor),
+                                                darkMode: !judgeDarknessMode(context) 
+                                            //这里是为了 切换。是 target! 而不是状态 因此得取反向的值。
+                                            );
+                                        }
+                                    ),
+
+                                    const Padding(padding: PaddingH6),
+
+                                    IconButton(
+                                        onPressed: () async {
+                                            if (await canLaunchUrlString(BangumiWebUrls.subject(widget.subjectID))) {
+                                                await launchUrlString(BangumiWebUrls.subject(widget.subjectID));
+                                            }
+                                        },
+                                        icon: Transform.rotate(
+                                            angle: -45,
+                                            child: const Icon(Icons.link),
+                                        )
+                                    )
+                                ],
+                            ),
+
+                            body: NotificationListener<ScrollNotification>(
+                                onNotification: (notification) {
+
+                                    final double offset = notification.metrics.pixels; //scrollview 的 offset : 注意不要让更内层的scrollView影响到它监听
+
+                                    if (offset >= 60) { 
+
+                                        if (appbarTitleNotifier.value.isNotEmpty) return false;
+
+                                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                appbarTitleNotifier.value = bangumiModel.bangumiDetails?.name ?? "";
+                                            });
+                                    }
+
+                                    else {
+
+                                        if (appbarTitleNotifier.value.isEmpty) return false;
+
+                                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                appbarTitleNotifier.value = "";
+                                            });
+
+                                    }
+
+                                    return false;
+                                },
+
+                                child: Selector<BangumiModel, int?>(
+                                    selector: (_, bangumiModel) => bangumiModel.subjectID,
+                                    shouldRebuild: (previous, next) {
+                                        if (next == null) return false;
+                                        return previous != next;
+                                    },
+                                    builder: (_, subjectID, child) {
+
+                                        debugPrint("subjectID: $subjectID => ${widget.subjectID}");
+
+                                        return FutureBuilder(
+                                            future: bangumiModel.loadDetails(),
+                                            builder: (_, snapshot) {
+
+                                                if (snapshot.connectionState == ConnectionState.done) {
+                                                    debugPrint("parse ${widget.subjectID} done ,builderStamp: ${DateTime.now()}");
+
+                                                    MyHive.historySurfDataBase.put(
+                                                        widget.subjectID,
+                                                        SurfTimelineDetails(
+                                                            detailID: widget.subjectID
+                                                        )
+                                                            ..updatedAt = DateTime.now().millisecondsSinceEpoch
+                                                            ..title = bangumiModel.bangumiDetails?.name ?? ""
+                                                            ..bangumiSurfTimelineType = BangumiSurfTimelineType.subject
+                                                            ..commentDetails = (
+                                                              CommentDetails()
+                                                                ..userInformation = (
+                                                                  UserInformation()
+                                                                    ..avatarUrl = bangumiModel.bangumiDetails?.coverUrl
+                                                            )
+                                                        )
+
+                                                    );
+
+                                                }
+
+                                                /// 预先信息注入(假设有) 可以获取少量信息进入布局页面
+                                                BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails ?? widget.injectBangumiInfoDetail; //dependency
+
+                                                return EasyRefresh(
+                                                    header: const TextHeader(),
+                                                    footer: const TextFooter(),
+                                                    onRefresh: () {
+                                                        bangumiModel.loadDetails(isRefresh: true);
+                                                        context.read<CommentModel>().loadComments(isReloaded: true);
+                                                        context.read<TopicModel>().loadSubjectSubContentList(isReloaded: true);
+                                                        context.read<ReviewModel>().loadSubjectSubContentList(isReloaded: true);
+                                                    },
+
+                                                    child: CustomScrollView(
+                                                        slivers: [
+                                                            Skeletonizer.sliver(
+                                                                enabled: currentSubjectDetail == null,
+                                                                child: Selector<BangumiModel, Color?>(
+                                                                    selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
+                                                                    shouldRebuild: (previous, next) => previous != next,
+                                                                    builder: (_, linearColor, detailChild) {
+
+                                                                        return TweenAnimationBuilder<Color?>(
+                                                                            tween: ColorTween(
+                                                                                begin: judgeCurrentThemeColor(context),
+                                                                                end: judgeDarknessMode(context) ? Colors.black : judgeDetailRenderColor(context, linearColor),
+                                                                            ),
+                                                                            duration: const Duration(milliseconds: 500),
+                                                                            builder: (_, linearColor, __) {
+
+                                                                                return DecoratedSliver(
+                                                                                    decoration: BoxDecoration(
+                                                                                        gradient: LinearGradient(
+                                                                                            begin: Alignment.topCenter,
+                                                                                            end: Alignment.bottomCenter,
+                                                                                            colors: [
+                                                                                                judgeDarknessMode(context) ? Colors.black : Colors.white,
+                                                                                                linearColor!.withValues(alpha: 0.8),
+                                                                                            ]
+                                                                                        )
+                                                                                    ),
+                                                                                    sliver: detailChild,
+
+                                                                                );
+
+                                                                            },
+
+                                                                        );
+
+                                                                    },
+                                                                    child: SliverPadding(
+                                                                        padding: Padding16,
+                                                                        sliver: SliverList(
+                                                                            delegate: SliverChildListDelegate(
+                                                                                [
+                                                                                    BangumiDetailIntro(bangumiDetails: currentSubjectDetail ?? BangumiDetails()),
+
+                                                                                    BangumiSummary(summary: currentSubjectDetail?.summary),
+
+                                                                                    BangumiDetailRecentReview(
+                                                                                        name: bangumiModel.bangumiDetails?.name,
+                                                                                        collapseStatusNotifer: reviewsCollaspeStatusNotifier
+                                                                                    ),
+
+                                                                                    const BangumiDetailRelations(),
+
+                                                                                    BangumiDetailTopics(
+                                                                                        name: bangumiModel.bangumiDetails?.name,
+                                                                                        collapseStatusNotifer: topicsCollaspeStatusNotifier
+                                                                                    ),
+
+                                                                                    NotificationListener<ScrollNotification>(
+                                                                                        onNotification: (_) => true,
+                                                                                        child: BangumiHotComment(id: widget.subjectID, name: bangumiModel.bangumiDetails?.name,) 
+                                                                                    ),
+                                                                                ]
+                                                                            )
+                                                                        ),
+                                                                    )
+
+                                                                ),
+
+                                                            ),
+                                                        ],
+                                                    )
+                                                );
+
+                                            },
+
+                                        );
+
+                                    },
+                                ),
+                            )
+
+                        );
+                    }
                 )
-                  
-              );
-            }
-    		  )
-    			
-    		),
-    );
-      
-    
-  }
+
+            ),
+        );
+
+    }
 
 
 }

@@ -97,13 +97,30 @@ class _BangumiRankBoxState extends State<BangumiRankBox> {
                         ],
                       ),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ScalableText("标准差 ${convertRankBoxStandardDiffusion(widget.bangumiDetails.ratingList["total"], widget.bangumiDetails.ratingList["count"].values.toList(), widget.bangumiDetails.ratingList["score"])}",),
+                      Builder(
+                        builder: (_) {
 
-                          ScalableText("${widget.bangumiDetails.ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey)),
-                        ],
+                          final ratingList = widget.bangumiDetails.ratingList;
+
+                          
+                          //final countList = 
+                          //  ratingList["count"] is Map ? 
+                          //  ratingList["count"].values.toList() : 
+                          //  ratingList["count"].reversed.toList();
+
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ScalableText("标准差 ${convertRankBoxStandardDiffusion(
+                                ratingList["total"],
+                                ratingList["count"].values.toList(),
+                                ratingList["score"]
+                              )}",),
+                          
+                              ScalableText("${ratingList["total"]} vote(s)",style: const TextStyle(color: Colors.grey)),
+                            ],
+                          );
+                        }
                       ),
                     
                     
@@ -129,6 +146,8 @@ class _BangumiRankBoxState extends State<BangumiRankBox> {
                 
                     else{
                       currentRankRatio = widget.bangumiDetails.ratingList["count"]["${index+1}"] / widget.bangumiDetails.ratingList["total"];
+
+                      
                     }
                 
                     return Tooltip(

@@ -96,7 +96,7 @@ class EpRepliedTile extends ListTile {
 
                                 ScalableText(
                                   "${repliedComment.userInformation?.nickName}:",
-                                  style:TextStyle(fontWeight: FontWeight.w500)
+                                  style:TextStyle(fontWeight: FontWeight.w500,fontSize: AppFontSize.s14)
                                 ),
 
                                 epCommentData.repliedComment![index].state?.isNotAvaliable() == true ?
@@ -120,37 +120,28 @@ class EpRepliedTile extends ListTile {
                                               child: Padding(
                                                 padding: Padding6,
                                                 child: ScalableText(
-                                                  quoteContent.length > 30 
-                                                  ? "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}...\n"
-                                                  : "${quoteContent.replaceAll(bbcodeRegexp, '')}\n",
+                                                  quoteContent.length > 30 ? 
+                                                  "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}..." : 
+                                                  quoteContent.replaceAll(bbcodeRegexp, ''),
                                                   maxLines: 1,
-                                                  style: TextStyle(color: judgeCurrentThemeColor(context)),
+                                                  style: TextStyle(color: judgeCurrentThemeColor(context),fontSize: AppFontSize.s14),
                                                 ),
                                               )
                                             )
                                           ),
-                                  
-                                          TextSpan(
-                                            text: "\n",
-                                          ),
+
+                                          /// 往上面的text内容增加\n没有用 必须在这里加才生效 甚是奇怪
+                                          TextSpan(text: "\n"),
                                   
                                         ],
                                   
                                         WidgetSpan(
                                           child: AdapterBBCodeText(
                                             data: convertBangumiCommentSticker(mainContent),
-                                            stylesheet: appDefaultStyleSheet(context,richless: true),
+                                            stylesheet: appDefaultStyleSheet(context,richless: true,fontSize: AppFontSize.s14),
                                             maxLine: 3,
                                           )
                                         )
-                                  
-                                        //TextSpan( 
-                                        //  text: mainContent,
-                                        //  style: TextStyle(
-                                        //    color: judgeDarknessMode(context) ? Colors.white : Colors.black,
-                                        //  ),					
-                                        //),
-                                        
                                         
                                       ],
                                     ),

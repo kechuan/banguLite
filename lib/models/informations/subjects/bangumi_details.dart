@@ -4,6 +4,8 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/models/informations/local/star_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -25,22 +27,12 @@ class BangumiDetails {
 	String? summary;
 	Map<String,dynamic> informationList = {};
 	Map<String,int> tagsList = {};
+
 	Map<String,dynamic> ratingList = {
 		"total": 0,
 		"score": 0.0,
 		"rank": 0.0,
-    "count":{
-      "1": 0,
-      "2": 0,
-      "3": 0,
-      "4": 0,
-      "5": 0,
-      "6": 0,
-      "7": 0,
-      "8": 0,
-      "9": 0,
-      "10": 0
-    }
+    "count":{}
 	};
 
 }
@@ -101,6 +93,7 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
 
     return weekCalender;
   }
+
 
 List<BangumiDetails> loadSearchData(Map<String,dynamic> bangumiData,{bool? animateFilter}){
 
@@ -167,17 +160,10 @@ Map<String,List<BangumiDetails>> searchDataAdapter(
 
   for(BangumiDetails currentBangumi in bangumiSearchDetailsList){
     
-  int weekday = DateTime.tryParse(currentBangumi.informationList["air_date"] ?? "")?.weekday ?? 0;
+    int weekday = DateTime.tryParse(currentBangumi.informationList["air_date"] ?? "")?.weekday ?? 0;
 
-    switch(weekday){
-      case 1: {searchWeekList["星期一"]!.add(currentBangumi);break;}
-      case 2: {searchWeekList["星期二"]!.add(currentBangumi);break;}
-      case 3: {searchWeekList["星期三"]!.add(currentBangumi);break;}
-      case 4: {searchWeekList["星期四"]!.add(currentBangumi);break;}
-      case 5: {searchWeekList["星期五"]!.add(currentBangumi);break;}
-      case 6: {searchWeekList["星期六"]!.add(currentBangumi);break;}
-      case 7: {searchWeekList["星期日"]!.add(currentBangumi);break;}
-      default: break;
+    if(weekday != 0){
+      searchWeekList.values.elementAt(weekday-1).add(currentBangumi);
     }
 
     if(
@@ -202,16 +188,35 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
 
     bangumiDetails.coverUrl = bangumiData["images"]?["large"];
     bangumiDetails.summary = bangumiData["summary"];
-    bangumiDetails.name = bangumiData["name_cn"].isNotEmpty ? bangumiData["name_cn"] : bangumiData["name"];
+
+    bangumiDetails.name = convertAmpsSymbol(
+      (bangumiData["nameCN"] ?? bangumiData["name_cn"]).isNotEmpty ? 
+      (bangumiData["nameCN"] ?? bangumiData["name_cn"]) : 
+      bangumiData["name"]
+    );
+
     bangumiDetails.id = bangumiData["id"];
     bangumiDetails.type = bangumiData["type"];
 
     bangumiDetails.ratingList = {
+      "rank": bangumiData["rating"]?["rank"] ?? 0, //返回的是一个数值0
       "total": bangumiData["rating"]?["total"] ?? 0,
       "score": bangumiData["rating"]?["score"] ?? 0.0,
-      "rank": bangumiData["rating"]?["rank"] ?? 0, //返回的是一个数值0
-      "count": bangumiData["rating"]?["count"] ?? {}
+
+      // v0 v1的数据返回不同 
+      // v0(主页信息) 为倒序map v0 实际信息 却是正序map
+      // v1(relation信息)则是正序List
+      "count": convertRankList(bangumiData["rating"]?["count"] ?? [])
+
     };
+
+
+      bangumiDetails.informationList = {
+        "air_date":bangumiData["air_date"],
+        "air_weekday":'星期${WeekDay.values.elementAtOrNull((bangumiData["air_weekday"] ?? 1)-1)?.dayText}',
+        "alias":bangumiData["name"],
+      };
+    
 
 	 //info collect
 
@@ -238,6 +243,7 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
             bangumiDetails.informationList.addAll({
               "air_weekday": currentInformation["value"].toString()
             });
+
             break;
           }
         }
@@ -258,7 +264,6 @@ BangumiDetails loadDetailsData(Map<String,dynamic> bangumiData,{bool detailFlag 
    }
 
       
-
     //debugPrint("bangumiDetails.informationList:${bangumiDetails.informationList}");
 
     //debugPrint("model parse done:${DateTime.now()}. reloadInformation");
@@ -278,7 +283,7 @@ BangumiDetails loadRelationsData(Map<String,dynamic> bangumiData){
       "total": bangumiData["rating"]?["total"] ?? 0,
       "score": bangumiData["rating"]?["score"] ?? 0.0,
       "rank": bangumiData["rating"]?["rank"] ?? 0, //返回的是一个数值0
-      "count": bangumiData["rating"]?["count"] ?? {}
+      "count": convertRankList(bangumiData["rating"]?["count"] ?? [])
     };
 
   return bangumiDetails;

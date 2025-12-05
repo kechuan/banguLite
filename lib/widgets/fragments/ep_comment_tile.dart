@@ -18,7 +18,6 @@ import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bbcode/flutter_bbcode.dart';
 
 class EpCommentTile extends StatefulWidget {
     const EpCommentTile({
@@ -66,7 +65,10 @@ class _EpCommentTileState extends State<EpCommentTile> {
                 widget.postCommentType != PostCommentType.replyTopic
               )
               {
-                  if ((extractBBCodeSelectableContent(parseBBCode(widget.epCommentData.comment ?? "",stylesheet: BBStylesheet(tags: allEffectTag))).length) > 500) {
+                  if (
+                    //(extractBBCodeSelectableContent(parseBBCode(widget.epCommentData.comment ?? "",stylesheet: BBStylesheet(tags: allEffectTag))).length) > 500
+                    extractBBCodeSelectableContent(widget.epCommentData.comment ?? "").length > 400
+                  ) {
                       isCollapsable = true;
                   }
 
@@ -163,7 +165,10 @@ class _EpCommentTileState extends State<EpCommentTile> {
 
                             //优先完整实现 size约束盒
                             ScalableText(
-                                widget.epCommentData.epCommentIndex == null ? "" : "#${widget.epCommentData.epCommentIndex}",
+                              widget.epCommentData.epCommentIndex == null ? "" : "#${widget.epCommentData.epCommentIndex}",
+                              style: TextStyle(
+                                  color: widget.themeColor,
+                              ),
                             ),
 
                             BangumiCommentActionButton(
