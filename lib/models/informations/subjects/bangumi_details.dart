@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/models/informations/local/star_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';

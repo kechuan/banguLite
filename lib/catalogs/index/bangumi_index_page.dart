@@ -73,7 +73,4 @@ class _BangumiIndexPageState extends State<BangumiIndexPage>{
 
   }
 
-
-  @override
-  bool get wantKeepAlive => true; //Disactive == !wantKeepAlive
 }

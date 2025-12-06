@@ -190,9 +190,11 @@ class IntroPortrait extends StatelessWidget {
                     Row(
                       
                       children: [
-    
-                        Builder(
-                          builder: (_){
+
+                        Selector<EpModel,num>(
+                          selector: (_,epModel) => epModel.epsData.length,
+                          shouldRebuild: (previous, next) => previous != next,
+                          builder: (_,epCount,child){
     
                             final epModel = context.read<EpModel>();
     
@@ -200,13 +202,13 @@ class IntroPortrait extends StatelessWidget {
     
                             if (
                               bangumiDetails.informationList["air_weekday"] == null || 
-                              convertAiredEps(bangumiDetails.informationList["air_date"]) >= bangumiDetails.informationList["eps"] ||
-                              bangumiDetails.informationList["eps"] > 500 //不确定长度
+                              convertAiredEps(bangumiDetails.informationList["air_date"]) >= (epCount) ||
+                              epCount > 500 //不确定长度
                             ){
-                              return ScalableText("共${bangumiDetails.informationList["eps"]}集");
+                              return ScalableText("共$epCount集");
                             }
     
-                            if(bangumiDetails.informationList["eps"] != 0){
+                            if(epCount != 0){
                               
                               if(epModel.epsData[epModel.epsData.length]?.airDate != null){
                                 epModel.epsData.values.any((currentEpInfo){
@@ -223,11 +225,10 @@ class IntroPortrait extends StatelessWidget {
                               }
                             }
     
-                            return ScalableText("$airedEps/${bangumiDetails.informationList["eps"]}");
+                            return ScalableText("$airedEps/$epCount");
                           }
                         ),
-    
-    
+
                         const Padding(
                           padding: EdgeInsets.only(left: 6),
                           child: Icon(Icons.arrow_forward_ios,size: 16)

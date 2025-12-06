@@ -1,0 +1,136 @@
+name: banguLite-build-action
+
+# 推送 Tag 时触发
+on: 
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+  # 1. Windows 构建 Job (基于您的现有逻辑)
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      # 缓存优化设置（使用 D 盘）
+      - name: Create PUB_CACHE Directory
+        run: mkdir "D:/flutter-pub"
+
+      - name: Setup Flutter
+        #v2.x
+        uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e
+        with:
+          flutter-version: "3.32.x"
+          cache: true
+          pub-cache-key: "flutter-pub-change"
+          pub-cache-path: "D:/flutter-pub" 
+
+      - name: Set PUB_CACHE Environment Variable
+        run: setx /m PUB_CACHE "D:/flutter-pub" # 设置系统环境变量
+
+      - name: Enable Flutter Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Setup JAVA (for Windows)
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "17"
+          cache: "gradle"
+          
+      - name: Restore Packages
+        run: flutter pub get
+        env:
+          PUB_CACHE: "D:/flutter-pub" # 临时覆盖，确保当前运行使用
+
+      - name: Install flutter_distributor
+        run: dart pub global activate flutter_distributor
+
+      # Windows 构建步骤 (如果需要，请取消注释并配置)
+      - name: Build Windows
+        run: flutter_distributor package --platform windows --targets zip --skip-clean
+        
+      # 3.5 上传打包文件
+      - name: Upload Release Assets (Windows)
+        #v2.x
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
+        with:
+          tag_name: ${{ github.ref_name }} # 使用 ${{ github.ref }} 或 ${{ github.ref_name }} 都可以，推荐前者
+          files: |
+            ./dist/*/*.zip
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - run: echo "Windows build done."
+
+  # 2. Android APK 构建 Job (新增，用于签名打包)
+  build-android:
+    #needs: build-context # 可选：让 Android 等待 Windows 完成。若想并行，请删除此行。
+    runs-on: ubuntu-latest # 使用 Linux 镜像，通常更快更稳定
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          
+      # 1. 设置 Flutter 和 Java 环境
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.32.x" # 保持版本一致性
+          cache: true
+          
+      - name: Setup JAVA (for Android)
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "17"
+          cache: "gradle"
+
+      - name: Restore Packages
+        run: flutter pub get
+
+      # 2. 准备签名环境
+      # 创建 sign 目录，匹配您的本地配置 android/sign/*
+      - name: Create Sign Directory
+        run: mkdir -p android/sign
+
+      # 关键步骤 2.1: 解码 Keystore 文件
+      - name: Decode Keystore and Place File
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/sign/banguLite.keystore
+          
+      # 关键步骤 2.2: 创建 keystore.properties 文件
+      # 创建的文件是 android/sign/keystore.properties
+      - name: Create Key Properties File
+        run: |
+          # 'storeFile' 路径必须是相对于项目根目录的相对路径
+          echo "storeFile=../sign/banguLite.keystore" >> android/sign/keystore.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/sign/keystore.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/sign/keystore.properties
+          echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/sign/keystore.properties
+
+      # 3. 执行 Flutter 构建
+      - name: Build Android APK
+        # gradle配置特殊性 输出目录作出变更 默认输出目录为gradle找不到会触发 exit code 1
+        continue-on-error: true  
+        run: flutter build apk --flavor production --split-per-abi
+
+      # 4. 上传 APK 到 Release
+      - name: Upload Release Asset (Android APK)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }} 
+          # 上传 asset 到已创建的 Release
+          files: build/app/outputs/apk/production/release/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - run: echo "Android build done."

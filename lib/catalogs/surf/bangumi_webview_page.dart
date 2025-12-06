@@ -35,7 +35,7 @@ class BangumiWebviewPage extends StatefulWidget {
   State<BangumiWebviewPage> createState() => _BangumiWebviewPageState();
 }
 
-class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage> with RouteLifecycleMixin {
+class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
   
   PullToRefreshController? pullToRefreshController;
   
