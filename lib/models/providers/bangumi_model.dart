@@ -80,7 +80,6 @@ class BangumiModel extends ChangeNotifier {
     debugPrint("[detailPage] ID: $subjectID, Color:$imageProviderColor => $resultColor, Lumi:${resultColor.computeLuminance()}");
     notifyListeners();
 
-
   }
 
   @override

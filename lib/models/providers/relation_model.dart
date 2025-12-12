@@ -17,7 +17,7 @@ class RelationModel extends BaseModel<RelationDetails,Null>{
     SubjectType type = SubjectType.anime,
     int offset = 0
   }) async {
-    await loadSubjectSubContentList(
+    await loadSubjectContentList(
       queryParameters: BangumiQuerys.relationsQuery
         ..["type"] = type.subjectType
         ..["offset"] = offset

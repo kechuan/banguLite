@@ -34,8 +34,9 @@ GroupTopicDetails loadGroupTopicDetails(Map<String,dynamic> bangumiGroupTopicDat
       ..createdTime = bangumiGroupTopicData['createdAt']
       ..updatedTime = bangumiGroupTopicData['updatedAt']
       ..groupTopicTitle = bangumiGroupTopicData['title']
+      ..content = bangumiGroupTopicData["replies"].isEmpty ? "" : bangumiGroupTopicData["replies"]?.first["content"] ?? ""
       ..topicReplyCount = bangumiGroupTopicData['replyCount']
-      ..contentRepliedComment = loadEpCommentDetails(bangumiGroupTopicData['replies'])
+      ..contentRepliedComment = loadEpCommentDetails(bangumiGroupTopicData['replies'].skip(1).toList())
     ;
 
   return currentGroupTopicDetails;

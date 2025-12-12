@@ -1,6 +1,7 @@
 
 
-import 'package:bangu_lite/models/informations/subjects/group_details.dart';import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_details.dart';
+import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 

@@ -26,7 +26,7 @@ jobs:
         #v2.x
         uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e
         with:
-          flutter-version: "3.32.x"
+          flutter-version: "3.38.x"
           cache: true
           pub-cache-key: "flutter-pub-change"
           pub-cache-path: "D:/flutter-pub" 
@@ -52,7 +52,6 @@ jobs:
       - name: Install flutter_distributor
         run: dart pub global activate flutter_distributor
 
-      # Windows 构建步骤 (如果需要，请取消注释并配置)
       - name: Build Windows
         run: flutter_distributor package --platform windows --targets zip --skip-clean
         
@@ -61,7 +60,8 @@ jobs:
         #v2.x
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
         with:
-          tag_name: ${{ github.ref_name }} # 使用 ${{ github.ref }} 或 ${{ github.ref_name }} 都可以，推荐前者
+          # 使用 ${{ github.ref }} 或 ${{ github.ref_name }} 都可以，推荐前者
+          tag_name: ${{ github.ref_name }} 
           files: |
             ./dist/*/*.zip
         env: 
@@ -71,8 +71,7 @@ jobs:
 
   # 2. Android APK 构建 Job (新增，用于签名打包)
   build-android:
-    #needs: build-context # 可选：让 Android 等待 Windows 完成。若想并行，请删除此行。
-    runs-on: ubuntu-latest # 使用 Linux 镜像，通常更快更稳定
+    runs-on: ubuntu-latest 
     permissions:
       contents: write
     steps:
@@ -85,7 +84,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.32.x" # 保持版本一致性
+          # 保持版本一致性
+          flutter-version: "3.38.x" 
           cache: true
           
       - name: Setup JAVA (for Android)

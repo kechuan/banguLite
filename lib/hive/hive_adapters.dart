@@ -4,7 +4,6 @@ import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 
 import 'package:bangu_lite/models/informations/local/star_details.dart';
-import 'package:bangu_lite/models/informations/surf/surf_record_details.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:flutter/material.dart';
@@ -20,17 +19,14 @@ part 'hive_adapters.g.dart';
     AdapterSpec<ThemeMode>(),
     AdapterSpec<ScaleType>(),
     AdapterSpec<Color>(),
+    AdapterSpec<BangumiSurfTimelineType>(),
     AdapterSpec<StarBangumiDetails>(),
     AdapterSpec<UserInformation>(),
     AdapterSpec<LoginedUserInformations>(),
     AdapterSpec<SurfTimelineDetails>(),
     AdapterSpec<CommentDetails>(),
-    AdapterSpec<BangumiSurfTimelineType>(),
     AdapterSpec<StarType>(),
-    //AdapterSpec<SurfRecordDetails>()
-
     
-    //AdapterSpec<TimelineDetails>()
   ]    
 )
 // Annotations must be on some element

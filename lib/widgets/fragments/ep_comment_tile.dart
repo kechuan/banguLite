@@ -25,7 +25,7 @@ class EpCommentTile extends StatefulWidget {
         required this.contentID,
         required this.epCommentData,
         required this.postCommentType,
-        this.themeColor, 
+        this.readableThemeColor, 
         this.onUpdateComment,
         this.authorType,
     });
@@ -35,7 +35,7 @@ class EpCommentTile extends StatefulWidget {
     final EpCommentDetails epCommentData;
     final PostCommentType? postCommentType;
     final BangumiCommentAuthorType? authorType;
-    final Color? themeColor;
+    final Color? readableThemeColor;
 
     final Function(String?)? onUpdateComment;
 
@@ -126,7 +126,8 @@ class _EpCommentTileState extends State<EpCommentTile> {
                                                             color: widget.epCommentData.userInformation?.getName() == AccountModel.loginedUserInformations.userInformation?.getName()
                                                                 ? judgeCurrentThemeColor(context)
                                                                 //: Colors.blue,
-                                                                : widget.themeColor,
+                                                                : widget.readableThemeColor
+                                                                
 
                                                         ),
                                                         maxLines: 2,
@@ -167,7 +168,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
                             ScalableText(
                               widget.epCommentData.epCommentIndex == null ? "" : "#${widget.epCommentData.epCommentIndex}",
                               style: TextStyle(
-                                  color: widget.themeColor,
+                                  color: widget.readableThemeColor,
                               ),
                             ),
 
@@ -383,7 +384,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
 
                                     CommentReaction(
                                         animatedReactionsListKey: animatedTagsListKey,
-                                        themeColor: widget.themeColor,
+                                        themeColor: widget.readableThemeColor,
                                         postCommentType: widget.postCommentType,
                                         commentID: widget.epCommentData.commentID,
                                         commentIndex: commentIndex,
@@ -404,7 +405,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
                     // 回帖: 3-1(详情界面特供)
                     ...?widget.epCommentData.epCommentIndex?.contains("-") ?? false ? 
                         [
-                            Divider(color: widget.themeColor)
+                            Divider(color: widget.readableThemeColor)
                         ] :
                         null,
 

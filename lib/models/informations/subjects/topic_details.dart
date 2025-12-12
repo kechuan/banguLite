@@ -1,6 +1,7 @@
 
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
 
 class TopicDetails extends ContentDetails{
 
@@ -31,11 +32,15 @@ TopicDetails loadTopicDetails(Map<String,dynamic> topicData){
 
 	currentTopic
 		..topicTitle = topicData["title"]
-		..content = topicData["content"]
+		..content = topicData["replies"].isEmpty ? "" : topicData["replies"]?.first["content"] ?? ""
+    ..contentReactions = topicData["replies"].isEmpty ? {} : loadReactionDetails(topicData["replies"]?.first["reactions"])
 		..state = topicData["state"]
 		..createdTime = topicData["createdAt"]
-		..topicRepliedComment = loadEpCommentDetails(topicData["replies"])
+		..topicRepliedComment = loadEpCommentDetails(topicData["replies"]).skip(1).toList()
+    ..userInformation = loadUserInformations(topicData["creator"])
 	;
+
+
 
 	return currentTopic;
 

@@ -13,7 +13,7 @@ class TopicModel extends BaseModel<TopicInfo, TopicDetails> {
   }
 
   Future<void> loadSubjectTopics({int? offset = 0}) async {
-    await loadSubjectSubContentList(
+    await loadSubjectContentList(
       queryParameters: BangumiQuerys.topicsQuery
         ..["offset"] = offset ?? 0
     );

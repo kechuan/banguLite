@@ -55,10 +55,6 @@ class IndexModel extends ChangeNotifier {
     userConfig = MyHive.appConfigDataBase.get("currentTheme") ?? defaultAPPConfig();
   }
 
-  void loadHistoryData(){
-
-  }
-
   void updateThemeMode(ThemeMode mode,{bool? config}) {
     userConfig.themeMode = mode;
     notifyListeners();
@@ -90,6 +86,11 @@ class IndexModel extends ChangeNotifier {
 
   void updateCommentImageLoadMode(bool imageLoadMode){
     userConfig.isManuallyImageLoad = imageLoadMode;
+    updateConfig();
+  }
+
+  void updateUpdateAlertMode(bool alertMode){
+    userConfig.isUpdateAlert = alertMode;
     updateConfig();
   }
 
@@ -125,7 +126,7 @@ class IndexModel extends ChangeNotifier {
 
   Future<void> updateCachedSize() async {
     cachedImageSize = await compute(getTotalSizeOfFilesInDir, MyHive.cachedImageDir);
-    updateConfig();
+    notifyListeners();
   }
 
   Future<void> reloadCalendar({Future<List<BangumiDetails>> Function()? switchCalendar}){
@@ -171,6 +172,8 @@ class IndexModel extends ChangeNotifier {
     return loadCompleter.future;
 
   }
+
+  
 
   void updateSelectedWeekDay(int newWeekDay){
     selectedWeekDay = newWeekDay;

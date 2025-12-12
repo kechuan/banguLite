@@ -36,15 +36,49 @@ class SettingsPage extends StatelessWidget {
     const List<Widget> behaviourConfigList = [
       CommentImageLoadModeTile(),
 	    ImageStorageManageTile(),
+      UpdateAlertToggleTile(),
       ClearCacheTile(),
-      ConfigTile(),
       AboutTile(),
       if(kDebugMode) TestTile()
     ];
 
 
     return Scaffold(
-      appBar: AppBar(title: const ScalableText("设置")),
+      appBar: AppBar(
+        title: const ScalableText("设置"),
+        actions: [
+          IconButton(
+            onPressed: (){
+            final indexModel = context.read<IndexModel>();
+            showDialog(
+              context: context,
+              builder: (_){
+                return AlertDialog(
+                  title: const ScalableText("重置配置确认"),
+                  content: const ScalableText("要恢复默认配置吗"),
+                  actions:[
+                    TextButton(
+                      onPressed: ()=> Navigator.of(context).pop(),
+                      child: const ScalableText("取消")
+                    ),
+                    TextButton(
+                      onPressed: (){
+                        indexModel.resetConfig();
+                        Navigator.of(context).pop();
+                      }, 
+                      child: const ScalableText("确认")
+                    )
+                  ]
+                );
+              }
+            );
+            },
+            icon: const Icon(Icons.refresh),
+          
+            
+          )
+        ],
+      ),
 
       body: EasyRefresh(
         child: Padding(
@@ -71,7 +105,14 @@ class SettingsPage extends StatelessWidget {
                   
                       Padding(
                         padding: PaddingH16V12,
-                        child: ScalableText("外观",style:TextStyle(color:Colors.grey.withValues(alpha: 0.8))),
+                        child: Row(
+                          spacing: 12,
+                          children: [
+                            Icon(Icons.color_lens),
+                        
+                            ScalableText("外观",style:TextStyle(color:Colors.grey.withValues(alpha: 0.8))),
+                          ],
+                        ),
                       ),
                   
                       ListView.separated(
@@ -105,7 +146,14 @@ class SettingsPage extends StatelessWidget {
                   
                       Padding(
                         padding: PaddingH16V12,
-                        child: ScalableText("功能设置",style:TextStyle(color:Colors.grey.withValues(alpha: 0.8))),
+                        child: Row(
+                          spacing: 12,
+                          children: [
+                            Icon(Icons.settings),
+                        
+                            ScalableText("功能设置",style:TextStyle(color:Colors.grey.withValues(alpha: 0.8))),
+                          ],
+                        ),
                       ),
                   
                       ListView.separated(
@@ -446,10 +494,6 @@ class CommentImageLoadModeTile extends ListTile{
       ),
     );
 
-
-    
-      
-    
   }
 
 }
@@ -522,45 +566,36 @@ class ClearCacheTile extends ListTile{
 
 }
 
-class ConfigTile extends ListTile{
-  const ConfigTile({super.key});
+class UpdateAlertToggleTile extends ListTile{
+  const UpdateAlertToggleTile({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final indexModel = context.read<IndexModel>();
+
     return SizedBox(
       height: 80,
       child: Center(
-        child: ListTile(
-          onTap: (){
-            final indexModel = context.read<IndexModel>();
-            showDialog(
-              context: context,
-              builder: (_){
-                return AlertDialog(
-                  title: const ScalableText("重置配置确认"),
-                  content: const ScalableText("要恢复默认配置吗"),
-                  actions:[
-                    TextButton(
-                      onPressed: ()=> Navigator.of(context).pop(),
-                      child: const ScalableText("取消")
+        child: Selector<IndexModel,bool?>(
+            selector: (_, indexModel) => indexModel.userConfig.isUpdateAlert,
+            shouldRebuild: (previous, next) => previous!=next,
+            builder: (_,manualStatus,child){
+              return ListTile(
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const ScalableText("是否在启动后弹出更新通知"),
+                    Switch(
+                      value: manualStatus ?? true, 
+                      onChanged: (value) => indexModel.updateUpdateAlertMode(value)
                     ),
-                    TextButton(
-                      onPressed: (){
-                        indexModel.resetConfig();
-                        Navigator.of(context).pop();
-                      }, 
-                      child: const ScalableText("确认")
-                    )
-                  ]
-                );
-              }
-            );
-          },
-          title: ScalableText("重置设置",style: TextStyle(fontSize: AppFontSize.s16)),
-        ),
+                  ],
+                ),
+              );
+            }
+          ),
       ),
-    );
-      
+    ); 
     
   }
 
@@ -732,25 +767,7 @@ class TestTile extends ListTile{
           child: Center(
             child: ListTile(
               onTap: (){
-                openAction();
-                //  //Navigator.pushNamed(context, Routes.test);
-        
-                //  //showSeasonDialog(context);
-                //  //showStarSubjectDialog(context);
-          
-                //  //downloadSticker(isOldType: false);
-          
-                //  //bus.emit('AppRoute','${BangumiAPIUrls.timelineReply(52089780)}?timelineID=52089780&comment=我难道喜欢看厕纸？');
-                
-                //  //debugPrint("callAndroidFunction");
-          
-                //  //await DocMan.perms.list().then((result){
-                //  //  debugPrint("list: $result");
-                //  //});
-          
-                //  //DocMan.perms.releaseAll();
-          
-                //  //await callAndroidFunction();
+                debugPrint("${MyHive.appConfigDataBase.get("currentTheme")}");
               },
               title: ScalableText("测试触发工具",style: TextStyle(fontSize: AppFontSize.s16))
             ),

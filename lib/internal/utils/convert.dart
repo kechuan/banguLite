@@ -42,18 +42,16 @@ String convertDigitNumString(int originalNumber, {int numberBits = 2}){
 
   String fillingContent = '';
 
-  if(originalNumber >= 10*(numberBits-1)){
+  if(originalNumber >= pow(10,numberBits-1)){
     return '$originalNumber';
   }
 
   else{
-    for(numberBits; numberBits>1; numberBits--){
-      fillingContent+='0';
-    }
-
+    fillingContent='0'*(numberBits-('$originalNumber'.length));
     return '$fillingContent$originalNumber';
   }
 
+  
 }
 
 String convertDecimalDigitNumString(num originalNumber, {int numberBits = 2}){

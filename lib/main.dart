@@ -31,6 +31,7 @@ void main() async {
   await listenAPPLink();
 
   HttpApiClient.init();
+
   await MyHive.init();
 
   if(Platform.isAndroid){

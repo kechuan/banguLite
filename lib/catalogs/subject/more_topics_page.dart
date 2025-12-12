@@ -60,7 +60,7 @@ class MoreTopicsPageState extends BangumiGeneralMoreContentPageState
         arguments: {
           "topicModel":getContentModel(),
           "topicInfo":getContentModel().contentListData[index],
-
+          "themeColor": bangumiThemeColor,
           "sourceTitle":widget.title
         }
       );

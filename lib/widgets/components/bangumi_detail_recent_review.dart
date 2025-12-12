@@ -28,6 +28,8 @@ class BangumiDetailRecentReview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    final bangumiModel = context.read<BangumiModel>();
+
     return Padding(
       padding: Padding16,
       child: Consumer<ReviewModel>(
@@ -62,7 +64,7 @@ class BangumiDetailRecentReview extends StatelessWidget {
                     child: TextButton(
                       onPressed: (){
 
-                        final bangumiModel = context.read<BangumiModel>();
+                        
 
                         Navigator.pushNamed(
                           context,
@@ -154,17 +156,14 @@ class BangumiDetailRecentReview extends StatelessWidget {
                               
                               onTap: () {
 
-
-
-                                //reviewModel.selectedBlogID = reviewModel.contentListData[index].blogID ?? 0;
-
                                 Navigator.pushNamed(
                                   context,
                                   Routes.blog,
                                    arguments: {
                                     "reviewModel":reviewModel,
                                     "reviewInfo": reviewModel.contentListData[index],
-                                    "sourceTitle": name
+                                    "sourceTitle": name,
+                                    "themeColor":bangumiModel.bangumiThemeColor
                                   }
                                 );
  

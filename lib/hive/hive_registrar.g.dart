@@ -16,7 +16,6 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(ScaleTypeAdapter());
     registerAdapter(StarBangumiDetailsAdapter());
     registerAdapter(StarTypeAdapter());
-    registerAdapter(SurfRecordDetailsAdapter());
     registerAdapter(SurfTimelineDetailsAdapter());
     registerAdapter(ThemeModeAdapter());
     registerAdapter(UserInformationAdapter());

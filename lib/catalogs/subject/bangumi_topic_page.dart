@@ -70,7 +70,6 @@ class _BangumiTopicPageState extends BangumiContentPageState
 
     if(!isContentLoading(contentDetail?.topicID)){
       if(contentDetail?.topicID != null){
-        //return contentDetail!.topicRepliedComment!.isEmpty ? 0 : contentDetail.topicRepliedComment!.length - 1;
         return contentDetail!.topicRepliedComment?.length ?? 0;
       }
     }
@@ -84,17 +83,19 @@ class _BangumiTopicPageState extends BangumiContentPageState
   @override
   Future<void> loadContent(int topicID,{bool isRefresh = false}){
     return getContentModel().loadContentDetail(
-		topicID,
-		isRefresh:isRefresh,
-		fallbackAction: (message) {
-			showRequestSnackBar(
-				message: message,
-				requestStatus: false,
-        backgroundColor: judgeCurrentThemeColor(context)
-			);
-		},
+      topicID,
+      isRefresh:isRefresh,
+      fallbackAction: (message) {
+        showRequestSnackBar(
+          message: message,
+          requestStatus: false,
+          backgroundColor: judgeCurrentThemeColor(context)
+        );
+      },
     );
   }
+
+  
 
   @override
   int? getReferPostContentID() => widget.referPostContentID;

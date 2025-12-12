@@ -11,7 +11,7 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
     required this.currentComment,
     this.commentIndex,
     this.postCommentType,
-    this.themeColor,
+    this.readableThemeColor,
 
   });
 
@@ -20,7 +20,7 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
   final EpCommentDetails currentComment;
   final int? commentIndex;
   final PostCommentType? postCommentType;
-  final Color? themeColor;
+  final Color? readableThemeColor;
   
   @override
   Widget build(BuildContext context) {
@@ -45,10 +45,10 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
                   contentID: contentID,
                   postCommentType: postCommentType,
                   epCommentData: currentComment,
-                  themeColor: themeColor,
+                  readableThemeColor: readableThemeColor,
                 ),
 
-                Divider(height: 2,color: themeColor),
+                Divider(height: 2,color: readableThemeColor),
               ],
             );
         }
@@ -58,7 +58,7 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
             contentID: contentID,
             postCommentType: postCommentType,
             epCommentData: currentComment.repliedComment![index-1],
-            themeColor: themeColor,
+            readableThemeColor: readableThemeColor,
             authorType: 
               currentComment.repliedComment![index-1].userInformation?.userID == currentComment.userInformation?.userID ?
               BangumiCommentAuthorType.levelAuthor:

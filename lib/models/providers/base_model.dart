@@ -20,13 +20,16 @@ abstract class BaseModel
     required this.subjectID,
   });
 
+  /// group 将 groupName 作为属性 一己之力将 int 属性更改为 dynamic
   final dynamic subjectID;
+
+  // 内容列表数据 装载着id 用于加载内部数据
   final List<I> contentListData = [];
 
-  /// group 将 groupName 作为属性 一己之力将 int 属性更改为 dynamic
+  // 单个内容的内部数据 id:Details
   final Map<dynamic, D> contentDetailData = {};
 
-  Future<bool> loadSubjectSubContentList({
+  Future<bool> loadSubjectContentList({
     Map<String, dynamic> queryParameters = const {},
     bool isReloaded = false,
     Function(String)? fallbackAction
@@ -81,7 +84,6 @@ abstract class BaseModel
       } 
       
       else {
-
         contentListData.addAll(convertResponseToList(subContentListResponseData));
       }
       notifyListeners();
@@ -159,7 +161,7 @@ abstract class BaseModel
 
   D? convertResponseToDetail(Map<String,dynamic> contentResponseData) => null;
 
-  //空数据填充 I为空表示 D为占位符表示
+  //空数据填充
   List<I> createEmptyInfoList();
   D? createEmptyDetails() => null;
 

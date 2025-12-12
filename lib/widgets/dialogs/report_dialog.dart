@@ -84,14 +84,18 @@ class ReportDialog extends StatelessWidget {
                                                       return Row(
                                                           spacing: 6,
                                                           children: [
-                                                      
-                                                              Radio(
-                                                                value: ReportReasonType.values[index],
-                                                                groupValue: reportType,
+
+                                                              RadioGroup(
                                                                 onChanged: (reportReasonType){
                                                                   reportTypeNotifier.value = reportReasonType!;
-                                                                }
+                                                                },
+                                                                groupValue: reportType,
+                                                                child: Radio(
+                                                                    value: ReportReasonType.values[index],
+                                                                ),
                                                               ),
+                                                      
+                                                              
                                                       
                                                               ConstrainedBox(
                                                                 constraints: BoxConstraints(

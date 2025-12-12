@@ -40,7 +40,7 @@ abstract class BangumiContentPageState<
   M extends BaseModel,
   I extends ContentInfo,
   D extends ContentDetails
-> extends LifecycleRouteState<W> with RouteLifecycleMixin {
+> extends LifecycleRouteState<W> {
 
     //widget.*信息获取
     M getContentModel();
@@ -50,36 +50,39 @@ abstract class BangumiContentPageState<
     String getWebUrl(int? contentID);
 
     String? sourceTitle() => null;
+    PostCommentType? getPostCommentType();
 
     //因为 reviewID 不与 blogID 相匹配 需要额外适配
     int? getSubContentID() => null;
+
+    int? getCommentCount(D? contentDetail, bool isLoading);
+    Color? getcurrentSubjectThemeColor();
+
+    //可选的跳转ID
+    int? getReferPostContentID();
 
     Future<void> loadContent(int contentID, {bool isRefresh = false});
 
     //blog 与 其他的 commentLoading 与 CommentCount 判定标注不一样 需要针对重写
     bool isContentLoading(int? contentID) {
         return getContentModel().contentDetailData[contentID] == null || 
-            getContentModel().contentDetailData[contentID]?.detailID == 0;
+        getContentModel().contentDetailData[contentID]?.detailID == 0;
     }
 
     List<String>? getTrailingPhotosUri() => null;
 
-    int? getCommentCount(D? contentDetail, bool isLoading);
-
-    PostCommentType? getPostCommentType();
-    Color? getcurrentSubjectThemeColor();
-
-    int? getReferPostContentID();
-
     //子内容加载(评论)
     Future? contentFuture;
 
+    bool isInitaled = false;
+
     final scrollController = ScrollController();
-    GlobalKey<SliverAnimatedListState> animatedSliverListKey = GlobalKey();
-    final authorContentKey = GlobalKey();
+    final GlobalKey<SliverAnimatedListState> animatedSliverListKey = GlobalKey();
+    final GlobalKey authorContentKey = GlobalKey();
 
     final refreshNotifier = ValueNotifier(0);
 
+    //推迟执行以允许非const输入
     late final commentFilterTypeNotifier = ValueNotifier(
       getReferPostContentID() != null ? 
       BangumiCommentRelatedType.id :
@@ -87,8 +90,6 @@ abstract class BangumiContentPageState<
     );
 
     /// [Local Record] will be refreshed by selectedEP Toggle
-    bool isInitaled = false;
-
     // For Record Comment Type List
     List<EpCommentDetails> resultFilterCommentList = [];
 
@@ -142,6 +143,7 @@ abstract class BangumiContentPageState<
                         return Theme(
                             data: Theme.of(context).copyWith(
                                 scaffoldBackgroundColor: judgeDarknessMode(context) ? null : getcurrentSubjectThemeColor(),
+                                //scaffoldBackgroundColor: getcurrentSubjectThemeColor()?.withValues(alpha: 0.8),
                             ),
                             child: Scaffold(
                                 body: Selector<M, D>(
@@ -266,7 +268,7 @@ abstract class BangumiContentPageState<
                                                                 return SliverAnimatedList(
                                                                     key: animatedSliverListKey,
                                                                     //rebuild不会影响内部 initialItemCount 只能分离逻辑了
-                                                                    initialItemCount: (contentDetail!.contentRepliedComment!.length - (isTopicContent() ? 1 : 0)),
+                                                                    initialItemCount:contentDetail!.contentRepliedComment!.length,
                                                                     itemBuilder: (_, contentCommentIndex, animation) {
 
                                                                         /// 用户添加回复时:
@@ -331,11 +333,11 @@ abstract class BangumiContentPageState<
           if (currentEpCommentDetails != null) {
               resultFilterCommentList = [...currentEpCommentDetails];                                               
 
-              if (isTopicContent()) {
-                  resultFilterCommentList.removeAt(0);
+              //if (isTopicContent()) {
+              //    resultFilterCommentList.removeAt(0);
 
-                  debugPrint("rawData: ${currentEpCommentDetails.first.epCommentIndex}");
-              }
+              //    debugPrint("rawData: ${currentEpCommentDetails.first.epCommentIndex}");
+              //}
 
               recordHistorySurf(contentInfo, contentDetail);
               isInitaled = true;
@@ -428,13 +430,9 @@ abstract class BangumiContentPageState<
                                 ..bangumiSurfTimelineType = BangumiSurfTimelineType.fromPostCommentType(getPostCommentType())
                                 ..replies = contentDetail?.contentRepliedComment?.length ?? 0
                                 ..commentDetails = (
-                            CommentDetails()
-                                ..userInformation = (
-                            isTopicContent() ?
-                                contentDetail?.contentRepliedComment?.first.userInformation :
-                                contentDetail?.userInformation ?? contentInfo.userInformation
-                            )
-                            )
+                                  CommentDetails()
+                                    ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
+                                )
                         );
 
                     }
@@ -459,19 +457,6 @@ abstract class BangumiContentPageState<
 
                 Builder(
                     builder: (_) {
-
-                        if (isTopicContent()) {
-
-                            authorEPCommentData = contentDetail!.contentRepliedComment?[0] ?? EpCommentDetails();
-
-                            return EpCommentView(
-                                contentID: contentInfo.id ?? 0,
-                                postCommentType: getPostCommentType(),
-                                epCommentData: authorEPCommentData,
-                                themeColor: getcurrentSubjectThemeColor(),
-                            );
-
-                        }
 
                         authorEPCommentData = EpCommentDetails()
                             ..comment = contentDetail?.content
@@ -516,31 +501,22 @@ abstract class BangumiContentPageState<
                         //  animatedSliverListKey = GlobalKey();
                         //}
 
-                        if (isTopicContent()) {
-                            resultFilterCommentList = filterCommentList(
-                                filterCommentType,
-                                [...contentDetail!.contentRepliedComment!].also((it) {
-                                        it.removeAt(0);
-                                    }),
-                                referID: contentDetail.contentRepliedComment?.first.userInformation?.userID
-                            );
-
-                        }
-
-                        else {
-                            resultFilterCommentList = filterCommentList(
+                        resultFilterCommentList = filterCommentList(
                                 filterCommentType,
                                 contentDetail!.contentRepliedComment!,
                                 referID: contentDetail.userInformation?.userID
-                            );
-                        }
+                        );
+
+                        
+
+                       
 
                         debugPrint("filter content resultFilterCommentList: ${resultFilterCommentList.length}");
 
                     },
                 ),
 
-                Divider(color: getcurrentSubjectThemeColor()),
+                Divider(color: judgeDarknessMode(context) ? getcurrentSubjectThemeColor() : judgeCurrentThemeColor(context)),
 
                 //无评论的显示状态
                 if(resultFilterCommentList.isEmpty && userCommentMap.isEmpty)
@@ -597,7 +573,7 @@ abstract class BangumiContentPageState<
                 ),
 
                 if(contentCommentIndex < max(0, resultFilterCommentList.length) + userCommentMap.length - 1)
-                Divider(color: getcurrentSubjectThemeColor())
+                Divider(color: judgeDarknessMode(context) ? getcurrentSubjectThemeColor() : judgeCurrentThemeColor(context)),
             ],
         );
 
@@ -612,19 +588,19 @@ abstract class BangumiContentPageState<
         bool isFiltered = false;
 
         final D? contentDetail = getContentModel().contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
-        int commentListCount = (getCommentCount(contentDetail, false) ?? 0) - (isTopicContent() ? 1 : 0);
+        int commentListCount = (getCommentCount(contentDetail, false) ?? 0);
 
         if (resultFilterCommentList.length != commentListCount) isFiltered = true;
 
         // Blog 第一个评论为 第一层, 而 Topic 则以 主楼 为 第一层
         int newFloor = isFiltered ? 
             commentListCount + contentCommentIndex + 1 :
-            contentCommentIndex + (isTopicContent() ? 1 : 0) + 1
+            contentCommentIndex + 1
         ;
 
         int newCommentID = isFiltered ?
             userCommentMap.keys.elementAt(newFloor - (commentListCount + contentCommentIndex + 1)) :
-            userCommentMap.keys.elementAt(newFloor - (contentCommentIndex + (isTopicContent() ? 1 : 0) + 1))
+            userCommentMap.keys.elementAt(newFloor - (contentCommentIndex + 1))
         ;
 
         final currentEpCommentDetails = EpCommentDetails()
@@ -665,13 +641,6 @@ abstract class BangumiContentPageState<
             )
 
         );
-    }
-
-    bool isTopicContent() {
-        return [
-            PostCommentType.replyTopic,
-            PostCommentType.replyGroupTopic,
-        ].contains(getPostCommentType());
     }
 
     void removeCommentAction(

@@ -221,8 +221,8 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                                                     onRefresh: () {
                                                         bangumiModel.loadDetails(isRefresh: true);
                                                         context.read<CommentModel>().loadComments(isReloaded: true);
-                                                        context.read<TopicModel>().loadSubjectSubContentList(isReloaded: true);
-                                                        context.read<ReviewModel>().loadSubjectSubContentList(isReloaded: true);
+                                                        context.read<TopicModel>().loadSubjectContentList(isReloaded: true);
+                                                        context.read<ReviewModel>().loadSubjectContentList(isReloaded: true);
                                                     },
 
                                                     child: CustomScrollView(

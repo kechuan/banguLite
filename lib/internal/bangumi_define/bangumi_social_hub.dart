@@ -61,11 +61,9 @@ enum BangumiSurfTimelineType{
   all("全部",Icons.history),
   subject("条目",Icons.crop_free),
   group("小组",Icons.forum_outlined),
-  timeline("时间线",Icons.history),
+  timeline("时间线",Icons.history)
   // 条目 有两组内容 Topic / Blog
   // 但API目前只有 trending 与 latest Topic 并没有 Blog...
-
-
   ;
 
   final String typeName;

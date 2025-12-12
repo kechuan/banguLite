@@ -219,7 +219,7 @@ class HistoryModel {
     return 
       pageIndex == localHistoryPageMap.length - 1 ?
       localHistoryPageMap.keys.last :
-      localHistoryPageMap.keys.elementAt(pageIndex) - 1
+      localHistoryPageMap.isEmpty ? 0 : localHistoryPageMap.keys.elementAt(pageIndex) - 1
     ;
 	}
 

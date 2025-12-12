@@ -74,7 +74,7 @@ class DateRangeSelect extends StatelessWidget {
             isExpanded: true,
             isDense: true,
             menuMaxHeight: (kMinInteractiveDimension*3),
-            value: initMonth,
+            initialValue: initMonth,
             items: [
               ...List.generate(
                 12, (index){

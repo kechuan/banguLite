@@ -20,7 +20,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
   }
 
   Future<void> loadSubjectReviews({int? offset = 0}) async {
-    await loadSubjectSubContentList(
+    await loadSubjectContentList(
       queryParameters: BangumiQuerys.reviewsQuery
         ..["offset"] = offset ?? 0
     );

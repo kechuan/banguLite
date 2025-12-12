@@ -8,7 +8,7 @@ part of 'hive_adapters.dart';
 
 class AppConfigAdapter extends TypeAdapter<AppConfig> {
   @override
-  final int typeId = 0;
+  final typeId = 0;
 
   @override
   AppConfig read(BinaryReader reader) {
@@ -23,13 +23,15 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
       ..customColor = fields[3] as Color?
       ..isSelectedCustomColor = fields[5] as bool?
       ..isFollowThemeColor = fields[6] as bool?
-      ..isManuallyImageLoad = fields[7] as bool?;
+      ..isManuallyImageLoad = fields[7] as bool?
+      ..isUpdateAlert = fields[8] as bool?
+    ;
   }
 
   @override
   void write(BinaryWriter writer, AppConfig obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.currentThemeColor)
       ..writeByte(1)
@@ -43,7 +45,10 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
       ..writeByte(6)
       ..write(obj.isFollowThemeColor)
       ..writeByte(7)
-      ..write(obj.isManuallyImageLoad);
+      ..write(obj.isManuallyImageLoad)
+      ..writeByte(8)
+      ..write(obj.isUpdateAlert)
+    ;
   }
 
   @override
@@ -59,7 +64,7 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
 
 class AppThemeColorAdapter extends TypeAdapter<AppThemeColor> {
   @override
-  final int typeId = 1;
+  final typeId = 1;
 
   @override
   AppThemeColor read(BinaryReader reader) {
@@ -104,7 +109,7 @@ class AppThemeColorAdapter extends TypeAdapter<AppThemeColor> {
 
 class ThemeModeAdapter extends TypeAdapter<ThemeMode> {
   @override
-  final int typeId = 2;
+  final typeId = 2;
 
   @override
   ThemeMode read(BinaryReader reader) {
@@ -145,7 +150,7 @@ class ThemeModeAdapter extends TypeAdapter<ThemeMode> {
 
 class ScaleTypeAdapter extends TypeAdapter<ScaleType> {
   @override
-  final int typeId = 3;
+  final typeId = 3;
 
   @override
   ScaleType read(BinaryReader reader) {
@@ -194,7 +199,7 @@ class ScaleTypeAdapter extends TypeAdapter<ScaleType> {
 
 class ColorAdapter extends TypeAdapter<Color> {
   @override
-  final int typeId = 4;
+  final typeId = 4;
 
   @override
   Color read(BinaryReader reader) {
@@ -228,7 +233,7 @@ class ColorAdapter extends TypeAdapter<Color> {
 
 class StarBangumiDetailsAdapter extends TypeAdapter<StarBangumiDetails> {
   @override
-  final int typeId = 5;
+  final typeId = 5;
 
   @override
   StarBangumiDetails read(BinaryReader reader) {
@@ -289,7 +294,7 @@ class StarBangumiDetailsAdapter extends TypeAdapter<StarBangumiDetails> {
 class LoginedUserInformationsAdapter
     extends TypeAdapter<LoginedUserInformations> {
   @override
-  final int typeId = 7;
+  final typeId = 7;
 
   @override
   LoginedUserInformations read(BinaryReader reader) {
@@ -334,7 +339,7 @@ class LoginedUserInformationsAdapter
 
 class UserInformationAdapter extends TypeAdapter<UserInformation> {
   @override
-  final int typeId = 8;
+  final typeId = 8;
 
   @override
   UserInformation read(BinaryReader reader) {
@@ -386,7 +391,7 @@ class UserInformationAdapter extends TypeAdapter<UserInformation> {
 
 class SurfTimelineDetailsAdapter extends TypeAdapter<SurfTimelineDetails> {
   @override
-  final int typeId = 10;
+  final typeId = 10;
 
   @override
   SurfTimelineDetails read(BinaryReader reader) {
@@ -441,7 +446,7 @@ class SurfTimelineDetailsAdapter extends TypeAdapter<SurfTimelineDetails> {
 
 class CommentDetailsAdapter extends TypeAdapter<CommentDetails> {
   @override
-  final int typeId = 11;
+  final typeId = 11;
 
   @override
   CommentDetails read(BinaryReader reader) {
@@ -497,7 +502,7 @@ class CommentDetailsAdapter extends TypeAdapter<CommentDetails> {
 
 class BangumiTimelineTypeAdapter extends TypeAdapter<BangumiSurfTimelineType> {
   @override
-  final int typeId = 12;
+  final typeId = 12;
 
   @override
   BangumiSurfTimelineType read(BinaryReader reader) {
@@ -542,7 +547,7 @@ class BangumiTimelineTypeAdapter extends TypeAdapter<BangumiSurfTimelineType> {
 
 class StarTypeAdapter extends TypeAdapter<StarType> {
   @override
-  final int typeId = 13;
+  final typeId = 13;
 
   @override
   StarType read(BinaryReader reader) {
@@ -593,39 +598,3 @@ class StarTypeAdapter extends TypeAdapter<StarType> {
           typeId == other.typeId;
 }
 
-class SurfRecordDetailsAdapter extends TypeAdapter<SurfRecordDetails> {
-  @override
-  final int typeId = 14;
-
-  @override
-  SurfRecordDetails read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return SurfRecordDetails(
-      recordTimeStamp: (fields[0] as num?)?.toInt(),
-      detailID: (fields[1] as num?)?.toInt(),
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, SurfRecordDetails obj) {
-    writer
-      ..writeByte(2)
-      ..writeByte(0)
-      ..write(obj.recordTimeStamp)
-      ..writeByte(1)
-      ..write(obj.detailID);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SurfRecordDetailsAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}

@@ -99,7 +99,7 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
 
     if(isAppend != true) contentListData.clear();
 
-    await loadSubjectSubContentList(
+    await loadSubjectContentList(
       queryParameters: BangumiQuerys.topicsQuery
         ..["offset"] = offset ?? 0
     ).then((result){

@@ -92,29 +92,37 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
       appLoginMethodListener(context, link);
     });
 
-    pullLatestRelease().then((latestRelease){
-      cleanInstalledPackageCache(latestRelease?.tagName);
-      if(latestRelease == null) return;
+    //更新检查逻辑
+    cleanInstalledPackageCache(APPInformationRepository.version);
 
-      if(APPInformationRepository.version == latestRelease.tagName){
-        return;
-      }
+    if(context.read<IndexModel>().userConfig.isUpdateAlert != false){
+      pullLatestRelease().then((latestRelease){
+        
+        if(latestRelease == null) return;
+        if(APPInformationRepository.version == latestRelease.tagName){
+          return;
+        }
 
-      Future.delayed(
-        const Duration(seconds: 3), 
-        ()=> showRequestSnackBar(
-          message: "检测到新版本",
-          trailingWidget: TextButton(
-            onPressed: ()=> invokeShowUpdateDialog(latestRelease),
-            child: const Text('去更新',style: TextStyle(color: Colors.black))
+        Future.delayed(
+          const Duration(seconds: 3), 
+          ()=> showRequestSnackBar(
+            message: "检测到新版本",
+            trailingWidget: TextButton(
+              onPressed: ()=> invokeShowUpdateDialog(latestRelease),
+              child: const Text('去更新',style: TextStyle(color: Colors.black))
+              
+            ),
             
-          ),
-          
-          backgroundColor: judgeCurrentThemeColor(getContext())
-        )
-      );
-    });
+            backgroundColor: judgeCurrentThemeColor(getContext())
+          )
+       );
+
+      
+      });
     
+    }
+
+
     super.initState();
   }
 

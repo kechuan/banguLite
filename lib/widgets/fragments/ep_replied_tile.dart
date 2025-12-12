@@ -112,6 +112,7 @@ class EpRepliedTile extends ListTile {
                                                               
                                         if (quoteContent.isNotEmpty) ...[
                                           WidgetSpan(
+                                            alignment: PlaceholderAlignment.bottom,
                                             child: DecoratedBox(
                                               decoration: BoxDecoration(
                                                 border: Border.all(),
@@ -124,7 +125,10 @@ class EpRepliedTile extends ListTile {
                                                   "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}..." : 
                                                   quoteContent.replaceAll(bbcodeRegexp, ''),
                                                   maxLines: 1,
-                                                  style: TextStyle(color: judgeCurrentThemeColor(context),fontSize: AppFontSize.s14),
+                                                  style: TextStyle(
+                                                    color: judgeDarknessMode(context) ? judgeCurrentThemeColor(context) : Colors.blueGrey,
+                                                    fontSize: AppFontSize.s14
+                                                  ),
                                                 ),
                                               )
                                             )
@@ -218,7 +222,7 @@ class ShowCommentTap extends InkResponse {
               currentComment: epCommentData,
               commentIndex: commentIndex,
               postCommentType: postCommentType,
-              themeColor: themeColor,
+              readableThemeColor: themeColor,
             );
             
           }

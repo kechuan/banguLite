@@ -35,9 +35,9 @@ abstract class ContentInfo extends BaseInfo {
   UserInformation? userInformation;
 
 
-  // 工厂方法，创建空对象
+  // 工厂方法，创建空对象 需求交付给子类实现
   factory ContentInfo.empty() {
-    throw UnimplementedError('BaseInfo.empty() must be implemented by subclasses');
+    throw UnimplementedError('ContentInfo.empty() must be implemented by subclasses');
   }
 
 }

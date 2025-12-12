@@ -12,8 +12,9 @@ class AppConfig extends HiveObject{
   bool? isSelectedCustomColor = false;
   bool? isFollowThemeColor = false;
   bool? isManuallyImageLoad = true;
-  //登入凭证
+  bool? isUpdateAlert = true;
   
+  //登入凭证
 
   @override
   String toString() {
@@ -26,6 +27,7 @@ class AppConfig extends HiveObject{
       isSelectedCustomColor:$isSelectedCustomColor
       follow:$isFollowThemeColor
       ManuallyImageLoad:$isManuallyImageLoad
+      isUpdateAlert:$isUpdateAlert
     ]""";
   }
 }

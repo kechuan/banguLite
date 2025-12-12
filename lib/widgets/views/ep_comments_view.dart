@@ -33,6 +33,14 @@ class EpCommentView extends StatelessWidget {
 
     //final bangumiModelThemeColor = context.read<EpModel>().bangumiThemeColor;
 
+    Color? readableThemeColor = 
+    themeColor?.withValues(
+      red: 1-themeColor!.r,
+      green: 1-themeColor!.g,
+      blue: 1-themeColor!.b
+    ) ;
+    //judgeDetailRenderColor(context,themeColor);
+
     BangumiCommentAuthorType? authorType;
 
     epCommentData.userInformation.let(
@@ -53,7 +61,7 @@ class EpCommentView extends StatelessWidget {
         contentID: contentID,
         epCommentData: epCommentData,
         postCommentType:postCommentType,
-        themeColor: themeColor,
+        readableThemeColor: readableThemeColor,
         onUpdateComment: onUpdateComment,
         authorType: authorType,
       ),
@@ -61,7 +69,7 @@ class EpCommentView extends StatelessWidget {
         contentID: contentID,
         epCommentData: epCommentData,
         postCommentType:postCommentType,
-        themeColor: themeColor,
+        themeColor: readableThemeColor,
         onUpdateComment: onUpdateComment,
         authorType: authorType,
         

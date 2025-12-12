@@ -747,9 +747,9 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                                             children: [
                           
                                               ScalableText(
-                                                "${historyModel.groupIndices.keys.elementAt(startIndex)}"
+                                                "${historyModel.groupIndices.keys.elementAtOrNull(startIndex) ?? ""}"
                                                 " ~ "
-                                                "${historyModel.groupIndices.keys.elementAt(endIndex)}",
+                                                "${historyModel.groupIndices.keys.elementAtOrNull(endIndex) ?? ""}",
                                                 style: TextStyle(fontWeight: FontWeight.bold),
                                               ),
                           
@@ -789,9 +789,16 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                         Expanded(
                             child: PageView(
                                 controller: historyModel.historyPageController,
-                                children: List.generate(historyModel.localHistoryPageMap.length, (index) => CustomScrollView(
-                                  slivers: buildPageSection(context, index)
-                                )),
+                                children: [
+                                  if(historyModel.localHistoryPageMap.isEmpty)
+                                    Center(
+                                      child: ScalableText("空空如也"),
+                                    )
+                                  else
+                                    ...List.generate(historyModel.localHistoryPageMap.length, (index) => CustomScrollView(
+                                      slivers: buildPageSection(context, index)
+                                    )),
+                                ]
                             )
                         )
 

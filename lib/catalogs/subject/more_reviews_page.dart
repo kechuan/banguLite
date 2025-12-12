@@ -60,8 +60,7 @@ class MoreReviewsPageState extends BangumiGeneralMoreContentPageState
         arguments: {
           "reviewModel":getContentModel(),
           "reviewInfo": getContentModel().contentListData[index],
-          "themeColor": judgeDetailRenderColor(context,bangumiThemeColor),
-
+          "themeColor": bangumiThemeColor,
           "sourceTitle":widget.title
           
         }
