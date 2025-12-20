@@ -368,7 +368,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                                       
                                       ValueListenableBuilder(
                                         valueListenable: transitionalSeasonNotifier,
-                                        builder: (_,noticeStatus,child) {
+                                        builder: (_,noticeStatus,__) {
                                           return Offstage(
                                             offstage: !judgeTransitionalSeason() || noticeStatus,
                                               child: Transform.translate( 

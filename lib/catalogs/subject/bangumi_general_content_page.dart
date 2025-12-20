@@ -9,6 +9,7 @@ import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
@@ -36,11 +37,11 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 abstract class BangumiContentPageState<
-  W extends StatefulWidget,
-  M extends BaseModel,
-  I extends ContentInfo,
-  D extends ContentDetails
-> extends LifecycleRouteState<W> {
+    W extends StatefulWidget,
+    M extends BaseModel,
+    I extends ContentInfo,
+    D extends ContentDetails
+    > extends LifecycleRouteState<W> {
 
     //widget.*信息获取
     M getContentModel();
@@ -66,7 +67,7 @@ abstract class BangumiContentPageState<
     //blog 与 其他的 commentLoading 与 CommentCount 判定标注不一样 需要针对重写
     bool isContentLoading(int? contentID) {
         return getContentModel().contentDetailData[contentID] == null || 
-        getContentModel().contentDetailData[contentID]?.detailID == 0;
+            getContentModel().contentDetailData[contentID]?.detailID == 0;
     }
 
     List<String>? getTrailingPhotosUri() => null;
@@ -84,9 +85,9 @@ abstract class BangumiContentPageState<
 
     //推迟执行以允许非const输入
     late final commentFilterTypeNotifier = ValueNotifier(
-      getReferPostContentID() != null ? 
-      BangumiCommentRelatedType.id :
-      BangumiCommentRelatedType.normal
+        getReferPostContentID() != null ? 
+            BangumiCommentRelatedType.id :
+            BangumiCommentRelatedType.normal
     );
 
     /// [Local Record] will be refreshed by selectedEP Toggle
@@ -96,28 +97,25 @@ abstract class BangumiContentPageState<
     // For record Local comment Change.
     final Map<int, String> userCommentMap = {};
 
-    
-
     @override
     void initState() {
 
-      final contentInfo = getContentInfo();
+        final contentInfo = getContentInfo();
 
-      debugPrint('[GenernalContent] ${contentInfo.runtimeType} ID / subContentID: ${contentInfo.id} / ${getSubContentID()}');
-      
-      /// TODO 加载预先拦截区域 迟早会封装到 BaseModel 中...
-      /// 然后直接以 ?.call(contentFuture) 的形式调用
-      
-      if(contentInfo is TopicInfo){
-        if(contentInfo.commentState == CommentState.adminCloseTopic.index){
-          contentFuture = Future.error("此帖子已被管理员关闭,需要登录以获取查看权限");
+        debugPrint('[GenernalContent] ${contentInfo.runtimeType} ID / subContentID: ${contentInfo.id} / ${getSubContentID()}');
+
+        /// TODO 加载预先拦截区域 迟早会封装到 BaseModel 中...
+        /// 然后直接以 ?.call(contentFuture) 的形式调用
+
+        if (contentInfo is TopicInfo) {
+            if (contentInfo.commentState == CommentState.adminCloseTopic.index) {
+                contentFuture = Future.error("此帖子已被管理员关闭,需要登录以获取查看权限");
+            }
         }
-      }
 
-      contentFuture ??= loadContent(getSubContentID() ?? getContentInfo().id ?? 0);
+        contentFuture ??= loadContent(getSubContentID() ?? getContentInfo().id ?? 0);
 
-
-      super.initState();
+        super.initState();
     }
 
     @override
@@ -142,13 +140,12 @@ abstract class BangumiContentPageState<
                     childBuilder: (_, physic) {
                         return Theme(
                             data: Theme.of(context).copyWith(
-                                scaffoldBackgroundColor: judgeDarknessMode(context) ? null : getcurrentSubjectThemeColor(),
-                                //scaffoldBackgroundColor: getcurrentSubjectThemeColor()?.withValues(alpha: 0.8),
+                              scaffoldBackgroundColor: judgeDarknessMode(context) ? null : convertFineTuneColor(getcurrentSubjectThemeColor() ?? judgeCurrentThemeColor(context),lumiScaleType: ScaleType.min),
                             ),
                             child: Scaffold(
                                 body: Selector<M, D>(
                                     selector: (_, model) => (contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?) ?? createEmptyDetailData(),
-                                    shouldRebuild: (previous, next) => true,
+                                    shouldRebuild: (previous, next) => previous != next,
                                     builder: (_, contentDetailData, contentComment) {
 
                                         return Scrollbar(
@@ -197,8 +194,8 @@ abstract class BangumiContentPageState<
                                                                             height: MediaQuery.sizeOf(context).height,
                                                                             width: MediaQuery.sizeOf(context).width,
                                                                             child: ErrorLoadPrompt(
-                                                                              message: snapshot.error,
-                                                                              onRetryAction: () => loadContent(getSubContentID() ?? contentInfo.id ?? 0, isRefresh: true),
+                                                                                message: snapshot.error,
+                                                                                onRetryAction: () => loadContent(getSubContentID() ?? contentInfo.id ?? 0, isRefresh: true),
                                                                             ),
 
                                                                         );
@@ -208,24 +205,24 @@ abstract class BangumiContentPageState<
                                                                     initCotent();
 
                                                                     return isCommentLoading ?
-                                                                    Skeletonizer.sliver(
-                                                                        enabled: true,
-                                                                        child: SliverList(
-                                                                            delegate: SliverChildBuilderDelegate(
-                                                                                (_, index) {
-                                                                                    if (index == 0) {
-                                                                                        return Padding(
-                                                                                            padding: EdgeInsetsGeometry.only(top: 50, bottom: 125),
-                                                                                            child: const SkeletonListTileTemplate(scaleType: ScaleType.medium),
-                                                                                        );
+                                                                        Skeletonizer.sliver(
+                                                                            enabled: true,
+                                                                            child: SliverList(
+                                                                                delegate: SliverChildBuilderDelegate(
+                                                                                    (_, index) {
+                                                                                        if (index == 0) {
+                                                                                            return Padding(
+                                                                                                padding: EdgeInsetsGeometry.only(top: 50, bottom: 125),
+                                                                                                child: const SkeletonListTileTemplate(scaleType: ScaleType.medium),
+                                                                                            );
+                                                                                        }
+                                                                                        return const SkeletonListTileTemplate(scaleType: ScaleType.min);
                                                                                     }
-                                                                                    return const SkeletonListTileTemplate(scaleType: ScaleType.min);
-                                                                                }
-                                                                            ),
+                                                                                ),
 
-                                                                        ),
-                                                                    ) :
-                                                                    authorContent(contentInfo, contentDetailData);
+                                                                            ),
+                                                                        ) :
+                                                                        authorContent(contentInfo, contentDetailData);
 
                                                                 }
                                                             ),
@@ -244,6 +241,8 @@ abstract class BangumiContentPageState<
                                             return FutureBuilder(
                                                 future: contentFuture,
                                                 builder: (_, snapshot) {
+
+                                                    debugPrint("[GeneralContentPage] commentRebuild");
 
                                                     final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != unExistID;
                                                     final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
@@ -268,7 +267,7 @@ abstract class BangumiContentPageState<
                                                                 return SliverAnimatedList(
                                                                     key: animatedSliverListKey,
                                                                     //rebuild不会影响内部 initialItemCount 只能分离逻辑了
-                                                                    initialItemCount:contentDetail!.contentRepliedComment!.length,
+                                                                    initialItemCount: contentDetail!.contentRepliedComment!.length,
                                                                     itemBuilder: (_, contentCommentIndex, animation) {
 
                                                                         /// 用户添加回复时:
@@ -318,65 +317,67 @@ abstract class BangumiContentPageState<
         );
     }
 
-    void initCotent(){
+    void initCotent() {
 
-      final contentModel = getContentModel();
-      final contentInfo = getContentInfo();
+        final contentModel = getContentModel();
+        final contentInfo = getContentInfo();
 
-      final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
+        final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
 
-      final currentEpCommentDetails = contentDetail?.contentRepliedComment;
+        final currentEpCommentDetails = contentDetail?.contentRepliedComment;
 
-      if (!isInitaled) {
-          debugPrint("contentDetail?.detailID: ${contentDetail?.detailID} currentEpCommentDetails:${currentEpCommentDetails?.length} ");
+        if (!isInitaled) {
+            debugPrint("contentDetail?.detailID: ${contentDetail?.detailID} currentEpCommentDetails:${currentEpCommentDetails?.length} ");
 
-          if (currentEpCommentDetails != null) {
-              resultFilterCommentList = [...currentEpCommentDetails];                                               
+            if (currentEpCommentDetails != null) {
+                resultFilterCommentList = [...currentEpCommentDetails];                                               
 
-              //if (isTopicContent()) {
-              //    resultFilterCommentList.removeAt(0);
+                recordHistorySurf(contentInfo, contentDetail);
+                isInitaled = true;
 
-              //    debugPrint("rawData: ${currentEpCommentDetails.first.epCommentIndex}");
-              //}
+                if (commentFilterTypeNotifier.value == BangumiCommentRelatedType.id) {
 
-              recordHistorySurf(contentInfo, contentDetail);
-              isInitaled = true;
+                    debugPrint("trigged referContentID: ${getReferPostContentID()}");
 
-              if (commentFilterTypeNotifier.value == BangumiCommentRelatedType.id) {
+                    resultFilterCommentList = filterCommentList(
+                        commentFilterTypeNotifier.value,
+                        resultFilterCommentList,
+                        referID: getReferPostContentID()
+                    );
 
-                  debugPrint("trigged referContentID: ${getReferPostContentID()}");
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                            debugPrint("measure height:${authorContentKey.currentContext?.size?.height},result:${(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - scrollController.offset}");
+                            scrollController.animateTo(
+                                max(0, (authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - MediaQuery.sizeOf(context).height / 3),
+                                duration: const Duration(milliseconds: 500),
+                                curve: Curves.easeOut,
+                            );
 
-                  resultFilterCommentList = filterCommentList(
-                      commentFilterTypeNotifier.value,
-                      resultFilterCommentList,
-                      referID: getReferPostContentID()
-                  );
+                        });
 
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                      debugPrint("measure height:${authorContentKey.currentContext?.size?.height},result:${(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - scrollController.offset}");
-                      scrollController.animateTo(
-                          max(0, (authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - MediaQuery.sizeOf(context).height / 3),
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeOut,
-                      );
+                }
 
-                  });
-
-              }
-
-          }
-      }
+            }
+        }
 
     }
 
     void recordHistorySurf(I contentInfo, D? contentDetail) {
         if (contentDetail?.detailID != 0) {
 
-            String? subjectTitle = 
-                getPostCommentType() == PostCommentType.replyBlog ? 
-                    sourceTitle()!.contains('[日志]') ? sourceTitle() : '[日志] ${sourceTitle()}' : 
-                    sourceTitle()
-            ;
+            String? subjectTitle = sourceTitle();
+
+            if (getPostCommentType() == PostCommentType.replyBlog) {
+                if (sourceTitle() != null) {
+                    subjectTitle = sourceTitle()!.contains('[日志]') ? sourceTitle() : '[日志] ${sourceTitle()}';
+                }
+
+                else {
+                    subjectTitle = '[日志]';
+                }
+            }
+
+            final accessID = getSubContentID() ?? contentInfo.id ?? 0;
 
             switch (getPostCommentType()){
 
@@ -384,31 +385,28 @@ abstract class BangumiContentPageState<
                 case PostCommentType.replyBlog:
                 {
 
-                    final accessID = getSubContentID() ?? contentInfo.id ?? 0;
-
                     if (accessID == 0) break;
 
                     if (MyHive.historySurfDataBase.keys.contains(accessID)) {
 
                         MyHive.historySurfDataBase.get(accessID)?.sourceTitle.let((sourceTitle) {
-                            if (sourceTitle == "帖子" || sourceTitle == "博客") {
+                                if (sourceTitle == "帖子" || sourceTitle == "博客") {
 
-                                final historyModel = HistoryModel.instance;
+                                    final historyModel = HistoryModel.instance;
 
-                                subjectTitle = historyModel.dataSource.firstWhere((surfTimelineDetails) {
-                                  return 
-                                    surfTimelineDetails.detailID == getContentModel().subjectID &&
-                                    surfTimelineDetails.sourceTitle == null
-                                  ;
-                                }).title;
+                                    subjectTitle = historyModel.dataSource.firstWhere((surfTimelineDetails) {
+                                            return 
+                                            surfTimelineDetails.detailID == getContentModel().subjectID &&
+                                                surfTimelineDetails.sourceTitle == null
+                                            ;
+                                        }).title;
 
-                            }
-                        });
+                                }
+                            });
 
                         MyHive.historySurfDataBase.put(
                             accessID,
                             MyHive.historySurfDataBase.get(accessID)!
-                                ..sourceID = getContentModel().subjectID
                                 ..sourceTitle = subjectTitle
                                 ..updatedAt = DateTime.now().millisecondsSinceEpoch
                                 ..replies = contentDetail?.contentRepliedComment?.length ?? 0
@@ -430,9 +428,9 @@ abstract class BangumiContentPageState<
                                 ..bangumiSurfTimelineType = BangumiSurfTimelineType.fromPostCommentType(getPostCommentType())
                                 ..replies = contentDetail?.contentRepliedComment?.length ?? 0
                                 ..commentDetails = (
-                                  CommentDetails()
-                                    ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
-                                )
+                            CommentDetails()
+                                ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
+                            )
                         );
 
                     }
@@ -444,11 +442,21 @@ abstract class BangumiContentPageState<
             }
 
         }
+
     }
 
     Widget authorContent(I contentInfo, D? contentDetail) {
 
         late EpCommentDetails authorEPCommentData;
+
+        Color? readableThemeColor = 
+        !judgeDarknessMode(context) ?
+        getcurrentSubjectThemeColor()?.withValues(
+          red: 1 - getcurrentSubjectThemeColor()!.r,
+          green: 1 - getcurrentSubjectThemeColor()!.g,
+          blue: 1 - getcurrentSubjectThemeColor()!.b
+        ) : 
+        getcurrentSubjectThemeColor();
 
         return Column(
             key: authorContentKey,
@@ -470,7 +478,7 @@ abstract class BangumiContentPageState<
                             contentID: contentInfo.id ?? 0,
                             postCommentType: getPostCommentType(),
                             epCommentData: authorEPCommentData,
-                            themeColor: getcurrentSubjectThemeColor(),
+                            themeColor: readableThemeColor,
                         );
 
                     }
@@ -495,28 +503,18 @@ abstract class BangumiContentPageState<
                     isUserContent: true,
                     onCommentFilter: (filterCommentType) {
 
-                        //RESET Aniamted SliverList State
-                        //if(commentFilterTypeNotifier.value == BangumiCommentRelatedType.id){
-                        //  //同时也会撤销掉所有的 insertItem/removeItem 毕竟直接重构了
-                        //  animatedSliverListKey = GlobalKey();
-                        //}
-
                         resultFilterCommentList = filterCommentList(
-                                filterCommentType,
-                                contentDetail!.contentRepliedComment!,
-                                referID: contentDetail.userInformation?.userID
+                            filterCommentType,
+                            contentDetail!.contentRepliedComment!,
+                            referID: contentDetail.userInformation?.userID
                         );
-
-                        
-
-                       
 
                         debugPrint("filter content resultFilterCommentList: ${resultFilterCommentList.length}");
 
                     },
                 ),
 
-                Divider(color: judgeDarknessMode(context) ? getcurrentSubjectThemeColor() : judgeCurrentThemeColor(context)),
+                Divider(color: Colors.grey.withValues(alpha: 0.8)),
 
                 //无评论的显示状态
                 if(resultFilterCommentList.isEmpty && userCommentMap.isEmpty)
@@ -537,7 +535,17 @@ abstract class BangumiContentPageState<
         I contentInfo
     ) {
 
+        debugPrint("[CommentIndex:$contentCommentIndex Rebuild]");
+
         final ValueNotifier<int> commentUpdateFlag = ValueNotifier(0);
+
+        Color? readableThemeColor = 
+          !judgeDarknessMode(context) ?
+          getcurrentSubjectThemeColor()?.withValues(
+            red: 1 - getcurrentSubjectThemeColor()!.r,
+            green: 1 - getcurrentSubjectThemeColor()!.g,
+            blue: 1 - getcurrentSubjectThemeColor()!.b
+          ) : getcurrentSubjectThemeColor();
 
         return Column(
             children: [
@@ -565,7 +573,7 @@ abstract class BangumiContentPageState<
                             },
                             epCommentData: currentEpCommentDetails,
                             authorID: contentInfo.userInformation?.userID,
-                            themeColor: getcurrentSubjectThemeColor(),
+                            themeColor: readableThemeColor,
 
                         );
                     },
@@ -573,7 +581,15 @@ abstract class BangumiContentPageState<
                 ),
 
                 if(contentCommentIndex < max(0, resultFilterCommentList.length) + userCommentMap.length - 1)
-                Divider(color: judgeDarknessMode(context) ? getcurrentSubjectThemeColor() : judgeCurrentThemeColor(context)),
+                Divider(
+                    thickness: 0.5,
+                    height: 1,
+                    color: 
+                    judgeDarknessMode(context) ? 
+                        getcurrentSubjectThemeColor() : 
+                        readableThemeColor
+                ),
+
             ],
         );
 

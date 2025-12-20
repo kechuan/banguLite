@@ -33,135 +33,144 @@ class IndexLandscape extends StatelessWidget {
 
         expandedMenuNotifier.value = false;
 
-        return LayoutBuilder(
-          builder: (_,constraint) {
-            
-            return Row(
+        return Row(
+          children: [
+        
+            Column(
+        
               children: [
-            
-                NavigationRail(
-                  groupAlignment: -1.0,
-                  labelType: NavigationRailLabelType.all,
-                  selectedIndex: currentPageIndex,
-                  leading: railLeading!,
-                  trailing: Builder(
-                    builder: (_) {
-                      
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        spacing: 32,
-                        children: [
-
-                          Padding(
-                            padding: EdgeInsets.only(top: max(0,constraint.maxHeight-658))
-                          ),
-
-                          const SizedBox(
-                            height: 30,
-                            width: 30,
-                            child: AppUserAvatar()
-                          ),
-
-                          const ToggleThemeModeButton(),
-                      
-                          InkResponse(
-                            onTap: () {
-                              indexModel.updateCachedSize();
-                              Navigator.pushNamed(context,Routes.settings);
-                            },
-                            child: Icon(Icons.settings,size: min(30,MediaQuery.sizeOf(context).width/15)),
-                          ),
-                      
-                      
-                        ],
-                      );
-                    }
-                  ),
-                
-                  destinations: const [
-                        
-                    NavigationRailDestination(
-                      icon: Icon(Icons.local_fire_department_outlined),
-                      selectedIcon: Icon(Icons.local_fire_department_rounded),
-                      label: ScalableText('番剧')
-                    ),
-                        
-                    NavigationRailDestination(
-                      icon: Icon(Icons.filter_alt_outlined),
-                      selectedIcon: Icon(Icons.filter_alt),
-                      label: ScalableText('筛选')
-                    ),
-                
-                    NavigationRailDestination(
-                      icon: Icon(Icons.star_border),
-                      selectedIcon: Icon(Icons.star),
-                      label: ScalableText('收藏')
-                    ),
-                
-                
-                  ],
-                  onDestinationSelected: (newIndex){
-                    FocusScope.of(context).unfocus();
-                    selectedPageIndexNotifier.value = newIndex;
-                  }
-                ),
-            
-                const VerticalDivider(width: 1),
-            
+        
                 Expanded(
-                  child: Stack(
-                    children: [
-
-                      IndexedStack(
-                        index: currentPageIndex,
-                        children: const [
-                          BangumiCalendarPage(),
-                          BangumiSortPage(),
-                          BangumiStarPage()
-                        ],
-                      ),
-
-                      ValueListenableBuilder(
-                        valueListenable: expandedMenuNotifier,
-                        builder: (_,menuExpandedStatus,menu) {
-
-                          return AnimatedPositioned(
-                            left: menuExpandedStatus ? 0 : -350,
-                            width: min(350, MediaQuery.sizeOf(context).width*3/4),
-                            height: MediaQuery.sizeOf(context).height,
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeOut,
-                            child: menu!
+                  child: SizedBox(
+                    width: 80,
+                    child: NavigationRail(
+                      groupAlignment: -1.0,
+                      labelType: NavigationRailLabelType.all,
+                      selectedIndex: currentPageIndex,
+                      leading: railLeading!,
+                      //因为是trailing 本质的约束是无限的。。 可是 占据有效高度的在 onDestinationSelected 与 leading 中
+                      //在widget上无法获取它们的高度 以作为调整
+                    
+                      destinations: const [
                             
-                          );
-                        },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Material(
-                            color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
-                            child: const AppDrawer()
-                          )
+                        NavigationRailDestination(
+                          icon: Icon(Icons.local_fire_department_outlined),
+                          selectedIcon: Icon(Icons.local_fire_department_rounded),
+                          label: ScalableText('番剧')
                         ),
-                      )
-
-
-                    ],
+                            
+                        NavigationRailDestination(
+                          icon: Icon(Icons.filter_alt_outlined),
+                          selectedIcon: Icon(Icons.filter_alt),
+                          label: ScalableText('筛选')
+                        ),
+                    
+                        NavigationRailDestination(
+                          icon: Icon(Icons.star_border),
+                          selectedIcon: Icon(Icons.star),
+                          label: ScalableText('收藏')
+                        ),
+                    
+                    
+                      ],
+                      onDestinationSelected: (newIndex){
+                        FocusScope.of(context).unfocus();
+                        selectedPageIndexNotifier.value = newIndex;
+                      }
+                    ),
+                  ),
+                ),
+        
+        
+                Material(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: SizedBox(
+                      width: 80,
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          spacing: 32,
+                          children: [    
+                            const SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: AppUserAvatar()
+                            ),
+                                      
+                            const ToggleThemeModeButton(),
+                        
+                            InkResponse(
+                              onTap: () {
+                                indexModel.updateCachedSize();
+                                Navigator.pushNamed(context,Routes.settings);
+                              },
+                              child: Icon(Icons.settings,size: min(30,MediaQuery.sizeOf(context).width/15)),
+                            ),
+                        
+                        
+                          ],
+                      ),
+                    ),
                   ),
                 )
-                
+                      
+        
               ],
-            );
-          }
+            ),
+        
+            const VerticalDivider(width: 1),
+        
+            Expanded(
+              child: Stack(
+                children: [
+        
+                  IndexedStack(
+                    index: currentPageIndex,
+                    children: const [
+                      BangumiCalendarPage(),
+                      BangumiSortPage(),
+                      BangumiStarPage()
+                    ],
+                  ),
+        
+                  ValueListenableBuilder(
+                    valueListenable: expandedMenuNotifier,
+                    builder: (_,menuExpandedStatus,menu) {
+        
+                      return AnimatedPositioned(
+                        left: menuExpandedStatus ? 0 : -350,
+                        width: min(350, MediaQuery.sizeOf(context).width*3/4),
+                        height: MediaQuery.sizeOf(context).height,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeOut,
+                        child: menu!
+                        
+                      );
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Material(
+                        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
+                        child: const AppDrawer()
+                      )
+                    ),
+                  )
+        
+        
+                ],
+              ),
+            )
+            
+          ],
         );
       },
       child: Padding( 
         padding: const EdgeInsets.symmetric(vertical: 25),
         child: Column(
-          spacing: 24,
+          spacing: 16,
           children: [
 
             const Column(
-              
               children: [
                 Icon(Icons.live_tv_rounded),
                 ScalableText("BanguLite"),

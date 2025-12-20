@@ -47,8 +47,8 @@ class BangumiTimelineTile extends StatelessWidget{
                 ///历史记录的updatedAt 与 展示用的 updatedAt 效果不一致
                 switch (surfTimelineDetails.bangumiSurfTimelineType){
                     case BangumiSurfTimelineType.subject:{
-
-                        if (surfTimelineDetails.sourceTitle == null) {
+                        //错误 因为 单独透过Link 访问时得到的 同样会是null 没办法
+                        if (surfTimelineDetails.commentDetails?.userInformation == null) {
                             Navigator.pushNamed(
                                 context,
                                 Routes.subjectDetail,
@@ -64,10 +64,8 @@ class BangumiTimelineTile extends StatelessWidget{
                                 bus.emit(
                                     "AppRoute",
                                     '${BangumiWebUrls.userBlog(surfTimelineDetails.detailID ?? 0)}'
-                                    //'?topicTitle=${surfTimelineDetails.title}'
-                                    '?sourceID=${surfTimelineDetails.sourceID}'
-                                    '&sourceTitle=${surfTimelineDetails.sourceTitle}'
-                                    
+                                    '?sourceID=${surfTimelineDetails.sourceID}' 
+                                    '${surfTimelineDetails.sourceTitle!=null ? "&sourceTitle=${surfTimelineDetails.sourceTitle}" : ""}'
                                 );
                             }
 
@@ -75,9 +73,9 @@ class BangumiTimelineTile extends StatelessWidget{
                                 bus.emit(
                                     "AppRoute",
                                     '${BangumiWebUrls.subjectTopic(surfTimelineDetails.detailID ?? 0)}'
-                                    '?topicTitle=${surfTimelineDetails.title}'
-                                    '&sourceID=${surfTimelineDetails.sourceID}'
-                                    '&sourceTitle=${surfTimelineDetails.sourceTitle}'
+									'?sourceID=${surfTimelineDetails.sourceID}'
+                                    '&topicTitle=${surfTimelineDetails.title}'
+                                    '${surfTimelineDetails.sourceTitle!=null ? "&sourceTitle=${surfTimelineDetails.sourceTitle}" : ""}'
 
                                 );
                             }
@@ -126,7 +124,7 @@ class BangumiTimelineTile extends StatelessWidget{
 
                                         AdapterBBCodeText(
                                             data: '${surfTimelineDetails.title}',
-                                            stylesheet: appDefaultStyleSheet(context),
+                                            stylesheet: appDefaultBBStyleSheet(context),
                                             maxLine: 3,
                                         ),
 
@@ -168,7 +166,7 @@ class BangumiTimelineTile extends StatelessWidget{
                                         ),
                                         child: AdapterBBCodeText(
                                             data: "[quote]${surfTimelineDetails.commentDetails?.comment}[/quote]",
-                                            stylesheet: appDefaultStyleSheet(context, richless: true)
+                                            stylesheet: appDefaultBBStyleSheet(context, richless: true)
                                         )
                                     ),
                                 );
@@ -200,6 +198,8 @@ class BangumiTimelineTile extends StatelessWidget{
                                                 onTap: () {
 
                                                     //debugPrint("sourceID: ${surfTimelineDetails.sourceID}");
+
+													if(surfTimelineDetails.sourceID == null) return;
 
                                                     switch (surfTimelineDetails.bangumiSurfTimelineType) {
 
@@ -234,7 +234,11 @@ class BangumiTimelineTile extends StatelessWidget{
                                                 },
                                                 child: ScalableText(                              
                                                     surfTimelineDetails.sourceTitle ?? "",
-                                                    style: const TextStyle(fontSize: 14, color: Colors.grey, decoration: TextDecoration.underline),
+                                                    style: TextStyle(
+														fontSize: 14, 
+														color: Colors.grey, 
+														decoration: surfTimelineDetails.sourceID != null ? TextDecoration.underline : null
+													),
                                                     maxLines: 2,
                                                     textAlign: TextAlign.left,
                                                     overflow: TextOverflow.ellipsis,

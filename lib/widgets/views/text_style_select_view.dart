@@ -108,7 +108,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                                                     child: AbsorbPointer(
                                                         child: AdapterBBCodeText(
                                                           data: '[url=]超链接[/url]',
-                                                          stylesheet: appDefaultStyleSheet(context)
+                                                          stylesheet: appDefaultBBStyleSheet(context)
                                                         ),
                                                     ),
                                                 ),

@@ -331,7 +331,7 @@ class EpInfo extends StatelessWidget {
           padding: Padding12,
           child: AdapterBBCodeText(
             data: epsInfo[selectedEp]?.description ?? "",
-            stylesheet: appDefaultStyleSheet(context,selectableText: true),
+            stylesheet: appDefaultBBStyleSheet(context,selectableText: true),
           ),
         )
      

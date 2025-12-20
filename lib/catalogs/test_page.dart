@@ -1,9 +1,11 @@
+import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 @FFRoute(name: 'test')
@@ -21,20 +23,16 @@ class _TestPageState extends State<TestPage> {
 
   final dataListScrollController = ScrollController();
 
+  final testList = [
+    "[url=https://bangumi.tv/subject/topic/37962]Topic链接[/url]",
+    "[url=https://bangumi.tv/blog/363176]Blog链接[/url]",
+  ];
+
   @override
   Widget build(BuildContext context) {
   
     return EasyRefresh(
       footer: TextFooter(),
-      onLoad: () {
-        double recordOffset = dataListScrollController.offset;
-        testCount+=5;
-        setState(() {
-          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-            dataListScrollController.animateTo(recordOffset+100, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-          });
-        });
-      },
       child: Scaffold(
         appBar: AppBar(
           title: const ScalableText('测试页面'),
@@ -43,8 +41,13 @@ class _TestPageState extends State<TestPage> {
           slivers: [
             SliverWaterfallFlow(
               delegate: SliverChildBuilderDelegate(
-                (context, index) => ListTile(title: Text("data $index")),
-                childCount: testCount,
+                (context, index) => ListTile(
+                  title: BBCodeText(
+                    data: testList[index],
+                    stylesheet: appDefaultBBStyleSheet(context),
+                  )
+                ),
+                childCount: testList.length,
               ),
               gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 1
@@ -52,13 +55,7 @@ class _TestPageState extends State<TestPage> {
             )
           ],
         ),
-        //body: ListView.builder(
-        //  controller: dataListScrollController,
-        //  itemCount: testCount,
-        //  itemExtent: 50,
-        //  itemBuilder: (context, index) => ListTile(title: Text("data $index")),
-        //  shrinkWrap: true,
-        //),
+
         
       ),
     );

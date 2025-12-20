@@ -1,4 +1,5 @@
 
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/utils/callback.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
@@ -16,7 +17,7 @@ import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:bbob_dart/bbob_dart.dart' as bbob;
 import 'package:url_launcher/url_launcher_string.dart';
 
-BBStylesheet appDefaultStyleSheet(
+BBStylesheet appDefaultBBStyleSheet(
     BuildContext context, {
       bool selectableText = false,
       bool richless = false,
@@ -205,6 +206,12 @@ class AdapterQuoteDisplay extends StatelessWidget{
                                             ClipboardData(
                                                 text: content.last.toPlainText().split('说:').last.trim()
                                             )
+                                        );
+
+                                        fadeToaster(
+                                          context: context,
+                                          message: "引用内容已复制到剪切板",
+                                          color: judgeCurrentThemeColor(context).withValues(alpha: 0.6)
                                         );
                                     },
                                     child: Container(
@@ -402,12 +409,13 @@ class BangumiStickerTag extends AdvancedTag{
             return [TextSpan(text: "[$tag]")];
         }
 
-        //String imageUrl = element.children.first.textContent;
         String imageUrl = element.textContent;
 
+        //scale的参数是指代 多少个图片的像素去渲染一个像素
+        //因此值越大反而让整体图片越小。。奇怪的描述方式
         final image = Image.asset(
             imageUrl,
-            scale: 0.8,
+            scale: 1/AppFontSize.scale.fontScale,
             errorBuilder: (context, error, stack) => ScalableText("[$tag]")
         );
 
@@ -502,7 +510,7 @@ class PatchColorTag extends StyleTag {
     @override
     TextStyle transformStyle(
         TextStyle oldStyle, Map<String, String>? attributes) {
-        RegExp hexColorRegExp = RegExp(r'^#?[0-9a-f]{6}$', caseSensitive: false);
+        final hexColorRegExp = RegExp(r'^#?[0-9a-f]{6}$', caseSensitive: false);
 
         if (attributes?.entries.isEmpty ?? true) {
             return oldStyle;

@@ -97,7 +97,7 @@ class BangumiCommentTile extends StatelessWidget {
             behavior: ScrollConfiguration.of(context).copyWith(physics: const NeverScrollableScrollPhysics()),
             child: AdapterBBCodeText(
               data: convertBangumiCommentSticker(commentData.comment ?? "comment"),
-              stylesheet: appDefaultStyleSheet(context,selectableText:true)
+              stylesheet: appDefaultBBStyleSheet(context,selectableText:true)
             ),
           ),
 

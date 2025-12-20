@@ -58,17 +58,20 @@ class BangumiDetailPage extends StatefulWidget {
 
 class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> with RouteLifecycleMixin  {
 
-    ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
-
-    ValueNotifier<bool> reviewsCollaspeStatusNotifier = ValueNotifier(false);
-    ValueNotifier<bool> topicsCollaspeStatusNotifier = ValueNotifier(false);
+    final ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
+    final ValueNotifier<bool> reviewsCollaspeStatusNotifier = ValueNotifier(false);
+    final ValueNotifier<bool> topicsCollaspeStatusNotifier = ValueNotifier(false);
 
     @override
     Widget build(BuildContext context) {
-
         return MultiProvider(
             providers: [
-                ChangeNotifierProvider(create: (_) => BangumiModel(subjectID: widget.subjectID)),
+                ChangeNotifierProvider(
+                    create: (_) => BangumiModel(
+                        subjectID: widget.subjectID,
+                        bangumiDetails: widget.injectBangumiInfoDetail
+                    )
+                ),
                 ChangeNotifierProvider(create: (_) => EpModel(subjectID: widget.subjectID, selectedEp: 1)),
                 ChangeNotifierProvider(create: (_) => RelationModel(subjectID: widget.subjectID)),
                 ChangeNotifierProvider(create: (_) => ReviewModel(subjectID: widget.subjectID)),
@@ -179,6 +182,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                                     selector: (_, bangumiModel) => bangumiModel.subjectID,
                                     shouldRebuild: (previous, next) {
                                         if (next == null) return false;
+                                        //debugPrint("previous/next : $previous/$next");
                                         return previous != next;
                                     },
                                     builder: (_, subjectID, child) {
@@ -201,18 +205,18 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                                                             ..title = bangumiModel.bangumiDetails?.name ?? ""
                                                             ..bangumiSurfTimelineType = BangumiSurfTimelineType.subject
                                                             ..commentDetails = (
-                                                              CommentDetails()
-                                                                ..userInformation = (
-                                                                  UserInformation()
-                                                                    ..avatarUrl = bangumiModel.bangumiDetails?.coverUrl
-                                                            )
+                                                        CommentDetails()
+                                                            ..userInformation = (
+                                                        UserInformation()
+                                                            ..avatarUrl = bangumiModel.bangumiDetails?.coverUrl
+                                                        )
                                                         )
 
                                                     );
-
                                                 }
 
                                                 /// 预先信息注入(假设有) 可以获取少量信息进入布局页面
+                                                /// 通常注入信息会缺失summary 因此可用此进行判断?
                                                 BangumiDetails? currentSubjectDetail = bangumiModel.bangumiDetails ?? widget.injectBangumiInfoDetail; //dependency
 
                                                 return EasyRefresh(
@@ -226,9 +230,11 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                                                     },
 
                                                     child: CustomScrollView(
+                                                        cacheExtent: 1000,
                                                         slivers: [
                                                             Skeletonizer.sliver(
-                                                                enabled: currentSubjectDetail == null,
+                                                                enabled: currentSubjectDetail?.summary == null,
+                                                                //enabled: bangumiModel.bangumiDetails == null,
                                                                 child: Selector<BangumiModel, Color?>(
                                                                     selector: (_, bangumiModel) => bangumiModel.bangumiThemeColor,
                                                                     shouldRebuild: (previous, next) => previous != next,
@@ -267,25 +273,19 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                                                                         sliver: SliverList(
                                                                             delegate: SliverChildListDelegate(
                                                                                 [
-                                                                                    BangumiDetailIntro(bangumiDetails: currentSubjectDetail ?? BangumiDetails()),
+                                                                                    const BangumiDetailIntro(),
 
-                                                                                    BangumiSummary(summary: currentSubjectDetail?.summary),
+                                                                                    const BangumiSummary(),
 
-                                                                                    BangumiDetailRecentReview(
-                                                                                        name: bangumiModel.bangumiDetails?.name,
-                                                                                        collapseStatusNotifer: reviewsCollaspeStatusNotifier
-                                                                                    ),
+                                                                                    const BangumiDetailRecentReview(),
 
                                                                                     const BangumiDetailRelations(),
 
-                                                                                    BangumiDetailTopics(
-                                                                                        name: bangumiModel.bangumiDetails?.name,
-                                                                                        collapseStatusNotifer: topicsCollaspeStatusNotifier
-                                                                                    ),
+                                                                                    const BangumiDetailTopics(),
 
                                                                                     NotificationListener<ScrollNotification>(
                                                                                         onNotification: (_) => true,
-                                                                                        child: BangumiHotComment(id: widget.subjectID, name: bangumiModel.bangumiDetails?.name,) 
+                                                                                        child: const BangumiHotComment()
                                                                                     ),
                                                                                 ]
                                                                             )

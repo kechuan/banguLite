@@ -1,14 +1,16 @@
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class BangumiSummary extends StatelessWidget {
   const BangumiSummary({
     super.key,
-    this.summary
+    //this.summary
   });
 
-  final String? summary;
+  //final String? summary;
 
   @override
   Widget build(BuildContext context) {
@@ -16,113 +18,121 @@ class BangumiSummary extends StatelessWidget {
     final ValueNotifier<bool> expandedSummaryNotifier = ValueNotifier<bool>(false);
 
     //功能等待实现: 1初始时固定size 用户展开时 变成滚动组件 也可以恢复成原来的样子
-    debugPrint("summary rebuild");
 
-    if(summary == null || summary!.isEmpty){
-      return const Padding(
-        padding: EdgeInsets.all(12.0),
-        child:  Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-             Padding(
-              padding: EdgeInsets.symmetric(vertical: 8), //16
-              child: ScalableText("简介",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)), // 24*(aspectRatio) => 34
-            ),
-        
-            Center(child: ScalableText("该番剧暂无简介..."),)
-          ],
-        ),
-      );
-                            
-    }
+    return Selector<BangumiModel,String?>(
+      selector: (_, bangumiModel) => bangumiModel.bangumiDetails?.summary,
+      shouldRebuild: (previous, next) => previous != next,
+      builder: (_, summary,child) {
+        debugPrint("summary rebuild");
 
-    return NotificationListener<ScrollNotification>(
-      onNotification: (_) => true,
-      child: ValueListenableBuilder(
-        valueListenable: expandedSummaryNotifier,
-        builder: (_,expandedStatus,child) {
-          return Stack(
-            children: [
-      
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                height: expandedStatus ? 300 : MediaQuery.sizeOf(context).height/4,
-                padding: Padding12,
-                child: LayoutBuilder(
-                  builder: (_,constraint) {
-                    return Column(
-                      spacing: 6,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8), //16
-                          child: ScalableText("简介",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)), // 24*(aspectRatio) => 34
-                        ),
-                    
-                        expandedStatus ? 
-                        Expanded(child: child!) : 
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxHeight: constraint.maxHeight - 50 - 6*2, // 16 + 34 => 50 + spacing*2
-                          ),
-                          child: child!,
-                        ),
-                    
-                        expandedStatus ?
-                        Align(
-                          alignment: const Alignment(1.0, 0),
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              border: Border.all(width: 1,color: Colors.green),
-                              borderRadius: BorderRadius.circular(24),
-                              
-                            ),
-                            child: TextButton(
-                              onPressed: ()=> expandedSummaryNotifier.value = false, 
-                              child: const ScalableText("收起")
-                            ),
-                          )) :
-                        const SizedBox.shrink()
-                    
-                      ],
-                    );
-                  }
+        if(summary == null || summary.isEmpty){
+          return const Padding(
+            padding: EdgeInsets.all(12.0),
+            child:  Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8), //16
+                  child: ScalableText("简介",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)), // 24*(aspectRatio) => 34
                 ),
-              ),
-      
-              Positioned.fill(
-                child: Offstage(
-                  offstage: expandedStatus,
-                  child: InkResponse(
-                    onTap: () => expandedSummaryNotifier.value = !expandedSummaryNotifier.value,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        gradient: const LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            Color.fromRGBO(162, 167, 146, 0.329),
-                            Colors.transparent
-                          ]
-                        )
-                      ),
+            
+                Center(child: ScalableText("该番剧暂无简介..."),)
+              ],
+            ),
+          );          
+        }
+
+        return NotificationListener<ScrollNotification>(
+          onNotification: (_) => true,
+          child: ValueListenableBuilder(
+            valueListenable: expandedSummaryNotifier,
+            builder: (_,expandedStatus,child) {
+              return Stack(
+                children: [
+          
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    height: expandedStatus ? 300 : MediaQuery.sizeOf(context).height/4,
+                    padding: Padding12,
+                    child: LayoutBuilder(
+                      builder: (_,constraint) {
+                        return Column(
+                          spacing: 6,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                        
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8), //16
+                              child: ScalableText("简介",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)), // 24*(aspectRatio) => 34
+                            ),
+                        
+                            expandedStatus ? 
+                            Expanded(child: child!) : 
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: constraint.maxHeight - 50 - 6*2, // 16 + 34 => 50 + spacing*2
+                              ),
+                              child: child!,
+                            ),
+                        
+                            expandedStatus ?
+                            Align(
+                              alignment: const Alignment(1.0, 0),
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  border: Border.all(width: 1,color: Colors.green),
+                                  borderRadius: BorderRadius.circular(24),
+                                  
+                                ),
+                                child: TextButton(
+                                  onPressed: ()=> expandedSummaryNotifier.value = false, 
+                                  child: const ScalableText("收起")
+                                ),
+                              )) :
+                            const SizedBox.shrink()
+                        
+                          ],
+                        );
+                      }
                     ),
                   ),
-                ),
-              )
+          
+                  Positioned.fill(
+                    child: Offstage(
+                      offstage: expandedStatus,
+                      child: InkResponse(
+                        onTap: () => expandedSummaryNotifier.value = !expandedSummaryNotifier.value,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: const LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Color.fromRGBO(162, 167, 146, 0.329),
+                                Colors.transparent
+                              ]
+                            )
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                
+                ],
+              );
+            },
+            child: ScalableText(
+              selectable: true,
+              summary,
+              style: const TextStyle(overflow: TextOverflow.ellipsis),          
+            )
             
-            ],
-          );
-        },
-        child: ScalableText(
-          selectable: true,
-          summary ?? "no Data",
-          style: const TextStyle(overflow: TextOverflow.ellipsis),          
-        )
-        
-      ),
+          ),
+        );
+      },
     );
+
+    
   }
 }

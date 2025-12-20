@@ -27,7 +27,7 @@ class SendCommentPreview extends StatelessWidget {
             child: SingleChildScrollView(
               child: AdapterBBCodeText(
                 data: convertBangumiCommentSticker(renderText),
-                stylesheet: appDefaultStyleSheet(context)
+                stylesheet: appDefaultBBStyleSheet(context)
               ),
             ),
           ),

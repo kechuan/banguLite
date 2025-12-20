@@ -103,13 +103,16 @@ void appRouteMethodListener(BuildContext context,String link){
 
           debugPrint("topic link: $link");
 
+          
+
           Navigator.pushNamed(
             context, 
             Routes.subjectTopic,
             arguments: {
-              "topicModel":TopicModel(subjectID: int.parse(appRouteUri.queryParameters['sourceID'] ?? "0")),
+              //单链接触发 固定为 0(生效范围: URL链接跳转/ 历史模式进入)
+              "topicModel":TopicModel(subjectID: 0),
               "topicInfo":TopicInfo(id: resID,contentTitle: appRouteUri.queryParameters['topicTitle'] ?? "topicID: $resID"),
-              'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
+              "sourceTitle": appRouteUri.queryParameters['sourceTitle'],
               "referPostContentID": postReferID,
               "themeColor":judgeCurrentThemeColor(context),
             }
@@ -158,7 +161,7 @@ void appRouteMethodListener(BuildContext context,String link){
           context,
           Routes.blog,
           arguments: {
-            "reviewModel":ReviewModel(subjectID: int.parse(appRouteUri.queryParameters['sourceID'] ?? "0")),
+            "reviewModel":ReviewModel(subjectID: 0),
             "reviewInfo": ReviewInfo(id: resID),
             'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
             "referPostContentID": postReferID,

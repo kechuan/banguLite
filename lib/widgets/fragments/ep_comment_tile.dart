@@ -249,7 +249,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
                             }
                             return Padding(
                                 padding: const EdgeInsets.only(top: 8),
-                                child: ScalableText("(${widget.epCommentData.userInformation?.sign})", style: TextStyle(color: Colors.grey, fontSize: AppFontSize.s14)),
+                                child: ScalableText("(${widget.epCommentData.userInformation?.sign})", style: TextStyle(color: widget.readableThemeColor?.withValues(alpha: 0.8), fontSize: AppFontSize.s14)),
                             );
                         }),
 
@@ -294,7 +294,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
                                                                                     //contentIndex: widget.epCommentData.epCommentIndex,
                                                                                     data: convertBangumiCommentSticker(widget.epCommentData.comment ?? ""),
                                                                                     //data:widget.epCommentData.comment ?? "",
-                                                                                    stylesheet: appDefaultStyleSheet(context, selectableText: true),
+                                                                                    stylesheet: appDefaultBBStyleSheet(context, selectableText: true),
                                                                                     errorBuilder: (context, error, stackTrace) {
                                                                                         debugPrint("renderError: ${widget.epCommentData.epCommentIndex} err:$error ");
                                                                                         return ScalableText("${widget.epCommentData.comment}");

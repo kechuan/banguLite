@@ -27,13 +27,13 @@ android {
 	//newest LTS ndkVersion "27.2.12479018"
 
 	compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
 		encoding="UTF-8"
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17
+        jvmTarget = JavaVersion.VERSION_25
     }
 
     defaultConfig {

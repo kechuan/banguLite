@@ -47,6 +47,7 @@ enum CommentState {
   normal("正常"),
   /// #1楼层专属 触发关闭帖子的话 不仅无法评论 还会直接导致游客状态无法进入该帖子
   adminCloseTopic("管理员关闭"), 
+  
   adminReopen("管理员重开"),
   adminPin("管理员置顶"),
   adminMerge("管理员合并"),

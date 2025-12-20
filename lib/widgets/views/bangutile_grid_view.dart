@@ -7,12 +7,9 @@ import 'package:flutter/material.dart';
 class BanguTileGridView extends StatelessWidget {
   const BanguTileGridView({
     super.key,
-    
     required this.bangumiLists,
-    
   });
 
-  
   final List<BangumiDetails> bangumiLists;
 
   @override

@@ -7,6 +7,7 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
+import 'package:flutter/material.dart';
 
 List<String> convertSystemFontFamily() {
     if (Platform.isAndroid) {
@@ -125,7 +126,7 @@ String convertBangumiStickerPath(int stickerIndex){
 }
 
 String convertBangumiCommentSticker(String originalComment){
-  RegExp stickerMatch = RegExp(r'(\()+bgm+(\d{2,3})(\))');
+  final stickerMatch = RegExp(r'(\()+bgm+(\d{2,3})(\))');
   
   String mappedComment = originalComment.replaceAllMapped(
     stickerMatch, 
@@ -389,4 +390,56 @@ String convertInsertContent({String originalText = '',String insertText = '',int
 String convertProxyImageUri(String imageLink){ 
   Uri imageUri = Uri.parse(imageLink);
   return "${APPInformationRepository.banguLiteImageForwardUri}${imageUri.host}${imageUri.path}";
+}
+
+
+Color convertFineTuneColor(
+	Color originColor,
+	{
+		bool? darkMode,
+		ScaleType? lumiScaleType
+	}
+){
+    
+    Color resultColor = originColor;
+
+	double lumiScale;
+
+	switch(lumiScaleType){
+		case ScaleType.min: {lumiScale = 0.1; break;}
+		case ScaleType.medium: {lumiScale = 0.2; break;}
+		case ScaleType.max: {lumiScale = 0.3; break;}
+		default: {lumiScale = 0.3; break;}
+	}
+
+    if(darkMode==true){
+      if(resultColor.computeLuminance()>0.5){
+        HSLColor hslColor = HSLColor.fromColor(resultColor); //亮度过低 转换HSL色度
+        double newLightness = (hslColor.lightness - lumiScale).clamp(0.5-lumiScale, 0.5); // 确保不超过 1.0
+        double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.4); //偏透明色
+        HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
+
+        resultColor = newHSLColor.toColor();
+
+      }
+    }
+
+    else{
+      if(resultColor.computeLuminance()<0.5){
+        HSLColor hslColor = HSLColor.fromColor(resultColor);
+        double newLightness = (hslColor.lightness + lumiScale).clamp(lumiScale+0.5, 1.0);
+
+        double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.4);
+        HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
+
+        resultColor = newHSLColor.toColor();
+
+      }
+    }
+
+	debugPrint("$resultColor, Lumi:${resultColor.computeLuminance()}");
+
+    return resultColor;
+
+    
 }

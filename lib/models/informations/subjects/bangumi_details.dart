@@ -23,7 +23,11 @@ class BangumiDetails {
 	String? coverUrl;
 	String? name;
 
+  ///深详细信息独有的信息
+  ///无论是 v0/v1 的 calendar 都没有 返回有效的summary信息
+  ///因此作为深信息获取的评判标准
 	String? summary;
+
 	Map<String,dynamic> informationList = {};
 	Map<String,int> tagsList = {};
 
@@ -85,8 +89,6 @@ Map<String,List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespon
       weekCalender.addAll({
         "最热门":popularInSeasonBangumis
       });
-
-      //debugPrint("timestamp calendar done:${weekCalender.length}");
 
     }
 

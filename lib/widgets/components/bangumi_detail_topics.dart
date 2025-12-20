@@ -13,18 +13,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class BangumiDetailTopics extends StatelessWidget {
+class BangumiDetailTopics extends StatefulWidget {
   const BangumiDetailTopics({
     super.key,
-    this.name,
-    required this.collapseStatusNotifer,
   });
 
-  final String? name;
-  final ValueNotifier<bool> collapseStatusNotifer;
-  
+  @override
+  State<BangumiDetailTopics> createState() => _BangumiDetailTopicsState();
+}
+
+class _BangumiDetailTopicsState extends State<BangumiDetailTopics> with AutomaticKeepAliveClientMixin{
+  final ValueNotifier<bool> collapseStatusNotifer = ValueNotifier(false);
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
 
 	  final bangumiModel = context.read<BangumiModel>();
     final topicModel = context.read<TopicModel>();
@@ -79,7 +82,7 @@ class BangumiDetailTopics extends StatelessWidget {
                               context,
                               Routes.moreTopics,
                               arguments: {
-                                "title":name,
+                                "title":bangumiModel.bangumiDetails?.name,
                                 "topicModel":topicModel,
                                 "bangumiThemeColor":bangumiModel.bangumiThemeColor
                               }
@@ -153,4 +156,7 @@ class BangumiDetailTopics extends StatelessWidget {
         ),
     );
   }
+  
+  @override
+  bool get wantKeepAlive => true;
 }

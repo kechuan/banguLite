@@ -16,6 +16,10 @@ class BangumiTopicPage extends StatefulWidget {
   const BangumiTopicPage({
     super.key,
     required this.topicModel,
+
+    ///为什么我不直接传递Index过来?
+    ///因为也有透过urlLink直接打开单个Info的时候 这样的话Index就是一个无意义的值了
+    ///但你却不能反过来说 TopicModel 没用 毕竟你把加载Detail的方法都写进去了(
 	  required this.topicInfo,
     this.themeColor,
     this.referPostContentID,

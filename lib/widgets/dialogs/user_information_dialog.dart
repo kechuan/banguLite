@@ -294,7 +294,7 @@ class UserInformationDialog extends StatelessWidget {
 
                                                                                         AdapterBBCodeText(
                                                                                             data: convertTimelineDescription(timelineActions[index]),
-                                                                                            stylesheet: appDefaultStyleSheet(context)
+                                                                                            stylesheet: appDefaultBBStyleSheet(context)
                                                                                         ),
                                                                                     ],
                                                                                 );

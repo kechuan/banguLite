@@ -15,18 +15,22 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class BangumiDetailRecentReview extends StatelessWidget {
+class BangumiDetailRecentReview extends StatefulWidget {
   const BangumiDetailRecentReview({
     super.key,
-    this.name,
-    required this.collapseStatusNotifer,
   });
 
-  final String? name;
-  final ValueNotifier<bool> collapseStatusNotifer;
+  @override
+  State<BangumiDetailRecentReview> createState() => _BangumiDetailRecentReviewState();
+}
+
+class _BangumiDetailRecentReviewState extends State<BangumiDetailRecentReview> with AutomaticKeepAliveClientMixin{
+
+  final ValueNotifier<bool> collapseStatusNotifer = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
 
     final bangumiModel = context.read<BangumiModel>();
 
@@ -70,7 +74,7 @@ class BangumiDetailRecentReview extends StatelessWidget {
                           context,
                           Routes.moreReviews,
                           arguments: {
-                            "title":name,
+                            "title":bangumiModel.bangumiDetails?.name,
                             "reviewModel": reviewModel,
                             "bangumiThemeColor":bangumiModel.bangumiThemeColor
                           }
@@ -162,7 +166,7 @@ class BangumiDetailRecentReview extends StatelessWidget {
                                    arguments: {
                                     "reviewModel":reviewModel,
                                     "reviewInfo": reviewModel.contentListData[index],
-                                    "sourceTitle": name,
+                                    "sourceTitle": bangumiModel.bangumiDetails?.name,
                                     "themeColor":bangumiModel.bangumiThemeColor
                                   }
                                 );
@@ -186,6 +190,9 @@ class BangumiDetailRecentReview extends StatelessWidget {
       ),
     );
   }
+  
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class BuildReviewAvatar extends StatelessWidget {
@@ -236,5 +243,6 @@ class BuildReviewAvatar extends StatelessWidget {
   );
 
   }
+
 }
 

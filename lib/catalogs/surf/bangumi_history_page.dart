@@ -23,6 +23,7 @@ import 'package:sliver_tools/sliver_tools.dart';
 @FFRoute(name: '/history')
 
 class BangumiHistoryPage extends StatefulWidget {
+
     const BangumiHistoryPage({super.key});	
 
     @override

@@ -5,7 +5,8 @@ import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 void fadeToaster({
   required BuildContext context,
   required String message,
-  Duration? duration
+  Duration? duration,
+  Color? color
 }){
   showToastWidget(
     duration: duration,
@@ -15,10 +16,9 @@ void fadeToaster({
     SizedBox(
       height: 50,
       width: 350,
-      
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Colors.grey,
+          color: color ?? Colors.grey,
           borderRadius: BorderRadius.circular(16)
         ),
         child: Center(child: ScalableText(message,style: const TextStyle(color: Colors.white))),

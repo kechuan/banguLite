@@ -226,7 +226,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                           constraints: const BoxConstraints(maxHeight: 200),
                                           child: AdapterBBCodeText(
                                               data: '${widget.title?.split('回复').last} 说: ${widget.referenceObject}',
-                                              stylesheet: appDefaultStyleSheet(context,richless: true)
+                                              stylesheet: appDefaultBBStyleSheet(context,richless: true)
                                   
                                           ),
                                       ),

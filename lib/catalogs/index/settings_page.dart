@@ -768,6 +768,7 @@ class TestTile extends ListTile{
             child: ListTile(
               onTap: (){
                 debugPrint("${MyHive.appConfigDataBase.get("currentTheme")}");
+                openAction();
               },
               title: ScalableText("测试触发工具",style: TextStyle(fontSize: AppFontSize.s16))
             ),

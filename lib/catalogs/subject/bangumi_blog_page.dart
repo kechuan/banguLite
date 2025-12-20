@@ -74,7 +74,6 @@ class _BangumiBlogPageState extends BangumiContentPageState
   @override
   bool isContentLoading(int? blogID){
 	return 
-		getContentModel().contentDetailData[blogID] == null || //没别的意思 只是消除 nullable
 		getContentModel().contentDetailData[blogID]?.blogID == null ||
 		getContentModel().contentDetailData[blogID]?.blogReplies == null
 	;

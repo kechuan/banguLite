@@ -14,33 +14,31 @@ import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class BangumiHotComment extends StatefulWidget {
-  const BangumiHotComment({
-    super.key,
-    required this.id,
-	  this.name
-  });
+  const BangumiHotComment({super.key});
 
-  final int id;
-  final String? name;
 
   @override
   State<BangumiHotComment> createState() => _BangumiHotCommentState();
 }
 
-class _BangumiHotCommentState extends State<BangumiHotComment> {
+class _BangumiHotCommentState extends State<BangumiHotComment> with AutomaticKeepAliveClientMixin{
+
   final ValueNotifier<bool> isOldCommentSort = ValueNotifier<bool>(false);
 
   Future? commentFuture; //better than in stateless.
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
 
-      if(widget.id == 0) return const SizedBox.shrink();
+      
 
       final bangumiModel = context.read<BangumiModel>();
       final commentModel = context.read<CommentModel>();
       
       commentFuture ??= commentModel.loadComments();
+
+      if(bangumiModel.bangumiDetails?.id == 0) return const SizedBox.shrink();
 
         return Padding(
           padding: const EdgeInsets.all(12),
@@ -51,7 +49,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
 
               //last 代表offset最靠前的位置 也就是最早的comments
               return isOldCommentSort.value ?
-              commentModel.commentsData.values.last :
+              commentModel.commentsData.values.last.reversed.toList() :
               commentModel.commentsData.values.first ;
 
             },
@@ -153,8 +151,8 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
                                   Routes.subjectComment,
                                   arguments: {
                                     "commentModel":commentModel,
-                                    "subjectID":widget.id,
-                                    "name":widget.name,
+                                    "subjectID":bangumiModel.bangumiDetails?.id,
+                                    "name":bangumiModel.bangumiDetails?.name,
                                     "bangumiThemeColor":bangumiModel.bangumiThemeColor
                                   }
                                 );
@@ -224,4 +222,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> {
         );
       
   }
+  
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -22,20 +22,26 @@ import 'package:provider/provider.dart';
 class BangumiDetailIntro extends StatelessWidget {
   const BangumiDetailIntro({
     super.key,
-    required this.bangumiDetails
 });
-
-  final BangumiDetails bangumiDetails;
 
   @override
   Widget build(BuildContext context) {
-    return MediaQuery.orientationOf(context) == Orientation.portrait ?
-    IntroPortrait(bangumiDetails: bangumiDetails) :
-    IntroLandscape(bangumiDetails: bangumiDetails);
+
+    return Selector<BangumiModel,BangumiDetails?>(
+      selector: (_, bangumiModel)=>bangumiModel.bangumiDetails,
+      shouldRebuild: (previous, next) => previous != next,
+      builder: (_, bangumiDetails,__) {
+        return MediaQuery.orientationOf(context) == Orientation.portrait ?
+        IntroPortrait(bangumiDetails: bangumiDetails ?? BangumiDetails()) :
+        IntroLandscape(bangumiDetails: bangumiDetails ?? BangumiDetails());
+      }, 
+    );
+
+
   }
 }
 
-class IntroPortrait extends StatelessWidget {
+class IntroPortrait extends StatefulWidget {
   const IntroPortrait({
     super.key,
     required this.bangumiDetails
@@ -44,7 +50,32 @@ class IntroPortrait extends StatelessWidget {
   final BangumiDetails bangumiDetails;
 
   @override
+  State<IntroPortrait> createState() => _IntroPortraitState();
+}
+
+class _IntroPortraitState extends State<IntroPortrait> {
+
+  Widget? cachedImages;
+
+  @override
+    void initState() {
+      super.initState();
+
+      if(widget.bangumiDetails.coverUrl != null){
+        cachedImages = BuildDetailImages(
+          imageName: widget.bangumiDetails.name,
+          imageID: widget.bangumiDetails.id,
+          detailImageUrl: widget.bangumiDetails.coverUrl,
+        );
+      }
+      
+
+    }
+
+  @override
   Widget build(BuildContext context) {
+    debugPrint("Build IntroPortrait");
+
     return Column(
       spacing: 12,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,17 +84,14 @@ class IntroPortrait extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
     
           children: [
-    
             //Pic
             Expanded(
               flex: 2,
               child: FittedBox(
-                child: BuildDetailImages(
-                  imageName: bangumiDetails.name,
-                  imageID: bangumiDetails.id,
-                  detailImageUrl: bangumiDetails.coverUrl,
-                  
-
+                child: cachedImages ?? BuildDetailImages(
+                  imageName: widget.bangumiDetails.name,
+                  imageID: widget.bangumiDetails.id,
+                  detailImageUrl: widget.bangumiDetails.coverUrl,
                 )
               )
             ),
@@ -85,36 +113,29 @@ class IntroPortrait extends StatelessWidget {
                         Expanded(
                           child: ListTile(
                             onTap: () {
-                              Clipboard.setData(ClipboardData(text: '${bangumiDetails.name}'));
+                              Clipboard.setData(ClipboardData(text: '${widget.bangumiDetails.name}'));
                               fadeToaster(context: context,message: "标题已复制,长按复制别称");
                             },
                             onLongPress: () {
-                              Clipboard.setData(ClipboardData(text: '${bangumiDetails.informationList["alias"] ?? ""}'));
+                              Clipboard.setData(ClipboardData(text: '${widget.bangumiDetails.informationList["alias"] ?? ""}'));
                               fadeToaster(context:context,message: "别称已复制");
                             },
                             title: ScalableText(
-                              "${bangumiDetails.name}",
+                              "${widget.bangumiDetails.name}",
                               style: const TextStyle(fontSize: 18),
                             ),
                             subtitle: ScalableText(
-                              bangumiDetails.informationList["alias"] ?? "",
+                              widget.bangumiDetails.informationList["alias"] ?? "",
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             )
                           )
                         ),
-    
-                        
-                        
-    
+
                       ]
                     ),
                     
-                    BuildInfoBox(informationList: bangumiDetails.informationList,type: bangumiDetails.type)
-                
-    
-    
-    
+                    BuildInfoBox(informationList: widget.bangumiDetails.informationList,type: widget.bangumiDetails.type)
                   ]
                 )
               )
@@ -124,13 +145,13 @@ class IntroPortrait extends StatelessWidget {
           ]
         ),
 
-        StarButton(bangumiDetails: bangumiDetails),
+        StarButton(bangumiDetails: widget.bangumiDetails),
     
         LayoutBuilder(
           builder: (_,constraint) {
             return BangumiRankBox(
               constraint: constraint,
-              bangumiDetails: bangumiDetails
+              bangumiDetails: widget.bangumiDetails
             );
           }
         ),
@@ -158,9 +179,9 @@ class IntroPortrait extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(12),
                         child: BuildEps(
-                          subjectID: bangumiDetails.id!, 
-                          subjectName: bangumiDetails.name,
-                          informationList: bangumiDetails.informationList,
+                          subjectID: widget.bangumiDetails.id!, 
+                          subjectName: widget.bangumiDetails.name,
+                          informationList: widget.bangumiDetails.informationList,
                           portialMode: true,
                         )
                       )
@@ -201,8 +222,8 @@ class IntroPortrait extends StatelessWidget {
                             int airedEps = 0;
     
                             if (
-                              bangumiDetails.informationList["air_weekday"] == null || 
-                              convertAiredEps(bangumiDetails.informationList["air_date"]) >= (epCount) ||
+                              widget.bangumiDetails.informationList["air_weekday"] == null || 
+                              convertAiredEps(widget.bangumiDetails.informationList["air_date"]) >= (epCount) ||
                               epCount > 500 //不确定长度
                             ){
                               return ScalableText("共$epCount集");
@@ -247,7 +268,7 @@ class IntroPortrait extends StatelessWidget {
           constraints: const BoxConstraints.tightFor(width: double.infinity),
           child: Padding(
             padding: const EdgeInsets.all(12),
-            child: BuildTags(tagsList: bangumiDetails.tagsList)
+            child: BuildTags(tagsList: widget.bangumiDetails.tagsList)
           )
         )
     

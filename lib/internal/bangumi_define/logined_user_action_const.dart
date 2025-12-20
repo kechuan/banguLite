@@ -13,10 +13,8 @@ enum LoginStatus{
 enum PostCommentType{
   //subject不会拥有回复评论的选项
   subjectComment("番剧吐槽"),
-  //API 暂没有 replyEpComment 的功能
   replyEpComment("单集吐槽"),
   
-  //API 暂没有 blog 的功能
   postBlog("发布博客"),
   replyBlog("回复博客"),
   
@@ -43,8 +41,8 @@ enum CommentActionType{
   //任意
   copy("复制"),
   //登录可操作
-  reply("回复"),
   sticker("贴条"),
+  reply("回复"),
   report("检举"),
   //自身评论可操作
   delete("删除"),

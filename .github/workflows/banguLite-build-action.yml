@@ -38,12 +38,12 @@ jobs:
         run: flutter config --enable-windows-desktop
 
       - name: Setup JAVA (for Windows)
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v5
         with:
           distribution: "zulu"
-          java-version: "17"
+          java-version: "25"
           cache: "gradle"
-          
+     
       - name: Restore Packages
         run: flutter pub get
         env:
@@ -54,7 +54,10 @@ jobs:
 
       - name: Build Windows
         run: flutter_distributor package --platform windows --targets zip --skip-clean
-        
+
+      - name: Rename Zip
+        run: mv ./dist/${{ github.ref_name }}/bangu_lite-${{ github.ref_name }}-windows.zip ./dist/${{ github.ref_name }}/banguLite-${{ github.ref_name }}-windows.zip
+
       # 3.5 上传打包文件
       - name: Upload Release Assets (Windows)
         #v2.x
@@ -89,10 +92,10 @@ jobs:
           cache: true
           
       - name: Setup JAVA (for Android)
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v5
         with:
           distribution: "zulu"
-          java-version: "17"
+          java-version: "25"
           cache: "gradle"
 
       - name: Restore Packages
@@ -132,5 +135,11 @@ jobs:
           files: build/app/outputs/apk/production/release/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-build-files
+          path: build/app/outputs/apk/production/release/*.apk
           
       - run: echo "Android build done."

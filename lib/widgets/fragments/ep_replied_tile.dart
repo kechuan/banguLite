@@ -142,7 +142,7 @@ class EpRepliedTile extends ListTile {
                                         WidgetSpan(
                                           child: AdapterBBCodeText(
                                             data: convertBangumiCommentSticker(mainContent),
-                                            stylesheet: appDefaultStyleSheet(context,richless: true,fontSize: AppFontSize.s14),
+                                            stylesheet: appDefaultBBStyleSheet(context,richless: true,fontSize: AppFontSize.s14),
                                             maxLine: 3,
                                           )
                                         )
