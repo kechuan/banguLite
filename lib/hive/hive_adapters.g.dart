@@ -24,8 +24,7 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
       ..isSelectedCustomColor = fields[5] as bool?
       ..isFollowThemeColor = fields[6] as bool?
       ..isManuallyImageLoad = fields[7] as bool?
-      ..isUpdateAlert = fields[8] as bool?
-    ;
+      ..isUpdateAlert = fields[8] as bool?;
   }
 
   @override
@@ -47,8 +46,7 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
       ..writeByte(7)
       ..write(obj.isManuallyImageLoad)
       ..writeByte(8)
-      ..write(obj.isUpdateAlert)
-    ;
+      ..write(obj.isUpdateAlert);
   }
 
   @override
@@ -70,28 +68,28 @@ class AppThemeColorAdapter extends TypeAdapter<AppThemeColor> {
   AppThemeColor read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return AppThemeColor.sea;
+        return AppThemeColor.ice;
       case 1:
         return AppThemeColor.macha;
       case 2:
-        return AppThemeColor.ruby;
-      case 3:
-        return AppThemeColor.ice;
-      default:
         return AppThemeColor.sea;
+      case 3:
+        return AppThemeColor.ruby;
+      default:
+        return AppThemeColor.ice;
     }
   }
 
   @override
   void write(BinaryWriter writer, AppThemeColor obj) {
     switch (obj) {
-      case AppThemeColor.sea:
+      case AppThemeColor.ice:
         writer.writeByte(0);
       case AppThemeColor.macha:
         writer.writeByte(1);
-      case AppThemeColor.ruby:
+      case AppThemeColor.sea:
         writer.writeByte(2);
-      case AppThemeColor.ice:
+      case AppThemeColor.ruby:
         writer.writeByte(3);
     }
   }
@@ -217,7 +215,7 @@ class ColorAdapter extends TypeAdapter<Color> {
     writer
       ..writeByte(1)
       ..writeByte(0)
-      ..write(obj.toARGB32());
+      ..write(obj.value);
   }
 
   @override
@@ -500,7 +498,8 @@ class CommentDetailsAdapter extends TypeAdapter<CommentDetails> {
           typeId == other.typeId;
 }
 
-class BangumiTimelineTypeAdapter extends TypeAdapter<BangumiSurfTimelineType> {
+class BangumiSurfTimelineTypeAdapter
+    extends TypeAdapter<BangumiSurfTimelineType> {
   @override
   final typeId = 12;
 
@@ -540,7 +539,7 @@ class BangumiTimelineTypeAdapter extends TypeAdapter<BangumiSurfTimelineType> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is BangumiTimelineTypeAdapter &&
+      other is BangumiSurfTimelineTypeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -597,4 +596,3 @@ class StarTypeAdapter extends TypeAdapter<StarType> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
-

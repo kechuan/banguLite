@@ -177,7 +177,6 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
 
                             },
                             itemBuilder: (_, timelineIndex) {
-
                               return BangumiTimelineContentView(
                                   currentPageIndex: timelineIndex,
                                   groupTypeNotifier: groupTypeNotifier,

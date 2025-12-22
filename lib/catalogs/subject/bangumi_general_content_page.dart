@@ -140,7 +140,7 @@ abstract class BangumiContentPageState<
                     childBuilder: (_, physic) {
                         return Theme(
                             data: Theme.of(context).copyWith(
-                              scaffoldBackgroundColor: judgeDarknessMode(context) ? null : convertFineTuneColor(getcurrentSubjectThemeColor() ?? judgeCurrentThemeColor(context),lumiScaleType: ScaleType.min),
+                                scaffoldBackgroundColor: judgeDarknessMode(context) ? null : convertFineTuneColor(getcurrentSubjectThemeColor() ?? judgeCurrentThemeColor(context), lumiScaleType: ScaleType.min),
                             ),
                             child: Scaffold(
                                 body: Selector<M, D>(
@@ -450,13 +450,13 @@ abstract class BangumiContentPageState<
         late EpCommentDetails authorEPCommentData;
 
         Color? readableThemeColor = 
-        !judgeDarknessMode(context) ?
-        getcurrentSubjectThemeColor()?.withValues(
-          red: 1 - getcurrentSubjectThemeColor()!.r,
-          green: 1 - getcurrentSubjectThemeColor()!.g,
-          blue: 1 - getcurrentSubjectThemeColor()!.b
-        ) : 
-        getcurrentSubjectThemeColor();
+            !judgeDarknessMode(context) ?
+                getcurrentSubjectThemeColor()?.withValues(
+                    red: 1 - getcurrentSubjectThemeColor()!.r,
+                    green: 1 - getcurrentSubjectThemeColor()!.g,
+                    blue: 1 - getcurrentSubjectThemeColor()!.b
+                ) : 
+                getcurrentSubjectThemeColor();
 
         return Column(
             key: authorContentKey,
@@ -540,12 +540,12 @@ abstract class BangumiContentPageState<
         final ValueNotifier<int> commentUpdateFlag = ValueNotifier(0);
 
         Color? readableThemeColor = 
-          !judgeDarknessMode(context) ?
-          getcurrentSubjectThemeColor()?.withValues(
-            red: 1 - getcurrentSubjectThemeColor()!.r,
-            green: 1 - getcurrentSubjectThemeColor()!.g,
-            blue: 1 - getcurrentSubjectThemeColor()!.b
-          ) : getcurrentSubjectThemeColor();
+            !judgeDarknessMode(context) ?
+                getcurrentSubjectThemeColor()?.withValues(
+                    red: 1 - getcurrentSubjectThemeColor()!.r,
+                    green: 1 - getcurrentSubjectThemeColor()!.g,
+                    blue: 1 - getcurrentSubjectThemeColor()!.b
+                ) : getcurrentSubjectThemeColor();
 
         return Column(
             children: [
@@ -558,6 +558,7 @@ abstract class BangumiContentPageState<
                         final currentEpCommentDetails = resultFilterCommentList[contentCommentIndex];
 
                         return EpCommentView(
+                            key: ValueKey(currentEpCommentDetails.commentID),
                             contentID: contentInfo.id ?? 0,
                             postCommentType: getPostCommentType(),
                             /// 用户更改拥有的内容时
@@ -636,7 +637,6 @@ abstract class BangumiContentPageState<
                     EpCommentView(
                         contentID: contentInfo.id ?? 0,
                         postCommentType: getPostCommentType(),
-
                         onUpdateComment: (content) {
                             if (content == null) {
                                 userCommentMap.remove(currentEpCommentDetails.commentID);
@@ -684,6 +684,7 @@ abstract class BangumiContentPageState<
                                 return fadeSizeTransition(
                                     animation: animation,
                                     child: EpCommentView(
+                                        key: ValueKey(currentEpCommentDetails.commentID),
                                         contentID: getContentInfo().id ?? 0,
                                         epCommentData: currentEpCommentDetails,
                                         themeColor: getcurrentSubjectThemeColor(),

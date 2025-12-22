@@ -78,6 +78,7 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
                                     padding: PaddingH12,
                                     color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
                                     child: BangumiTimelineTile(
+                                        key: ValueKey(timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.currentPageIndex]]![index].detailID),
                                         surfTimelineDetails: timelineFlowModel.timelinesData[BangumiSurfTimelineType.values[widget.currentPageIndex]]![index],
                                     )
                                 );

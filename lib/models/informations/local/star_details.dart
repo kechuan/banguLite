@@ -1,6 +1,4 @@
-import 'package:hive_ce/hive.dart';
-
-class StarBangumiDetails extends HiveObject{
+class StarBangumiDetails{
   int? bangumiID;
   String? name;
   String? coverUrl;

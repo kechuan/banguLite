@@ -14,20 +14,22 @@ part 'hive_adapters.g.dart';
 
 @GenerateAdapters(
   [
+
     AdapterSpec<AppConfig>(),
     AdapterSpec<AppThemeColor>(),
     AdapterSpec<ThemeMode>(),
     AdapterSpec<ScaleType>(),
     AdapterSpec<Color>(),
-    AdapterSpec<BangumiSurfTimelineType>(),
     AdapterSpec<StarBangumiDetails>(),
-    AdapterSpec<UserInformation>(),
     AdapterSpec<LoginedUserInformations>(),
+    AdapterSpec<UserInformation>(),
     AdapterSpec<SurfTimelineDetails>(),
     AdapterSpec<CommentDetails>(),
+    AdapterSpec<BangumiSurfTimelineType>(),
     AdapterSpec<StarType>(),
     
-  ]    
+
+  ],
 )
 // Annotations must be on some element
 // ignore: unused_element

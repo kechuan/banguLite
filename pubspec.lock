@@ -513,10 +513,10 @@ packages:
     dependency: "direct main"
     description:
       name: hive_ce
-      sha256: "81d39a03c4c0ba5938260a8c3547d2e71af59defecea21793d57fc3551f0d230"
+      sha256: "412c638aeac0f003bba664884e3048b9547e541aaca13f10cc639da788184bed"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.15.1"
+    version: "2.16.0"
   hive_ce_flutter:
     dependency: "direct main"
     description:
@@ -529,10 +529,10 @@ packages:
     dependency: "direct dev"
     description:
       name: hive_ce_generator
-      sha256: c3d04f17b39cac9439e1c7d098d0b3fd93a488d167af2bd52746dbb5fc109411
+      sha256: fd629eefef44f3efb92dec5c422ab4c395153def0e651ed0f9bb3c8a4d4f783b
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.10.1"
+    version: "1.11.0"
   http:
     dependency: transitive
     description:

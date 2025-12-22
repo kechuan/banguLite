@@ -60,7 +60,9 @@ class MyHive {
     }
     
     Hive
-      //..initFlutter()
+      //..initFlutter(
+        //'${filesDir.path}${Platform.pathSeparator}hivedb'
+      //)
       ..init('${filesDir.path}${Platform.pathSeparator}hivedb')
       ..registerAdapters()
     ;
