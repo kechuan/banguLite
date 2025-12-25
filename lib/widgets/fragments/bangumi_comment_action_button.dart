@@ -105,9 +105,10 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                 style: ButtonStyle(
                   alignment: Alignment.bottomCenter,
                 ),
+                onOpened: (){
+                  debugPrint("contentID: ${widget.contentID}, reply:${widget.commentData.commentID}, action:${widget.postCommentType}");
+                },
                 onSelected: (commentAction) {
-            
-                    debugPrint("contentID: ${widget.contentID}, reply:${widget.commentData.commentID}, action:${widget.postCommentType}");
             
                     debugPrint("${currentRoute.runtimeType}");
             

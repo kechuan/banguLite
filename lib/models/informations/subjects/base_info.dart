@@ -18,9 +18,6 @@ abstract class ContentInfo extends BaseInfo {
   //Blog/Topic 应需求
   int? sourceID;
 
-  //GroupInfo需求
-  //String? sourceTitle;
-
   //title
   String? contentTitle;
 
@@ -29,15 +26,15 @@ abstract class ContentInfo extends BaseInfo {
   
   int? repliesCount;
   String? lastRepliedNickName;
-  int? lastRepliedTime;
 
   //user
   UserInformation? userInformation;
-
 
   // 工厂方法，创建空对象 需求交付给子类实现
   factory ContentInfo.empty() {
     throw UnimplementedError('ContentInfo.empty() must be implemented by subclasses');
   }
+
+  Function()? loadInterceptionCallback;
 
 }

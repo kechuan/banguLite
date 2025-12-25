@@ -98,7 +98,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
     if(context.read<IndexModel>().userConfig.isUpdateAlert != false){
       pullLatestRelease().then((latestRelease){
         
-        if(latestRelease == null) return;
+        if(latestRelease == null || latestRelease.hasErrors) return;
         if(APPInformationRepository.version == latestRelease.tagName){
           return;
         }

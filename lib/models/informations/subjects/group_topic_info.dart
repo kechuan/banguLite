@@ -1,7 +1,6 @@
 
 
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
-import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 
@@ -12,24 +11,6 @@ class GroupTopicInfo extends TopicInfo {
 
   factory GroupTopicInfo.empty() => GroupTopicInfo(id: 0);
 
-  factory GroupTopicInfo.fromSurfTimeline(SurfTimelineDetails surfTimelineData){
-    return GroupTopicInfo(
-      id: surfTimelineData.detailID
-    )
-      
-      ..topicTitle = surfTimelineData.title
-      ..topicID = surfTimelineData.detailID
-      
-      ..userInformation = surfTimelineData.commentDetails?.userInformation
-      ..repliesCount = surfTimelineData.replies
-    
-    ..groupInfo = (
-      GroupInfo()
-        ..groupTitle = surfTimelineData.sourceTitle
-        ..groupName = surfTimelineData.sourceID
-    );
-  }
-
   factory GroupTopicInfo.fromTopicInfo(TopicInfo topicInfo){
     return GroupTopicInfo()
       ..topicTitle = topicInfo.topicTitle
@@ -37,6 +18,8 @@ class GroupTopicInfo extends TopicInfo {
       ..userInformation = topicInfo.userInformation
       ..repliesCount = topicInfo.repliesCount
       ..commentState = topicInfo.commentState
+      ..createdTime = topicInfo.createdTime
+      ..updatedTime = topicInfo.updatedTime
     ;
   }
 }
@@ -55,6 +38,7 @@ List<GroupTopicInfo> loadGroupTopicInfo(
       return GroupTopicInfo.fromTopicInfo(currentTopicInfo)
         ..groupInfo = groupInfo ?? loadGroupsInfo([bangumiGroupTopicsListData[index]?["group"]]).first
       ;
+
     }
   );
 

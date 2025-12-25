@@ -215,7 +215,7 @@ class ColorAdapter extends TypeAdapter<Color> {
     writer
       ..writeByte(1)
       ..writeByte(0)
-      ..write(obj.value);
+      ..write(obj.toARGB32);
   }
 
   @override

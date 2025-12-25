@@ -37,7 +37,17 @@ class SurfTimelineDetails extends BaseDetails {
       ..updatedAt = DateTime.now().millisecondsSinceEpoch;
   }
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SurfTimelineDetails &&
+          runtimeType == other.runtimeType &&
+          detailID == other.detailID;
 
+
+
+  @override
+  int get hashCode => super.detailID ?? 0;
 }
 
 
@@ -111,7 +121,7 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
               ..userInformation = groupDataList[index].userInformation
           )
           ..replies = groupDataList[index].repliesCount
-          ..updatedAt = groupDataList[index].lastRepliedTime
+          ..updatedAt = groupDataList[index].updatedTime
 
         ;
 
@@ -150,3 +160,32 @@ List<SurfTimelineDetails> loadSurfTimelineDetails(
   return surfTimelineDetailsList;
 }
 
+Iterable<SurfTimelineDetails> interceptSelectedSurfTimelineType(
+  Set<SurfTimelineDetails> timelinesData,
+  {
+    BangumiSurfTimelineType bangumiSurfTimelineType = BangumiSurfTimelineType.all
+  }
+){
+  switch(bangumiSurfTimelineType){
+
+    case BangumiSurfTimelineType.all:{
+      return timelinesData.where(
+        (currentTimelineDetail){
+          return 
+            currentTimelineDetail.commentDetails?.comment != null ||
+            currentTimelineDetail.bangumiSurfTimelineType != BangumiSurfTimelineType.timeline
+          ;
+        }
+
+      );
+      //return timelinesData;
+    }
+    case BangumiSurfTimelineType.subject:
+    case BangumiSurfTimelineType.group:
+    case BangumiSurfTimelineType.timeline:
+    {
+      return timelinesData.where((currentTimelineDetail)=>currentTimelineDetail.bangumiSurfTimelineType == bangumiSurfTimelineType);
+    }
+
+  }
+}

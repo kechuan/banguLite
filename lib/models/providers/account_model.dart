@@ -410,7 +410,6 @@ class AccountModel extends ChangeNotifier {
       Function(String message)? fallbackAction
     }) async {
 
-        //Completer<int> commentCompleter = Completer();
         String requestUrl = "";
 
         late Future<Response<dynamic>> Function() commentFuture;

@@ -34,7 +34,7 @@ abstract class BangumiGeneralMoreContentPageState<
     GlobalKey<AnimatedListState> animatedListKey = GlobalKey();
     ScrollController scrollController = ScrollController();
 
-    Function(int)? onTap;
+    Function(int index)? onTap;
     Function((String title,String message))? onPostContent;
 
     @override

@@ -484,7 +484,11 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
 
     // 构建分区标题
     Widget buildSectionHeader(BuildContext context, String dateTimeText) {
-        debugPrint("buildSectionHeader: $dateTimeText");
+        //Debug HotReload特性 即使透过navigation跳转也会强制build上一个页面
+        if(kDebugMode && ModalRoute.of(context)?.isCurrent == true){
+          debugPrint("buildSectionHeader: $dateTimeText");
+        }
+
         return SliverPinnedHeader(
             child: Container(
                 padding: PaddingH12,

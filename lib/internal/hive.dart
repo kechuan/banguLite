@@ -67,12 +67,10 @@ class MyHive {
       ..registerAdapters()
     ;
 
-
     starBangumisDataBase = await Hive.openBox(HiveBoxKey.starBangumisDataBase);
     historySurfDataBase = await Hive.openBox(HiveBoxKey.historySurfDataBase);
     appConfigDataBase = await Hive.openBox(HiveBoxKey.appConfigDataBase);
     loginUserDataBase = await Hive.openBox(HiveBoxKey.loginUserDataBase);
-
 
   }
 

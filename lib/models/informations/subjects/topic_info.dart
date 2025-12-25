@@ -1,3 +1,4 @@
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
 
@@ -26,9 +27,25 @@ class TopicInfo extends ContentInfo {
   factory TopicInfo.empty() {
     return TopicInfo(id: 0);
   }
+
+  
+
+  @override
+  Function()? get loadInterceptionCallback => (){
+    
+    if (commentState == CommentState.adminCloseTopic.index) {
+      return Future.error("此帖子已被管理员关闭,需要登录以获取查看权限");    
+    }
+
+    return null;
+
+  };
+
 }
 
 List<TopicInfo> loadTopicsInfo(List bangumiTopicsInfoData){
+
+  
 
 	final List<TopicInfo> topicsList = [];
 
@@ -43,7 +60,7 @@ List<TopicInfo> loadTopicsInfo(List bangumiTopicsInfoData){
         ..createdTime = currentTopicMap["createdAt"]
         ..repliesCount = currentTopicMap["replyCount"]
         ..commentState = currentTopicMap["state"]
-        ..lastRepliedTime = currentTopicMap["updatedAt"]
+        ..updatedTime = currentTopicMap["updatedAt"]
         ..userInformation = currentUserInformation
       ;
 

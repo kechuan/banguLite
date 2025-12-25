@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
-import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
@@ -14,7 +13,6 @@ import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
-import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
@@ -23,8 +21,8 @@ import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_filter.dart';
 import 'package:bangu_lite/widgets/components/general_replied_line.dart';
+import 'package:bangu_lite/widgets/fragments/custom_friction.dart';
 import 'package:bangu_lite/widgets/fragments/error_load_prompt.dart';
-import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
@@ -72,10 +70,10 @@ abstract class BangumiContentPageState<
 
     List<String>? getTrailingPhotosUri() => null;
 
+    bool isContentInitaled = false;
+
     //子内容加载(评论)
     Future? contentFuture;
-
-    bool isInitaled = false;
 
     final scrollController = ScrollController();
     final GlobalKey<SliverAnimatedListState> animatedSliverListKey = GlobalKey();
@@ -83,7 +81,7 @@ abstract class BangumiContentPageState<
 
     final refreshNotifier = ValueNotifier(0);
 
-    //推迟执行以允许非const输入
+    //推迟执行以允许在函数作用域之外执行 非const输入
     late final commentFilterTypeNotifier = ValueNotifier(
         getReferPostContentID() != null ? 
             BangumiCommentRelatedType.id :
@@ -99,21 +97,12 @@ abstract class BangumiContentPageState<
 
     @override
     void initState() {
-
         final contentInfo = getContentInfo();
 
         debugPrint('[GenernalContent] ${contentInfo.runtimeType} ID / subContentID: ${contentInfo.id} / ${getSubContentID()}');
 
-        /// TODO 加载预先拦截区域 迟早会封装到 BaseModel 中...
-        /// 然后直接以 ?.call(contentFuture) 的形式调用
-
-        if (contentInfo is TopicInfo) {
-            if (contentInfo.commentState == CommentState.adminCloseTopic.index) {
-                contentFuture = Future.error("此帖子已被管理员关闭,需要登录以获取查看权限");
-            }
-        }
-
-        contentFuture ??= loadContent(getSubContentID() ?? getContentInfo().id ?? 0);
+        /// loadInterceptionCallback 拦截注入
+        contentFuture = contentInfo.loadInterceptionCallback?.call() ?? loadContent(getSubContentID() ?? getContentInfo().id ?? 0);
 
         super.initState();
     }
@@ -128,15 +117,15 @@ abstract class BangumiContentPageState<
         return ChangeNotifierProvider.value(
             //因为下方的 Selector 需求 使用 带有contentModel 的context环境
             value: contentModel,
-            builder: (context, child) {
+            builder: (context, _) {
 
                 return EasyRefresh.builder(
-                    scrollController: scrollController,
-                    header: const TextHeader(),
-                    onRefresh: () {
-                        contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0, isRefresh: true);
-                        refreshNotifier.value += 1;
-                    },
+                    //与自定义physic冲突 取消了
+                    //header: const TextHeader(),
+                    //onRefresh: () {
+                    //    contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0, isRefresh: true);
+                    //    refreshNotifier.value += 1;
+                    //},
                     childBuilder: (_, physic) {
                         return Theme(
                             data: Theme.of(context).copyWith(
@@ -155,7 +144,7 @@ abstract class BangumiContentPageState<
                                             controller: scrollController,
                                             child: CustomScrollView(
                                                 controller: scrollController,
-                                                physics: physic,
+                                                physics: CustomDampingPhysic(parent: physic),
                                                 slivers: [
                                                     MultiSliver(
                                                         children: [
@@ -195,34 +184,37 @@ abstract class BangumiContentPageState<
                                                                             width: MediaQuery.sizeOf(context).width,
                                                                             child: ErrorLoadPrompt(
                                                                                 message: snapshot.error,
-                                                                                onRetryAction: () => loadContent(getSubContentID() ?? contentInfo.id ?? 0, isRefresh: true),
+                                                                                onRetryAction: (){
+                                                                                  contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0, isRefresh: true);
+                                                                                  refreshNotifier.value += 1;
+                                                                                },
                                                                             ),
 
                                                                         );
                                                                     }
 
                                                                     // 初始化载入内容
-                                                                    initCotent();
+                                                                    if (!isContentInitaled) initCotent();
 
                                                                     return isCommentLoading ?
-                                                                        Skeletonizer.sliver(
-                                                                            enabled: true,
-                                                                            child: SliverList(
-                                                                                delegate: SliverChildBuilderDelegate(
-                                                                                    (_, index) {
-                                                                                        if (index == 0) {
-                                                                                            return Padding(
-                                                                                                padding: EdgeInsetsGeometry.only(top: 50, bottom: 125),
-                                                                                                child: const SkeletonListTileTemplate(scaleType: ScaleType.medium),
-                                                                                            );
-                                                                                        }
-                                                                                        return const SkeletonListTileTemplate(scaleType: ScaleType.min);
+                                                                    Skeletonizer.sliver(
+                                                                        enabled: true,
+                                                                        child: SliverList(
+                                                                            delegate: SliverChildBuilderDelegate(
+                                                                                (_, index) {
+                                                                                    if (index == 0) {
+                                                                                        return Padding(
+                                                                                            padding: EdgeInsetsGeometry.only(top: 50, bottom: 125),
+                                                                                            child: const SkeletonListTileTemplate(scaleType: ScaleType.medium),
+                                                                                        );
                                                                                     }
-                                                                                ),
-
+                                                                                    return const SkeletonListTileTemplate(scaleType: ScaleType.min);
+                                                                                }
                                                                             ),
-                                                                        ) :
-                                                                        authorContent(contentInfo, contentDetailData);
+
+                                                                        ),
+                                                                    ) :
+                                                                    authorContent(contentInfo, contentDetailData);
 
                                                                 }
                                                             ),
@@ -241,8 +233,6 @@ abstract class BangumiContentPageState<
                                             return FutureBuilder(
                                                 future: contentFuture,
                                                 builder: (_, snapshot) {
-
-                                                    debugPrint("[GeneralContentPage] commentRebuild");
 
                                                     final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != unExistID;
                                                     final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
@@ -326,39 +316,39 @@ abstract class BangumiContentPageState<
 
         final currentEpCommentDetails = contentDetail?.contentRepliedComment;
 
-        if (!isInitaled) {
-            debugPrint("contentDetail?.detailID: ${contentDetail?.detailID} currentEpCommentDetails:${currentEpCommentDetails?.length} ");
+        
+        debugPrint("contentDetail?.detailID: ${contentDetail?.detailID} currentEpCommentDetails:${currentEpCommentDetails?.length} ");
 
-            if (currentEpCommentDetails != null) {
-                resultFilterCommentList = [...currentEpCommentDetails];                                               
+        if (currentEpCommentDetails != null) {
+            resultFilterCommentList = [...currentEpCommentDetails];                                               
 
-                recordHistorySurf(contentInfo, contentDetail);
-                isInitaled = true;
+            recordHistorySurf(contentInfo, contentDetail);
+            isContentInitaled = true;
 
-                if (commentFilterTypeNotifier.value == BangumiCommentRelatedType.id) {
+            if (commentFilterTypeNotifier.value == BangumiCommentRelatedType.id) {
 
-                    debugPrint("trigged referContentID: ${getReferPostContentID()}");
+                debugPrint("trigged referContentID: ${getReferPostContentID()}");
 
-                    resultFilterCommentList = filterCommentList(
-                        commentFilterTypeNotifier.value,
-                        resultFilterCommentList,
-                        referID: getReferPostContentID()
-                    );
+                resultFilterCommentList = filterCommentList(
+                    commentFilterTypeNotifier.value,
+                    resultFilterCommentList,
+                    referID: getReferPostContentID()
+                );
 
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                            debugPrint("measure height:${authorContentKey.currentContext?.size?.height},result:${(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - scrollController.offset}");
-                            scrollController.animateTo(
-                                max(0, (authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - MediaQuery.sizeOf(context).height / 3),
-                                duration: const Duration(milliseconds: 500),
-                                curve: Curves.easeOut,
-                            );
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                        debugPrint("measure height:${authorContentKey.currentContext?.size?.height},result:${(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - scrollController.offset}");
+                        scrollController.animateTo(
+                            max(0, (authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - MediaQuery.sizeOf(context).height / 3),
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeOut,
+                        );
 
-                        });
-
-                }
+                    });
 
             }
+
         }
+        
 
     }
 
@@ -699,3 +689,5 @@ abstract class BangumiContentPageState<
     }
 
 }
+
+

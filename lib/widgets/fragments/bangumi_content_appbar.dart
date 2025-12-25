@@ -68,7 +68,13 @@ class BangumiContentAppbar extends StatelessWidget {
             IconButton(
               onPressed: (){
                 debugPrint('new replied in UI');
-                onSendMessage?.call((null,"一个回帖测试"));
+                onSendMessage?.call(
+                  (
+                    //null,
+                    Random().nextInt(65535),
+                    "一个回帖测试"
+                  )
+                );
               }, 
               icon: const Icon(Icons.download_outlined)
             ),

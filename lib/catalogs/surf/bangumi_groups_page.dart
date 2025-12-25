@@ -231,8 +231,11 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                                             sliver: Consumer<GroupsModel>(
                                                 builder: (_, groupsModel, __) {
                               
-                                                    List selectedGroupData = groupTitleNotifier.value == null ?
-                                                        timelineFlowModel.timelinesData[BangumiSurfTimelineType.group] ?? [] :
+                                                    Iterable selectedGroupData = groupTitleNotifier.value == null ?
+                                                        interceptSelectedSurfTimelineType(
+                                                          timelineFlowModel.timelinesData,
+                                                          bangumiSurfTimelineType: BangumiSurfTimelineType.group
+                                                        ) :
                                                         loadSurfTimelineDetails(
                                                             groupsModel.contentListData,
                                                             bangumiSurfTimelineType: BangumiSurfTimelineType.group
@@ -253,7 +256,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                                                             return Container(
                                                                 color: index % 2 == 0 ? Colors.grey.withValues(alpha: 0.3) : null,
                                                                 child: BangumiTimelineTile(
-                                                                  surfTimelineDetails: selectedGroupData[index],
+                                                                  surfTimelineDetails: selectedGroupData.elementAt(index),
                                                                 ),
                                                             );
                                                         }
@@ -291,9 +294,13 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 
         final Function() invokeRequest;
 
-        List selectedGroupData = groupTitleNotifier.value == null ?
-        timelineFlowModel.timelinesData[BangumiSurfTimelineType.group] ?? [] :
-        groupsModel.contentListData;
+        Iterable selectedGroupData = groupTitleNotifier.value == null ?
+          interceptSelectedSurfTimelineType(
+            timelineFlowModel.timelinesData,
+            bangumiSurfTimelineType: BangumiSurfTimelineType.group
+          ) :
+          groupsModel.contentListData
+        ;
 
         final initalLength = selectedGroupData.length;
 
@@ -315,9 +322,13 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                 //groupsModel 的 修改是 .contentListData.addAll(result); 而不是直接重新赋值
                 //无法让 selectedGroupData 重新获取引用 只能再次赋值变量
 
-                List newSelectedGroupData = groupTitleNotifier.value == null ?
-                timelineFlowModel.timelinesData[BangumiSurfTimelineType.group] ?? [] :
-                groupsModel.contentListData;
+                Iterable newSelectedGroupData = groupTitleNotifier.value == null ?
+                    interceptSelectedSurfTimelineType(
+                      timelineFlowModel.timelinesData,
+                      bangumiSurfTimelineType: BangumiSurfTimelineType.group
+                    ) :
+                    groupsModel.contentListData
+                ;
 
                 final int receiveLength = max(0, newSelectedGroupData.length);
 

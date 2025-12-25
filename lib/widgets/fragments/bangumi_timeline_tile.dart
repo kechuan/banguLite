@@ -48,7 +48,7 @@ class BangumiTimelineTile extends StatelessWidget{
                 switch (surfTimelineDetails.bangumiSurfTimelineType){
                     case BangumiSurfTimelineType.subject:{
                         //错误 因为 单独透过Link 访问时得到的 同样会是null 没办法
-                        if (surfTimelineDetails.commentDetails?.userInformation == null) {
+                        if (surfTimelineDetails.commentDetails?.userInformation?.userID == null) {
                             Navigator.pushNamed(
                                 context,
                                 Routes.subjectDetail,
@@ -73,7 +73,7 @@ class BangumiTimelineTile extends StatelessWidget{
                                 bus.emit(
                                     "AppRoute",
                                     '${BangumiWebUrls.subjectTopic(surfTimelineDetails.detailID ?? 0)}'
-									'?sourceID=${surfTimelineDetails.sourceID}'
+									                  '?sourceID=${surfTimelineDetails.sourceID}'
                                     '&topicTitle=${surfTimelineDetails.title}'
                                     '${surfTimelineDetails.sourceTitle!=null ? "&sourceTitle=${surfTimelineDetails.sourceTitle}" : ""}'
 
