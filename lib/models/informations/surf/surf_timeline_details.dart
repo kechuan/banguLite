@@ -178,7 +178,6 @@ Iterable<SurfTimelineDetails> interceptSelectedSurfTimelineType(
         }
 
       );
-      //return timelinesData;
     }
     case BangumiSurfTimelineType.subject:
     case BangumiSurfTimelineType.group:
