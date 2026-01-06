@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 /// 有些数据 并不存在后续的内容 因此 [D] 允许为 nullable
 abstract class BaseModel
 <
-  I extends BaseInfo,
-  D extends BaseDetails?
+  I extends ContentInfo,
+  D extends ContentDetails?
 > extends ChangeNotifier {
 
   BaseModel({

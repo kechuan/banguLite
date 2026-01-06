@@ -15,9 +15,11 @@ class IndexPortial extends StatefulWidget {
   const IndexPortial({
     super.key,
     required this.selectedPageIndexNotifier,
+    this.onPop
   });
 
   final ValueNotifier<int> selectedPageIndexNotifier;
+  final Function(BuildContext)? onPop;
 
   @override
   State<IndexPortial> createState() => _IndexPortialState();
@@ -46,6 +48,9 @@ class _IndexPortialState extends State<IndexPortial> {
 
         return Scaffold(
           drawerEnableOpenDragGesture: true,
+          onDrawerChanged: (isOpened) {
+            return DrawerStatusNotification(isOpened).dispatch(context);
+          },
           appBar: AppBar(
             //leading: const ToggleThemeModeButton(),
             leading:  Builder(
@@ -95,11 +100,8 @@ class _IndexPortialState extends State<IndexPortial> {
           body: Builder(
             builder: (context) {
               return PopScope(
-                onPopInvokedWithResult: (didPop, result) {
-                  if(Scaffold.of(context).isDrawerOpen){
-                    Scaffold.of(context).closeDrawer();
-                    return;
-                  }
+                onPopInvokedWithResult: (_, __) {
+                  widget.onPop?.call(context);
                 },
                 child:PageView(
                   
@@ -148,4 +150,9 @@ class _IndexPortialState extends State<IndexPortial> {
       }
     );
   }
+}
+
+class DrawerStatusNotification extends Notification {
+  DrawerStatusNotification(this.isOpen);
+  final bool isOpen;
 }

@@ -1,17 +1,18 @@
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
+import 'package:bangu_lite/models/informations/subjects/base_details.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:dio/dio.dart';
 
 abstract class BaseComment {
   BaseComment({
-    
+
+    this.commentID,
+
     // CommentDetails 实际上不需要这个字段 
     // 但。。有些 通用的页面需要这个字段。而我不可能就为了这一个字段再开一个 特化的类
     // 那就干脆直接填平好了
     this.contentID,
-
-    this.commentID,
     this.userInformation,
     this.comment,
     this.commentTimeStamp,
@@ -29,6 +30,17 @@ abstract class BaseComment {
   factory BaseComment.empty(){
     throw UnimplementedError('factory should implemented in subclass');
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is BaseComment && other.hashCode == hashCode;
+  }
+
+  @override
+  int get hashCode => commentID.hashCode;
+
+  
 
 }
 
@@ -57,6 +69,19 @@ class EpCommentDetails extends BaseComment{
   CommentState? state;
 
   factory EpCommentDetails.empty() => EpCommentDetails(commentID: 0);
+
+  factory EpCommentDetails.fromContentDetail(
+    ContentDetails? contentDetail,
+    int? commentID
+  ){
+      return EpCommentDetails()
+        ..comment = contentDetail?.content
+        ..commentReactions = contentDetail?.contentReactions
+        ..userInformation = contentDetail?.userInformation
+        ..commentID = commentID
+        ..commentTimeStamp = contentDetail?.createdTime
+      ;
+  }
 }
 
 

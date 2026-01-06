@@ -17,6 +17,8 @@ import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/models/providers/history_model.dart';
+import 'package:bangu_lite/widgets/components/bangumi_general_content_comment.dart';
+//import 'package:bangu_lite/widgets/components/bangumi_general_content_comment.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_filter.dart';
@@ -95,6 +97,8 @@ abstract class BangumiContentPageState<
     // For record Local comment Change.
     final Map<int, String> userCommentMap = {};
 
+    Color? readableThemeColor;
+
     @override
     void initState() {
         final contentInfo = getContentInfo();
@@ -107,6 +111,7 @@ abstract class BangumiContentPageState<
         super.initState();
     }
 
+
     @override
     Widget build(BuildContext context) {
 
@@ -114,18 +119,21 @@ abstract class BangumiContentPageState<
         final contentModel = getContentModel();
         final contentInfo = getContentInfo();
 
+        readableThemeColor ??= 
+          !judgeDarknessMode(context) ?
+          getcurrentSubjectThemeColor()?.withValues(
+              red: 1 - getcurrentSubjectThemeColor()!.r,
+              green: 1 - getcurrentSubjectThemeColor()!.g,
+              blue: 1 - getcurrentSubjectThemeColor()!.b
+          ) : getcurrentSubjectThemeColor()
+        ;
+
         return ChangeNotifierProvider.value(
             //因为下方的 Selector 需求 使用 带有contentModel 的context环境
             value: contentModel,
             builder: (context, _) {
 
                 return EasyRefresh.builder(
-                    //与自定义physic冲突 取消了
-                    //header: const TextHeader(),
-                    //onRefresh: () {
-                    //    contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0, isRefresh: true);
-                    //    refreshNotifier.value += 1;
-                    //},
                     childBuilder: (_, physic) {
                         return Theme(
                             data: Theme.of(context).copyWith(
@@ -133,7 +141,7 @@ abstract class BangumiContentPageState<
                             ),
                             child: Scaffold(
                                 body: Selector<M, D>(
-                                    selector: (_, model) => (contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?) ?? createEmptyDetailData(),
+                                    selector: (_, model) => (getContentModel().contentDetailData[getSubContentID() ?? contentInfo.id] as D?) ?? createEmptyDetailData(),
                                     shouldRebuild: (previous, next) => previous != next,
                                     builder: (_, contentDetailData, contentComment) {
 
@@ -184,9 +192,9 @@ abstract class BangumiContentPageState<
                                                                             width: MediaQuery.sizeOf(context).width,
                                                                             child: ErrorLoadPrompt(
                                                                                 message: snapshot.error,
-                                                                                onRetryAction: (){
-                                                                                  contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0, isRefresh: true);
-                                                                                  refreshNotifier.value += 1;
+                                                                                onRetryAction: () {
+                                                                                    contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0, isRefresh: true);
+                                                                                    refreshNotifier.value += 1;
                                                                                 },
                                                                             ),
 
@@ -197,24 +205,24 @@ abstract class BangumiContentPageState<
                                                                     if (!isContentInitaled) initCotent();
 
                                                                     return isCommentLoading ?
-                                                                    Skeletonizer.sliver(
-                                                                        enabled: true,
-                                                                        child: SliverList(
-                                                                            delegate: SliverChildBuilderDelegate(
-                                                                                (_, index) {
-                                                                                    if (index == 0) {
-                                                                                        return Padding(
-                                                                                            padding: EdgeInsetsGeometry.only(top: 50, bottom: 125),
-                                                                                            child: const SkeletonListTileTemplate(scaleType: ScaleType.medium),
-                                                                                        );
+                                                                        Skeletonizer.sliver(
+                                                                            enabled: true,
+                                                                            child: SliverList(
+                                                                                delegate: SliverChildBuilderDelegate(
+                                                                                    (_, index) {
+                                                                                        if (index == 0) {
+                                                                                            return Padding(
+                                                                                                padding: EdgeInsetsGeometry.only(top: 50, bottom: 125),
+                                                                                                child: const SkeletonListTileTemplate(scaleType: ScaleType.medium),
+                                                                                            );
+                                                                                        }
+                                                                                        return const SkeletonListTileTemplate(scaleType: ScaleType.min);
                                                                                     }
-                                                                                    return const SkeletonListTileTemplate(scaleType: ScaleType.min);
-                                                                                }
-                                                                            ),
+                                                                                ),
 
-                                                                        ),
-                                                                    ) :
-                                                                    authorContent(contentInfo, contentDetailData);
+                                                                            ),
+                                                                        ) :
+                                                                        authorContent(contentInfo, contentDetailData);
 
                                                                 }
                                                             ),
@@ -253,16 +261,16 @@ abstract class BangumiContentPageState<
                                                         sliver: ValueListenableBuilder(
                                                             valueListenable: commentFilterTypeNotifier,
                                                             builder: (_, commentFilterType, __) {
-
+                                                    
                                                                 return SliverAnimatedList(
                                                                     key: animatedSliverListKey,
                                                                     //rebuild不会影响内部 initialItemCount 只能分离逻辑了
                                                                     initialItemCount: contentDetail!.contentRepliedComment!.length,
                                                                     itemBuilder: (_, contentCommentIndex, animation) {
-
+                                                    
                                                                         /// 用户添加回复时:
                                                                         if (contentCommentIndex >= resultCommentCount) {
-
+                                                    
                                                                             // 但因为 animatedList 的 特质 
                                                                             // 会出现 相等甚至是超越 initialItemCount 的 index(明明没insert)
                                                                             if (
@@ -270,23 +278,22 @@ abstract class BangumiContentPageState<
                                                                             ) {
                                                                                 return const SizedBox.shrink();
                                                                             }
-
+                                                    
                                                                             return newRepliedContent(
                                                                                 contentCommentIndex,
                                                                                 contentInfo,
                                                                                 animation
                                                                             );
-
+                                                    
                                                                         }
-
+                                                    
                                                                         /// 常规内容
-                                                                        return repliedContent(
-                                                                            contentCommentIndex,
-                                                                            contentInfo,
+                                                                        return RepaintBoundary(
+                                                                          child: repliedContent(contentCommentIndex)
                                                                         );
-
+                                                    
                                                                     },
-
+                                                    
                                                                 );
                                                             }
                                                         ),
@@ -316,7 +323,6 @@ abstract class BangumiContentPageState<
 
         final currentEpCommentDetails = contentDetail?.contentRepliedComment;
 
-        
         debugPrint("contentDetail?.detailID: ${contentDetail?.detailID} currentEpCommentDetails:${currentEpCommentDetails?.length} ");
 
         if (currentEpCommentDetails != null) {
@@ -348,7 +354,6 @@ abstract class BangumiContentPageState<
             }
 
         }
-        
 
     }
 
@@ -437,41 +442,21 @@ abstract class BangumiContentPageState<
 
     Widget authorContent(I contentInfo, D? contentDetail) {
 
-        late EpCommentDetails authorEPCommentData;
-
-        Color? readableThemeColor = 
-            !judgeDarknessMode(context) ?
-                getcurrentSubjectThemeColor()?.withValues(
-                    red: 1 - getcurrentSubjectThemeColor()!.r,
-                    green: 1 - getcurrentSubjectThemeColor()!.g,
-                    blue: 1 - getcurrentSubjectThemeColor()!.b
-                ) : 
-                getcurrentSubjectThemeColor();
-
         return Column(
             key: authorContentKey,
             spacing: 12,
             children: [
 
-                Builder(
-                    builder: (_) {
+                EpCommentView(
+                    contentID: contentInfo.id ?? 0,
+                    postCommentType: getPostCommentType(),
+                    //epCommentData: authorEPCommentData,
+                    epCommentData: EpCommentDetails.fromContentDetail(
+                        contentDetail,
+                        getSubContentID() ?? contentInfo.id
+                    ),
 
-                        authorEPCommentData = EpCommentDetails()
-                            ..comment = contentDetail?.content
-                            ..commentReactions = contentDetail?.contentReactions
-                            ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
-                            ..commentID = getSubContentID() ?? contentInfo.id
-                            ..commentTimeStamp = contentDetail?.createdTime ?? contentInfo.createdTime
-                        ;
-
-                        return EpCommentView(
-                            contentID: contentInfo.id ?? 0,
-                            postCommentType: getPostCommentType(),
-                            epCommentData: authorEPCommentData,
-                            themeColor: readableThemeColor,
-                        );
-
-                    }
+                    themeColor: readableThemeColor,
                 ),
 
                 ...List.generate(
@@ -522,63 +507,43 @@ abstract class BangumiContentPageState<
 
     Widget repliedContent(
         int contentCommentIndex,
-        I contentInfo
     ) {
 
-        debugPrint("[CommentIndex:$contentCommentIndex Rebuild]");
+      final currentEpCommentDetails = resultFilterCommentList[contentCommentIndex];
 
-        final ValueNotifier<int> commentUpdateFlag = ValueNotifier(0);
-
-        Color? readableThemeColor = 
-            !judgeDarknessMode(context) ?
-                getcurrentSubjectThemeColor()?.withValues(
-                    red: 1 - getcurrentSubjectThemeColor()!.r,
-                    green: 1 - getcurrentSubjectThemeColor()!.g,
-                    blue: 1 - getcurrentSubjectThemeColor()!.b
-                ) : getcurrentSubjectThemeColor();
+        debugPrint(
+          "[CommentIndex:$contentCommentIndex Rebuild]"
+          "[commentID:${currentEpCommentDetails.commentID}}]"
+        );
 
         return Column(
             children: [
 
-                /// 常规内容
-                ValueListenableBuilder(
-                    valueListenable: commentUpdateFlag,
-                    builder: (_, __, ___) {
+              BangumiGeneralContentComment(
+                currentEpCommentDetails: currentEpCommentDetails, 
+                postCommentType: getPostCommentType(),
+                contentID: currentEpCommentDetails.contentID ?? getContentInfo().id ?? 0,
+                authorID: getContentInfo().userInformation?.userID,
+                themeColor: readableThemeColor,
+                onUpdateComment: (content) {
+                    if (content == null) {
+                      removeCommentAction(contentCommentIndex, currentEpCommentDetails);
+                    }
 
-                        final currentEpCommentDetails = resultFilterCommentList[contentCommentIndex];
-
-                        return EpCommentView(
-                            key: ValueKey(currentEpCommentDetails.commentID),
-                            contentID: contentInfo.id ?? 0,
-                            postCommentType: getPostCommentType(),
-                            /// 用户更改拥有的内容时
-                            onUpdateComment: (content) {
-                                if (content == null) {
-                                    removeCommentAction(contentCommentIndex, currentEpCommentDetails);
-                                }
-
-                                else {
-                                    userCommentMap[contentCommentIndex] = content;
-                                    commentUpdateFlag.value += 1;
-                                }
-                            },
-                            epCommentData: currentEpCommentDetails,
-                            authorID: contentInfo.userInformation?.userID,
-                            themeColor: readableThemeColor,
-
-                        );
-                    },
-
-                ),
+                    else {
+                      userCommentMap[contentCommentIndex] = content;
+                    }
+                },
+              ),
 
                 if(contentCommentIndex < max(0, resultFilterCommentList.length) + userCommentMap.length - 1)
                 Divider(
                     thickness: 0.5,
                     height: 1,
                     color: 
-                    judgeDarknessMode(context) ? 
-                        getcurrentSubjectThemeColor() : 
-                        readableThemeColor
+                      judgeDarknessMode(context) ? 
+                      getcurrentSubjectThemeColor() : 
+                      readableThemeColor
                 ),
 
             ],
@@ -599,7 +564,6 @@ abstract class BangumiContentPageState<
 
         if (resultFilterCommentList.length != commentListCount) isFiltered = true;
 
-        // Blog 第一个评论为 第一层, 而 Topic 则以 主楼 为 第一层
         int newFloor = isFiltered ? 
             commentListCount + contentCommentIndex + 1 :
             contentCommentIndex + 1

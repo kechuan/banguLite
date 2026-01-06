@@ -23,7 +23,7 @@ class BangumiDetailRelations extends StatelessWidget {
 
           bool isRelationsEmpty =  
             relationModel.contentListData.isEmpty ||
-            relationModel.contentListData.first.relatedID == 0
+            relationModel.contentListData.first.sourceID == 0
           ;
 
           return SizedBox(
@@ -86,7 +86,7 @@ class BangumiDetailRelations extends StatelessWidget {
                                                   overflow: TextOverflow.ellipsis,
                                                 ),
                                               ),
-                                              ScalableText("${relationModel.contentListData[index].name}",style: const TextStyle(color: Colors.grey),),
+                                              ScalableText("${relationModel.contentListData[index].contentTitle}",style: const TextStyle(color: Colors.grey),),
                                             ],
                                           ),
                                         ),
