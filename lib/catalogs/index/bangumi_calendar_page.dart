@@ -175,7 +175,6 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
         return Scaffold(
           body: Selector<IndexModel, DateTime>(
             selector: (_, indexModel) => indexModel.dataTime,
-            shouldRebuild: (previous, next) => previous!=next,
             builder: (_, updateTime, child) {
               return FutureBuilder(
                 future: calendarLoadFuture,
@@ -197,7 +196,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                               padding: const EdgeInsets.only(left: 24),
                               decoration: BoxDecoration(
                                 border: Border(
-                                  bottom: Divider.createBorderSide(context) //
+                                  bottom: Divider.createBorderSide(context)
                                 ),
           
                                 color: Theme.of(context).colorScheme.surface.withValues(alpha:0.6),
@@ -249,7 +248,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                                           center: false,
                                           loop: true,
                                           itemCount: calendarBangumis["最热门"]!.isEmpty ? 1 : calendarBangumis["最热门"]!.length,
-                                          itemExtent: calendarBangumis["最热门"]!.isEmpty ? MediaQuery.sizeOf(context).width : max(200,MediaQuery.sizeOf(context).width/4), //主轴约束
+                                          itemExtent: measureCarouselItemExtent(),
                                           velocityFactor: 0.8 , //滚动速度
                                           controller: infiniteScrollController,
                                           itemBuilder: (_, currentIndex, itemCount){
@@ -262,26 +261,15 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                                               );
                                             }
 
-                                            return TransitionContainer(
-                                              builder: (_,openAciton){
-                                                return Padding(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                                                  child: UnVisibleResponse( 
-
+                                            return Container(
+                                              padding: PaddingH12,
+                                              child: TransitionContainer(
+                                                builder: (_,openAciton){
+                                                  return UnVisibleResponse(                
                                                       containedInkWell: true,
-                                                      
                                                       onTap: (){
-                                                                        
-                                                        debugPrint("$currentIndex => ${weeklyBangumisRecommend[currentIndex].name}");
-
-                                                        openAciton();
-                                                          
-                                                        //Navigator.pushNamed(
-                                                        //  context,
-                                                        //  Routes.subjectDetail,
-                                                        //  arguments: {"subjectID":weeklyBangumisRecommend[currentIndex].id},
-                                                        //);
-                                                                
+                                                        debugPrint("$currentIndex => ${weeklyBangumisRecommend[currentIndex].name}");            
+                                                        openAciton();        
                                                       },
                                                       child: DecoratedBox(
                                                         decoration: BoxDecoration(
@@ -352,12 +340,12 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                                                           
                                                         ),
                                                       )
-                                                    ),
-                                                );  
-                                              },
-                                              next: BangumiDetailPage(
-                                                subjectID: weeklyBangumisRecommend[currentIndex].id ?? 0,
-                                                injectBangumiInfoDetail: weeklyBangumisRecommend[currentIndex],
+                                                    );  
+                                                },
+                                                next: BangumiDetailPage(
+                                                  subjectID: weeklyBangumisRecommend[currentIndex].id ?? 0,
+                                                  injectBangumiInfoDetail: weeklyBangumisRecommend[currentIndex],
+                                                ),
                                               ),
                                             );
                                                               
@@ -535,10 +523,26 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
       
     );
   }
+
+  double measureCarouselItemExtent() {
+
+    final calendarBangumis = context.read<IndexModel>().calendarBangumis;
+
+    if(calendarBangumis["最热门"]!.isEmpty) return MediaQuery.sizeOf(context).width;
+    if(MediaQuery.orientationOf(context) == Orientation.portrait) return ((MediaQuery.sizeOf(context).width) - (12/2))/2;
+    //if(MediaQuery.orientationOf(context) == Orientation.portrait) return 160;
+
+    //主轴模糊约束
+    return max(200,MediaQuery.sizeOf(context).width/4);
+
+
+  }
+
   
   @override
   bool get wantKeepAlive => true;
 }
+
 
 
 

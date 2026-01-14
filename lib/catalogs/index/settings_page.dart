@@ -79,12 +79,10 @@ class SettingsPage extends StatelessWidget {
           )
         ],
       ),
-
+      backgroundColor: judgeDarknessMode(context) ? judgeDarkContentSurfaceColor(context) : null,
       body: EasyRefresh(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-
-
+          padding: PaddingH24,
           child: Theme(
             data: Theme.of(context).copyWith(
               scrollbarTheme : const ScrollbarThemeData(
@@ -261,7 +259,7 @@ class ColorThemeTile extends ListTile{
         children: [
           Selector<IndexModel,Color?>(
             selector: (_, indexModel) => judgeCurrentThemeColor(context),
-            shouldRebuild: (previous, next) => previous!=next,
+            
             builder: (_,currentColor,child) => ScalableText("主题色设置",style: TextStyle(color: judgeCurrentThemeColor(context).withValues(alpha: 0.8)))
           ),
 
@@ -378,7 +376,7 @@ class ColorThemeTile extends ListTile{
       ),
       subtitle: Selector<IndexModel,bool?>(
         selector: (_, indexModel) => indexModel.userConfig.isFollowThemeColor,
-        shouldRebuild: (previous, next) => previous!=next,
+        
         builder: (_,followStatus,child){
           return Padding(
             padding: const EdgeInsets.only(top: 24),
@@ -456,6 +454,28 @@ class ThemeModeTile extends ListTile{
       
         ],
       ),
+      subtitle: AnimatedCrossFade(
+        sizeCurve: Curves.easeOut,
+        crossFadeState: Theme.brightnessOf(context) == Brightness.dark ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+        firstChild: Container(
+          padding: const EdgeInsets.only(top: 24),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("纯黑的深色模式背景 (OLED屏幕省电)"),
+              Switch(
+                value: context.watch<IndexModel>().userConfig.isPureDarkMode ?? true, 
+                onChanged: (value){
+                  indexModel.updatePureDarkMode(value);
+                }
+              ),
+            ],
+          ),
+        ),
+        secondChild: const SizedBox.shrink(),
+        duration: const Duration(milliseconds: 300),
+      
+      ),
         
     );
   }
@@ -475,7 +495,7 @@ class CommentImageLoadModeTile extends ListTile{
       child: Center(
         child: Selector<IndexModel,bool?>(
             selector: (_, indexModel) => indexModel.userConfig.isManuallyImageLoad,
-            shouldRebuild: (previous, next) => previous!=next,
+            
             builder: (_,manualStatus,child){
               return ListTile(
                 title: Row(
@@ -578,7 +598,7 @@ class UpdateAlertToggleTile extends ListTile{
       child: Center(
         child: Selector<IndexModel,bool?>(
             selector: (_, indexModel) => indexModel.userConfig.isUpdateAlert,
-            shouldRebuild: (previous, next) => previous!=next,
+            
             builder: (_,manualStatus,child){
               return ListTile(
                 title: Row(
@@ -630,8 +650,6 @@ class AboutTile extends ListTile{
 
 class ImageStorageManageTile extends ListTile{
   const ImageStorageManageTile({super.key});
-
-  
 
 	@override
 	Widget build(BuildContext context) {
@@ -754,7 +772,6 @@ class ImageStorageManageTile extends ListTile{
 
 }
 
-
 class TestTile extends ListTile{
   const TestTile({super.key});
 
@@ -781,7 +798,6 @@ class TestTile extends ListTile{
     }
 
 }
-
 
 void saveImageFile(DocumentFile? targetWriteDocument,DocumentFile? selectedDocFile) async {
 

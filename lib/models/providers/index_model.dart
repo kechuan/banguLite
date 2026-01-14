@@ -94,6 +94,11 @@ class IndexModel extends ChangeNotifier {
     updateConfig();
   }
 
+  void updatePureDarkMode(bool darkMode){
+    userConfig.isPureDarkMode = darkMode;
+    updateConfig();
+  }
+
   Future<void> updateStarDetail() async {
     List<int> starsList = [];
 

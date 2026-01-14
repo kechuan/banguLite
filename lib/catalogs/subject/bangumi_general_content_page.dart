@@ -137,7 +137,12 @@ abstract class BangumiContentPageState<
                     childBuilder: (_, physic) {
                         return Theme(
                             data: Theme.of(context).copyWith(
-                                scaffoldBackgroundColor: judgeDarknessMode(context) ? null : convertFineTuneColor(getcurrentSubjectThemeColor() ?? judgeCurrentThemeColor(context), lumiScaleType: ScaleType.min),
+                              scaffoldBackgroundColor: 
+                                judgeDarknessMode(context) ? 
+                                judgeDarkContentSurfaceColor(context) :
+                                convertFineTuneColor(getcurrentSubjectThemeColor() ?? judgeCurrentThemeColor(context), lumiScaleType: ScaleType.min)
+                              ,
+
                             ),
                             child: Scaffold(
                                 body: Selector<M, D>(
@@ -513,13 +518,14 @@ abstract class BangumiContentPageState<
 
         debugPrint(
           "[CommentIndex:$contentCommentIndex Rebuild]"
-          "[commentID:${currentEpCommentDetails.commentID}}]"
+          "[commentID:${currentEpCommentDetails.commentID}]"
         );
 
         return Column(
             children: [
 
               BangumiGeneralContentComment(
+                key: ValueKey(currentEpCommentDetails.commentID),
                 currentEpCommentDetails: currentEpCommentDetails, 
                 postCommentType: getPostCommentType(),
                 contentID: currentEpCommentDetails.contentID ?? getContentInfo().id ?? 0,
@@ -529,7 +535,7 @@ abstract class BangumiContentPageState<
                     if (content == null) {
                       removeCommentAction(contentCommentIndex, currentEpCommentDetails);
                     }
-
+              
                     else {
                       userCommentMap[contentCommentIndex] = content;
                     }

@@ -1,6 +1,5 @@
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
-import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -91,23 +90,22 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                     epModel.bangumiThemeColor = linearColor;
 
                     return Theme(
-                        data: ThemeData(
-                            brightness: Theme.of(context).brightness,
-                            primaryColor: judgeDetailRenderColor(context, linearColor),
-                            scaffoldBackgroundColor: judgeDetailRenderColor(context, linearColor),
-                            fontFamilyFallback: convertSystemFontFamily(),
-                        ),
-                        child: detailScaffold!,
+                      data: Theme.of(context).copyWith(
+                        primaryColor: judgeDetailRenderColor(context, linearColor),
+                        scaffoldBackgroundColor: judgeDetailRenderColor(context, linearColor),
+                      ),
+
+                      child: detailScaffold!,
                     );
                 },
                 child: Builder(
-                    builder: (context) {
+                    builder: (innerContext) {
 
                         //因为sliver的原因 commentModel 的 loadComments 会直到我触发了 HotComment 区域才开始加载。
                         //因此无法把用户评论获取放到那个页面 里 那么久只能直接放进这里了
 
-                        final bangumiModel = context.read<BangumiModel>();
-                        final commentModel = context.read<CommentModel>();
+                        final bangumiModel = innerContext.read<BangumiModel>();
+                        final commentModel = innerContext.read<CommentModel>();
 
                         commentModel.loadUserComment(
                             currentUserInformation: AccountModel.loginedUserInformations.userInformation
@@ -255,7 +253,8 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                                                                                             end: Alignment.bottomCenter,
                                                                                             colors: [
                                                                                                 judgeDarknessMode(context) ? Colors.black : Colors.white,
-                                                                                                linearColor!.withValues(alpha: 0.8),
+                                                                                                judgeDarknessMode(context) ? Colors.black.withValues(alpha: 0.6) : linearColor!.withValues(alpha: 0.8),
+                                                                                                
                                                                                             ]
                                                                                         )
                                                                                     ),

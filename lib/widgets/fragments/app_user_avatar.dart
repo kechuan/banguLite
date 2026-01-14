@@ -1,10 +1,10 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
 class AppUserAvatar extends StatelessWidget {
@@ -48,7 +48,7 @@ class AppUserAvatar extends StatelessWidget {
               return CachedImageLoader(imageUrl: AccountModel.loginedUserInformations.userInformation?.avatarUrl);
             }
             else{
-              return Icon(MdiIcons.accountCircleOutline,size: 30);
+              return Icon(MdiExtendsionIcons.accountCircleOutline,size: 30);
             }
           } 
         ),

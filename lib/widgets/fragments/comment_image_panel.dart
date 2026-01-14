@@ -10,6 +10,7 @@ import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 
 const excludeImageFormatted = [
@@ -70,10 +71,15 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
               child: UnVisibleResponse(
                 onTap: (){
                   if(!isValid){
-                    Navigator.pushNamed(
-                      context,
-                      Routes.webview,
-                      arguments: {"url":widget.imageUrl},
+                    //Navigator.pushNamed(
+                    //  context,
+                    //  Routes.webview,
+                    //  arguments: {"url":widget.imageUrl},
+                    //);
+
+                    launchUrlString(
+                      //mode: LaunchMode.inAppWebView,
+                      widget.imageUrl
                     );
                   }
 

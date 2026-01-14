@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -12,7 +13,6 @@ import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
 abstract class BangumiGeneralMoreContentPageState<
@@ -152,7 +152,7 @@ abstract class BangumiGeneralMoreContentPageState<
                                               crossAxisAlignment: WrapCrossAlignment.center,
                                               spacing: 3,
                                               children: [
-                                                Icon(MdiIcons.chat,size: 12),
+                                                Icon(MdiExtendsionIcons.chat,size: 12),
                                                 ScalableText("${contentList[index].repliesCount}"),
                                               ],
                                             ),

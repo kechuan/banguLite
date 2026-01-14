@@ -1,6 +1,7 @@
 import 'dart:io';
 
 
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
@@ -71,41 +72,59 @@ class MainApp extends StatelessWidget {
      
       child: Builder(
         builder: (context) {
-          return Selector<IndexModel,Color>(
+          return Selector<IndexModel,(Color,ThemeMode?)>(
             selector: (_, indexModel){
               if(indexModel.userConfig.isSelectedCustomColor == true){
-                return indexModel.userConfig.customColor!;
+                return (
+					indexModel.userConfig.customColor!,
+					indexModel.userConfig.themeMode
+				);
               }
 
-              return indexModel.userConfig.currentThemeColor!.color;
+              	return (
+					indexModel.userConfig.currentThemeColor!.color,
+					indexModel.userConfig.themeMode
+				);
             },
-            shouldRebuild: (previous, next) => previous!=next,
-            builder: (_, currentColor, child){
+            
+            builder: (_, currentRecord, child){
               return MaterialApp(
+				
                 scaffoldMessengerKey: scaffoldMessengerKey,
+				
                 //debugShowCheckedModeBanner: false,
                 theme: ThemeData(
-                  colorScheme: ColorScheme.fromSeed(seedColor: currentColor),
-                  fontFamilyFallback:convertSystemFontFamily()
-                  
+                  colorScheme: ColorScheme.fromSeed(seedColor: currentRecord.$1),
+                  fontFamilyFallback:convertSystemFontFamily(),
                 ),
                 darkTheme: ThemeData(
                   brightness: Brightness.dark,
                   fontFamilyFallback:convertSystemFontFamily(),
-                  //colorScheme: ColorScheme.fromSeed(seedColor: currentColor),
-                  
+                  //colorScheme: ColorScheme.fromSeed(seedColor: currentRecord.$1),
+
+				  /// 比用 dividerColor: Colors.grey 好
+				  expansionTileTheme: ExpansionTileThemeData(
+					shape: Border.symmetric(
+						horizontal: BorderSide(color:Colors.grey),
+					),
+				  ),
+				  
+
+				  scaffoldBackgroundColor: judgeDarkContentSurfaceColor(context),
+				  
                   colorScheme: ColorScheme.dark(
-                    
-                    primary: currentColor,
+                    primary: currentRecord.$1,
                     onPrimary: Colors.white, //unSelected颜色
-                    secondary: currentColor.withValues(alpha: 0.8), // Selected 底色颜色(Button 一类)
-                    onSecondary:currentColor, //onSelected 的内部颜色(内部Widget/Text 一类)
-                    
-                    surface: Colors.black,
+                    secondary: currentRecord.$1.withValues(alpha: 0.8), // Selected 底色颜色(Button 一类)
+                    onSecondary:currentRecord.$1, //onSelected 的内部颜色(内部Widget/Text 一类)
+
                     outline: Colors.white,
+
+					//主要目的给 dividerColor 使用 
+					outlineVariant: Colors.grey
                   )
                 ),
-                themeMode: context.watch<IndexModel>().userConfig.themeMode,
+                themeMode: currentRecord.$2,
                   
                 initialRoute: Routes.index,
                 navigatorObservers: [Lifecycle.lifecycleRouteObserver],

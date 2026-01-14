@@ -13,6 +13,7 @@ class AppConfig extends HiveObject{
   bool? isFollowThemeColor = false;
   bool? isManuallyImageLoad = true;
   bool? isUpdateAlert = true;
+  bool? isPureDarkMode = true;
   
   //登入凭证
 

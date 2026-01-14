@@ -437,9 +437,8 @@ Color convertFineTuneColor(
       }
     }
 
-	debugPrint("$resultColor, Lumi:${resultColor.computeLuminance()}");
+  	debugPrint("$resultColor, Lumi:${resultColor.computeLuminance()}");
 
     return resultColor;
 
-    
 }

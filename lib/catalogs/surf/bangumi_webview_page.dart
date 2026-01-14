@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
@@ -10,7 +11,6 @@ import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
 //预计用途: 查看外部图片之类的
@@ -114,7 +114,7 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
                       
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        prefixIcon: Icon(MdiIcons.web),
+                        prefixIcon: Icon(MdiExtendsionIcons.web),
                     
                         suffixIcon: ValueListenableBuilder(
                           valueListenable: progressNotifier,

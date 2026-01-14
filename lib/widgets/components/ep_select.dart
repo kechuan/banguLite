@@ -145,7 +145,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
 						//epModel => context.watch区域
 						return Selector<EpModel,bool>(
 						selector: (_, epModel)=> epModel.epsData[(currentSegementRange)+1]?.epID == null,
-						shouldRebuild: (previous, next) => previous!=next,
+						
 						builder: (_,loadingStatus,child) {
 						//debugPrint(" inside enabled: ${(currentSegementRange)+1}  ${epModel.epsData[(currentSegementRange)+1]?.epID == null}");
 							return Skeletonizer(

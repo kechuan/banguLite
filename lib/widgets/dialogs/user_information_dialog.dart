@@ -1,6 +1,7 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
@@ -20,8 +21,8 @@ import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class UserInformationDialog extends StatelessWidget {
     const UserInformationDialog({
@@ -96,16 +97,16 @@ class UserInformationDialog extends StatelessWidget {
 
                                                         if (userInformation?.userName != null) {
 
-                                                            Navigator.pushNamed(
-                                                                context,
-                                                                Routes.webview,
-                                                                arguments: {"url":BangumiWebUrls.userTimeline(userInformation!.userName!)},
-                                                            );
-
-                                                            //launchUrlString(
-                                                            //  mode: LaunchMode.inAppWebView,
-                                                            //  BangumiWebUrls.userTimeline(userInformation!.userName!)
+                                                            //Navigator.pushNamed(
+                                                            //    context,
+                                                            //    Routes.webview,
+                                                            //    arguments: {"url":BangumiWebUrls.userTimeline(userInformation!.userName!)},
                                                             //);
+
+                                                            launchUrlString(
+                                                              //mode: LaunchMode.inAppWebView,
+                                                              BangumiWebUrls.userTimeline(userInformation!.userName!)
+                                                            );
                                                         }
 
                                                     },
@@ -158,7 +159,7 @@ class UserInformationDialog extends StatelessWidget {
                                                             },
                                                             child: Icon(
 
-                                                                MdiIcons.accountPlusOutline,
+                                                                MdiExtendsionIcons.accountPlusOutline,
                                                                 color: blockStatus ? Colors.grey : null,
                                                             )
                                                         ),

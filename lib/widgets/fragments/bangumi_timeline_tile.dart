@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
@@ -17,7 +18,6 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class BangumiTimelineTile extends StatelessWidget{
 
@@ -146,7 +146,7 @@ class BangumiTimelineTile extends StatelessWidget{
                             if(surfTimelineDetails.replies != null)
                             Row(
                                 children: [
-                                    Icon(MdiIcons.chat, size: 16, color: Colors.grey.shade700),
+                                    Icon(MdiExtendsionIcons.chat, size: 16, color: Colors.grey.shade700),
                                     ScalableText("${surfTimelineDetails.replies}", style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
                                 ],
                             ),

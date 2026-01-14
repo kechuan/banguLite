@@ -5,7 +5,7 @@ nextTypeId: 14
 types:
   AppConfig:
     typeId: 0
-    nextIndex: 9
+    nextIndex: 10
     fields:
       currentThemeColor:
         index: 0
@@ -23,6 +23,8 @@ types:
         index: 7
       isUpdateAlert:
         index: 8
+      isPureDarkMode:
+        index: 9
   AppThemeColor:
     typeId: 1
     nextIndex: 4

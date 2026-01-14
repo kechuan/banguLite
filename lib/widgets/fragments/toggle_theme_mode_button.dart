@@ -37,7 +37,7 @@ class ToggleThemeModeButton extends StatelessWidget {
       },
       child: Selector<IndexModel,ThemeMode>(
         selector: (_, indexModel) => indexModel.userConfig.themeMode!,
-        shouldRebuild: (previous, next) => previous!=next,
+        
         builder: (_, currentTheme, child){
 
           if(isDetailText == true){

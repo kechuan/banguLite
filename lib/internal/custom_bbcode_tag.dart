@@ -39,7 +39,8 @@ BBStylesheet appDefaultBBStyleSheet(
 
 final allEffectTag = [
     BoldTag(),
-    ItalicTag(),
+    //ItalicTag(),
+    PatchItalicTag(),
     UnderlineTag(),
     StrikeThroughTag(),
     PatchColorTag(),
@@ -398,6 +399,31 @@ class MaskTag extends WrappedStyleTag {
     }
 }
 
+class PatchItalicTag extends AdvancedTag {
+  PatchItalicTag() : super('i');
+
+  
+  @override
+  List<InlineSpan> parse(FlutterRenderer renderer, bbob.Element element) {
+
+    String textItalicContent = element.textContent;
+
+    return [
+       WidgetSpan(
+        alignment: PlaceholderAlignment.baseline,
+        baseline: TextBaseline.alphabetic,
+        child: Transform(
+          // -0.1 是非常克制的倾斜，看起来既有斜体感，又不会像系统默认的那样“躺倒”
+          transform: Matrix4.skewX(-0.2), 
+          child: ScalableText(
+            textItalicContent,
+          ),
+        ),
+      )
+    ];
+  }
+}
+
 class BangumiStickerTag extends AdvancedTag{
 
     BangumiStickerTag() : super("sticker");
@@ -463,8 +489,6 @@ class LateLoadImgTag extends AdvancedTag {
         return [WidgetSpan(child: CommentImagePanel(imageUrl: imageUrl))];
     }
 }
-
-
 
 class SizeTag extends StyleTag{
     SizeTag() : super('size');

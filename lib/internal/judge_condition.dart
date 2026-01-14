@@ -44,6 +44,30 @@ Color judgeCurrentThemeColor(BuildContext context){
 
 }
 
+Color? judgeDarkContentSurfaceColor(
+  BuildContext context,
+){
+  final indexModel = context.watch<IndexModel>();
+
+  if(indexModel.userConfig.isPureDarkMode == false){
+
+    //debugPrint("lumi: ${Colors.grey.withValues(alpha: 0.1).computeLuminance()} / ${Color(0xFF2C2C2C).computeLuminance()}");
+    
+    //更浅
+    //return Colors.grey.withValues(alpha: 0.15);
+
+    //更深
+    return const Color(0xFF2C2C2C);
+
+    //[DEBUG]
+    //return Colors.grey.withValues(alpha: 0.5);
+  }
+
+  return null;
+  
+
+}
+
 Color judgeDetailRenderColor(BuildContext context,Color? imageColor){
 
   final IndexModel indexModel = context.read<IndexModel>();

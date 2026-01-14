@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/delegates/star_sort_strategy.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
+import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
@@ -14,7 +15,6 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
@@ -27,7 +27,7 @@ List<SortType> valueList = const [
 ];
 
 List<Icon> iconList =  [
-  Icon(MdiIcons.calendarImport),
+  const Icon(MdiExtendsionIcons.calendarImport),
   const Icon(Icons.history),
   const Icon(Icons.calendar_month),
   const Icon(Icons.numbers),
@@ -159,7 +159,7 @@ class BangumiStarPage extends StatelessWidget {
       ),
       body: Selector<IndexModel,int>(
         selector: (_, indexModel) => indexModel.starUpdateFlag,
-        shouldRebuild: (previous, next) => previous!=next,
+        
         builder: (_,__,___){
 
 

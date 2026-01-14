@@ -27,8 +27,8 @@ class WebViewModel extends ChangeNotifier {
         if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
             final availableVersion = await WebViewEnvironment.getAvailableVersion();
             assert(
-            availableVersion != null,
-            'Failed to find an installed WebView2 Runtime or non-stable Microsoft Edge installation.'
+              availableVersion != null,
+              'Failed to find an installed WebView2 Runtime or non-stable Microsoft Edge installation.'
             );
 
             webViewEnvironment = await WebViewEnvironment.create(

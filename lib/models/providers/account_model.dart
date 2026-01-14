@@ -86,8 +86,11 @@ class AccountModel extends ChangeNotifier {
 
     void loginWebAuth() {
 		    accountLoginStatus = LoginStatus.logining;
-        launchUrlString(BangumiWebUrls.webAuthPage());
-        notifyListeners();
+        launchUrlString(
+          BangumiWebUrls.webAuthPage(),
+          mode: LaunchMode.externalApplication,
+        );
+        notifyListeners();  
     }
 
     void loadUserDetail() {

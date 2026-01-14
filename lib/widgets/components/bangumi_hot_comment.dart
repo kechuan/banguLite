@@ -31,8 +31,6 @@ class _BangumiHotCommentState extends State<BangumiHotComment> with AutomaticKee
   Widget build(BuildContext context) {
     super.build(context);
 
-      
-
       final bangumiModel = context.read<BangumiModel>();
       final commentModel = context.read<CommentModel>();
       
@@ -77,10 +75,11 @@ class _BangumiHotCommentState extends State<BangumiHotComment> with AutomaticKee
                         child: Padding(
                           padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
                           child: ListView.separated(
+                            
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemCount: commentListData.isEmpty ? 3 : commentListData.length,
-                            separatorBuilder: (_, index) => const Divider(height: 2),
+                            separatorBuilder: (_, index)=> const Divider(height: 2),
                             itemBuilder: (_,index){
                               
                               //原本获取过来的数据是 Offset: 390 391 392 ... 400 这样给你展示的 所以默认状态下会变成越滚动越晚的消息
