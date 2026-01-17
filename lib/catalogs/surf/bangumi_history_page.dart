@@ -2,11 +2,11 @@
 
 import 'dart:async';
 
+import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/custom_toaster.dart';
-import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/history_model.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
@@ -228,7 +228,7 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
 								  );
 
                                 },
-                                icon: Icon(Icons.date_range),
+                                icon: const Icon(Icons.date_range),
                             ),
 
 
@@ -258,7 +258,7 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
                                     MyHive.historySurfDataBase.putAll(patchedDetails);
 
                                 },
-                                icon: Icon(Icons.auto_fix_high),
+                                icon: const Icon(Icons.auto_fix_high),
                             ),
 
                             if (multiSelectMode) 
@@ -726,7 +726,7 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                                       onPressed: () {
                                           historyModel.historyPageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
                                       },
-                                      icon: Icon(Icons.arrow_back_ios_new_outlined),
+                                      icon: const Icon(Icons.arrow_back_ios_new_outlined),
                                   ),
                           
                                   AnimatedBuilder(
@@ -755,7 +755,7 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                                                 "${historyModel.groupIndices.keys.elementAtOrNull(startIndex) ?? ""}"
                                                 " ~ "
                                                 "${historyModel.groupIndices.keys.elementAtOrNull(endIndex) ?? ""}",
-                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                style: const TextStyle(fontWeight: FontWeight.bold),
                                               ),
                           
                                               rangeButton!
@@ -776,7 +776,7 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                                             });
                                           }
                                         }, 
-                                        icon: Icon(Icons.date_range)
+                                        icon: const Icon(Icons.date_range)
                                       ),
                                   ),
                           
@@ -784,7 +784,7 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                                       onPressed: () {
                                           historyModel.historyPageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
                                       },
-                                      icon: Icon(Icons.arrow_forward_ios_outlined),
+                                      icon: const Icon(Icons.arrow_forward_ios_outlined),
                                   ),
                           
                               ],
@@ -796,7 +796,7 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                                 controller: historyModel.historyPageController,
                                 children: [
                                   if(historyModel.localHistoryPageMap.isEmpty)
-                                    Center(
+                                    const Center(
                                       child: ScalableText("空空如也"),
                                     )
                                   else

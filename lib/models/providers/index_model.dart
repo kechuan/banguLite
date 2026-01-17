@@ -2,14 +2,14 @@
 import 'dart:async';
 
 import 'package:bangu_lite/hive/config_model.dart';
-import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 
 class IndexModel extends ChangeNotifier {
   IndexModel(){
@@ -48,7 +48,7 @@ class IndexModel extends ChangeNotifier {
 
   void initModel() async {
     loadConfigData();
-    //await updateStarDetail();
+    await updateStarDetail();
   }
 
   void loadConfigData(){
@@ -99,14 +99,32 @@ class IndexModel extends ChangeNotifier {
     updateConfig();
   }
 
+  //更新所有收藏的番剧未免不现实 更改一下逻辑
+  //变成只更新目前还未完结的番剧吧。。
   Future<void> updateStarDetail() async {
-    List<int> starsList = [];
+    Set<int> starsList = {};
 
-	if(MyHive.starBangumisDataBase.keys.isEmpty) return;
+	  if(MyHive.starBangumisDataBase.keys.isEmpty) return;
+
+
+    starsList.addAll(
+      MyHive.starBangumisDataBase.values.where(
+        (bangumiData){
+          if(
+            bangumiData.rank == 0 || 
+            bangumiData.score == 0.0
+          ){
+             return true;
+          }
+
+          DateTime finishedTime = convertDateTime(bangumiData.finishedDate);
+          if(DateTime.now().compareTo(finishedTime) < 0) return true;
+          return false;
+        }
+      ).map((e)=>e.bangumiID!).toList()
+    );
     
-    for(dynamic bangumiID in MyHive.starBangumisDataBase.keys){
-      starsList.add(bangumiID);
-    }
+
     
     starsUpdateRating = await compute(
       loadStarsDetail,

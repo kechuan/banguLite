@@ -3,13 +3,13 @@ import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
+import 'package:bangu_lite/models/informations/subjects/review_details.dart';
+import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/models/providers/review_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
-import 'package:bangu_lite/models/informations/subjects/review_details.dart';
-import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -243,7 +243,7 @@ void appRouteMethodListener(BuildContext context,String link){
   }
 
   else{
-	launchUrlString(link);
+	  launchUrlString(link);
   }
 }
 

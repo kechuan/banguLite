@@ -2,16 +2,16 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
-import 'package:bangu_lite/internal/utils/extract.dart';
-import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
@@ -341,10 +341,10 @@ class _EpCommentTileState extends State<EpCommentTile> {
                                                         borderRadius: BorderRadius.circular(16),
                                                         gradient: LinearGradient(
                                                             begin: Alignment.bottomCenter,
-                                                            end: Alignment(0, 0.15),
+                                                            end: const Alignment(0, 0.15),
                                                             colors: [
 
-                                                                judgeDarknessMode(context) ? Colors.white : Color.fromRGBO(162, 167, 146, 0.329),
+                                                                judgeDarknessMode(context) ? Colors.white : const Color.fromRGBO(162, 167, 146, 0.329),
                                                                 Colors.transparent
                                                             ]
                                                         )

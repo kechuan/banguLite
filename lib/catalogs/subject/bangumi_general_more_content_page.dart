@@ -152,7 +152,7 @@ abstract class BangumiGeneralMoreContentPageState<
                                               crossAxisAlignment: WrapCrossAlignment.center,
                                               spacing: 3,
                                               children: [
-                                                Icon(MdiExtendsionIcons.chat,size: 12),
+                                                const Icon(MdiExtendsionIcons.chat,size: 12),
                                                 ScalableText("${contentList[index].repliesCount}"),
                                               ],
                                             ),

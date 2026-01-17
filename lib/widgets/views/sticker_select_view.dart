@@ -103,7 +103,7 @@ class StickerSelectView extends StatelessWidget {
                             // 激活的tab占用更多空间，非激活的占用较少空间
                             flex: isActive ? (judgeLandscapeMode(context) ? 2 : 3) : 1,
                             child: AnimatedContainer(
-                              duration: Duration(milliseconds: 300),
+                              duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
                               child: UnVisibleResponse(
                                 onTap: () {
@@ -111,7 +111,7 @@ class StickerSelectView extends StatelessWidget {
                                   stickerPageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
                                 },
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                                   decoration: BoxDecoration(
                                     //color: isActive ? Colors.white : Colors.transparent,
                                     borderRadius: BorderRadius.only(
@@ -120,7 +120,7 @@ class StickerSelectView extends StatelessWidget {
                                     ),
                                   ),
                                   child: AnimatedSwitcher(
-                                    duration: Duration(milliseconds: 200),
+                                    duration: const Duration(milliseconds: 200),
                                     child: 
                                         isActive ? 
                                         Row(
@@ -131,7 +131,7 @@ class StickerSelectView extends StatelessWidget {
                                             Flexible(
                                               child: Text(
                                                 "${tabList[index].text}",
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                                 overflow: TextOverflow.ellipsis,

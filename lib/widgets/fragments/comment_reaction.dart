@@ -1,8 +1,8 @@
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -130,8 +130,8 @@ class _CommentReactionState extends State<CommentReaction> {
                 ),
                 width: 80,
                 child: TextButton(
-                  style: ButtonStyle(
-                    padding: const WidgetStatePropertyAll(EdgeInsets.all(0)),
+                  style: const ButtonStyle(
+                    padding: WidgetStatePropertyAll(EdgeInsets.all(0)),
                   ),
                   onPressed:  () {
                       debugPrint("dataLikeIndex:$dataLikeIndex, stickerIndex:$stickerIndex");

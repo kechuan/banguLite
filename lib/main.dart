@@ -1,23 +1,22 @@
 import 'dart:io';
 
-
-import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/platforms/register_windows_applink.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/models/providers/user_model.dart';
 import 'package:bangu_lite/models/providers/webview_model.dart';
+import 'package:bangu_lite/routes/bangu_lite_route.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/routes/bangu_lite_route.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
@@ -103,7 +102,7 @@ class MainApp extends StatelessWidget {
                   //colorScheme: ColorScheme.fromSeed(seedColor: currentRecord.$1),
 
 				  /// 比用 dividerColor: Colors.grey 好
-				  expansionTileTheme: ExpansionTileThemeData(
+				  expansionTileTheme: const ExpansionTileThemeData(
 					shape: Border.symmetric(
 						horizontal: BorderSide(color:Colors.grey),
 					),

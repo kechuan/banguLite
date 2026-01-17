@@ -3,10 +3,10 @@
 import 'dart:async';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/template.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:bangu_lite/models/informations/surf/user_notificaion_details.dart';
@@ -112,9 +112,6 @@ class AccountModel extends ChangeNotifier {
         }
 
         else {
-
-          
-
 
           return await generalRequest(
             BangumiAPIUrls.me,

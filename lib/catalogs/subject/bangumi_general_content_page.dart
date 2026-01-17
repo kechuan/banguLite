@@ -2,12 +2,11 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
-
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
@@ -18,11 +17,11 @@ import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/models/providers/history_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_general_content_comment.dart';
+import 'package:bangu_lite/widgets/components/general_replied_line.dart';
 //import 'package:bangu_lite/widgets/components/bangumi_general_content_comment.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_filter.dart';
-import 'package:bangu_lite/widgets/components/general_replied_line.dart';
 import 'package:bangu_lite/widgets/fragments/custom_friction.dart';
 import 'package:bangu_lite/widgets/fragments/error_load_prompt.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
@@ -216,9 +215,9 @@ abstract class BangumiContentPageState<
                                                                                 delegate: SliverChildBuilderDelegate(
                                                                                     (_, index) {
                                                                                         if (index == 0) {
-                                                                                            return Padding(
+                                                                                            return const Padding(
                                                                                                 padding: EdgeInsetsGeometry.only(top: 50, bottom: 125),
-                                                                                                child: const SkeletonListTileTemplate(scaleType: ScaleType.medium),
+                                                                                                child: SkeletonListTileTemplate(scaleType: ScaleType.medium),
                                                                                             );
                                                                                         }
                                                                                         return const SkeletonListTileTemplate(scaleType: ScaleType.min);

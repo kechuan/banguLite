@@ -60,12 +60,12 @@ class ReportDialog extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
 
-                                ScalableText("举报该内容", style: const TextStyle(fontSize: 20)),
+                                const ScalableText("举报该内容", style: TextStyle(fontSize: 20)),
 
                                 GridView.builder(
                                     shrinkWrap: true,
                                     itemCount: ReportReasonType.values.length,
-                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 2,
                                       mainAxisExtent: 45,
                                       mainAxisSpacing: 3,

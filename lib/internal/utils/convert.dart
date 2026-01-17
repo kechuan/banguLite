@@ -3,9 +3,9 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 import 'package:flutter/material.dart';
 
@@ -369,7 +369,7 @@ String covertPastedTime(int? timeStamp){
   } 
 
   else{
-    resultText = "${recordTime.year%100}-${convertDigitNumString(recordTime.hour)}-${convertDigitNumString(recordTime.minute)}";
+    resultText = "${recordTime.year%100}-${convertDigitNumString(recordTime.month)}-${convertDigitNumString(recordTime.day)}";
   }
 
  

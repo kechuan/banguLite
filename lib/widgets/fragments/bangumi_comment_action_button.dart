@@ -3,13 +3,12 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
-import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
-
 import 'package:bangu_lite/widgets/components/sticker_select_overlay.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:bangu_lite/widgets/dialogs/report_dialog.dart';
@@ -98,11 +97,11 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
         return CompositedTransformTarget(
             link: stickerLayerLink,
             child: PopupMenuButton<CommentActionType>(
-                constraints:BoxConstraints(
+                constraints:const BoxConstraints(
                   maxHeight: 3*kToolbarHeight
                 ),
                 iconSize: 22,
-                style: ButtonStyle(
+                style: const ButtonStyle(
                   alignment: Alignment.bottomCenter,
                 ),
                 onOpened: (){

@@ -4,27 +4,26 @@ import 'dart:math';
 import 'package:bangu_lite/catalogs/about_page.dart';
 import 'package:bangu_lite/catalogs/subject/bangumi_detail_page.dart';
 import 'package:bangu_lite/internal/bus_register_method.dart';
-import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_tab_content_select.dart';
 import 'package:bangu_lite/widgets/components/transition_container.dart';
 import 'package:bangu_lite/widgets/dialogs/new_update_dialog.dart';
+import 'package:bangu_lite/widgets/dialogs/warp_season_dialog.dart';
+import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
-import 'package:bangu_lite/widgets/dialogs/warp_season_dialog.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-
-import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
-import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -74,6 +73,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
 
     invokeShowUpdateDialog(latestRelease) => showUpdateDialog(context,latestRelease);
 
+    //延时context获取
     getContext() => context;
 
     carouselSpinTimer();
@@ -138,9 +138,9 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
 
   @override
   void onResume() {
-	debugPrint("caleandar resume");
-	carouselSpinTimer();
-	super.onResume();
+    debugPrint("caleandar resume");
+    carouselSpinTimer();
+    super.onResume();
 
   }
 
@@ -184,7 +184,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                   final calendarBangumis = indexModel.calendarBangumis;
             
                   return CustomScrollView(
-                    physics: ClampingScrollPhysics(),
+                    physics: const ClampingScrollPhysics(),
                     slivers: [
           
                       MultiSliver(

@@ -48,7 +48,7 @@ class AppUserAvatar extends StatelessWidget {
               return CachedImageLoader(imageUrl: AccountModel.loginedUserInformations.userInformation?.avatarUrl);
             }
             else{
-              return Icon(MdiExtendsionIcons.accountCircleOutline,size: 30);
+              return const Icon(MdiExtendsionIcons.accountCircleOutline,size: 30);
             }
           } 
         ),

@@ -23,14 +23,14 @@ class ErrorLoadPrompt extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: 6,
           children: [
-            Icon(Icons.warning_amber_outlined),
+            const Icon(Icons.warning_amber_outlined),
             ScalableText("$message"),
           ],
         ),
         
         TextButton(
           onPressed: onRetryAction, 
-          child: Row(
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 6,
             children: [

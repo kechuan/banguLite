@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 import 'package:dio/dio.dart';
@@ -205,7 +205,7 @@ class EpModel extends ChangeNotifier{
         BangumiAPIUrls.epComment(requestID),
       )
       .timeout(
-        Duration(seconds: 10),
+        const Duration(seconds: 10),
         onTimeout:() {
           throw DioException(
             requestOptions:RequestOptions(),

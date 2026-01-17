@@ -32,7 +32,7 @@ class _TestPageState extends State<TestPage> {
   Widget build(BuildContext context) {
   
     return EasyRefresh(
-      footer: TextFooter(),
+      footer: const TextFooter(),
       child: Scaffold(
         appBar: AppBar(
           title: const ScalableText('测试页面'),
@@ -49,7 +49,7 @@ class _TestPageState extends State<TestPage> {
                 ),
                 childCount: testList.length,
               ),
-              gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 1
               ),
             )

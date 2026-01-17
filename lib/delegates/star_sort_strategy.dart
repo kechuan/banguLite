@@ -1,8 +1,8 @@
 // 定义排序策略抽象类
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/informations/local/star_details.dart';
 
 abstract class SortStrategy {
@@ -38,25 +38,25 @@ class UpdateTimeSortStrategy implements SortStrategy {
 
     int resultWeekDate = 0;
 
-	DateTime finishedTime = convertDateTime(details.finishedDate);
+    DateTime finishedTime = convertDateTime(details.finishedDate);
 
-	//已完结
-	if(DateTime.now().compareTo(finishedTime) > 0) return resultWeekDate;
+    //已完结
+    if(DateTime.now().compareTo(finishedTime) > 0) return resultWeekDate;
 
-    WeekDay.values.any((currentDay){
+      WeekDay.values.any((currentDay){
 
-      if(currentDay.dayText == details.airWeekday?.substring(2,3)){
-		    resultWeekDate = currentDay.dayIndex; //覆盖才有用 太奇怪了
-        return true;
-      }
+        if(currentDay.dayText == details.airWeekday?.substring(2,3)){
+          resultWeekDate = currentDay.dayIndex; //覆盖才有用 太奇怪了
+          return true;
+        }
 
-      return false;
-     
-    });
+        return false;
+      
+      });
 
-    return resultWeekDate;
+      return resultWeekDate;
 
-  }
+    }
 
   @override
   String generateHeaderText(num weekday) {

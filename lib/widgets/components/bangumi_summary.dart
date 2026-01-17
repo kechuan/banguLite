@@ -1,6 +1,7 @@
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -56,42 +57,44 @@ class BangumiSummary extends StatelessWidget {
                     padding: Padding12,
                     child: LayoutBuilder(
                       builder: (_,constraint) {
-                        return Column(
-                          spacing: 6,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                        
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8), //16
-                              child: ScalableText("简介",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)), // 24*(aspectRatio) => 34
-                            ),
-                        
-                            expandedStatus ? 
-                            Expanded(child: child!) : 
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: constraint.maxHeight - 50 - 6*2, // 16 + 34 => 50 + spacing*2
+                        return EasyRefresh(
+                          child: Column(
+                            spacing: 6,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                          
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8), //16
+                                child: ScalableText("简介",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)), // 24*(aspectRatio) => 34
                               ),
-                              child: child!,
-                            ),
-                        
-                            expandedStatus ?
-                            Align(
-                              alignment: const Alignment(1.0, 0),
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  border: Border.all(width: 1,color: Colors.green),
-                                  borderRadius: BorderRadius.circular(24),
-                                  
+                          
+                              expandedStatus ? 
+                              Expanded(child: child!) : 
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight: constraint.maxHeight - 50 - 6*2, // 16 + 34 => 50 + spacing*2
                                 ),
-                                child: TextButton(
-                                  onPressed: ()=> expandedSummaryNotifier.value = false, 
-                                  child: const ScalableText("收起")
-                                ),
-                              )) :
-                            const SizedBox.shrink()
-                        
-                          ],
+                                child: child!,
+                              ),
+                          
+                              expandedStatus ?
+                              Align(
+                                alignment: const Alignment(1.0, 0),
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(width: 1,color: Colors.green),
+                                    borderRadius: BorderRadius.circular(24),
+                                    
+                                  ),
+                                  child: TextButton(
+                                    onPressed: ()=> expandedSummaryNotifier.value = false, 
+                                    child: const ScalableText("收起")
+                                  ),
+                                )) :
+                              const SizedBox.shrink()
+                          
+                            ],
+                          ),
                         );
                       }
                     ),

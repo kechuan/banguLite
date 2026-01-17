@@ -4,15 +4,15 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/delegates/star_sort_strategy.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
+import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/models/informations/local/star_details.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/models/informations/local/star_details.dart';
+import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
-import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,12 +26,12 @@ List<SortType> valueList = const [
   SortType.rank,
 ];
 
-List<Icon> iconList =  [
-  const Icon(MdiExtendsionIcons.calendarImport),
-  const Icon(Icons.history),
-  const Icon(Icons.calendar_month),
-  const Icon(Icons.numbers),
-  const Icon(Icons.leaderboard_outlined),
+List<Icon> iconList = const [
+  Icon(MdiExtendsionIcons.calendarImport),
+  Icon(Icons.history),
+  Icon(Icons.calendar_month),
+  Icon(Icons.numbers),
+  Icon(Icons.leaderboard_outlined),
 ];
 
 class BangumiStarPage extends StatelessWidget {
@@ -190,7 +190,7 @@ class BangumiStarPage extends StatelessWidget {
                         sortStrategy: currentStrategy,
                         isReversed: reversedStatus
                       ),
-                      physics: ClampingScrollPhysics(),
+                      physics: const ClampingScrollPhysics(),
                     );
                   },
                   

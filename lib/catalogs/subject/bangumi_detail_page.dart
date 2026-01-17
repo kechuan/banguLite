@@ -1,39 +1,36 @@
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/hive.dart';
-import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
-import 'package:bangu_lite/models/providers/account_model.dart';
-import 'package:bangu_lite/models/providers/relation_model.dart';
-import 'package:bangu_lite/models/providers/review_model.dart';
-import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
-import 'package:bangu_lite/models/informations/surf/user_details.dart';
-import 'package:bangu_lite/widgets/components/bangumi_detail_recent_review.dart';
-import 'package:bangu_lite/widgets/components/bangumi_detail_relations.dart';
-import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
-import 'package:flutter/material.dart';
-import 'package:easy_refresh/easy_refresh.dart';
-import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
-
-import 'package:provider/provider.dart';
-import 'package:skeletonizer/skeletonizer.dart';
-
-import 'package:url_launcher/url_launcher_string.dart';
-
-import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
+import 'package:bangu_lite/models/providers/relation_model.dart';
+import 'package:bangu_lite/models/providers/review_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
-import 'package:bangu_lite/widgets/components/bangumi_detail_topics.dart';
-import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
-import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
-import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
-import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_intro.dart';
+import 'package:bangu_lite/widgets/components/bangumi_detail_recent_review.dart';
+import 'package:bangu_lite/widgets/components/bangumi_detail_relations.dart';
+import 'package:bangu_lite/widgets/components/bangumi_detail_topics.dart';
 import 'package:bangu_lite/widgets/components/bangumi_hot_comment.dart';
 import 'package:bangu_lite/widgets/components/bangumi_summary.dart';
+import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
+import 'package:easy_refresh/easy_refresh.dart';
+import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 
 @FFRoute(name: '/subjectDetail')
@@ -272,20 +269,17 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                                                                         sliver: SliverList(
                                                                             delegate: SliverChildListDelegate(
                                                                                 [
-                                                                                    const BangumiDetailIntro(),
+                                                                                  const BangumiDetailIntro(),
 
-                                                                                    const BangumiSummary(),
+                                                                                  const BangumiSummary(),
 
-                                                                                    const BangumiDetailRecentReview(),
+                                                                                  const BangumiDetailRecentReview(),
 
-                                                                                    const BangumiDetailRelations(),
+                                                                                  const BangumiDetailRelations(),
 
-                                                                                    const BangumiDetailTopics(),
+                                                                                  const BangumiDetailTopics(),
 
-                                                                                    NotificationListener<ScrollNotification>(
-                                                                                        onNotification: (_) => true,
-                                                                                        child: const BangumiHotComment()
-                                                                                    ),
+                                                                                  const BangumiHotComment(),
                                                                                 ]
                                                                             )
                                                                         ),

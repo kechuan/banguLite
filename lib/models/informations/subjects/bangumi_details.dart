@@ -2,13 +2,13 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/local/star_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 
 const excludeTagsList = [
   "日本","TV","WEB"
@@ -341,7 +341,7 @@ bool animationFilter(Map currentBangumi){
 }
 
 //获取 收藏 番剧的信息 以后可能需要分批次请求。。 以免出现429错误
-Future<Map<int,Map<String,num>>> loadStarsDetail(List<int> starsIDList) async {
+Future<Map<int,Map<String,num>>> loadStarsDetail(Iterable<int> starsIDList) async {
 
   Completer<Map<int,Map<String,num>>> starUpdateCompleter = Completer();
 
@@ -360,7 +360,7 @@ Future<Map<int,Map<String,num>>> loadStarsDetail(List<int> starsIDList) async {
     List.generate(
       starsIDList.length,
       (index) async {
-        await HttpApiClient.client.get("${BangumiAPIUrls.subject}/${starsIDList[index]}").then((response){
+        await HttpApiClient.client.get("${BangumiAPIUrls.subject}/${starsIDList.elementAt(index)}").then((response){
           final ratingList = loadDetailsData(response.data).ratingList;
 
           resultRating.values.elementAt(index)["score"] = ratingList["score"];

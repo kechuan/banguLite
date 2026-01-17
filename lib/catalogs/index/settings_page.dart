@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/test_page.dart';
+import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
 import 'package:bangu_lite/widgets/components/transition_container.dart';
@@ -106,7 +106,7 @@ class SettingsPage extends StatelessWidget {
                         child: Row(
                           spacing: 12,
                           children: [
-                            Icon(Icons.color_lens),
+                            const Icon(Icons.color_lens),
                         
                             ScalableText("外观",style:TextStyle(color:Colors.grey.withValues(alpha: 0.8))),
                           ],
@@ -147,7 +147,7 @@ class SettingsPage extends StatelessWidget {
                         child: Row(
                           spacing: 12,
                           children: [
-                            Icon(Icons.settings),
+                            const Icon(Icons.settings),
                         
                             ScalableText("功能设置",style:TextStyle(color:Colors.grey.withValues(alpha: 0.8))),
                           ],

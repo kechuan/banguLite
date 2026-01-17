@@ -1,10 +1,10 @@
 import 'dart:math';
 
-import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/search_handler.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -168,7 +168,7 @@ class SelectSeasonLandscape extends StatelessWidget {
 		          child: AnimatedContainer(
 		            duration: const Duration(milliseconds: 300),
 		            color: convertPassedSeason(year, currentMonth) < seasonTypeIndex ? Colors.grey : AppThemeColor.values[seasonTypeIndex].color, //unable will be grey.,,
-		            child: SizedBox(child: Center(child: Text(SeasonType.values[seasonTypeIndex].seasonText,style: TextStyle(color: Colors.black)))),
+		            child: SizedBox(child: Center(child: Text(SeasonType.values[seasonTypeIndex].seasonText,style: const TextStyle(color: Colors.black)))),
 		          )
 		        );
 		      }

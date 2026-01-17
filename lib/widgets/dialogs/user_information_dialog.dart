@@ -1,4 +1,3 @@
-import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
@@ -158,7 +157,6 @@ class UserInformationDialog extends StatelessWidget {
                                                                 );
                                                             },
                                                             child: Icon(
-
                                                                 MdiExtendsionIcons.accountPlusOutline,
                                                                 color: blockStatus ? Colors.grey : null,
                                                             )

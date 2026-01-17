@@ -34,7 +34,7 @@ class GeneralRepliedLine extends StatelessWidget {
           Row(
             spacing: 12,
             children: [
-              ScalableText(descHeadline ?? "回复",style: TextStyle(fontSize: 24)),
+              ScalableText(descHeadline ?? "回复",style: const TextStyle(fontSize: 24)),
               ScalableText("$repliedCount",style: const TextStyle(color: Colors.grey)),
             ],
           ),

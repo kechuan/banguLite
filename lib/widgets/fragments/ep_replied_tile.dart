@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
-import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -100,7 +100,7 @@ class EpRepliedTile extends ListTile {
                                 ),
 
                                 epCommentData.repliedComment![index].state?.isNotAvaliable() == true ?
-                                ScalableText("发言已隐藏",style: TextStyle(fontWeight: FontWeight.bold)) :
+                                const ScalableText("发言已隐藏",style: TextStyle(fontWeight: FontWeight.bold)) :
                                 Expanded(
                                   child: RichText(  // 使用 RichText 合并文本
                                     text: TextSpan(
@@ -135,7 +135,7 @@ class EpRepliedTile extends ListTile {
                                           ),
 
                                           /// 往上面的text内容增加\n没有用 必须在这里加才生效 甚是奇怪
-                                          TextSpan(text: "\n"),
+                                          const TextSpan(text: "\n"),
                                   
                                         ],
                                   

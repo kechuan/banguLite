@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
-import 'package:flutter/material.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_tile.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 
@@ -30,7 +30,7 @@ class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepA
 
     final commentModel = context.read<CommentModel>();
 
-    final disactivePageRange = CommentModel.disactivePageRange;
+    const disactivePageRange = CommentModel.disactivePageRange;
 
     //判断页面是否为disactive状态: 透过 其在Model里的 currentPageIndex 与当前Page的相差值判断
 
