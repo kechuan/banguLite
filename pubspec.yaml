@@ -68,10 +68,10 @@ flutter:
     - assets/bangumiSticker/500-529 五行行行行行啊/
 
 flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icons/icon.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
+  # android: "launcher_icon"
+  # ios: true
+  # image_path: "assets/icons/icon.png"
+  # min_sdk_android: 21 # android min sdk min:16, default 21
   #web:
   #  generate: true
   #  image_path: "path/to/image.png"
@@ -79,7 +79,7 @@ flutter_launcher_icons:
   #  theme_color: "#hexcode"
   windows:
     generate: true
-    image_path: "assets/icons/icon.png"
+    image_path: "assets/icon.png"
     icon_size: 48 # min:48, max:256, default: 48
   #macos:
   #  generate: true

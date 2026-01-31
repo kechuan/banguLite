@@ -216,7 +216,7 @@ class FontSizeTile extends ListTile {
                       initialIndex: fontScale.index,
                       length: ScaleType.values.length,
                       child: TabBar(
-                        labelPadding: const EdgeInsets.all(0),
+                        labelPadding: EdgeInsets.zero,
                         onTap: (value) {
                           switch(value){
                             case 0: indexModel.updateFontSize(ScaleType.min); break;
