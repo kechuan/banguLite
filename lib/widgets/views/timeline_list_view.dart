@@ -199,7 +199,11 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
         ).then((result) {
           if (result){
             double recordOffset = scrollController.offset;
-            scrollController.animateTo(recordOffset+3*kToolbarHeight,duration: const Duration(milliseconds: 300),curve: Curves.ease);
+
+            if(recordOffset != 0){
+                scrollController.animateTo(recordOffset+3*kToolbarHeight,duration: const Duration(milliseconds: 300),curve: Curves.ease);
+            }
+            
 
             refreshNotifier.value += 1;
             

@@ -16,7 +16,7 @@
 
 目前支持Android 与 windows 双端，
 
-在项目release处下载。
+在项目 [release](https://github.com/kechuan/luckyBeastCardTemplateGenerator/releases) 处下载。
 
 > 如果不知道Android端要哪一个就选 arm64 的那个
 
