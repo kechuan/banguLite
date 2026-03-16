@@ -2,6 +2,8 @@
 
 
 
+
+
 const detectIDList = [
   'id',
   'subjectID',
@@ -58,6 +60,7 @@ enum TimelineCat {
   final String catName;
 
   int getValue(TimelineCat timelineCatType) => timelineCatType.value;
+  TimelineCat fromValue(int value) => TimelineCat.values.elementAt(value-1);
   
 
   const TimelineCat(this.value,this.catName);

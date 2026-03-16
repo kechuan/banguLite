@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
@@ -214,7 +215,7 @@ class EpModel extends ChangeNotifier{
         },
       )
       .then((response){
-        if(response.statusCode == 200){
+        if(response.statusCode == HttpStatus.ok){
 
           epCommentData[selectedEp] = loadEpCommentDetails(response.data);
 

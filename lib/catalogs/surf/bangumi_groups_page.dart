@@ -3,18 +3,19 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/utils/callback.dart';
-import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/callback.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+@FFAutoImport()
+import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
+import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
-
 import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
-import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
@@ -25,9 +26,6 @@ import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
-
-@FFAutoImport()
-import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 
 
 @FFRoute(name: '/Groups')
@@ -308,8 +306,8 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 
             invokeRequest = () => timelineFlowModel.requestSelectedTimeLineType(
                 BangumiSurfTimelineType.group,
-                isAppend: isAppend,
-                queryParameters: BangumiQuerys.groupsTopicsQuery(offset: initalLength)
+                //isAppend: isAppend,
+                queryParameters: [BangumiQuerys.groupsTopicsQuery(offset: initalLength)]
             );
         }
 

@@ -20,7 +20,7 @@ final pathRegExp = RegExp(r'^[^?]*');
 // 424493#post_3306858
 final anchorRegExp = RegExp(r'#post_\d+');
 
-void appRouteMethodListener(BuildContext context,String link){
+void appRouteMethodListener(BuildContext context,String link,{dynamic data}){
 
   final appRouteUri = Uri.parse(link);
 
@@ -210,15 +210,13 @@ void appRouteMethodListener(BuildContext context,String link){
 
         if(context.mounted){
 
+
           //stupid way. but general...
           Navigator.pushNamed(
             context,
             Routes.timelineChat,
             arguments: {
               'timelineID':appRouteUri.queryParameters['timelineID'],
-              'comment':appRouteUri.queryParameters['comment'],
-              'createdAt':appRouteUri.queryParameters['createdAt'],
-              'userName':appRouteUri.queryParameters['userName'],
               'onDeleteAction':(int resultID){
 
                 if(resultID!=0){

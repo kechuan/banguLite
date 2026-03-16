@@ -1,17 +1,17 @@
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
-import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
-import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/models/providers/account_model.dart';
-import 'package:bangu_lite/models/providers/user_model.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/surf/timeline_details.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
+import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/user_model.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
@@ -292,7 +292,16 @@ class UserInformationDialog extends StatelessWidget {
                                                                                         ),
 
                                                                                         AdapterBBCodeText(
-                                                                                            data: convertTimelineDescription(timelineActions[index]),
+                                                                                            data: convertTimelineDescription(
+                                                                                              timelineActions[index],
+                                                                                              onTimelineCommentParsed: (){
+
+                                                                                                UserModel.timelineChatsData.addAll({
+                                                                                                  timelineActions[index].timelineID! : timelineActions[index].commentDetails!
+                                                                                                });
+
+                                                                                              }
+                                                                                            ),
                                                                                             stylesheet: appDefaultBBStyleSheet(context)
                                                                                         ),
                                                                                     ],

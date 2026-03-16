@@ -8,7 +8,7 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables,unused_local_variable,unused_import,unnecessary_import,unused_shown_name,implementation_imports,duplicate_import,library_private_types_in_public_api
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
 import 'package:bangu_lite/models/informations/subjects/review_details.dart';
@@ -39,6 +39,7 @@ import '../catalogs/surf/bangumi_notifications_page.dart';
 import '../catalogs/surf/bangumi_picture_view_page.dart';
 import '../catalogs/surf/bangumi_surf_timeline_page.dart';
 import '../catalogs/surf/bangumi_timeline_chat_page.dart';
+import '../catalogs/surf/bangumi_trend_topic.dart';
 import '../catalogs/surf/bangumi_webview_page.dart';
 import '../catalogs/surf/banumi_user_page.dart';
 import '../catalogs/surf/send_comment_page.dart';
@@ -113,17 +114,18 @@ FFRouteSettings getRouteSettings({
           timelineID: asT<int>(
             safeArguments['timelineID'],
           )!,
-          comment: asT<String?>(
-            safeArguments['comment'],
-          ),
           onDeleteAction: asT<Function(int)?>(
             safeArguments['onDeleteAction'],
           ),
-          userName: asT<String?>(
-            safeArguments['userName'],
-          ),
-          createdAt: asT<int?>(
-            safeArguments['createdAt'],
+        ),
+      );
+    case '/TrendTopic':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => BangumiTrendTopic(
+          key: asT<Key?>(
+            safeArguments['key'],
           ),
         ),
       );
@@ -326,6 +328,9 @@ FFRouteSettings getRouteSettings({
           subjectID: asT<int>(
             safeArguments['subjectID'],
           )!,
+          injectBangumiInfoDetail: asT<BangumiDetails?>(
+            safeArguments['injectBangumiInfoDetail'],
+          ),
         ),
       );
     case '/subjectEp':

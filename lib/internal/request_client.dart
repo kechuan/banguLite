@@ -101,6 +101,10 @@ class BangumiAPIUrls {
   static String latestGroupTopics() => groupsTopics();
   static String latestSubjectTopics() => topics();
 
+  ///不启用
+  //static String trendSubjects() => '$newUrl/trending/subjects';
+  static String trendTopics() => '$newUrl/trending/subjects/topics';
+
   //user
   static String me = '$newUrl/me';
 
@@ -165,6 +169,7 @@ class BangumiAPIUrls {
   static String toggleEPCommentLike(int commentID) => '${actionEpComment(commentID)}/like';
   static String toggleTopicLike(int commentID) => '${actionTopicComment(commentID)}/like';
   static String toggleGroupTopicLike(int commentID) => '${actiongroupTopicComment(commentID)}/like';
+  static String toggleTimelineLike(int timelineID) => '${timeline()}/$timelineID/like';
 
   ///[POST]
   static String report() => '$newUrl/report';
@@ -338,6 +343,7 @@ class BangumiQuerys {
 		"id": notificationIDList ?? []
 	};
 
+  //until 字段 timelineID count Down 如目标为 998 那么 就要从 999 开始搜寻
   static Map<String,dynamic> timelineQuery({
     int? limit,
     int? until,
@@ -365,8 +371,8 @@ class BangumiQuerys {
                           epQuery = {"subject_id":0,"limit":100,"offset":0},
                           relationsQuery = {"type":2,"limit":20,"offset":0},
                           reviewsQuery = {"limit":20,"offset":0},
-                          groupTopicQuery = {"limit":20,"offset":0}
-                          //until字段 timelineID count Down 如目标为 998 那么 就要从 999 开始搜寻
+                          groupTopicQuery = {"limit":20,"offset":0},
+                          trendTopicQuery = {"limit":20,"offset":0}
                           
   ;
                              
@@ -459,7 +465,7 @@ class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.10.7",
+                      version = "0.11.0",
                       author = "kechuan"
   ;
 

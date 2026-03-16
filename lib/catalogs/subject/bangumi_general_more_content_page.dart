@@ -1,11 +1,11 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
-import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
@@ -91,7 +91,7 @@ abstract class BangumiGeneralMoreContentPageState<
 
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     scrollController.animateTo(
-                      scrollController.offset+120,
+                      scrollController.offset+3*kToolbarHeight,
                       duration: const Duration(milliseconds: 500), 
                       curve: Curves.easeOutCubic
                     );

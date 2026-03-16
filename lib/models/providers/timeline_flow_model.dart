@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -12,25 +13,26 @@ class TimelineFlowModel extends ChangeNotifier {
 
   final Set<SurfTimelineDetails> timelinesData = {};
 
+  final Set<SurfTimelineDetails> trendTimelinesData = {};
+
   Completer<bool>? requestTimelineCompleter;
+  Completer<bool>? requestTrendTopicTimelineCompleter;
 
   // 上滑 或 初次载入时触发
   Future<bool> requestSelectedTimeLineType(
     BangumiSurfTimelineType timelineType,
     {
-	    bool? isAppend,
-      Map<String,dynamic>? queryParameters,
+	    //bool? isAppend,
+      List<Map<String,dynamic>>? queryParameters,
       Function(String message)? fallbackAction,
     }
 
   ) async {
 
     if(requestTimelineCompleter!=null) return requestTimelineCompleter!.future;
+    requestTimelineCompleter = Completer();
 
-    Completer<bool> loadTimelineCompleter = Completer();
-    requestTimelineCompleter = loadTimelineCompleter;
-
-    if(isAppend != true){
+    if(queryParameters == null){
       if(timelineType == BangumiSurfTimelineType.all){
         timelinesData.clear();
       }
@@ -53,17 +55,17 @@ class TimelineFlowModel extends ChangeNotifier {
           [
             HttpApiClient.client.get(
               BangumiAPIUrls.latestSubjectTopics(),
-              queryParameters: BangumiQuerys.groupTopicQuery
+              queryParameters: queryParameters?.elementAtOrNull(0) ?? BangumiQuerys.topicsQuery
             ),
             HttpApiClient.client.get(
               BangumiAPIUrls.latestGroupTopics(),
               options: BangumiAPIUrls.bangumiAccessOption(),
-              queryParameters: BangumiQuerys.groupsTopicsQuery(),
+              queryParameters: queryParameters?.elementAtOrNull(1) ?? BangumiQuerys.groupsTopicsQuery()
             ),
             HttpApiClient.client.get(
               BangumiAPIUrls.timeline(),
               options: BangumiAPIUrls.bangumiAccessOption(),
-              queryParameters:BangumiQuerys.timelineQuery()
+              queryParameters: queryParameters?.elementAtOrNull(2) ?? BangumiQuerys.timelineQuery()
             ),
           ]
         );
@@ -74,7 +76,8 @@ class TimelineFlowModel extends ChangeNotifier {
         timelineFuture = () async {
           final response = await HttpApiClient.client.get(
             BangumiAPIUrls.latestSubjectTopics(),
-            queryParameters: queryParameters
+            queryParameters: queryParameters?.elementAtOrNull(0) ?? BangumiQuerys.topicsQuery
+            
           );
 
           return [response];
@@ -87,7 +90,7 @@ class TimelineFlowModel extends ChangeNotifier {
         timelineFuture = () async {
           final response = await HttpApiClient.client.get(
             BangumiAPIUrls.latestGroupTopics(),
-            queryParameters: queryParameters ?? BangumiQuerys.groupsTopicsQuery(),
+            queryParameters: queryParameters?.elementAtOrNull(0) ?? BangumiQuerys.groupsTopicsQuery(),
             options: BangumiAPIUrls.bangumiAccessOption(),
           );
 
@@ -101,7 +104,7 @@ class TimelineFlowModel extends ChangeNotifier {
           final response = await HttpApiClient.client.get(
             BangumiAPIUrls.timeline(),
             options: BangumiAPIUrls.bangumiAccessOption(),
-            queryParameters: queryParameters ?? BangumiQuerys.timelineQuery()
+            queryParameters: queryParameters?.elementAtOrNull(0) ?? BangumiQuerys.timelineQuery()
           );
 
           return [response];
@@ -117,7 +120,7 @@ class TimelineFlowModel extends ChangeNotifier {
         bool emptyResponseFlag = false;
 
         for(int responseIndex = 0; responseIndex < response.length; responseIndex++){
-          if(response[responseIndex].statusCode == 200){
+          if(response[responseIndex].statusCode == HttpStatus.ok){
 
             dynamic extractResponseData = 
               response[responseIndex].requestOptions.path.contains(BangumiAPIUrls.timeline()) ?
@@ -167,6 +170,53 @@ class TimelineFlowModel extends ChangeNotifier {
 
     return requestTimelineCompleter!.future;
     
+  }
+
+  Future<bool> requestTrendTopicTimeline(
+    {
+      Map<String,dynamic>? queryParameters,
+      Function(String message)? fallbackAction,
+    }
+  ) async {
+
+    if(requestTrendTopicTimelineCompleter!=null) return requestTrendTopicTimelineCompleter!.future;
+    requestTrendTopicTimelineCompleter = Completer();
+
+    try {
+      await HttpApiClient.client.get(
+        BangumiAPIUrls.trendTopics(),
+        queryParameters: queryParameters ?? BangumiQuerys.trendTopicQuery,
+        
+      ).then((response){
+
+        if(response.statusCode == HttpStatus.ok){
+
+          if(queryParameters == null) trendTimelinesData.clear();
+
+          trendTimelinesData.addAll(
+            loadSurfTimelineDetails(
+              response.data["data"],
+              //趋势话题里面都是subjectTopic
+              bangumiSurfTimelineType: BangumiSurfTimelineType.subject
+            )
+          );
+
+		  requestTrendTopicTimelineCompleter?.complete(true);
+          
+
+        }
+
+        
+      });
+    }
+
+    on DioException catch(e){
+      debugPrint("[TrendTopics] ${e.response?.statusCode} error:${e.response?.data["message"]}");
+      fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
+      return false;
+    }
+
+    return requestTrendTopicTimelineCompleter!.future;
   }
 
   @override

@@ -2,8 +2,8 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
@@ -25,10 +25,10 @@ class AppDrawer extends StatelessWidget {
     ValueNotifier<bool> isExpandedNotifier = ValueNotifier(true);
 
     return Padding(
-      padding: Padding12+PaddingV24,
+      padding: Padding12+PaddingV16,
       child: EasyRefresh(
         child: Column(
-          spacing: 24,
+          spacing: 16,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
         
@@ -232,11 +232,11 @@ class AppDrawer extends StatelessWidget {
                           Navigator.pushNamed(context, Routes.timeline);
                         }
         
-                        case BangumiSocialHubType.history:{
-                          //debugPrint("暂未开放");
-                          //fadeToaster(context: context, message: '暂未开放');
-                          Navigator.pushNamed(context, Routes.history);
+                        case BangumiSocialHubType.trend:{
+                          Navigator.pushNamed(context, Routes.trendTopic);
                         }
+
+                      
                         
                          
                       }
@@ -252,6 +252,14 @@ class AppDrawer extends StatelessWidget {
         
             Column(
               children: [
+
+                ListTile(
+                  leading: const Icon(Icons.history),
+                  title: const Text("历史记录"),
+                  onTap: (){
+                    Navigator.pushNamed(context,Routes.history);
+                  },
+                ),
             
                 const ToggleThemeModeButton(isDetailText: true),
             

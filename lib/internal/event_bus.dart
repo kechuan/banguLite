@@ -1,6 +1,9 @@
 //订阅者回调签名
 //typedef void EventCallback(arg);
-typedef EventCallback = Function(dynamic arg);
+//typedef EventCallback = Function(dynamic arg1);
+//typedef EventCallback = Function({dynamic arg1,dynamic arg2});
+//typedef EventCallback = Function({dynamic arg,dynamic arg2});
+typedef EventCallback = Function;
 
 
 class EventBus {
@@ -18,7 +21,7 @@ class EventBus {
 
   //添加订阅者
   void on(dynamic eventName, EventCallback f) {
-    _emap[eventName] ??=  <EventCallback>[];
+    _emap[eventName] ??= <EventCallback>[];
     _emap[eventName]!.add(f);
   }
 
@@ -34,13 +37,21 @@ class EventBus {
   }
 
   //触发事件，事件触发后该事件所有订阅者会被调用
-  void emit(dynamic eventName, [arg]) {
+  void emit(dynamic eventName, dynamic arg1,{dynamic arg2}) {
     List? list = _emap[eventName];
     if (list == null) return;
     int len = list.length - 1;
     //反向遍历，防止订阅者在回调中移除自身带来的下标错位
     for (int i = len; i > -1; --i) {
-      list[i](arg);
+      //list[i](arg1,arg2:arg2);
+      if(arg2 == null){
+        list[i](arg1);
+      }
+      
+      else{
+        list[i](arg1,arg2:arg2);
+      }
+
     }
   }
 }

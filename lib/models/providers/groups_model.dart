@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -54,7 +55,7 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
         ),
         options: Options(headers: accessQuery),
       ).then((response){
-        if(response.statusCode == 200){
+        if(response.statusCode == HttpStatus.ok){
 
           if(offset == 0){
             groupsData[mode] = loadGroupsInfo(response.data["data"]);  

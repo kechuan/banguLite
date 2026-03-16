@@ -1,12 +1,11 @@
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
-
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/user_model.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
-
 import 'package:bangu_lite/widgets/fragments/ep_comment_tile.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -14,28 +13,19 @@ import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-@FFAutoImport()
-import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
-
 
 @FFRoute(name: '/TimelineChat')
 class BangumiTimelineChatPage extends StatefulWidget {
   const BangumiTimelineChatPage({
     super.key,
     required this.timelineID,
-    this.comment,
     this.onDeleteAction,
-    this.userName,
-    this.createdAt,
-    
 
   });
 
   final int timelineID;
-  final String? comment;
-  final String? userName;
-  final int? createdAt;
   final Function(int)? onDeleteAction;
+
   
 
   @override
@@ -54,17 +44,6 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
   Widget build(BuildContext context) {
 
     if(widget.timelineID == 0) return const SizedBox.shrink();
-
-    //timelineFuture ??= HttpApiClient.client.get(
-    //  BangumiAPIUrls.timeline(),
-    //  queryParameters: {
-    //    "mode" : 'all',
-    //    "limit" : 1,
-    //    "until" : (widget.timelineID+1)
-    //  },
-    //  options: BangumiAPIUrls.bangumiAccessOption()
-
-    //);
 
     timelineChatFuture ??= HttpApiClient.client.get(
       BangumiAPIUrls.timelineReply(widget.timelineID)
@@ -104,20 +83,22 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
                     
                     builder: (_) {
 
-                      
-              
+                      final CommentDetails currentCommentDetail = UserModel.timelineChatsData[widget.timelineID] ?? CommentDetails();
+
                       final currentEpCommentDetails = EpCommentDetails(
                         commentID: widget.timelineID
                       )
                         ..epCommentIndex = '1'
-                        ..comment = widget.comment
-                        ..userInformation = UserModel.userData[widget.userName]?.userInfomation
-                        ..commentTimeStamp = widget.createdAt
+                        ..comment = currentCommentDetail.comment
+                        ..userInformation = currentCommentDetail.userInformation
+                        ..commentTimeStamp = currentCommentDetail.commentTimeStamp
+                        ..commentReactions = currentCommentDetail.commentReactions
                       ;
               
                       return EpCommentTile(
                         contentID: widget.timelineID,
                         epCommentData: currentEpCommentDetails,
+                        
                         postCommentType:PostCommentType.postTimeline,
                         onUpdateComment: (content) {
                       

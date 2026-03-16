@@ -1,9 +1,9 @@
 
 import 'dart:math';
 
-import 'package:bangu_lite/internal/utils/extract.dart';
-import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/bangumi_define/timeline_const.dart';
+import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
@@ -100,9 +100,11 @@ List<TimelineDetails> loadTimelineDetails(List bangumiTimelineListData,{UserInfo
       ..commentDetails = (
         CommentDetails()
           ..userInformation = currentUserInformation ?? loadUserInformations(bangumiTimelineData['user'])
+          ..commentID = bangumiTimelineData['id']
           ..comment = resultFields['comment']
-          ..commentReactions = resultFields['reactions']
-          ..rate = resultFields['rate']
+          ..commentReactions = loadReactionDetails(bangumiTimelineData['reactions'])
+          ..commentTimeStamp = bangumiTimelineData['createdAt']
+          ..rate = bangumiTimelineData['rate']
       )
       ..catType = bangumiTimelineData['cat']
       ..catAction = bangumiTimelineData['type']
@@ -124,7 +126,8 @@ String convertTimelineDescription(
   TimelineDetails currentTimeline, 
   {
     bool? authorDeclared,
-    bool isCommentDeclared = true
+    bool isCommentDeclared = true,
+    Function? onTimelineCommentParsed
   }
 ){
 
@@ -197,20 +200,11 @@ String convertTimelineDescription(
     else if(currentTimeline.catAction == TimelineCatStatus.Comment.value){
       actionText = 
        //注: 因为 公共的 timelineID 无法溯源(最多只保存1000条)
-       //因此 timelineID 的信息是不可靠的 最好提供 comment 信息 没有的也就没办法了
-
-       
+       //因此 想纯靠一个timelineID 的信息完全溯源是不可靠的 这也是为什么只有用户timeline能提供这些信息
+       //这些信息是单独保留的
         "["
-        "url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}"
-        "?timelineID=${currentTimeline.timelineID}"
-        "&userName=${currentTimeline.commentDetails?.userInformation?.userName}"
-        "&createdAt=${currentTimeline.timelineCreatedAt}"
-
-        /// 这个操作实际上非常危险.. 毕竟params理论上只最大支持4k字符 要是原本的正常编码自然什么问题没有
-        /// 但一旦需求通过Uri体系就需要转译 转译的字符数可能会超过4k
-        /// 唉 暂时先这样吧 毕竟一般情况下没人往时间线吐槽超过1000字 
-        /// 以及 DAU没两位数的家伙还不配思考这些情况
-        "&comment=${Uri.encodeComponent(currentTimeline.commentDetails?.comment ?? "")}"
+          "url=${BangumiAPIUrls.timelineReply(currentTimeline.timelineID!)}"
+          "?timelineID=${currentTimeline.timelineID}"
         "]"
         "${TimelineCatStatus.Comment.actionName}"
       ;
@@ -225,6 +219,8 @@ String convertTimelineDescription(
       if(currentTimeline.commentDetails?.comment?.isEmpty == false){
         suffixText = '[quote]${currentTimeline.commentDetails?.comment ?? ""}[/quote]';
       }
+
+      onTimelineCommentParsed?.call();
 
     }
     

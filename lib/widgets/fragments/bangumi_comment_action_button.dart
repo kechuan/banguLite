@@ -372,7 +372,6 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                 if (
                 [
                     PostCommentType.replyBlog,
-                    PostCommentType.postTimeline,
                     PostCommentType.replyTimeline,
                 ].contains(widget.postCommentType)
                 ) {

@@ -47,7 +47,7 @@ enum BangumiSocialHubType{
 
   group("小组",Icons.forum_outlined),
   timeline("时间线",Icons.clear_all_sharp),
-  history("历史记录",Icons.history),
+  trend("热点话题",Icons.trending_up_outlined),
   
   ;
 

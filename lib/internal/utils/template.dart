@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/response_status_code.dart';
@@ -70,7 +71,7 @@ Future<dynamic> generalRequest(
   try{
     //try 无法处理 异步的错误
     await contentFuture().then((response){
-      if(response.statusCode == 200){
+      if(response.statusCode == HttpStatus.ok){
         generalCompleteLoadAction?.call(response,generalCompleter);
       }
     });

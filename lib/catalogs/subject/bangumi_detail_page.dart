@@ -5,6 +5,7 @@ import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+@FFAutoImport()
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
@@ -31,7 +32,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-
 
 @FFRoute(name: '/subjectDetail')
 

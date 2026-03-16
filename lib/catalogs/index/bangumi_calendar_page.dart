@@ -83,9 +83,9 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
     context.read<AccountModel>().initModel(context);
 
     //由 轮换页进行 监听 AppRoute 
-    bus.on('AppRoute', (link) {
+    bus.on('AppRoute', (link,{data}) {
       if (!mounted) return;
-      appRouteMethodListener(context, link);
+      appRouteMethodListener(context, link,data: data);
     });
 
     bus.on('LoginRoute', (link) {

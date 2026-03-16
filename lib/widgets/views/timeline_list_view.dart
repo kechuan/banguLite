@@ -1,8 +1,8 @@
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
-import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
@@ -134,18 +134,19 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
             }
         }
 
-        Map<String, dynamic> queryParameters = {};
+        List<Map<String, dynamic>> queryParameters = [];
         
-        final selectSurfTimelineTypeContent = 
-          interceptSelectedSurfTimelineType(
-            timelineFlowModel.timelinesData,
-            bangumiSurfTimelineType: widget.currentTimelineSurfType
-        )
-          .toList()
-          ..sort(
-            (prev,next) => next.updatedAt?.compareTo(prev.updatedAt ?? 0) ?? 0
-          )
+        final selectedSurfTypeTimelines = interceptSelectedSurfTimelineType(
+          timelineFlowModel.timelinesData,
+          bangumiSurfTimelineType: widget.currentTimelineSurfType
+        );
+
+        final latestSelectedSurfTypeTimeline = 
+          selectedSurfTypeTimelines.isEmpty ? 
+          null :
+          selectedSurfTypeTimelines.reduce((prev,next) => (prev.updatedAt ?? 0) > (next.updatedAt ?? 0) ? prev : next)
         ;
+
         
 
         if (isAppend == true) {
@@ -154,20 +155,32 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
 
                 //默认以最后一个数据的 until为准 如果获取失败 则期望杯返回空数据 并触发提示
                 case BangumiSurfTimelineType.all:{
-                  queryParameters = BangumiQuerys.timelineQuery(until: selectSurfTimelineTypeContent.last.detailID ?? 0);
-                }
-
-                case BangumiSurfTimelineType.subject:{queryParameters = BangumiQuerys.groupTopicQuery..["offset"] = selectSurfTimelineTypeContent.length;
-                }
-                case BangumiSurfTimelineType.group:{
-                    queryParameters = BangumiQuerys.groupsTopicsQuery(mode: widget.groupTypeNotifier.value, offset: selectSurfTimelineTypeContent.length);
-                }
-                case BangumiSurfTimelineType.timeline:{
-                    queryParameters = 
+                  //全局数据获取
+                  queryParameters = [
+                    BangumiQuerys.topicsQuery..["offset"] = selectedSurfTypeTimelines.length,
+                    BangumiQuerys.groupsTopicsQuery(mode: widget.groupTypeNotifier.value, offset: selectedSurfTypeTimelines.length),
                     BangumiQuerys.timelineQuery(
                         mode: widget.timelineSortTypeNotifier.value,
-                        until: selectSurfTimelineTypeContent.last.detailID ?? 0 
-                    );
+                        until: latestSelectedSurfTypeTimeline?.detailID ?? 0 
+                    )
+
+
+                  ];
+                }
+
+                case BangumiSurfTimelineType.subject:{queryParameters = [
+					BangumiQuerys.topicsQuery..["offset"] = selectedSurfTypeTimelines.length
+				];}
+                case BangumiSurfTimelineType.group:{
+                    queryParameters = [BangumiQuerys.groupsTopicsQuery(mode: widget.groupTypeNotifier.value, offset: selectedSurfTypeTimelines.length)];
+                }
+                case BangumiSurfTimelineType.timeline:{
+                    queryParameters = [
+                      BangumiQuerys.timelineQuery(
+                        mode: widget.timelineSortTypeNotifier.value,
+                        until: latestSelectedSurfTypeTimeline?.detailID ?? 0 
+                      )
+                    ];
                 }
             }
         }
@@ -177,13 +190,14 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
             switch (widget.currentTimelineSurfType){
 
                 case BangumiSurfTimelineType.group:{
-                    queryParameters = BangumiQuerys.groupsTopicsQuery(mode: widget.groupTypeNotifier.value);
+                    queryParameters = [BangumiQuerys.groupsTopicsQuery(mode: widget.groupTypeNotifier.value)];
                 }
                 case BangumiSurfTimelineType.timeline:{
-                    queryParameters = 
-                    BangumiQuerys.timelineQuery(
+                    queryParameters = [
+                      BangumiQuerys.timelineQuery(
                         mode: widget.timelineSortTypeNotifier.value,
-                    );
+                      )
+                    ];
                 }
 
                 default:{}
@@ -194,16 +208,17 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
 
         await timelineFlowModel.requestSelectedTimeLineType(
             widget.currentTimelineSurfType,
-            isAppend: isAppend,
+            //isAppend: isAppend,
             queryParameters: queryParameters
         ).then((result) {
           if (result){
             double recordOffset = scrollController.offset;
 
-            if(recordOffset != 0){
+			if(recordOffset != 0){
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                 scrollController.animateTo(recordOffset+3*kToolbarHeight,duration: const Duration(milliseconds: 300),curve: Curves.ease);
+              });
             }
-            
 
             refreshNotifier.value += 1;
             

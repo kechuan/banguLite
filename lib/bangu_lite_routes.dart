@@ -12,6 +12,7 @@ const List<String> routeNames = <String>[
   '/Groups',
   '/Timeline',
   '/TimelineChat',
+  '/TrendTopic',
   '/commentPreview',
   '/groupTopic',
   '/history',
@@ -66,8 +67,13 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiTimelineChatPage : [int(required) timelineID, String? comment,  Function(int)? onDeleteAction, String? userName, int? createdAt]
+  /// BangumiTimelineChatPage : [int(required) timelineID,  Function(int)? onDeleteAction]
   static const String timelineChat = '/TimelineChat';
+
+  /// '/TrendTopic'
+  ///
+  /// [name] : '/TrendTopic'
+  static const String trendTopic = '/TrendTopic';
 
   /// '/commentPreview'
   ///
@@ -158,7 +164,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiDetailPage : [int(required) subjectID]
+  /// BangumiDetailPage : [int(required) subjectID, BangumiDetails? injectBangumiInfoDetail]
   static const String subjectDetail = '/subjectDetail';
 
   /// '/subjectEp'

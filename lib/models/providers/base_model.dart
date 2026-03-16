@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
@@ -55,7 +56,7 @@ abstract class BaseModel
         queryParameters: queryParameters,
         options: BangumiAPIUrls.bangumiAccessOption(),
       ).then((response) {
-        if(response.statusCode == 200){
+        if(response.statusCode == HttpStatus.ok){
           subContentListResponseDataCallback(response);
           completer.complete(true);
         }
