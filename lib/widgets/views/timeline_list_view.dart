@@ -64,50 +64,60 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
             onRefresh: () => loadTimelineContent(context),
             onLoad: () => loadTimelineContent(context, isAppend: true),
 
-            child: Column(
-              children: [
-                Expanded(
-                  child: ValueListenableBuilder(
-                      valueListenable: refreshNotifier,
-                      builder: (_, __, ___) {
-
-                        final currentTimelineTypeDetails = interceptSelectedSurfTimelineType(
-                          timelineFlowModel.timelinesData,
-                          bangumiSurfTimelineType: widget.currentTimelineSurfType
-                        )
-                        .toList()
-                        ..sort(
-                          (prev,next) => next.updatedAt?.compareTo(prev.updatedAt ?? 0) ?? 0
-                        );
-
-
-
-                        return ListView.builder(
-                          controller: scrollController,
-                          itemCount: interceptSelectedSurfTimelineType(timelineFlowModel.timelinesData,bangumiSurfTimelineType: widget.currentTimelineSurfType).length,
-                          shrinkWrap: true,
-                          itemBuilder: (_, index) {
-                              //Animated Question
-                              if (index >= currentTimelineTypeDetails.length) {
-                                return const SizedBox();
-                              }
+            child: ValueListenableBuilder(
+                valueListenable: refreshNotifier,
+                builder: (_, __, ___) {
+                        
+                  final currentTimelineTypeDetails = interceptSelectedSurfTimelineType(
+                    timelineFlowModel.timelinesData,
+                    bangumiSurfTimelineType: widget.currentTimelineSurfType
+                  )
+                  .toList()
+                  ..sort(
+                    (prev,next) => next.updatedAt?.compareTo(prev.updatedAt ?? 0) ?? 0
+                  );
+                        
+                        
+                        
+                  return ListView.builder(
+                    controller: scrollController,
+                    itemCount: 
+                      currentTimelineTypeDetails.isEmpty ?
+                      1 :
+                      currentTimelineTypeDetails.length 
                       
-                              return Container(
-                                padding: PaddingH12,
-                                color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
-                                child: BangumiTimelineTile(
-                                  key: ValueKey(currentTimelineTypeDetails.elementAt(index).detailID),
-                                  surfTimelineDetails: currentTimelineTypeDetails.elementAt(index),
-                                )
-                              );
+                    ,
+                    shrinkWrap: true,
+                    itemBuilder: (_, index) {
+                        
+                        if(currentTimelineTypeDetails.isEmpty){
+                          return const SizedBox(
+                            height: 400,
+                            child: Center(
+                              child: Text("¯\\_(ツ)_/¯"),
+                            ),
+                          );
+                        
+                        }
                       
-                          }
+                        //Animated Question
+                        if (index >= currentTimelineTypeDetails.length) {
+                          return const SizedBox();
+                        }
+                
+                        return Container(
+                          padding: PaddingH12,
+                          color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
+                          child: BangumiTimelineTile(
+                            key: ValueKey(currentTimelineTypeDetails.elementAt(index).detailID),
+                            surfTimelineDetails: currentTimelineTypeDetails.elementAt(index),
+                          )
                         );
-                      }
-                    ),
-                ),
-              ],
-            ),
+                
+                    }
+                  );
+                }
+              ),
 
         );
     }

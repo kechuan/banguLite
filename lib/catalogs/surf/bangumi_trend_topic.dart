@@ -31,23 +31,34 @@ class _BangumiTrendTopicState extends State<BangumiTrendTopic> {
         header: const TextHeader(),
         footer: const TextFooter(reverse: true),
         onRefresh: () => loadTrendTopicContent(context),
-        onLoad: () => loadTrendTopicContent(context,isAppend: true),
+        onLoad: () => loadTrendTopicContent(context, isAppend: true),
         child: ValueListenableBuilder(
           valueListenable: refreshNotifier,
           builder: (_, __, ___) {
 
             final timelineFlowModel = context.read<TimelineFlowModel>();
-      
+
             return ListView.builder(
               controller: scrollController,
-              itemCount: timelineFlowModel.trendTimelinesData.length,
-              shrinkWrap: true,
+              itemCount: 
+              timelineFlowModel.trendTimelinesData.isEmpty ? 
+                1 :
+                timelineFlowModel.trendTimelinesData.length,
+                shrinkWrap: true,
               itemBuilder: (_, index) {
+
+                if (timelineFlowModel.trendTimelinesData.isEmpty){
+                  return const SizedBox(
+                    height: 400,
+                    child: Center(child: Text("¯\\_(ツ)_/¯"))
+                  );
+                }
+
                 //Animated Question
                 if (index >= timelineFlowModel.trendTimelinesData.length) {
                   return const SizedBox();
                 }
-        
+
                 return Container(
                   padding: PaddingH12,
                   color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
@@ -55,53 +66,51 @@ class _BangumiTrendTopicState extends State<BangumiTrendTopic> {
                     surfTimelineDetails: timelineFlowModel.trendTimelinesData.elementAt(index),
                   )
                 );
-          
+
               }
             );
           }
         ),
 
-        
       ),
     );
   }
 
   void loadTrendTopicContent(
-      BuildContext context,
-      {bool? isAppend}
-    ) async{
+    BuildContext context,
+    {bool? isAppend}
+  ) async{
 
-        final timelineFlowModel = context.read<TimelineFlowModel>();
-        timelineFlowModel.requestTrendTopicTimelineCompleter = null;
+    final timelineFlowModel = context.read<TimelineFlowModel>();
+    timelineFlowModel.requestTrendTopicTimelineCompleter = null;
 
-        invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
+    invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
 
-        Map<String, dynamic> queryParameters = 
-          isAppend == true ?
-          (BangumiQuerys.trendTopicQuery..["offset"] = timelineFlowModel.trendTimelinesData.length) :
-          BangumiQuerys.trendTopicQuery 
-        ;
-        
-        await timelineFlowModel.requestTrendTopicTimeline(
-          queryParameters: queryParameters,
-          fallbackAction: (message) => invokeToaster(message: message),
-        ).then((result) {
-          if (result){
+    Map<String, dynamic> queryParameters = 
+      isAppend == true ?
+        (BangumiQuerys.trendTopicQuery..["offset"] = timelineFlowModel.trendTimelinesData.length) :
+        BangumiQuerys.trendTopicQuery 
+    ;
+
+    await timelineFlowModel.requestTrendTopicTimeline(
+      queryParameters: queryParameters,
+      fallbackAction: (message) => invokeToaster(message: message),
+    ).then((result) {
+          if (result) {
 
             double recordOffset = scrollController.offset;
 
-            if(recordOffset != 0){
+            if (recordOffset != 0) {
               WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                scrollController.animateTo(recordOffset+3*kToolbarHeight,duration: const Duration(milliseconds: 300),curve: Curves.ease);
-              });
+                  scrollController.animateTo(recordOffset + 3 * kToolbarHeight, duration: const Duration(milliseconds: 300), curve: Curves.ease);
+                });
             }
-            
 
             refreshNotifier.value += 1;
-            
+
           }
 
         });
 
-    }
+  }
 }
