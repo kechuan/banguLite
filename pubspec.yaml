@@ -1,7 +1,7 @@
 name: bangu_lite
 description: "Lite to Surf Bangumi"
 publish_to: 'none'
-version: 0.11.0
+version: 0.11.2
 environment:
   sdk: ^3.5.0
 
@@ -66,6 +66,9 @@ flutter:
     - assets/bangumiSticker/24-125 Cinnamor/
     - assets/bangumiSticker/200-238 神戶小鳥/
     - assets/bangumiSticker/500-529 五行行行行行啊/
+    #体积太大 决定仅以网络缓存导入 只保留入口icon
+    - assets/bangumiSticker/貓魚/
+    
 
 flutter_launcher_icons:
   # android: "launcher_icon"

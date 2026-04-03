@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
@@ -22,7 +21,7 @@ class EpRepliedTile extends ListTile {
     this.themeColor, 
     this.onUpdateComment,
 
-    this.authorType
+    this.floorHostUserID
 
 
   });
@@ -34,10 +33,11 @@ class EpRepliedTile extends ListTile {
   final Color? themeColor;
   final Function(String?)? onUpdateComment;
 
-  final BangumiCommentAuthorType? authorType;
+  final int? floorHostUserID;
 
   @override
   Widget build(BuildContext context) {
+
     if( 
       epCommentData.repliedComment == null ||
       epCommentData.repliedComment!.isEmpty
@@ -53,9 +53,9 @@ class EpRepliedTile extends ListTile {
           borderRadius: BorderRadius.circular(12),
           color: judgeDarknessMode(context) ? const Color.fromARGB(255, 118, 121, 119) : const Color.fromARGB(225, 212, 232, 215),
         ),
-        child: ListTile(
-          title: Center(
-
+        child: Padding(
+          padding: Padding16,
+          child: Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -66,39 +66,42 @@ class EpRepliedTile extends ListTile {
                   (index) {
                     final repliedComment = epCommentData.repliedComment![index];
 
-                      debugPrint('${epCommentData.state}: ${repliedComment.epCommentIndex}');
-
-                      
+                      debugPrint('[epCommentData.state] ${epCommentData.state}: ${repliedComment.epCommentIndex}');
 
                       final quoteContent = quoteBBcodeContentRegexp
                         .firstMatch(repliedComment.comment ?? "")
                         ?.group(1) ?? ""
                       ;
-
+          
                       final mainContent = repliedComment.comment
                         ?.split(quoteBBcodeRegexp)
                         .last
                         .replaceAll(bbcodeRegexp, '') ?? ""
                       ;
-
+          
                         return Padding(
-                          padding: PaddingV6,
+                          padding: Padding6,
                           child: ShowCommentTap(
                             contentID: contentID,
                             postCommentType: postCommentType,
                             epCommentData: epCommentData,
                             commentIndex: index,
                             themeColor: themeColor,
+                            floorHostUserID : floorHostUserID,
+                            
                             child: Row(
                               spacing: 12,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: (
+                                quoteContent.isNotEmpty || 
+                                mainContent.contains("\n") || (AppFontSize.s16*mainContent.length > MediaQuery.sizeOf(context).width*2/3) 
+                              ) ? CrossAxisAlignment.start : CrossAxisAlignment.end,
                               children: [
-
+          
                                 ScalableText(
                                   "${repliedComment.userInformation?.nickName}:",
-                                  style:TextStyle(fontWeight: FontWeight.w500,fontSize: AppFontSize.s14)
+                                  style:TextStyle(fontWeight: FontWeight.w600,fontSize: AppFontSize.s15)
                                 ),
-
+          
                                 epCommentData.repliedComment![index].state?.isNotAvaliable() == true ?
                                 const ScalableText("发言已隐藏",style: TextStyle(fontWeight: FontWeight.bold)) :
                                 Expanded(
@@ -106,7 +109,7 @@ class EpRepliedTile extends ListTile {
                                     text: TextSpan(
                                       style: TextStyle(
                                         fontFamilyFallback: convertSystemFontFamily(),
-                                        fontSize: AppFontSize.s14,
+                                        fontSize: AppFontSize.s16,
                                       ),
                                       children: [
                                                               
@@ -133,7 +136,7 @@ class EpRepliedTile extends ListTile {
                                               )
                                             )
                                           ),
-
+          
                                           /// 往上面的text内容增加\n没有用 必须在这里加才生效 甚是奇怪
                                           const TextSpan(text: "\n"),
                                   
@@ -142,7 +145,7 @@ class EpRepliedTile extends ListTile {
                                         WidgetSpan(
                                           child: AdapterBBCodeText(
                                             data: convertBangumiCommentSticker(mainContent),
-                                            stylesheet: appDefaultBBStyleSheet(context,richless: true,fontSize: AppFontSize.s14),
+                                            stylesheet: appDefaultBBStyleSheet(context,richless: true),
                                             maxLine: 3,
                                           )
                                         )
@@ -161,17 +164,19 @@ class EpRepliedTile extends ListTile {
                       }
                 ),
                   
-                if(epCommentData.repliedComment!.length > 3) 
-                  ShowCommentTap(
-                    contentID: contentID,
-                    themeColor: themeColor,
-                    postCommentType: postCommentType,
-                    epCommentData: epCommentData,
-                    child: ScalableText(
-                      "> 点击查看 ${epCommentData.repliedComment!.length} 条评论",
-                      style: TextStyle(color: judgeDarknessMode(context) ? const Color.fromARGB(225, 212, 232, 215) : Colors.blueAccent),
-                    )
-                  ),
+                  if(epCommentData.repliedComment!.length > 3) 
+                    ShowCommentTap(
+                      contentID: contentID,
+                      themeColor: themeColor,
+                      postCommentType: postCommentType,
+                      epCommentData: epCommentData,
+                      //authorType:authorType,
+                      floorHostUserID : floorHostUserID,
+                      child: ScalableText(
+                        "> 点击查看 ${epCommentData.repliedComment!.length} 条评论",
+                        style: TextStyle(color: judgeDarknessMode(context) ? const Color.fromARGB(225, 212, 232, 215) : Colors.blueAccent),
+                      )
+                ),
                   
               ],
             ),
@@ -185,7 +190,7 @@ class EpRepliedTile extends ListTile {
 
 }
 
-class ShowCommentTap extends InkResponse {
+class ShowCommentTap extends InkResponse{
   const ShowCommentTap({
     super.key,
     super.child,
@@ -193,7 +198,8 @@ class ShowCommentTap extends InkResponse {
     required this.epCommentData,
     this.commentIndex,
     this.postCommentType,
-    this.themeColor,
+    this.themeColor, 
+    this.floorHostUserID, 
 
   });
 
@@ -203,7 +209,10 @@ class ShowCommentTap extends InkResponse {
   final int? commentIndex;
   final PostCommentType? postCommentType;
 
+  final int? floorHostUserID;
+
   final Color? themeColor;
+
 
   @override
   Widget build(BuildContext context) {
@@ -217,10 +226,12 @@ class ShowCommentTap extends InkResponse {
           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width,maxHeight:MediaQuery.sizeOf(context).height*3/4),
           context: context,
           builder: (_){
+
             return EpRepliedCommentBottomSheet(
               contentID: contentID,
-              currentComment: epCommentData,
+              currentLevelComment: epCommentData,
               commentIndex: commentIndex,
+              floorHostUserID:floorHostUserID,
               postCommentType: postCommentType,
               readableThemeColor: themeColor,
             );

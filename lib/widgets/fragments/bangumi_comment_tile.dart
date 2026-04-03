@@ -1,5 +1,7 @@
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_action_button.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
@@ -7,8 +9,6 @@ import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 
 class BangumiCommentTile extends StatelessWidget {
   const BangumiCommentTile({
@@ -101,25 +101,17 @@ class BangumiCommentTile extends StatelessWidget {
             ),
           ),
 
-          Row(
-            //mainAxisAlignment: MainAxisAlignment.end, 不生效 因为主轴已经被 Expanded 占满
-            children: [
-              Expanded(
-                //那么只能在内部插入松约束 Align 来调节方位
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: CommentReaction(
-                    commentID: commentData.commentID,
-                    postCommentType: PostCommentType.subjectComment,
-                    commentReactions: commentData.commentReactions,
-                    themeColor: themeColor,
-                    reactDataLikeNotifier: reactDataLikeNotifier
-                  ),
-                ),
-              ),
-            ],
+          Align(
+            alignment: Alignment.centerRight,
+            child: CommentReaction(
+              commentID: commentData.commentID,
+              postCommentType: PostCommentType.subjectComment,
+              commentReactions: commentData.commentReactions,
+              themeColor: themeColor,
+              reactDataLikeNotifier: reactDataLikeNotifier
+            ),
           ),
-
+          
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

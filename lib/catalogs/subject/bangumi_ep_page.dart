@@ -1,35 +1,33 @@
 
 import 'dart:math';
+
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
-import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
-
 @FFAutoImport()
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
+import 'package:bangu_lite/widgets/components/general_replied_line.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_filter.dart';
-import 'package:bangu_lite/widgets/components/general_replied_line.dart';
-import 'package:bangu_lite/widgets/fragments/error_load_prompt.dart';
-import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
-
-import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comments_progress_slider.dart';
 import 'package:bangu_lite/widgets/fragments/ep_toggle_panel.dart';
+import 'package:bangu_lite/widgets/fragments/error_load_prompt.dart';
+import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/skeleton_tile_template.dart';
+import 'package:bangu_lite/widgets/views/ep_comments_view.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -83,7 +81,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
             
             return Theme(
               data: ThemeData(
-                brightness: Theme.of(context).brightness,
+                brightness: Theme.brightnessOf(context),
                 colorSchemeSeed: judgeDetailRenderColor(context,widget.bangumiThemeColor),
                 fontFamilyFallback: convertSystemFontFamily(),
               ),

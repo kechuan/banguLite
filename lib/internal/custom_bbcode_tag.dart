@@ -1,20 +1,20 @@
 
 import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/callback.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/internal/event_bus.dart';
-import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/comment_image_panel.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
+import 'package:bbob_dart/bbob_dart.dart' as bbob;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
-
-import 'package:bbob_dart/bbob_dart.dart' as bbob;
 import 'package:url_launcher/url_launcher_string.dart';
 
 BBStylesheet appDefaultBBStyleSheet(
@@ -52,6 +52,7 @@ final allEffectTag = [
     RightAlignTag(),
     MaskTag(),
     BangumiStickerTag(),
+    BangumiNetStickerTag(),
 
     AdapterUrlTag(tagName: "URL"),
     AdapterUrlTag(tagName: "url"),
@@ -161,7 +162,7 @@ class AdapterQuoteDisplay extends StatelessWidget{
 
         return Theme(
             data: ThemeData(
-                brightness: Theme.of(context).brightness,
+                brightness: Theme.brightnessOf(context),
             ),
             child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 10),
@@ -441,7 +442,7 @@ class BangumiStickerTag extends AdvancedTag{
         //因此值越大反而让整体图片越小。。奇怪的描述方式
         final image = Image.asset(
             imageUrl,
-            scale: 1/AppFontSize.scale.fontScale,
+            scale: (1/AppFontSize.scale.fontScale)-0.2,
             errorBuilder: (context, error, stack) => ScalableText("[$tag]")
         );
 
@@ -449,6 +450,33 @@ class BangumiStickerTag extends AdvancedTag{
             WidgetSpan(
                 child: image,
             )
+        ];
+    }
+
+}
+
+class BangumiNetStickerTag extends AdvancedTag{
+
+    BangumiNetStickerTag() : super("net_sticker");
+
+    @override
+    List<InlineSpan> parse(FlutterRenderer renderer, bbob.Element element) {
+
+        if (element.children.isEmpty) return [TextSpan(text: "[$tag]")];
+
+        final image = SizedBox(
+          height: 65,
+          width: 65,
+          child: CachedNetworkImage(
+              imageUrl:element.textContent,
+              scale: 3,
+          ),
+        );
+
+        return [
+          WidgetSpan(
+            child: image,
+          )
         ];
     }
 

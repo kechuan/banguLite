@@ -4,6 +4,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/test_page.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -785,7 +786,8 @@ class TestTile extends ListTile{
             child: ListTile(
               onTap: (){
                 debugPrint("${MyHive.appConfigDataBase.get("currentTheme")}");
-                openAction();
+                //openAction();
+                downloadSticker2();
               },
               title: ScalableText("测试触发工具",style: TextStyle(fontSize: AppFontSize.s16))
             ),

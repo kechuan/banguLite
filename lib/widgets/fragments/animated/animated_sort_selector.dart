@@ -34,7 +34,7 @@ class AnimatedSortSelector extends StatelessWidget {
       data: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: judgeCurrentThemeColor(context),
-          brightness: Theme.of(context).brightness
+          brightness: Theme.brightnessOf(context)
         )
       ),
       child: Column(

@@ -100,6 +100,9 @@ class AdapterBBCodeText extends BBCodeText{
     // Improve accessibility, scale text with textScaleFactor.
     var textScaler = MediaQuery.of(context).textScaler;
 
+    //return Text(data,style: stylesheet?.defaultTextStyle);
+
+    ///测试屏蔽
     if (stylesheet?.selectableText ?? false) {
       return SelectableText.rich(
         TextSpan(children: spans, style: stylesheet?.defaultTextStyle),
@@ -110,12 +113,14 @@ class AdapterBBCodeText extends BBCodeText{
         ),
       );
     }
+
     return RichText(
         text: TextSpan(children: spans, style: stylesheet?.defaultTextStyle),
         textScaler: textScaler,
         maxLines: maxLine,
         overflow: maxLine != null ? TextOverflow.ellipsis : TextOverflow.clip,
-      );
+    );
+
   }
 
 

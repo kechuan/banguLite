@@ -110,9 +110,8 @@ List<EpCommentDetails> filterCommentList(
       ).toList();
     }
 
-    //只看楼主(这里只指主楼是楼主发的)
+    //只看楼主(这里只指主楼是楼主发的 如果楼中楼也算进去的话 就太乱了)
     case BangumiCommentRelatedType.author:{
-
       resultFilterCommentList = commentListData.where(
         (currentComment) => currentComment.userInformation?.userID == referID
       ).toList();

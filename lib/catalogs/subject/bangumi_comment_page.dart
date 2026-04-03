@@ -1,15 +1,13 @@
 
-import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
-import 'package:bangu_lite/widgets/dialogs/warp_page_dialog.dart';
-import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
-import 'package:flutter/material.dart';
-
+import 'package:bangu_lite/internal/utils/convert.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/providers/comment_model.dart';
-
 import 'package:bangu_lite/widgets/components/bangumi_comments.dart';
+import 'package:bangu_lite/widgets/dialogs/warp_page_dialog.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 @FFRoute(name: '/subjectComment')
@@ -35,7 +33,7 @@ class BangumiCommentPage extends StatelessWidget  {
     //给每个番剧页面都单独拉一个 CommentProvider 避免互相跳转之间打架
     return Theme(
       data: ThemeData(
-        brightness: Theme.of(context).brightness,
+        brightness: Theme.brightnessOf(context),
         colorSchemeSeed: judgeDetailRenderColor(context,bangumiThemeColor),
         
         fontFamilyFallback: convertSystemFontFamily()

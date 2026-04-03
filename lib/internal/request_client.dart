@@ -465,7 +465,7 @@ class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.11.0",
+                      version = "0.11.2",
                       author = "kechuan"
   ;
 
@@ -528,5 +528,30 @@ void downloadSticker({bool isOldType = true}) async {
         )
       );
   }
+
+}
+
+
+void downloadSticker2({bool pinkVersion = true}) async {
+
+      String typePath = pinkVersion ? "musume" : "blake";
+
+      String outputPath = pinkVersion ? "Bangumi娘 貓魚" : "Blake娘 貓魚";
+
+  
+      await Future.wait(
+          List.generate(
+            97, (index){
+              if(index == 96 && pinkVersion == true) return Future((){});
+
+              return HttpApiClient.client.download(
+                "https://lain.bgm.tv/img/smiles/$typePath/${typePath}_${convertDigitNumString(index+1)}.gif",
+                './assets/bangumiSticker/$outputPath/${typePath}_${convertDigitNumString(index+1)}.gif',
+              );
+            
+            }
+          )
+      );
+  
 
 }

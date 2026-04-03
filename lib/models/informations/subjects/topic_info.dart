@@ -32,7 +32,6 @@ class TopicInfo extends ContentInfo {
 
   @override
   Function()? get loadInterceptionCallback => (){
-    
     if (commentState == CommentState.adminCloseTopic.index) {
       return Future.error("此帖子已被管理员关闭,需要登录以获取查看权限");    
     }
@@ -46,7 +45,6 @@ class TopicInfo extends ContentInfo {
 List<TopicInfo> loadTopicsInfo(List bangumiTopicsInfoData){
 
   
-
 	final List<TopicInfo> topicsList = [];
 
 	for(Map currentTopicMap in bangumiTopicsInfoData){

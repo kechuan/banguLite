@@ -44,7 +44,7 @@ abstract class BangumiGeneralMoreContentPageState<
 
       return Theme(
         data: ThemeData(
-          brightness: Theme.of(context).brightness,
+          brightness: Theme.brightnessOf(context),
           colorSchemeSeed: judgeDetailRenderColor(context,bangumiThemeColor),
           fontFamilyFallback: convertSystemFontFamily(),
         ),

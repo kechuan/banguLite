@@ -1,15 +1,15 @@
 
 
 import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/widgets/fragments/date_range_select.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/internal/event_bus.dart';
-import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/widgets/fragments/date_range_select.dart';
 
 class Searchfilter extends StatefulWidget {
   const Searchfilter({super.key});
@@ -68,7 +68,7 @@ class _SearchfilterState extends State<Searchfilter> {
       data: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Theme.of(context).colorScheme.primary,
-          brightness: (Theme.of(context).brightness),
+          brightness: (Theme.brightnessOf(context)),
           
         ),
         

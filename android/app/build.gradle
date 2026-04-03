@@ -99,6 +99,10 @@ android {
 			signingConfig signingConfigs.release
         }
 
+		profile{
+			splits.abi.universalApk = false
+        }
+
 		debug{
 			splits.abi.universalApk = true
 		}

@@ -352,74 +352,78 @@ Widget buildSectionList(
 
   return Padding(
     padding: PaddingH6V12,
-    child: ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: itemCount,
-      shrinkWrap: true,
-      itemBuilder: (_, index) {
-
-        StarBangumiDetails starBangumiDetail = StarBangumiDetails();
-
-        if(isReversed == true){
-          starBangumiDetail = data[startIndex + (itemCount-1) - index];
-        }
-
-        else{
-          starBangumiDetail = data[startIndex + index];
-        }
-
-        
-        return BangumiListTile(
-          imageSize: const Size(100, 150),
-          bangumiDetails: loadStarDetailsData(starBangumiDetail),
-
-          trailing: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            spacing: 12,
-            children: [
-                  
-              Builder(
-                builder: (_) {
+    child: SizedBox(
+      height: (150+12)*itemCount.toDouble(),
+      child: ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: itemCount,
+        //shrinkWrap: true,
+        itemExtent: (150+12),
+        itemBuilder: (_, index) {
+      
+          StarBangumiDetails starBangumiDetail = StarBangumiDetails();
+      
+          if(isReversed == true){
+            starBangumiDetail = data[startIndex + (itemCount-1) - index];
+          }
+      
+          else{
+            starBangumiDetail = data[startIndex + index];
+          }
+      
           
-                  String resultText = getUpdateText(
-                    starsUpdateRating:indexModel.starsUpdateRating,
-                    item:starBangumiDetail,
-                    sortType:sortType,
-                    //resultIndex:startIndex + index
-                  );
-          
-                  if(resultText.isEmpty){
-                    return const SizedBox();
-                  }
+          return BangumiListTile(
+            imageSize: const Size(100, 150),
+            bangumiDetails: loadStarDetailsData(starBangumiDetail),
+      
+            trailing: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              spacing: 12,
+              children: [
                     
-        
-                  return ScalableText(
-                    resultText,
-                    style: TextStyle(fontSize: resultText.length > 6 ? 12 : null),
-                    maxLines: 2,
-                  );
-                }
-              ),
+                Builder(
+                  builder: (_) {
+            
+                    String resultText = getUpdateText(
+                      starsUpdateRating:indexModel.starsUpdateRating,
+                      item:starBangumiDetail,
+                      sortType:sortType,
+                      //resultIndex:startIndex + index
+                    );
+            
+                    if(resultText.isEmpty){
+                      return const SizedBox();
+                    }
+                      
           
-          
-              IconButton(
-                icon: const Icon(Icons.star),
-                onPressed: () {
-                  MyHive.starBangumisDataBase.delete(starBangumiDetail.bangumiID);
-                  indexModel.updateStar();
-                },
-              ),
-          
-          
-            ],
-          ),
-          onTap: () => Navigator.pushNamed(
-            context,
-            Routes.subjectDetail,
-            arguments: {"subjectID": starBangumiDetail.bangumiID},
-          ),
-        );
-      },
+                    return ScalableText(
+                      resultText,
+                      style: TextStyle(fontSize: resultText.length > 6 ? 12 : null),
+                      maxLines: 2,
+                    );
+                  }
+                ),
+            
+            
+                IconButton(
+                  icon: const Icon(Icons.star),
+                  onPressed: () {
+                    MyHive.starBangumisDataBase.delete(starBangumiDetail.bangumiID);
+                    indexModel.updateStar();
+                  },
+                ),
+            
+            
+              ],
+            ),
+            onTap: () => Navigator.pushNamed(
+              context,
+              Routes.subjectDetail,
+              arguments: {"subjectID": starBangumiDetail.bangumiID},
+            ),
+          );
+        },
+      ),
     ),
   );
 }

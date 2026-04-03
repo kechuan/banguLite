@@ -58,25 +58,14 @@ class BangumiCommentActionButton extends StatefulWidget {
 
 class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton> {
 
-    late final StickerSelectOverlay stickerSelectOverlay;
+    StickerSelectOverlay? stickerSelectOverlay;
     final LayerLink stickerLayerLink = LayerLink();
 
-    @override
-    void initState() {
-        stickerSelectOverlay = StickerSelectOverlay(
-            context: context,
-            buttonLayerLink: stickerLayerLink,
-            postCommentType: widget.postCommentType,
-            onStick: widget.onSticker
-        );
-        super.initState();
-    }
-
-    @override 
-    void dispose() {
-        stickerSelectOverlay.closeStickerSelectFieldOverlay();
-        super.dispose();
-    }
+    //@override 
+    //void dispose() {
+    //    //stickerSelectOverlay.closeStickerSelectFieldOverlay();
+    //    super.dispose();
+    //}
 
     void invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "请求中");
 
@@ -98,14 +87,24 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
             link: stickerLayerLink,
             child: PopupMenuButton<CommentActionType>(
                 constraints:const BoxConstraints(
-                  maxHeight: 3*kToolbarHeight
+                  maxHeight: 3.25*kToolbarHeight
                 ),
                 iconSize: 22,
                 style: const ButtonStyle(
                   alignment: Alignment.bottomCenter,
+                  
                 ),
                 onOpened: (){
                   debugPrint("contentID: ${widget.contentID}, reply:${widget.commentData.commentID}, action:${widget.postCommentType}");
+
+                  stickerSelectOverlay ??= StickerSelectOverlay(
+                    context: context,
+                    buttonLayerLink: stickerLayerLink,
+                    postCommentType: widget.postCommentType,
+                    onStick: widget.onSticker
+                  );
+
+                  debugPrint("content Done");
                 },
                 onSelected: (commentAction) {
             
@@ -202,7 +201,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                         }
             
                         case CommentActionType.sticker:{
-                            stickerSelectOverlay.showStickerSelectOverlay(
+                            stickerSelectOverlay?.showStickerSelectOverlay(
                                 widget.commentData.commentID
                             );
                         }

@@ -100,6 +100,19 @@ String convertBangumiStickerPath(int stickerIndex){
   String authorPath = "";
 
   switch(stickerIndex){
+
+    case <=0:{
+
+      if(stickerIndex == 0){
+        return "assets/bangumiSticker/貓魚/musume_intro.gif";
+      }
+
+      else{
+        return "assets/bangumiSticker/貓魚/blake_intro.gif";
+      }
+      
+    }
+
     case <= 23: {
       authorPath = "01-23 dsm";
       break;
@@ -125,25 +138,53 @@ String convertBangumiStickerPath(int stickerIndex){
   return "assets/bangumiSticker/$authorPath/bgm${convertDigitNumString(stickerIndex)}.gif";
 }
 
-String convertBangumiCommentSticker(String originalComment){
-  final stickerMatch = RegExp(r'(\()+bgm+(\d{2,3})(\))');
+String convertBangumiNetworkGirlStickerPath(int stickerIndex,{bool pinkVersion = true}){
+
+  String typePath = pinkVersion ? "musume" : "blake";
+
+  return "https://lain.bgm.tv/img/smiles/$typePath/${typePath}_${convertDigitNumString(stickerIndex)}.gif";
   
-  String mappedComment = originalComment.replaceAllMapped(
-    stickerMatch, 
+}
+
+String convertBangumiCommentSticker(String originalComment){
+
+  //final bgmStickerMatch = RegExp(r'(\()+bgm+(\d{2,3})(\))');
+  final bgmStickerMatch = RegExp(r'(\()+(bgm|musume_|blake_)+(\d{2,3})(\))');
+  
+  String mappedStickerComment = originalComment.replaceAllMapped(
+    bgmStickerMatch, 
     (match){
 
-      String replaceTag = "sticker";
-
       List<String?> resultList = [];
-      
-      for(String? currentPattern in match.groups([1,2,3])){
+
+      for(String? currentPattern in match.groups([1,2,3,4])){
         switch(currentPattern){
-          case '(': resultList.add("[$replaceTag]"); break;
-          case ')': resultList.add("[/$replaceTag]"); break;
-          //default: resultList.add("assets/bangumiSticker/bgm${match.group(2)}.gif");
-          default: resultList.add(convertBangumiStickerPath(int.parse(match.group(2)!)));
+          case '(': {
+            if(match.groups([2]).first == 'bgm'){
+              resultList.add("[sticker]");
+              resultList.add(convertBangumiStickerPath(int.parse(match.group(3)!)));
+            }
+            if(match.groups([2]).first == 'musume_' || match.groups([2]).first == 'blake_'){
+              bool isPinkVersion = match.groups([2]).first == 'musume_' ? true : false;
+              resultList.add("[net_sticker]");
+              resultList.add(convertBangumiNetworkGirlStickerPath(int.parse(match.group(3)!),pinkVersion:isPinkVersion));
+            }
+            
+            break;
+            
+          }
+          case ')': {
+            if(match.groups([2]).first == 'bgm') resultList.add("[/sticker]");
+            if(match.groups([2]).first == 'musume_' || match.groups([2]).first == 'blake_') resultList.add("[/net_sticker]");
+            break;
+          }
+          
+          
+         
         }
+
       }
+
 
       return resultList.join();
 
@@ -153,7 +194,7 @@ String convertBangumiCommentSticker(String originalComment){
 
   //debugPrint("convert :$mappedComment");
 
-  return mappedComment;
+  return mappedStickerComment;
 
 									
 }

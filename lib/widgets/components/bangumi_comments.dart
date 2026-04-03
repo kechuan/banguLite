@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/views/comment_cache_view.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/models/providers/comment_model.dart';
-import 'package:bangu_lite/widgets/views/comment_cache_view.dart';
 import 'package:provider/provider.dart';
 
 class CommentView extends StatefulWidget {
@@ -88,7 +88,7 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
 
     return Theme(
       data: ThemeData(
-        brightness: Theme.of(context).brightness,
+        brightness: Theme.brightnessOf(context),
         colorSchemeSeed: widget.bangumiThemeColor,
         fontFamilyFallback: convertSystemFontFamily(),
         scrollbarTheme: const ScrollbarThemeData(
