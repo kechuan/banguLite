@@ -516,51 +516,48 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
 
     return Padding(
       padding: PaddingH6V12,
-      child: SizedBox(
-        height: itemCount * (100),
-        child: ListView.builder(
-          padding: const EdgeInsets.all(0),
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: itemCount,
-          //shrinkWrap: true,
-          itemBuilder: (_, index) {
-            final item = rangeData[index];
-            final itemID = item.detailID;
-            final isDeleting = historyModel.deletingItems.contains(itemID);
-            // final isSelected = selectedItems.contains(itemID);
-        
-            final currentTime = DateTime.fromMillisecondsSinceEpoch(item.updatedAt ?? 0);
-        
-            // 15分钟为节点
-            if (currentTime.difference(recordTime).inMinutes.abs() > 15) {
-              recordTime = currentTime;
-            }
-        
-            // 如果有删除动画，使用动画包装
-            Widget itemWidget = buildHistoryItem(
-              item: item,
-              isNearlyTime: recordTime == currentTime,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(0),
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: itemCount,
+        shrinkWrap: true,
+        itemBuilder: (_, index) {
+          final item = rangeData[index];
+          final itemID = item.detailID;
+          final isDeleting = historyModel.deletingItems.contains(itemID);
+          // final isSelected = selectedItems.contains(itemID);
+      
+          final currentTime = DateTime.fromMillisecondsSinceEpoch(item.updatedAt ?? 0);
+      
+          // 15分钟为节点
+          if (currentTime.difference(recordTime).inMinutes.abs() > 15) {
+            recordTime = currentTime;
+          }
+      
+          // 如果有删除动画，使用动画包装
+          Widget itemWidget = buildHistoryItem(
+            item: item,
+            isNearlyTime: recordTime == currentTime,
+          );
+      
+          if (isDeleting && historyModel.deleteAnimations.containsKey(itemID)) {
+            itemWidget = AnimatedBuilder(
+              animation: historyModel.deleteAnimations[itemID]!,
+              builder: (context, child) {
+                return SizeTransition(
+                  sizeFactor: historyModel.deleteAnimations[itemID]!,
+                  child: FadeTransition(
+                    opacity: historyModel.deleteAnimations[itemID]!,
+                    child: child,
+                  ),
+                );
+              },
+              child: itemWidget,
             );
-        
-            if (isDeleting && historyModel.deleteAnimations.containsKey(itemID)) {
-              itemWidget = AnimatedBuilder(
-                animation: historyModel.deleteAnimations[itemID]!,
-                builder: (context, child) {
-                  return SizeTransition(
-                    sizeFactor: historyModel.deleteAnimations[itemID]!,
-                    child: FadeTransition(
-                      opacity: historyModel.deleteAnimations[itemID]!,
-                      child: child,
-                    ),
-                  );
-                },
-                child: itemWidget,
-              );
-            }
-        
-            return itemWidget;
-          },
-        ),
+          }
+      
+          return itemWidget;
+        },
       ),
     );
   }
@@ -662,12 +659,12 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                         if (item.detailID != null) {
                           historyModel.toggleItemSelection(item.detailID!);
                         }
-
+                  
                         return false;
                       }
-
+                  
                       return true;
-
+                  
                     },
                     surfTimelineDetails: item,
                     isRecordMode: true,
