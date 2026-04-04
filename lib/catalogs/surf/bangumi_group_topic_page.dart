@@ -2,19 +2,14 @@ import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-
-
 import 'package:bangu_lite/models/informations/subjects/group_topic_details.dart';
-import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
-
-import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
-import 'package:flutter/material.dart';
-
-@FFAutoImport()
-import 'package:bangu_lite/models/providers/groups_model.dart';
-
 @FFAutoImport()
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
+@FFAutoImport()
+import 'package:bangu_lite/models/providers/groups_model.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
+import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
+import 'package:flutter/material.dart';
 
 @FFRoute(name: '/groupTopic')
 class BangumiGroupTopicPage extends StatefulWidget {
@@ -24,7 +19,8 @@ class BangumiGroupTopicPage extends StatefulWidget {
     required this.groupTopicInfo,
     
     this.themeColor,
-    this.referPostContentID
+    this.referPostContentID,
+    this.sourceTitle
   });
 
   final GroupsModel groupsModel;
@@ -32,6 +28,7 @@ class BangumiGroupTopicPage extends StatefulWidget {
   final Color? themeColor;
 
   final int? referPostContentID;
+  final String? sourceTitle;
 
   @override
   State<BangumiGroupTopicPage> createState() => _BangumiGroupTopicPageState();
@@ -59,6 +56,9 @@ class _BangumiGroupTopicPageState extends BangumiContentPageState
 
   @override
   PostCommentType? getPostCommentType() => PostCommentType.replyGroupTopic;
+
+  @override
+  String? sourceTitle() => widget.sourceTitle;
 
   @override
   int? getCommentCount(GroupTopicDetails? contentDetail, bool isLoading){

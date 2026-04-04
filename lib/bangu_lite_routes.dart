@@ -90,7 +90,7 @@ class Routes {
   ///
   /// [constructors] :
   ///
-  /// BangumiGroupTopicPage : [GroupsModel(required) groupsModel, GroupTopicInfo(required) groupTopicInfo, Color? themeColor, int? referPostContentID]
+  /// BangumiGroupTopicPage : [GroupsModel(required) groupsModel, GroupTopicInfo(required) groupTopicInfo, Color? themeColor, int? referPostContentID, String? sourceTitle]
   static const String groupTopic = '/groupTopic';
 
   /// '/history'

@@ -140,9 +140,8 @@ class BangumiAPIUrls {
   static String postBlogComment(int subjectID) => '${userBlog(subjectID)}/comments';
 
   static String postGroupTopic(String groupName) => groupTopics(groupName);
-  static String postGroupTopicComment(int postID) => '${actionGroupTopicComment(postID)}/replies';
+  static String postGroupTopicComment(int postID) => '${groupsTopics()}/$postID/replies';
 
-  
   static String postTimeline() => timeline();
   static String postTimelineComment(int timelineID) => '${timeline()}/$timelineID/replies';
   
@@ -153,10 +152,12 @@ class BangumiAPIUrls {
   /// 行为允许 GET/PUT/DELETE
   /// '${subjects()}/-/topics/$topicID';
 
-  static String actionGroupTopicComment(int commentID) => '${groupsTopics()}/$commentID';
-  static String actionTopicComment(int commentID) => '${subjectPosts()}/$commentID';
   static String actionEpComment(int commentID) => '${episodes()}/-/comments/$commentID';
-  static String actiongroupTopicComment(int postID) => groupTopicComment(postID);
+
+  /// 从原本上来说 应该是api里对应一个改楼主 一个改普通楼层的Api
+  /// 但实际上首楼也有自己的postID 且也能透过这种方式更改内容 这就使得用楼主的API的意义实际上并不是很大
+  static String actionGroupTopicComment(int postID) => groupTopicComment(postID);
+  static String actionTopicComment(int commentID) => '${subjectPosts()}/$commentID';
   
   ///这个不允许GET
   static String actionBlogComment(int commentID) => '${blogs()}/-/comments/$commentID';
@@ -168,7 +169,7 @@ class BangumiAPIUrls {
   static String toggleSubjectCommentLike(int commentID) => '${subjects()}/-/collects/$commentID/like';  
   static String toggleEPCommentLike(int commentID) => '${actionEpComment(commentID)}/like';
   static String toggleTopicLike(int commentID) => '${actionTopicComment(commentID)}/like';
-  static String toggleGroupTopicLike(int commentID) => '${actiongroupTopicComment(commentID)}/like';
+  static String toggleGroupTopicLike(int commentID) => '${actionGroupTopicComment(commentID)}/like';
   static String toggleTimelineLike(int timelineID) => '${timeline()}/$timelineID/like';
 
   ///[POST]

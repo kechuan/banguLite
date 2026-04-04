@@ -136,10 +136,10 @@ void appRouteMethodListener(BuildContext context,String link,{dynamic data}){
             context, 
             Routes.groupTopic,
             arguments: {
-              "groupsModel":GroupsModel(),
+              "groupsModel":GroupsModel(subjectID: appRouteUri.queryParameters['sorceID']),
               "groupTopicInfo":
                   GroupTopicInfo(id: resID)
-                  ..contentTitle = appRouteUri.queryParameters['groupTitle']
+                  ..contentTitle = appRouteUri.queryParameters['groupTopicTitle']
               ,
               'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
               "referPostContentID": postReferID,

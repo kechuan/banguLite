@@ -6,31 +6,40 @@ import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/fragments/ep_comment_tile.dart';
 import 'package:bangu_lite/widgets/fragments/ep_replied_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class EpCommentView extends StatelessWidget {
   const EpCommentView({
     super.key, 
-    required this.contentID,
-    required this.epCommentData,
-    this.postCommentType,
-    this.onUpdateComment,
-    this.authorID, 
-    this.themeColor
+    //required this.contentID,
+    //required this.epCommentData,
+    //this.postCommentType,
+    //this.onUpdateComment,
+    //this.authorID, 
+    //this.themeColor
     
   });
 
-  final int contentID;
+  //final int contentID;
   
-  final EpCommentDetails epCommentData;
-  final PostCommentType? postCommentType;
-  final Function(String?)? onUpdateComment;
+  //final EpCommentDetails epCommentData;
+  //final PostCommentType? postCommentType;
+  //final Function(String?)? onUpdateComment;
 
-  final int? authorID;
+  //final int? authorID;
 
-  final Color? themeColor;
+  //final Color? themeColor;
   
   @override
   Widget build(BuildContext context) {
+
+    final epCommentData = context.read<EpCommentDetails>();
+
+    final int contentID = context.read<EpCommentViewConfig>().contentID;
+    final PostCommentType? postCommentType = context.read<EpCommentViewConfig>().postCommentType;
+    final Function(String?)? onUpdateComment = context.read<EpCommentViewConfig>().onUpdateComment;
+    final int? authorID = context.read<EpCommentViewConfig>().authorID;
+    final Color? themeColor = context.read<EpCommentViewConfig>().themeColor;
     
     /// [BangumiCommentAuthorType] 楼顶端
     BangumiCommentAuthorType? authorType;
@@ -72,4 +81,22 @@ class EpCommentView extends StatelessWidget {
       
  
   }
+}
+
+class EpCommentViewConfig{
+  EpCommentViewConfig({
+    required this.contentID,
+    
+    this.postCommentType,
+    this.onUpdateComment,
+    this.authorID,
+    this.themeColor
+  });
+
+  final int contentID;
+  
+  final PostCommentType? postCommentType;
+  final Function(String?)? onUpdateComment;
+  final int? authorID;
+  final Color? themeColor;
 }

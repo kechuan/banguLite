@@ -16,6 +16,7 @@ abstract class ContentInfo extends BaseInfo {
   });
 
   //Blog/Topic 应需求
+  //凭借Group的一己之力 更改为dynamic属性
   int? sourceID;
 
   //title

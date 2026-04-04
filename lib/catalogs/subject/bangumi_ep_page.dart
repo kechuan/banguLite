@@ -469,11 +469,15 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                           );
                         }
                     
-                        return EpCommentView(
-                          contentID: epModel.injectEpID != 0 ? epModel.injectEpID : (epModel.epsData[epModel.selectedEp]?.epID ?? 0) ,
-                          postCommentType: PostCommentType.replyEpComment,
-                          epCommentData: resultFilterCommentList[epCommentIndex-1],
-
+                        return MultiProvider(
+                          providers: [
+                            Provider<EpCommentDetails>.value(value: resultFilterCommentList[epCommentIndex-1]),
+                            Provider<EpCommentViewConfig>.value(value: EpCommentViewConfig(
+                              contentID: epModel.injectEpID != 0 ? epModel.injectEpID : (epModel.epsData[epModel.selectedEp]?.epID ?? 0),
+                              postCommentType: PostCommentType.replyEpComment,
+                            )),
+                          ],
+                          child: const EpCommentView(),
                         );
                       },
                       separatorBuilder: (_,__) => Divider(

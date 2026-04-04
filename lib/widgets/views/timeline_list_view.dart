@@ -100,9 +100,9 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
               return Container(
                 padding: PaddingH12,
                 color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
-                child: BangumiTimelineTile(
-                  key: ValueKey(currentTimelineTypeDetails.elementAt(index).detailID),
-                  surfTimelineDetails: currentTimelineTypeDetails.elementAt(index),
+                child: Provider<SurfTimelineDetails>.value(
+                  value: currentTimelineTypeDetails.elementAt(index),
+                  child: const BangumiTimelineTile(),
                 )
               );
 

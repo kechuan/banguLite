@@ -18,6 +18,7 @@ import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class EpCommentTile extends StatefulWidget {
   const EpCommentTile({
@@ -278,13 +279,19 @@ class _EpCommentTileState extends State<EpCommentTile> {
                               SizedBox(
                                 height: expandedStatus == false ? (MediaQuery.sizeOf(context).height / 3)-(16+6) : null,
                                 width: MediaQuery.sizeOf(context).width-24,
-                                child: AdapterBBCodeText(
-                                  data: convertBangumiCommentSticker(widget.epCommentData.comment ?? ""),
-                                  stylesheet: appDefaultBBStyleSheet(context, selectableText: true),
-                                  errorBuilder: (context, error, stackTrace) {
-                                    debugPrint("renderError: ${widget.epCommentData.epCommentIndex} err:$error ");
-                                    return ScalableText("${widget.epCommentData.comment}");
-                                  },
+                                child: Selector<IndexModel,Map<int,String>>(
+                                  selector: (_, indexModel) => indexModel.userCommentMap,
+                                  shouldRebuild: (previous, next) => previous != next,
+                                  builder: (_,userCommentMap,child) {
+                                    return AdapterBBCodeText(
+                                      data: convertBangumiCommentSticker(userCommentMap[widget.epCommentData.commentID] ?? widget.epCommentData.comment ?? ""),
+                                      stylesheet: appDefaultBBStyleSheet(context, selectableText: true),
+                                      errorBuilder: (context, error, stackTrace) {
+                                        debugPrint("renderError: ${widget.epCommentData.epCommentIndex} err:$error ");
+                                        return ScalableText("${widget.epCommentData.comment}");
+                                      },
+                                    );
+                                  }
                                 ),
                               )
                               : commentBlockReasonChild!,

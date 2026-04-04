@@ -5,18 +5,21 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
-import 'package:bangu_lite/internal/hive.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
+import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../internal/utils/const.dart';
 
@@ -24,20 +27,16 @@ class BangumiTimelineTile extends StatelessWidget{
 
   const BangumiTimelineTile({
     super.key,
-    required this.surfTimelineDetails,
-    this.isRecordMode,
-    this.onTap,
   });
 
-  final SurfTimelineDetails surfTimelineDetails;
-  final bool? isRecordMode;
-  final bool Function()? onTap;
-  
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {	
 
-	debugPrint('[BangumiTimelineTile build]: ${surfTimelineDetails.detailID}');
+  final SurfTimelineDetails surfTimelineDetails = context.read<SurfTimelineDetails>();
+  final bool? isRecordMode = context.read<BangumiTimelineTileUIConfig?>()?.isRecordMode;
+  final bool Function()? onInterception = context.read<BangumiTimelineTileUIConfig?>()?.onInterception;
+
+  debugPrint('[BangumiTimelineTile build]: ${surfTimelineDetails.detailID}');
 
     return RepaintBoundary(
       child: InkResponse(
@@ -47,7 +46,7 @@ class BangumiTimelineTile extends StatelessWidget{
         highlightColor: Colors.transparent,
         onTap: () {
       
-          if (onTap?.call() == false) return;
+          if (onInterception?.call() == false) return;
       
           debugPrint("timeline DetailID:${surfTimelineDetails.detailID} timelineType:${surfTimelineDetails.bangumiSurfTimelineType}");
       
@@ -90,19 +89,49 @@ class BangumiTimelineTile extends StatelessWidget{
               }
       
             }
-      
+
+            //历史记录 & 时间线的 GroupTopic 兼用卡 
+            //但是这样一来从历史记录进入的 GroupTopic就只能更新 timeStamp 更新不了Replied了
             case BangumiSurfTimelineType.group:{
       
               if (surfTimelineDetails.detailID != null) {
-                MyHive.historySurfDataBase.put(
-                  surfTimelineDetails.detailID!,
-                  surfTimelineDetails.copyWithUpdateAt(surfTimelineDetails)
+                //MyHive.historySurfDataBase.put(
+                //  surfTimelineDetails.detailID!,
+                //  surfTimelineDetails.copyWithUpdateAt(surfTimelineDetails)
+                //);
+
+
+                Navigator.pushNamed(
+                  context, 
+                  Routes.groupTopic,
+                  arguments: {
+                    "groupsModel":GroupsModel(subjectID: surfTimelineDetails.sourceID),
+                    "groupTopicInfo":
+                        GroupTopicInfo(id: surfTimelineDetails.detailID)
+                        ..contentTitle = surfTimelineDetails.title
+                    ,
+                    'sourceTitle': surfTimelineDetails.sourceTitle,
+                    "themeColor":judgeCurrentThemeColor(context),
+                  }
                 );
+
+                //Navigator.pushNamed(
+                //  context,
+                //  Routes.groupTopic,
+                //  arguments: {
+                //    "groupID":surfTimelineDetails.detailID
+                //  },
+                //);  
       
-                bus.emit(
-                  "AppRoute",
-                  '${BangumiWebUrls.groupTopic(surfTimelineDetails.detailID!)}?groupTitle=${surfTimelineDetails.title}'
-                );
+                //bus.emit(
+                //  "AppRoute",
+                //  '${BangumiWebUrls.groupTopic(surfTimelineDetails.detailID!)}'
+                //  '?groupTopicTitle=${surfTimelineDetails.title}'
+                //  '&sourceTitle=${surfTimelineDetails.sourceTitle}'
+                //  '&sourceID=${surfTimelineDetails.sourceID}'
+                //);
+
+
               }
       
             }
@@ -290,4 +319,14 @@ class BangumiTimelineTile extends StatelessWidget{
 
    
   }
+}
+
+class BangumiTimelineTileUIConfig {
+  BangumiTimelineTileUIConfig({
+    this.isRecordMode,
+    this.onInterception,
+  });
+
+  bool? isRecordMode;
+  bool Function()? onInterception;
 }

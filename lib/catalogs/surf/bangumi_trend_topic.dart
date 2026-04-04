@@ -1,6 +1,7 @@
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
@@ -62,8 +63,9 @@ class _BangumiTrendTopicState extends State<BangumiTrendTopic> {
                 return Container(
                   padding: PaddingH12,
                   color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
-                  child: BangumiTimelineTile(
-                    surfTimelineDetails: timelineFlowModel.trendTimelinesData.elementAt(index),
+                  child: Provider<SurfTimelineDetails>.value(
+                    value: timelineFlowModel.trendTimelinesData.elementAt(index),
+                    child: const BangumiTimelineTile(),
                   )
                 );
 

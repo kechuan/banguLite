@@ -18,6 +18,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 @FFRoute(name: '/history')
@@ -234,26 +235,14 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
               IconButton(
                 onPressed: () {
 
-                  Map<dynamic, SurfTimelineDetails> patchedDetails = {};
+                  ///TODO 尚未实现
+                  debugPrint("输出前5个数据");
 
-                  debugPrint("execute fix detailID null issue.");
+                  MyHive.historySurfDataBase.values.toList().sublist(0, 5).forEach((element) {
+                    debugPrint(element.toString());
+                  });
 
-                  patchedDetails.addEntries(
-                    MyHive.historySurfDataBase.toMap().entries.where((currentItem) {
-                        if (currentItem.value.detailID == null) return true;
-                        return false;
-                      })
-                  );
 
-                  patchedDetails.updateAll((key, value) {
-                      debugPrint("Before Patch: ${patchedDetails.keys} ${patchedDetails.values.map((it) => it.detailID)}");
-                      value.detailID = key;
-                      return value;
-                    });
-
-                  debugPrint("After Patch: ${patchedDetails.keys} ${patchedDetails.values.map((it) => it.detailID)}");
-
-                  MyHive.historySurfDataBase.putAll(patchedDetails);
 
                 },
                 icon: const Icon(Icons.auto_fix_high),
@@ -517,7 +506,7 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
     return Padding(
       padding: PaddingH6V12,
       child: ListView.builder(
-        padding: const EdgeInsets.all(0),
+        padding: EdgeInsets.zero,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: itemCount,
         shrinkWrap: true,
@@ -526,20 +515,20 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
           final itemID = item.detailID;
           final isDeleting = historyModel.deletingItems.contains(itemID);
           // final isSelected = selectedItems.contains(itemID);
-      
+
           final currentTime = DateTime.fromMillisecondsSinceEpoch(item.updatedAt ?? 0);
-      
+
           // 15分钟为节点
           if (currentTime.difference(recordTime).inMinutes.abs() > 15) {
             recordTime = currentTime;
           }
-      
+
           // 如果有删除动画，使用动画包装
           Widget itemWidget = buildHistoryItem(
             item: item,
             isNearlyTime: recordTime == currentTime,
           );
-      
+
           if (isDeleting && historyModel.deleteAnimations.containsKey(itemID)) {
             itemWidget = AnimatedBuilder(
               animation: historyModel.deleteAnimations[itemID]!,
@@ -555,7 +544,7 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
               child: itemWidget,
             );
           }
-      
+
           return itemWidget;
         },
       ),
@@ -653,22 +642,29 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
               Expanded(
                 child: Padding(
                   padding: PaddingH12,
-                  child: BangumiTimelineTile(
-                    onTap: () {
-                      if (historyModel.multiSelectModeNotifier.value) { 
-                        if (item.detailID != null) {
-                          historyModel.toggleItemSelection(item.detailID!);
-                        }
-                  
-                        return false;
-                      }
-                  
-                      return true;
-                  
-                    },
-                    surfTimelineDetails: item,
-                    isRecordMode: true,
-                  ),
+                  child: MultiProvider(
+                    //筛选更新会用到的key
+                    key: ValueKey(item.detailID),
+                    providers: [
+                      Provider<SurfTimelineDetails>.value(value: item),
+                      Provider<BangumiTimelineTileUIConfig>.value(value: BangumiTimelineTileUIConfig(
+                          isRecordMode: true,
+                          onInterception: () {
+                            if (historyModel.multiSelectModeNotifier.value) { 
+                              if (item.detailID != null) {
+                                historyModel.toggleItemSelection(item.detailID!);
+                              }
+
+                              return false;
+                            }
+
+                            return true;
+                          },
+                        ))
+                    ],
+                    child: const BangumiTimelineTile(),
+                  )
+
                 ),
               ),
 

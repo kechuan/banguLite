@@ -162,6 +162,9 @@ FFRouteSettings getRouteSettings({
           referPostContentID: asT<int?>(
             safeArguments['referPostContentID'],
           ),
+          sourceTitle: asT<String?>(
+            safeArguments['sourceTitle'],
+          ),
         ),
       );
     case '/history':

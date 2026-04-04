@@ -435,7 +435,7 @@ class AccountModel extends ChangeNotifier {
 
         requestUrl = actionType == UserContentActionType.post ?
           BangumiAPIUrls.postGroupTopicComment(contentID!) :
-          BangumiAPIUrls.actionTopicComment(commentID!);
+          BangumiAPIUrls.actionGroupTopicComment(commentID!);
 
       }
 

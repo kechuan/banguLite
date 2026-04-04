@@ -44,6 +44,18 @@ class IndexModel extends ChangeNotifier {
   //试试Record吧。。
   final Map<dynamic,(String,String)> draftContent = {};
 
+  //用于在视觉上覆盖用户原本的评论
+  Map<int, String> userCommentMap = {};
+
+  void updateUserCommentMap(int postID,String comment){
+    userCommentMap = {
+      ...userCommentMap
+      ..[postID] = comment
+    };
+
+    notifyListeners();
+  }
+
   int cachedImageSize = 0;
 
   void initModel() async {

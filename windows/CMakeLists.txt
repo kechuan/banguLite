@@ -1,5 +1,8 @@
 # Project-level configuration.
 cmake_minimum_required(VERSION 3.14)
+if(POLICY CMP0175)
+  cmake_policy(SET CMP0175 OLD)
+endif()
 project(flutter_bangumi LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change

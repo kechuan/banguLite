@@ -122,13 +122,12 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                             debugPrint("[ToggleContent] ${widget.contentID} SendContent: $errorMessage");
             
                             if (currentRoute is ModalBottomSheetRoute) {
-            
-                                invokeToaster(message: errorMessage);
+                                invokeToaster(message: "[草稿已保存] $errorMessage");
                             }
             
                             else {
                                 invokeRequestSnackBar(
-                                    message: errorMessage,
+                                    message: "[草稿已保存] $errorMessage",
                                     requestStatus: false,
                                 );
                             }
@@ -242,42 +241,44 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                                     'preservationContent': ("",widget.commentData.comment)
                                 }
                             ).then((content) async{
-                                        if (content is String) {
-            
-                                            if (currentRoute is ModalBottomSheetRoute) {
-                                                invokeToaster(message: "请求中",);
+                                if (content is String) {
+
+                                  
+    
+                                    if (currentRoute is ModalBottomSheetRoute) {
+                                        invokeToaster(message: "请求中",);
+                                    }
+    
+                                    else {
+                                        invokeRequestSnackBar();
+                                    }
+    
+                                    //invokeRequestSnackBar();
+    
+                                    //widget.onUpdateComment?.call(content);
+    
+                                    //网络层 Callback
+                                    await invokeCommentToggle(content).then((resultID) {
+                                            debugPrint("[EditContent] sendMessageresultID:$resultID SendContent: $content");
+    
+                                            if (resultID != 0) {
+                                                //UI层 Callback
+                                                widget.onUpdateComment?.call(content);
+    
+                                                if (currentRoute is ModalBottomSheetRoute) {
+                                                    invokeToaster(message: "发送成功");
+                                                }
+    
+                                                else {
+                                                    invokeRequestSnackBar(requestStatus: true);
+                                                }
+    
                                             }
-            
-                                            else {
-                                                invokeRequestSnackBar();
-                                            }
-            
-                                            //invokeRequestSnackBar();
-            
-                                            //widget.onUpdateComment?.call(content);
-            
-                                            //网络层 Callback
-                                            await invokeCommentToggle(content).then((resultID) {
-                                                    debugPrint("[EditContent] sendMessageresultID:$resultID SendContent: $content");
-            
-                                                    if (resultID != 0) {
-                                                        //UI层 Callback
-                                                        widget.onUpdateComment?.call(content);
-            
-                                                        if (currentRoute is ModalBottomSheetRoute) {
-                                                            invokeToaster(message: "发送成功");
-                                                        }
-            
-                                                        else {
-                                                            invokeRequestSnackBar(requestStatus: true);
-                                                        }
-            
-                                                    }
-            
-                                                });
-            
-                                        }
-                                    });
+    
+                                        });
+    
+                                }
+                            });
             
                         }
             

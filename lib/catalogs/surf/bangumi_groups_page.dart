@@ -253,8 +253,11 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                               
                                                             return Container(
                                                                 color: index % 2 == 0 ? Colors.grey.withValues(alpha: 0.3) : null,
-                                                                child: BangumiTimelineTile(
-                                                                  surfTimelineDetails: selectedGroupData.elementAt(index),
+                                                                child: Provider<SurfTimelineDetails>.value(
+                                                                  value: selectedGroupData.elementAt(index),
+                                                                  child: const BangumiTimelineTile(
+                                                                    //surfTimelineDetails: selectedGroupData.elementAt(index),
+                                                                  ),
                                                                 ),
                                                             );
                                                         }
