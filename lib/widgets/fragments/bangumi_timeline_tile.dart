@@ -219,26 +219,36 @@ class BangumiTimelineTile extends StatelessWidget{
                   Flexible(
                     flex: 3,
                     child: Row(
-      
                       children: [
       
-                        ScalableText(
-                          "${surfTimelineDetails.bangumiSurfTimelineType?.typeName ?? ""}"
-                          "${surfTimelineDetails.sourceTitle == null ? "" : " · "}"
-                          ,
-                          style: const TextStyle(fontSize: 14, color: Colors.grey)
+                        Builder(
+                          builder: (_) {
+
+                            String sourceDescriptionText = "";
+
+                            if(surfTimelineDetails.sourceTitle != BangumiPrivateHubType.email.typeName){
+                              sourceDescriptionText = 
+                                "${surfTimelineDetails.bangumiSurfTimelineType?.typeName ?? ""}"
+                                "${surfTimelineDetails.sourceTitle == null ? "" : " · "}";
+                            }
+
+                            return ScalableText(
+                              sourceDescriptionText,
+                              style: const TextStyle(fontSize: 14, color: Colors.grey)
+                            );
+                          }
                         ),
-      
+
                         Flexible(
                           child: UnVisibleResponse(
                             onTap: () {
-      
+                                
                               //debugPrint("sourceID: ${surfTimelineDetails.sourceID}");
-      
+                                
                               if (surfTimelineDetails.sourceID == null) return;
-      
+                                
                               switch (surfTimelineDetails.bangumiSurfTimelineType) {
-      
+                                
                                 //利用callback 加载数据? 否则历史记录里面会缺失avatar 
                                 //或者干脆直接在subjectDetail里加载得了。。
                                 case BangumiSurfTimelineType.subject:{
@@ -248,7 +258,7 @@ class BangumiTimelineTile extends StatelessWidget{
                                     arguments: {"subjectID":surfTimelineDetails.sourceID},
                                   );
                                 }
-      
+                                
                                 case BangumiSurfTimelineType.group:{
                                   Navigator.pushNamed(
                                     context,
@@ -262,25 +272,31 @@ class BangumiTimelineTile extends StatelessWidget{
                                     },
                                   );
                                 }
-      
+                                
                                 default:{}
-      
+                                
                               }
-      
+                                
                             },
                             child: ScalableText(                              
                               surfTimelineDetails.sourceTitle ?? "",
                               style: TextStyle(
                                 fontSize: 14, 
                                 color: Colors.grey, 
-                                decoration: surfTimelineDetails.sourceID != null ? TextDecoration.underline : null
+                                decoration: surfTimelineDetails.sourceID != null ? TextDecoration.underline : null,
                               ),
+                              strutStyle: const StrutStyle(
+                                forceStrutHeight: true,
+                                height: 1.0
+                              ),
+                              
                               maxLines: 2,
                               textAlign: TextAlign.left,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
+                      
                       ],
                     ),
                   ),

@@ -265,8 +265,9 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
 
                                                                     },
                                                                     child: SliverPadding(
-                                                                        padding: Padding16,
+                                                                        padding: Padding6,
                                                                         sliver: SliverList(
+                                                                          
                                                                             delegate: SliverChildListDelegate(
                                                                                 [
                                                                                   const BangumiDetailIntro(),

@@ -1,13 +1,14 @@
+import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
-import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
-import 'package:bangu_lite/internal/utils/extension.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_user_avatar.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
@@ -133,6 +134,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                       case NotificationType.groupTopicCall:
                       {
                         referenceLink = BangumiWebUrls.groupTopic(currentNotification.sourceID ?? 0);
+
                       }
             
             
@@ -166,6 +168,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                       case NotificationType.subjectEPPostCall:
                       {
                         referenceLink = BangumiWebUrls.ep(currentNotification.sourceID ?? 0);
+                        
                       }
             
                       case NotificationType.timelineReply:
@@ -199,7 +202,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                         currentNotification.relatedID != null &&
                         currentNotification.relatedID != 0
                       ){
-
+                        referenceLink += "?sourceTitle=${BangumiPrivateHubType.email.typeName}";
                         referenceLink += '#post_${currentNotification.relatedID}';
                         
                       }

@@ -9,6 +9,7 @@ class ScalableText extends Text {
     super.overflow,
     super.style,
     super.textAlign,
+    super.strutStyle,
     this.selectable = false
   }) : super('');
 
@@ -36,6 +37,7 @@ class ScalableText extends Text {
       style: resultStyle,
       textAlign:textAlign,
       maxLines: maxLines,
+      strutStyle: strutStyle,
       
     ) :
     Text(
@@ -43,6 +45,7 @@ class ScalableText extends Text {
       style: resultStyle,
       textAlign: textAlign,
       maxLines: maxLines,
+      strutStyle: strutStyle,
 
     );
   }

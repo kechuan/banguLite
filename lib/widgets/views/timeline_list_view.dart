@@ -76,37 +76,40 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
               (prev, next) => next.updatedAt?.compareTo(prev.updatedAt ?? 0) ?? 0
             );
 
-          return ListView.builder(
-            controller: scrollController,
-            itemCount: currentTimelineTypeDetails.isEmpty ? 1 : currentTimelineTypeDetails.length,
-            // 高度不固定 必须使用shrinkWrap
-            // 这里是滚动区域 并不强制需要约束 并不用搞什么约束传给内部
-            itemBuilder: (_, index) {
-
-              if (currentTimelineTypeDetails.isEmpty) {
-                return const SizedBox(
-                  height: 400,
-                  child: Center(
-                    child: Text("¯\\_(ツ)_/¯"),
-                  ),
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
+            child: ListView.builder(
+              controller: scrollController,
+              itemCount: currentTimelineTypeDetails.isEmpty ? 1 : currentTimelineTypeDetails.length,
+              // 高度不固定 必须使用shrinkWrap
+              // 这里是滚动区域 并不强制需要约束 并不用搞什么约束传给内部
+              itemBuilder: (_, index) {
+            
+                if (currentTimelineTypeDetails.isEmpty) {
+                  return const SizedBox(
+                    height: 400,
+                    child: Center(
+                      child: Text("¯\\_(ツ)_/¯"),
+                    ),
+                  );
+            
+                }
+            
+                if (index >= currentTimelineTypeDetails.length) {
+                  return const SizedBox();
+                }
+            
+                return Container(
+                  padding: PaddingH12,
+                  color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
+                  child: Provider<SurfTimelineDetails>.value(
+                    value: currentTimelineTypeDetails.elementAt(index),
+                    child: const BangumiTimelineTile(),
+                  )
                 );
-
+            
               }
-
-              if (index >= currentTimelineTypeDetails.length) {
-                return const SizedBox();
-              }
-
-              return Container(
-                padding: PaddingH12,
-                color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
-                child: Provider<SurfTimelineDetails>.value(
-                  value: currentTimelineTypeDetails.elementAt(index),
-                  child: const BangumiTimelineTile(),
-                )
-              );
-
-            }
+            ),
           );
         }
       ),

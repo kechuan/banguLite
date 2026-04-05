@@ -1,6 +1,7 @@
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
@@ -41,7 +42,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> with AutomaticKee
         return NotificationListener<ScrollNotification>(
           onNotification: (_) => true,
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: Padding6,
             child: Selector<CommentModel, List<CommentDetails>>(
               selector: (_, commentModel){
           
@@ -122,7 +123,10 @@ class _BangumiHotCommentState extends State<BangumiHotComment> with AutomaticKee
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     
                     children: [
-                      const ScalableText("吐槽",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
+                      const Padding(
+                        padding: Padding6,
+                        child: ScalableText("吐槽",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
+                      ),
           
                       Row(
           

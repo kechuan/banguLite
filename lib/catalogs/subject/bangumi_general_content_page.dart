@@ -274,7 +274,7 @@ abstract class BangumiContentPageState<
                           return SliverSafeArea(
                             top: false,
                             sliver: SliverPadding(
-                              padding: const EdgeInsetsGeometry.only(bottom: 24),
+                              padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
                               sliver: ValueListenableBuilder(
                                 valueListenable: commentFilterTypeNotifier,
                                 builder: (_, commentFilterType, __) {

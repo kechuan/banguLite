@@ -45,6 +45,24 @@ class AccountModel extends ChangeNotifier {
   void initModel(BuildContext context) {
     loadUserDetail();
 
+    Duration overlapDuration = const Duration();
+    loginedUserInformations.expiredTime?.let((it) {
+      
+      overlapDuration = DateTime.fromMillisecondsSinceEpoch(it * 1000).difference(DateTime.now());
+
+      //效果还剩3天时自动刷新令牌
+      if (overlapDuration < const Duration(days: 3) && overlapDuration > const Duration(minutes: 1)) {
+        updateAccessToken(loginedUserInformations.refreshToken);
+      }
+
+      else if(overlapDuration < const Duration(days: 0)){
+        logout();
+        showRequestSnackBar(backgroundColor: judgeCurrentThemeColor(context), message: "登录已过期", requestStatus: false);
+        return;
+      }
+
+    });
+
     verifySessionValidity(
       loginedUserInformations.accessToken,
       fallbackAction: (message) {
@@ -52,30 +70,14 @@ class AccountModel extends ChangeNotifier {
       },
     ).then((status) {
 
-          if (status) {
-            debugPrint("expired at:${loginedUserInformations.expiredTime}");
+      if (status) {
+        debugPrint("[Session Expired countDown] :${overlapDuration.inDays} Days ${(((overlapDuration.inHours/24)%1)*24).toStringAsFixed(1)} Hours");
+        getNotifications();
 
-            //debugPrint("accessToken:${loginedUserInformations.accessToken}");
-            getNotifications();
+      }
 
-            loginedUserInformations.expiredTime?.let((it) {
-                //效果还剩3天时自动刷新令牌
-                final differenceTime = DateTime.fromMillisecondsSinceEpoch(it * 1000).difference(DateTime.now());
-                if (differenceTime < const Duration(days: 3)) {
-                  updateAccessToken(loginedUserInformations.refreshToken);
-                  //debugPrint("${DateTime.fromMillisecondsSinceEpoch(it*1000).difference(DateTime.now()).inDays}");
-                }
-
-              });
-          }
-
-          else {
-            //刷新 avatar用
-            logout();
-          }
-
-          notifyListeners();
-        });
+      notifyListeners();
+    });
   }
 
   void logout() {

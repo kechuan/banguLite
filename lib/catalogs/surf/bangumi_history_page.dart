@@ -235,10 +235,9 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
               IconButton(
                 onPressed: () {
 
-                  ///TODO 尚未实现
-                  debugPrint("输出前5个数据");
+                  debugPrint("输出前5个最新的数据");
 
-                  MyHive.historySurfDataBase.values.toList().sublist(0, 5).forEach((element) {
+                  historyModel.dataSource.sublist(0, 5).forEach((element) {
                     debugPrint(element.toString());
                   });
 
