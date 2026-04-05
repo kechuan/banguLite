@@ -91,12 +91,15 @@ class EpRepliedTile extends ListTile {
                             
                             child: Row(
                               spacing: 12,
-                              crossAxisAlignment: (
+                              crossAxisAlignment: 
+                              (
                                 quoteContent.isNotEmpty || 
-                                (!mainContent.contains(RegExp(r'\(blake_|\(musume_')) ) ||
-								(AppFontSize.s16*mainContent.length > MediaQuery.sizeOf(context).width*2/3)
+                                (mainContent.contains(RegExp(r'\(bgm\d+\)|\(blake_\d+\)|\(musume_\d+\)')) || mainContent.contains("\n") ) ||
+                                (AppFontSize.s16*mainContent.length > MediaQuery.sizeOf(context).width*2/3)
 
-                              ) ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                              ) ? CrossAxisAlignment.end : 
+                              CrossAxisAlignment.start
+                              ,
                               children: [
           
                                 ScalableText(
