@@ -466,7 +466,7 @@ class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
                       projectName = "banguLite",
                       packageName = "io.flutter.banguLite",
-                      version = "0.11.2",
+                      version = "0.11.3",
                       author = "kechuan"
   ;
 
