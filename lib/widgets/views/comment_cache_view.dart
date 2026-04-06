@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_comment_tile.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -147,13 +148,27 @@ class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepA
                 if(itemCount == 0){
                   return const Center(child: ScalableText("空空如也..."));
                 }
-            
-                return BangumiCommentTile(
-                  //commentData: currentPageComments[itemCount-1 - index]
-                  contentID: currentPageComments[index].contentID ?? 0,
-                  commentData: currentPageComments[index],
-                  themeColor: Theme.of(context).colorScheme.primary,
+
+                return MultiProvider(
+                  providers: [
+                    Provider<CommentDetails>.value(value: currentPageComments[index]),
+                    Provider<BangumiCommentTileConfig?>.value(
+                      value: BangumiCommentTileConfig(
+                        contentID: currentPageComments[index].contentID ?? 0,
+                        themeColor: Theme.of(context).colorScheme.primary
+                      )
+                    ),
+                  ],
+                   child: const BangumiCommentTile(),
+                
+                 
                 );
+            
+                //return BangumiCommentTile(
+                //  contentID: currentPageComments[index].contentID ?? 0,
+                //  commentData: currentPageComments[index],
+                //  themeColor: Theme.of(context).colorScheme.primary,
+                //);
             
               },
               separatorBuilder: (_, index) => const Divider(height: 2),

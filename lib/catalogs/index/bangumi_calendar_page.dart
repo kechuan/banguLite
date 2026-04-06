@@ -21,7 +21,7 @@ import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
-import 'package:bangu_lite/widgets/views/bangutile_grid_view.dart';
+import 'package:bangu_lite/widgets/views/bangumi_grid_tile_view.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
@@ -470,11 +470,13 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                                   
                               ),
                         
-                              SliverToBoxAdapter(
-                                child: BanguTileGridView(
-                                  bangumiLists: calendarBangumis.isEmpty ? [] : calendarBangumis.values.elementAt(selectedDay-1),
+                              Provider<List<BangumiDetails>>.value(
+                                value: calendarBangumis.values.elementAtOrNull(selectedDay-1) ?? [],
+                                child: const SliverToBoxAdapter(
+                                  child: BangumiGridTileView(),
                                 ),
                               )
+
             
                             ]
                               

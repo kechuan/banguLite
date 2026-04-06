@@ -3,17 +3,21 @@ import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/widgets/components/transition_container.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class BanguTileGridView extends StatelessWidget {
-  const BanguTileGridView({
+class BangumiGridTileView extends StatelessWidget {
+  const BangumiGridTileView({
     super.key,
-    required this.bangumiLists,
+    //required this.bangumiLists,
   });
 
-  final List<BangumiDetails> bangumiLists;
+  //final List<BangumiDetails> bangumiLists;
 
   @override
   Widget build(BuildContext context) {
+
+    final bangumiLists = context.watch<List<BangumiDetails>>();
+
     if(bangumiLists.isEmpty) return const SizedBox.shrink();
 
     int mainAxisShowCount = 3; //deafult
@@ -54,15 +58,26 @@ class BanguTileGridView extends StatelessWidget {
 
               return TransitionContainer(
                 builder: (_,openAction){
-                  return BangumiGridTile(
-                  imageUrl: bangumiLists[currentBangumiIndex].coverUrl,
-                  bangumiTitle: bangumiLists[currentBangumiIndex].name,
-                  onTap: () {
-                      if(bangumiLists[currentBangumiIndex].name!=null){
-                        openAction();
-                      }
-                    },
-                );
+
+                  return MultiProvider(
+                    providers: [
+                      Provider<BangumiDetails?>.value(
+                        value: bangumiLists.elementAtOrNull(currentBangumiIndex),
+                      ),
+                      Provider<BangumiGridTileConfig?>.value(
+                        value: BangumiGridTileConfig(
+                          onTap: () {
+                           if(bangumiLists.elementAtOrNull(currentBangumiIndex)?.name!=null){
+                              openAction();
+                            }
+                          }
+                        )
+                      )
+                    ],
+                    child: const BangumiGridTile(),
+                  );
+
+                
                 }, 
                 next: BangumiDetailPage(
                   subjectID: bangumiLists[currentBangumiIndex].id ?? 0,

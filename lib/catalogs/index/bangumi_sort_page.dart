@@ -2,26 +2,25 @@
 
 import 'dart:math';
 
-
+import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/subject/bangumi_detail_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
+import 'package:bangu_lite/widgets/components/search_filter.dart';
 import 'package:bangu_lite/widgets/components/transition_container.dart';
+import 'package:bangu_lite/widgets/fragments/animated/animated_sort_selector.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_wave_footer.dart';
+import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/event_bus.dart';
-import 'package:bangu_lite/internal/search_handler.dart';
-import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
-import 'package:bangu_lite/widgets/components/search_filter.dart';
-import 'package:bangu_lite/widgets/fragments/animated/animated_sort_selector.dart';
-import 'package:bangu_lite/widgets/fragments/bangumi_tile.dart';
+import 'package:provider/provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 
@@ -271,10 +270,12 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                     opacity: animation,
                                     child: TransitionContainer(
                                       builder:(_,openAction){
-                                        return BangumiListTile(
-                                          bangumiDetails: messageList[index],
-                                          imageSize: const Size(100,150),
-                                          onTap: openAction                      
+                                        return MultiProvider(
+                                          providers: [
+                                            Provider<BangumiDetails?>.value(value: messageList[index]),
+                                            Provider<BangumiListTileConfig?>.value(value: BangumiListTileConfig(onTap: openAction))
+                                          ],
+                                          child: const BangumiListTile(),
                                         );
                                       },
                                       next: BangumiDetailPage(subjectID: messageList[index].id ?? 0),
@@ -315,19 +316,27 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                       onNotification: (notification) => true,
                                         child:  FadeTransition(
                                         opacity: animation,
-                                          child:  BangumiGridTile(
-                                            bangumiTitle: messageList[currentBangumiIndex].name,
-                                            imageUrl: messageList[currentBangumiIndex].coverUrl,
-                                            onTap: () {
-                                              if(messageList[currentBangumiIndex].name!=null){
-                                    
-                                                Navigator.pushNamed(
-                                                  context,
-                                                  Routes.subjectDetail,
-                                                  arguments: {"subjectID":messageList[currentBangumiIndex].id},
-                                                );
-                                              }
-                                            },
+                                          child:  MultiProvider(
+                                            providers: [
+                                              Provider<BangumiDetails?>.value(
+                                                value: messageList.elementAtOrNull(currentBangumiIndex),
+                                              ),
+                                              Provider<BangumiGridTileConfig?>.value(
+                                                value: BangumiGridTileConfig(
+                                                  onTap: () {
+                                                    if(messageList.elementAtOrNull(currentBangumiIndex)?.name!=null){
+                                                                                
+                                                      Navigator.pushNamed(
+                                                        context,
+                                                        Routes.subjectDetail,
+                                                        arguments: {"subjectID":messageList[currentBangumiIndex].id},
+                                                      );
+                                                    }
+                                                  }
+                                                )
+                                              )
+                                            ],
+                                            child: const BangumiGridTile(),
                                           )
                                       )
                                     );

@@ -1,28 +1,30 @@
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
+import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
+import 'package:provider/provider.dart';
 
-class BangumiListTile extends ListTile {
+class BangumiListTile extends StatelessWidget {
   const BangumiListTile({
     super.key,
-
-    required this.imageSize,
-    this.bangumiDetails,
-    super.trailing,
-    super.subtitle,
-    super.onTap,
-
+    this.imageSize = const Size(100, 150),
   });
 
-  final BangumiDetails? bangumiDetails;
   final Size imageSize;
 
   @override
   Widget build(BuildContext context) {
+
+    // 需要排序变更 必须使用watch监控变化位置
+    final bangumiDetails = context.watch<BangumiDetails?>();
+    final onTap = context.read<BangumiListTileConfig?>()?.onTap;
+    final subtitle = context.read<BangumiListTileConfig?>()?.subtitle;
+    final trailing = context.read<BangumiListTileConfig?>()?.trailing;
+
+    if(bangumiDetails == null) return const SizedBox();
 
     return ListTile(
       contentPadding: const EdgeInsets.only(left: 16),   
@@ -34,7 +36,7 @@ class BangumiListTile extends ListTile {
             height: imageSize.height,
             width: imageSize.width, // size 1
             child: CachedImageLoader(
-              imageUrl: bangumiDetails?.coverUrl,
+              imageUrl: bangumiDetails.coverUrl,
             )
           ),
     
@@ -44,7 +46,7 @@ class BangumiListTile extends ListTile {
               child: Builder(
                 builder: (_) {
                   
-                  final currentBangumiTime = DateTime.tryParse(bangumiDetails?.informationList["air_date"] ?? "");
+                  final currentBangumiTime = DateTime.tryParse(bangumiDetails.informationList["air_date"] ?? "");
 
                   return Column(
                     spacing: 6,
@@ -53,7 +55,7 @@ class BangumiListTile extends ListTile {
                     children: [
                   
                         ScalableText(
-                          bangumiDetails?.name ?? "name",
+                          bangumiDetails.name ?? "name",
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -89,7 +91,7 @@ class BangumiListTile extends ListTile {
                         Builder(
                           builder: (_) {
 
-                            int totalEps = bangumiDetails?.informationList["eps"] ?? 0;
+                            int totalEps = bangumiDetails.informationList["eps"] ?? 0;
                             int airedEps = currentBangumiTime != null ? convertAiredEps(currentBangumiTime.toString()) : 0;
 
                             return ScalableText(
@@ -104,8 +106,8 @@ class BangumiListTile extends ListTile {
                           builder: (_) {
                   
                             return ScalableText(
-                              "评分 ${convertDecimalDigitNumString(bangumiDetails?.ratingList["score"] ?? 0.0)}"
-                              "${bangumiDetails?.ratingList["rank"] == 0 ? "" : " #${bangumiDetails?.ratingList["rank"]}"}"
+                              "评分 ${convertDecimalDigitNumString(bangumiDetails.ratingList["score"] ?? 0.0)}"
+                              "${bangumiDetails.ratingList["rank"] == 0 ? "" : " #${bangumiDetails.ratingList["rank"]}"}"
                               ,
                               style: const TextStyle(fontSize: 12),
                             );
@@ -117,7 +119,7 @@ class BangumiListTile extends ListTile {
                         Builder(
                           builder: (_) {
                   
-                            List resultTagList = bangumiDetails?.tagsList.keys.toList() ?? [];
+                            List resultTagList = bangumiDetails.tagsList.keys.toList();
 
                             if(resultTagList.length > 3){
                               resultTagList = resultTagList.sublist(0,3);
@@ -150,42 +152,49 @@ class BangumiListTile extends ListTile {
   }
 }
 
+class BangumiListTileConfig{
+  const BangumiListTileConfig({
+    this.trailing,
+    this.subtitle,
+    this.onTap,
+  });
+
+  final Widget? trailing;
+  final Widget? subtitle;
+  final void Function()? onTap;
+
+}
+
 class BangumiGridTile extends StatelessWidget {
     const BangumiGridTile({
       super.key,
-      
-      this.imageUrl,
-      this.bangumiTitle,
-      this.onTap, 
-      
     });
 
-    final String? imageUrl;
-    final String? bangumiTitle;
-
-    final void Function()? onTap;
-  
   @override
   Widget build(BuildContext context) {
 
+    //需要排序变动 必须watch
+    final BangumiDetails bangumiDetails = context.read<BangumiDetails>();
+    final void Function()? onTap = context.read<BangumiGridTileConfig>().onTap;
+
     return GridTile(
-        
-      footer: ListTile(
-        title: Center(
-          child: ScalableText(
-            bangumiTitle ?? "loading",
-            maxLines: 2,
-            style: const TextStyle(color: Colors.white),
-            overflow: TextOverflow.ellipsis,
+      footer: Padding(
+        padding: Padding6,
+        child: Center(
+            child: ScalableText(
+              bangumiDetails.name ?? "loading",
+              maxLines: 2,
+              style: const TextStyle(color: Colors.white),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-        )
       ),
     
       child: Stack(
           children: [
                                           
             Positioned.fill(
-              child: CachedImageLoader(imageUrl: imageUrl),
+              child: CachedImageLoader(imageUrl: bangumiDetails.coverUrl),
             ),
                                           
             Positioned.fill(
@@ -216,4 +225,18 @@ class BangumiGridTile extends StatelessWidget {
 
     );
   }
+}
+
+class BangumiGridTileConfig{
+  const BangumiGridTileConfig({
+    this.onTap,
+    this.imageUrl,
+    this.bangumiTitle,
+  
+  });
+
+  final void Function()? onTap;
+  final String? imageUrl;
+  final String? bangumiTitle;
+
 }

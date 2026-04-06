@@ -9,23 +9,30 @@ import 'package:bangu_lite/widgets/fragments/comment_reaction.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class BangumiCommentTile extends StatelessWidget {
   const BangumiCommentTile({
     super.key,
-    required this.contentID,
-    required this.commentData,
-    this.themeColor,
+    //required this.contentID,
+    //required this.commentData,
+    //this.themeColor,
   });
 
-  final int contentID;
+  //final int contentID;
 
-  final CommentDetails commentData;
-  final Color? themeColor;
+  //final CommentDetails commentData;
+  //final Color? themeColor;
 
 
   @override
   Widget build(BuildContext context) {
+
+
+    final CommentDetails commentData = context.watch<CommentDetails>();
+
+    final int contentID = context.read<BangumiCommentTileConfig?>()?.contentID ?? 0;
+    final Color? themeColor = context.read<BangumiCommentTileConfig?>()?.themeColor;
 
     final ValueNotifier<int> reactDataLikeNotifier = ValueNotifier(-1);
 
@@ -131,4 +138,14 @@ class BangumiCommentTile extends StatelessWidget {
     );
                             
   }
+}
+
+class BangumiCommentTileConfig{
+  const BangumiCommentTileConfig({
+    this.themeColor,
+    required this.contentID,
+  });
+
+  final Color? themeColor;
+  final int contentID;
 }

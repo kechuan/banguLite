@@ -46,18 +46,6 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
       length: widget.totalPageLength
     );
     
-    commentTabController.addListener((){
-      //疑问:
-      //如果不添加这种设置 在左右划屏幕的时候 就会直接被取消动画 而
-      //但如果添加了这种设置 那么主动点击的时候。。就直接被return掉了
-
-      //只能这样了 阈值设置在 1 之内 好在jumpPage的时候只能是整数值
-
-      //if((commentTabController.index - widget.commentPageController.page!).abs() < 0.9) return;
-
-      //widget.commentPageController.jumpToPage(commentTabController.index);
-    });
-    
   }
 
   @override
@@ -103,6 +91,9 @@ class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTick
           flexibleSpace: EasyRefresh(
             child: TabBar(
               controller: commentTabController,
+              onTap: (value) {
+                widget.commentPageController.jumpToPage(value);
+              },
               isScrollable: true,
               indicatorSize: TabBarIndicatorSize.tab,
               labelPadding: EdgeInsets.symmetric(horizontal: MediaQuery.sizeOf(context).width/min(widget.totalPageLength*2.5,14)), // 同屏数量*2

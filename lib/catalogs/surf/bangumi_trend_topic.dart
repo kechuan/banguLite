@@ -39,37 +39,40 @@ class _BangumiTrendTopicState extends State<BangumiTrendTopic> {
 
             final timelineFlowModel = context.read<TimelineFlowModel>();
 
-            return ListView.builder(
-              controller: scrollController,
-              itemCount: 
-              timelineFlowModel.trendTimelinesData.isEmpty ? 
-                1 :
-                timelineFlowModel.trendTimelinesData.length,
-                shrinkWrap: true,
-              itemBuilder: (_, index) {
-
-                if (timelineFlowModel.trendTimelinesData.isEmpty){
-                  return const SizedBox(
-                    height: 400,
-                    child: Center(child: Text("¯\\_(ツ)_/¯"))
+            return Padding(
+              padding: EdgeInsetsGeometry.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
+              child: ListView.builder(
+                controller: scrollController,
+                itemCount: 
+                timelineFlowModel.trendTimelinesData.isEmpty ? 
+                  1 :
+                  timelineFlowModel.trendTimelinesData.length,
+                  shrinkWrap: true,
+                itemBuilder: (_, index) {
+              
+                  if (timelineFlowModel.trendTimelinesData.isEmpty){
+                    return const SizedBox(
+                      height: 400,
+                      child: Center(child: Text("¯\\_(ツ)_/¯"))
+                    );
+                  }
+              
+                  
+                  if (index >= timelineFlowModel.trendTimelinesData.length) {
+                    return const SizedBox();
+                  }
+              
+                  return Container(
+                    padding: PaddingH12,
+                    color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
+                    child: Provider<SurfTimelineDetails>.value(
+                      value: timelineFlowModel.trendTimelinesData.elementAt(index),
+                      child: const BangumiTimelineTile(),
+                    )
                   );
+              
                 }
-
-                
-                if (index >= timelineFlowModel.trendTimelinesData.length) {
-                  return const SizedBox();
-                }
-
-                return Container(
-                  padding: PaddingH12,
-                  color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
-                  child: Provider<SurfTimelineDetails>.value(
-                    value: timelineFlowModel.trendTimelinesData.elementAt(index),
-                    child: const BangumiTimelineTile(),
-                  )
-                );
-
-              }
+              ),
             );
           }
         ),

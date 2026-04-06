@@ -42,17 +42,17 @@ class AccountModel extends ChangeNotifier {
 
   /// 在 [BangumiCalendarPage] 的 initState 进行初始化
   /// 因为 在 main 上面的 初始化时 无法获取到 materialAPP的 context 从而无法激活 [showRequestSnackBar]
-  void initModel(BuildContext context) {
+  void initModel(BuildContext context) async {
     loadUserDetail();
 
     Duration overlapDuration = const Duration();
-    loginedUserInformations.expiredTime?.let((it) {
+    await loginedUserInformations.expiredTime?.let((it) async {
       
       overlapDuration = DateTime.fromMillisecondsSinceEpoch(it * 1000).difference(DateTime.now());
 
       //效果还剩3天时自动刷新令牌
       if (overlapDuration < const Duration(days: 3) && overlapDuration > const Duration(minutes: 1)) {
-        updateAccessToken(loginedUserInformations.refreshToken);
+        await updateAccessToken(loginedUserInformations.refreshToken);
       }
 
       else if(overlapDuration < const Duration(days: 0)){

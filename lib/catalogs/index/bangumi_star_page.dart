@@ -372,55 +372,61 @@ Widget buildSectionList(
           }
       
           
-          return BangumiListTile(
-            imageSize: const Size(100, 150),
-            bangumiDetails: loadStarDetailsData(starBangumiDetail),
-      
-            trailing: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              spacing: 12,
-              children: [
-                    
-                Builder(
-                  builder: (_) {
-            
-                    String resultText = getUpdateText(
-                      starsUpdateRating:indexModel.starsUpdateRating,
-                      item:starBangumiDetail,
-                      sortType:sortType,
-                      //resultIndex:startIndex + index
-                    );
-            
-                    if(resultText.isEmpty){
-                      return const SizedBox();
-                    }
-                      
-          
-                    return ScalableText(
-                      resultText,
-                      style: TextStyle(fontSize: resultText.length > 6 ? 12 : null),
-                      maxLines: 2,
-                    );
-                  }
-                ),
-            
-            
-                IconButton(
-                  icon: const Icon(Icons.star),
-                  onPressed: () {
-                    MyHive.starBangumisDataBase.delete(starBangumiDetail.bangumiID);
-                    indexModel.updateStar();
-                  },
-                ),
-            
-            
-              ],
-            ),
-            onTap: () => Navigator.pushNamed(
-              context,
-              Routes.subjectDetail,
-              arguments: {"subjectID": starBangumiDetail.bangumiID},
-            ),
+          return MultiProvider(
+            providers: [
+              Provider<BangumiDetails?>.value(value: loadStarDetailsData(starBangumiDetail)),
+              Provider<BangumiListTileConfig?>.value(
+                value: BangumiListTileConfig(
+                  trailing: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    spacing: 12,
+                    children: [
+                          
+                      Builder(
+                        builder: (_) {
+                  
+                          String resultText = getUpdateText(
+                            starsUpdateRating:indexModel.starsUpdateRating,
+                            item:starBangumiDetail,
+                            sortType:sortType,
+                            //resultIndex:startIndex + index
+                          );
+                  
+                          if(resultText.isEmpty){
+                            return const SizedBox();
+                          }
+                            
+                
+                          return ScalableText(
+                            resultText,
+                            style: TextStyle(fontSize: resultText.length > 6 ? 12 : null),
+                            maxLines: 2,
+                          );
+                        }
+                      ),
+                  
+                  
+                      IconButton(
+                        icon: const Icon(Icons.star),
+                        onPressed: () {
+                          MyHive.starBangumisDataBase.delete(starBangumiDetail.bangumiID);
+                          indexModel.updateStar();
+                        },
+                      ),
+                  
+                  
+                    ],
+                  ),
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    Routes.subjectDetail,
+                    arguments: {"subjectID": starBangumiDetail.bangumiID},
+                  ),
+
+                )
+              )
+            ],
+            child: const BangumiListTile()
           );
         },
       ),

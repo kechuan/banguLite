@@ -21,7 +21,8 @@ import 'package:provider/provider.dart';
 class BangumiCommentActionButton extends StatefulWidget {
     const BangumiCommentActionButton({
         super.key,
-        // 有些 commentData 字段缺失 主ID 导致无法回帖
+        // 有些 commentData 字段缺失 主ID 导致无法回帖 
+        // 所以才需要单独传一份 而不是去调用 commentData.id
         required this.contentID,
         required this.commentData,
         this.commentBlockStatus,

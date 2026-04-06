@@ -100,10 +100,24 @@ class _BangumiHotCommentState extends State<BangumiHotComment> with AutomaticKee
                                   );
                                 }
                                   
-                                return BangumiCommentTile(
-                                  contentID: commentListData[index].contentID ?? 0,
-                                  commentData: commentListData[index],
-                                  themeColor:judgeDetailRenderColor(context,bangumiModel.imageColor)
+                                return MultiProvider(
+                                  providers: [
+                                    Provider<CommentDetails>.value(value: commentListData[index]),
+                                    Provider<BangumiCommentTileConfig>.value(
+                                      value: BangumiCommentTileConfig(
+                                        contentID: commentListData[index].contentID ?? 0,
+                                        themeColor:judgeDetailRenderColor(context,bangumiModel.imageColor)
+                                      )
+                                    )
+                                  ],
+                                  child: const BangumiCommentTile(),
+
+
+                                  //return BangumiCommentTile(
+                                  //  contentID: commentListData[index].contentID ?? 0,
+                                  //  themeColor:judgeDetailRenderColor(context,bangumiModel.imageColor)
+                                  //  commentData: commentListData[index],
+                                  //);
                                 );
                               }
                             ),
