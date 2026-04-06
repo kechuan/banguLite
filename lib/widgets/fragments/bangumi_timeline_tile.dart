@@ -8,6 +8,7 @@ import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
@@ -21,8 +22,6 @@ import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../internal/utils/const.dart';
-
 class BangumiTimelineTile extends StatelessWidget{
 
   const BangumiTimelineTile({
@@ -32,7 +31,7 @@ class BangumiTimelineTile extends StatelessWidget{
   @override
   Widget build(BuildContext context) {	
 
-  final SurfTimelineDetails surfTimelineDetails = context.read<SurfTimelineDetails>();
+  final SurfTimelineDetails surfTimelineDetails = context.watch<SurfTimelineDetails>();
   final bool? isRecordMode = context.read<BangumiTimelineTileUIConfig?>()?.isRecordMode;
   final bool Function()? onInterception = context.read<BangumiTimelineTileUIConfig?>()?.onInterception;
 
