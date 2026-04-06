@@ -18,7 +18,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 final pathRegExp = RegExp(r'^[^?]*');
 
 // 424493#post_3306858
-final anchorRegExp = RegExp(r'#post_\d+');
+final anchorRegExp = RegExp(r'#post_(\d+)');
 
 void appRouteMethodListener(BuildContext context,String link,{dynamic data}){
 
@@ -44,11 +44,9 @@ void appRouteMethodListener(BuildContext context,String link,{dynamic data}){
       ) ?? 0
     ;
 
-    final int? postReferID = matchResult.isEmpty ? null :
-      int.tryParse(matchResult.last.group(0) ?? "") == resID ? 
-      null : 
-      int.tryParse(matchResult.last.group(0) ?? "")
-    ;
+    final int? postReferID = int.tryParse(anchorRegExp.firstMatch(link)?.group(1) ?? "");
+    postReferID;
+
 
       if(
         link == BangumiWebUrls.subject(resID) ||
@@ -130,7 +128,7 @@ void appRouteMethodListener(BuildContext context,String link,{dynamic data}){
           //那topic呢。。 一般的topic链接是不会拥有 subject/group 这种信息的
           //只有单独的 topic/postID
 
-          debugPrint("groupTopic link: $link");
+          debugPrint("groupTopic link: $link,refer: $postReferID");
 
           Navigator.pushNamed(
             context, 
