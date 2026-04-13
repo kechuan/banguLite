@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
@@ -171,7 +169,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                       //refreshOnStart: widget.selectedGroupInfo?.groupName == null,
                       refreshOnStart: true,
                       onRefresh: () => loadUIGroupTopics(context),
-                      onLoad: () => loadUIGroupTopics(context, isAppend: true),
+                      onLoad: () => loadUIGroupTopics(context),
       
                       child: SafeArea(
                         child: CustomScrollView(
@@ -283,9 +281,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 
     void loadUIGroupTopics(
         BuildContext context,
-        {
-          bool? isAppend,
-        }
+
     ) {
 
         final timelineFlowModel = context.read<TimelineFlowModel>();
@@ -293,7 +289,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 
         invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
 
-        final Function() invokeRequest;
+        final Future<bool> Function() invokeRequest;
 
         Iterable selectedGroupData = groupTitleNotifier.value == null ?
           interceptSelectedSurfTimelineType(
@@ -305,17 +301,24 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 
         final initalLength = selectedGroupData.length;
 
+        //初始使用timeFlowModel 请求 否则使用groupsModel
         if (groupTitleNotifier.value == null) {
 
-            invokeRequest = () => timelineFlowModel.requestSelectedTimeLineType(
+            invokeRequest = (){
+
+              timelineFlowModel.requestTimelineCompleter = null;
+
+              return timelineFlowModel.requestSelectedTimeLineType(
                 BangumiSurfTimelineType.group,
                 //isAppend: isAppend,
                 queryParameters: [BangumiQuerys.groupsTopicsQuery(offset: initalLength)]
             );
+            
+          };
         }
 
         else {
-            invokeRequest = () => groupsModel.loadGroupTopics(offset: initalLength, isAppend: isAppend);
+            invokeRequest = () => groupsModel.loadGroupTopics(offset: initalLength);
         }
 
         invokeRequest().then((result) {
@@ -331,12 +334,11 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                     groupsModel.contentListData
                 ;
 
-                final int receiveLength = max(0, newSelectedGroupData.length);
 
                 animatedListAppendContentCallback(
                     result,
                     initalLength,
-                    receiveLength,
+                    newSelectedGroupData.length,
                     animatedListKey: sliverAnimatedListKey,
                     fallbackAction: invokeToaster,
                     animatedListController: animatedGroupTopicsListController

@@ -138,10 +138,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                                                 await launchUrlString(BangumiWebUrls.subject(widget.subjectID));
                                             }
                                         },
-                                        icon: Transform.rotate(
-                                            angle: -45,
-                                            child: const Icon(Icons.link),
-                                        )
+                                        icon: const Icon(Icons.link)
                                     )
                                 ],
                             ),

@@ -1,9 +1,9 @@
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/request_task_information.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/request_task_information.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -140,10 +140,13 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                       );
                     }
 
+                    debugPrint("imageLink: ${pictureRequestInformation?.contentLink}");
+
                     
 
                     return CachedNetworkImage(
-                      imageUrl: convertProxyImageUri(widget.imageUrl),
+                      //imageUrl: convertProxyImageUri(widget.imageUrl),
+                      imageUrl: pictureRequestInformation?.contentLink ?? widget.imageUrl,
                       httpHeaders: HttpApiClient.broswerHeader,
                       
                       progressIndicatorBuilder: (context, url, progress){ 

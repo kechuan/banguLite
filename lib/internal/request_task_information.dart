@@ -45,7 +45,7 @@ Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
     .then((response){
 
       if(response.data!=null){
-		byteInformationCompleter.complete(extractPictureRequest(response,imageUrl));
+		    byteInformationCompleter.complete(extractPictureRequest(response,imageUrl));
       }
 
     }).catchError((error) async {
@@ -55,7 +55,7 @@ Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
 				headers: HttpApiClient.broswerHeader,
 			))
 			//最终请求
-			.timeout(const Duration(seconds: 10))
+			.timeout(const Duration(seconds: 5))
 			.then((response){
 				byteInformationCompleter.complete(extractPictureRequest(response,convertProxyImageUri(imageUrl)));
 			})

@@ -1,14 +1,14 @@
 import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/catalogs/index/bangumi_calendar_page.dart';
+import 'package:bangu_lite/catalogs/index/bangumi_sort_page.dart';
 import 'package:bangu_lite/catalogs/index/bangumi_star_page.dart';
+import 'package:bangu_lite/delegates/search_delegates.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/app_drawer.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
-import 'package:bangu_lite/catalogs/index/bangumi_calendar_page.dart';
-import 'package:bangu_lite/catalogs/index/bangumi_sort_page.dart';
-import 'package:bangu_lite/delegates/search_delegates.dart';
 import 'package:provider/provider.dart';
 
 class IndexPortial extends StatefulWidget {
@@ -49,6 +49,7 @@ class _IndexPortialState extends State<IndexPortial> {
         return Scaffold(
           drawerEnableOpenDragGesture: true,
           onDrawerChanged: (isOpened) {
+            //主动向外冒泡状态 避免在 openDrawer 的情况下触发外部的退出拦截
             return DrawerStatusNotification(isOpened).dispatch(context);
           },
           appBar: AppBar(

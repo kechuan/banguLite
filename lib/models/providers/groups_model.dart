@@ -91,31 +91,14 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
 
   Future<bool> loadGroupTopics({
     int? offset = 0,
-    bool? isAppend,
   }) async {
-
-    Completer<bool> groupTopicCompleter = Completer();
 
     if(selectedGroupInfo == null) return false;
 
-    if(isAppend != true) contentListData.clear();
-
-    await loadSubjectContentList(
+    return await loadSubjectContentList(
       queryParameters: BangumiQuerys.topicsQuery
         ..["offset"] = offset ?? 0
-    ).then((result){
-      if(result){
-        groupTopicCompleter.complete(true);
-      }
-
-      else{
-        groupTopicCompleter.complete(false);
-      }
-
-      
-    });
-
-    return groupTopicCompleter.future;
+    );
   }
 
   @override

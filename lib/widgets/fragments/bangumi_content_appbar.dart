@@ -195,10 +195,7 @@ class BangumiContentAppbar extends StatelessWidget {
                   await launchUrlString(webUrl ?? '');
                 }
               },
-              icon: Transform.rotate(
-                angle: -45 * pi / 180,
-                child: const Icon(Icons.link),
-              )
+              icon: const Icon(Icons.link)
             ),
 
         ],
