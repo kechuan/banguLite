@@ -33,6 +33,7 @@ class EpCommentView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    //失算了 实际上预览到它的话 如果不用watch 在EP里跳转到空内容会显示一大堆 "无人评论"
     final epCommentData = context.read<EpCommentDetails>();
 
     final int contentID = context.read<EpCommentViewConfig>().contentID;

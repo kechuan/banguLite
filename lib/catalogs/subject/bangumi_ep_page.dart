@@ -425,6 +425,12 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                     if(!isInitaled){
 
                       if(epModel.epCommentData[currentEp]?.isNotEmpty == true){
+
+                        //empty
+                        if(epModel.epCommentData[currentEp]?.first == EpCommentDetails.empty()){
+                          resultFilterCommentList = [EpCommentDetails.empty()];
+                        }
+
                         if(epModel.epCommentData[currentEp]?.first.epCommentIndex == "1"){
                           resultFilterCommentList = [...?originalCommentList];
                         }

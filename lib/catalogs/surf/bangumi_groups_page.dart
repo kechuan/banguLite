@@ -308,6 +308,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 
               timelineFlowModel.requestTimelineCompleter = null;
 
+
               return timelineFlowModel.requestSelectedTimeLineType(
                 BangumiSurfTimelineType.group,
                 //isAppend: isAppend,

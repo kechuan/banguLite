@@ -57,7 +57,10 @@ class AccountModel extends ChangeNotifier {
 
       else if(overlapDuration < const Duration(days: 0)){
         logout();
-        showRequestSnackBar(backgroundColor: judgeCurrentThemeColor(context), message: "登录已过期", requestStatus: false);
+        if(context.mounted){
+          showRequestSnackBar(backgroundColor: judgeCurrentThemeColor(context), message: "登录已过期", requestStatus: false);
+        }
+        
         return;
       }
 
