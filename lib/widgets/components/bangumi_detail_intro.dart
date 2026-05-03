@@ -5,6 +5,7 @@ import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
+import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_detail_eps.dart';
@@ -226,6 +227,8 @@ class _IntroPortraitState extends State<IntroPortrait> {
                               convertAiredEps(widget.bangumiDetails.informationList["air_date"]) >= (epCount) ||
                               epCount > 500 //不确定长度
                             ){
+
+                              if(epModel.epsData.values.first == EpsInfo.empty()) return ScalableText("暂无数据",style: TextStyle(color: Colors.grey.withValues(alpha: 0.8)));
                               return ScalableText("共$epCount集");
                             }
     

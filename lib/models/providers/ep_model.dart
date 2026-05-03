@@ -86,7 +86,7 @@ class EpModel extends ChangeNotifier{
     }
    
     //get Start. 占位符
-    epsData[requestOffset+1] = EpsInfo();
+    epsData[requestOffset+1] = EpsInfo.empty();
 
 		await HttpApiClient.client.get(
       BangumiAPIUrls.eps,

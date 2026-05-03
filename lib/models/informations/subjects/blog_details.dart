@@ -31,7 +31,6 @@ class BlogDetails extends ContentDetails{
 
   factory BlogDetails.empty() => BlogDetails(detailID: 0);
 
-
 }
 
 BlogDetails loadBlogDetails(Map<String,dynamic> blogData){

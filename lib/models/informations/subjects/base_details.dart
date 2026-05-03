@@ -39,5 +39,15 @@ class ContentDetails extends BaseDetails {
 
   factory ContentDetails.empty() => ContentDetails(detailID: 0);
 
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ContentDetails && other.hashCode == hashCode;
+    
+  }
+
+  @override
+  int get hashCode => detailID.hashCode;
+
 }
 

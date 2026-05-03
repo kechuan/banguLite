@@ -40,7 +40,7 @@ class BangumiTimelineContentView extends StatefulWidget{
 class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineContentView> 
   with SingleTickerProviderStateMixin, RouteLifecycleMixin {
 
-  final ScrollController scrollController = ScrollController();
+  final scrollController = ScrollController();
 
   final refreshNotifier = ValueNotifier(0);
 

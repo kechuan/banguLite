@@ -1,6 +1,12 @@
 import 'package:bangu_lite/internal/utils/convert.dart';
 
 class EpsInfo {
+  EpsInfo({
+    this.epID
+  });
+
+  int? epID;
+
   String? airDate;
   String? name;
   String? nameCN;
@@ -9,7 +15,7 @@ class EpsInfo {
 
   num? epIndex;
   num? sort; //同类条目的排序和集数
-  int? epID;
+  
   int? commentLength;
 
   int? type;
@@ -17,6 +23,18 @@ class EpsInfo {
   //上下ID的链表 kana?
   int? nextEpID;
   int? prevEpID;
+
+  factory EpsInfo.empty() => EpsInfo(epID: 0);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is EpsInfo && other.hashCode == hashCode;
+    
+  }
+
+  @override
+  int get hashCode => epID.hashCode;
 
 }
 

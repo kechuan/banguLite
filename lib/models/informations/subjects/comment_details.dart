@@ -56,6 +56,7 @@ class CommentDetails extends BaseComment{
   StarType? type;
 
   factory CommentDetails.empty() => CommentDetails(commentID: 0);
+
 }
 
 class EpCommentDetails extends BaseComment{
@@ -82,6 +83,8 @@ class EpCommentDetails extends BaseComment{
         ..commentTimeStamp = contentDetail?.createdTime
       ;
   }
+
+  
 }
 
 

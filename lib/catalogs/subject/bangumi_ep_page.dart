@@ -455,7 +455,7 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                           }
 
                           return GeneralRepliedLine(
-                            repliedCount: commentCount,
+                            repliedCount: commentCount-1,
                             commentFilterTypeNotifier: commentSurfTypeNotifier,
                             onCommentFilter: (selectFilter) {
                               resultFilterCommentList = filterCommentList(selectFilter,originalCommentList!);
