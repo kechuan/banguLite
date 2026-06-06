@@ -9,8 +9,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
-String extractNameCNData(Map datafield){
-  if(datafield["nameCN"] == null) return datafield["name"];
+String extractNameCNData(Map datafield) {
+  if (datafield["nameCN"] == null) return datafield["name"];
   return datafield["nameCN"].isEmpty ? datafield["name"] : datafield["nameCN"];
 }
 
@@ -19,7 +19,7 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
 
   Set<dynamic> objectIDSet = {};
   Set<String> objectNameSet = {};
-  Map<int,Set<String>>? commentReactions = {};
+  Map<int, Set<String>>? commentReactions = {};
 
   void recursiveExtract(Map<String, dynamic> map) {
     for (final entry in map.entries) {
@@ -28,69 +28,66 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
 
       if (detectNameList.contains(key)) {
 
-          if(key == 'nickname'){
-            //更改昵称 "nickname": {"before": "123","after": "456"}
-            if(value is Map){
-              objectNameSet.add(value["after"]);
-              continue;
-            }
+        if (key == 'nickname') {
+          //更改昵称 "nickname": {"before": "123","after": "456"}
+          if (value is Map) {
+            objectNameSet.add(value["after"]);
+            continue;
           }
-        
-          if(key == 'name' || key == 'nameCN'){
+        }
 
-            //Group 特化 跳转id由 idList 提供 name 直接抛弃,
-            //example : {"name": "zyzl","title": "自娱自乐",...}
+        if (key == 'name' || key == 'nameCN') {
 
-            //Unhandled Exception: type 'String' is not a subtype of type 'Iterable<dynamic>'
+          //Group 特化 跳转id由 idList 提供 name 直接抛弃,
+          //example : {"name": "zyzl","title": "自娱自乐",...}
 
-            // 因为API只接收 groupName 跳转 从而一己之力把 objectIDSet 的存储类型 从 int 更改为 dynamic
-            if(map['name'] !=null && map['title'] !=null && map['icon'] != null){
-              objectNameSet.add(map["title"]);
-              objectIDSet.clear();
-              objectIDSet.add(map['name']);
-              continue;
-            }
+          //Unhandled Exception: type 'String' is not a subtype of type 'Iterable<dynamic>'
 
-            String resultText = "";
-
-            if(map['nameCN'] !=null ){
-              resultText = 
-                map["name"].isEmpty ? 'ep.${map["sort"]}' : 
-                  map["nameCN"].isEmpty ? map["name"] : map["nameCN"]
-                ;
-            }
-
-            
-
-            else{
-              resultText = map["name"];
-            }
-
-          
-            objectNameSet.addAll({resultText});
+          // 因为API只接收 groupName 跳转 从而一己之力把 objectIDSet 的存储类型 从 int 更改为 dynamic
+          if (map['name'] != null && map['title'] != null && map['icon'] != null) {
+            objectNameSet.add(map["title"]);
+            objectIDSet.clear();
+            objectIDSet.add(map['name']);
+            continue;
           }
 
-          else{
-            objectNameSet.addAll({value});
+          String resultText = "";
+
+          if (map['nameCN'] != null) {
+            resultText = 
+            map["name"].isEmpty ? 'ep.${map["sort"]}' : 
+            map["nameCN"].isEmpty ? map["name"] : map["nameCN"]
+            ;
           }
+
+          else {
+            resultText = map["name"];
+          }
+
+          objectNameSet.addAll({resultText});
+        }
+
+        else {
+          objectNameSet.addAll({value});
+        }
       }
 
-      else if(detectIDList.contains(key)){
+      else if (detectIDList.contains(key)) {
         int resultID = map[key];
         objectIDSet.addAll({resultID});
 
       }
-      
-      else if(detectPropList.contains(key)){
+
+      else if (detectPropList.contains(key)) {
 
         switch (key) {
 
           case 'comment' || 'tsukkomi' || 'sign':{
             // [subject]"comment": 56, & "comment":"real user Comment"
-            if(value is String && value.isNotEmpty){
+            if (value is String && value.isNotEmpty) {
               resultFields['comment'] = value;
             }
-            
+
           }
 
           case 'reactions':{
@@ -101,10 +98,9 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
           default:{
             resultFields[key] = value;
           }
-            
-  
+
         }
-        
+
       }
 
       else if (value is Map<String, dynamic>) {
@@ -123,7 +119,6 @@ Map<String, dynamic> extractBaseFields(Map<String, dynamic> data) {
     resultFields['objectIDSet'] = objectIDSet;
     resultFields['objectNameSet'] = objectNameSet;
 
-
   }
 
   recursiveExtract(data);
@@ -135,12 +130,12 @@ Future<String?> extractFallbackToken(InAppWebViewController webViewController) a
   Completer<String?> tokenCompleter = Completer();
 
   debugPrint('>>> Attempting to read token from DOM...');
-    
-    try {
-      // Execute JavaScript to get the value of the hidden input
-      // Use getElementsByName as the name is consistent
-      // [0] gets the first element if multiple exist with the same name
-      var token = await webViewController.evaluateJavascript(source: """
+
+  try {
+    // Execute JavaScript to get the value of the hidden input
+    // Use getElementsByName as the name is consistent
+    // [0] gets the first element if multiple exist with the same name
+    var token = await webViewController.evaluateJavascript(source: """
         (function() {
           var inputElement = document.getElementsByName('cf-turnstile-response')[0];
           if (inputElement && inputElement.value) {
@@ -151,28 +146,28 @@ Future<String?> extractFallbackToken(InAppWebViewController webViewController) a
         })();
       """);
 
-      if (token != null && token.isNotEmpty) {
-        debugPrint('>>> Successfully read token from DOM');
-        tokenCompleter.complete(token);
-      } 
-      
-      else {
-        debugPrint('>>> Token input element not found or value is empty in DOM.');
-      }
+    if (token != null && token.isNotEmpty) {
+      debugPrint('>>> Successfully read token from DOM');
+      tokenCompleter.complete(token);
     } 
-    
-    catch (e) {
-      debugPrint('>>> Error reading token from DOM: $e');
-      tokenCompleter.complete();
 
+    else {
+      debugPrint('>>> Token input element not found or value is empty in DOM.');
     }
+  } 
 
-    return tokenCompleter.future;
+  catch (e) {
+    debugPrint('>>> Error reading token from DOM: $e');
+    tokenCompleter.complete();
+
+  }
+
+  return tokenCompleter.future;
 
 
 }
 
-RequestByteInformation extractPictureRequest(Response response,String imageUrl){
+RequestByteInformation extractPictureRequest(Response response, String imageUrl) {
   return RequestByteInformation()
     ..contentLink = imageUrl
     ..fileName = response.headers.value("name")
@@ -187,21 +182,21 @@ RequestByteInformation extractPictureRequest(Response response,String imageUrl){
 
 //  for (InlineSpan span in spans) {
 //    if (span is TextSpan) {
-      
+
 //      if (span.text != null) {
 //        content.write(span.text);
 //      }
-      
+
 //      //递归计算子节点长度
 //      if (span.children != null) {
 //        for (final child in span.children!) {
 //          content.write(extractBBCodeSelectableContent([child]));
 //        }
 //      }
-      
+
 //    } 
 //}
-  
+
 //  return content.toString();
 //}
 

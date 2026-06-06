@@ -22,34 +22,34 @@ class TimelineFlowModel extends ChangeNotifier {
   Future<bool> requestSelectedTimeLineType(
     BangumiSurfTimelineType timelineType,
     {
-	    //bool? isAppend,
-      List<Map<String,dynamic>>? queryParameters,
+      //bool? isAppend,
+      List<Map<String, dynamic>>? queryParameters,
       Function(String message)? fallbackAction,
     }
 
   ) async {
 
-    if(requestTimelineCompleter!=null) return requestTimelineCompleter!.future;
+    if (requestTimelineCompleter != null) return requestTimelineCompleter!.future;
     requestTimelineCompleter = Completer();
 
-    if(queryParameters == null){
-      if(timelineType == BangumiSurfTimelineType.all){
+    if (queryParameters == null) {
+      if (timelineType == BangumiSurfTimelineType.all) {
         timelinesData.clear();
       }
 
-      else{
+      else {
         timelinesData.removeWhere(
-          (currentTimeline)=>currentTimeline.bangumiSurfTimelineType == timelineType
+          (currentTimeline) => currentTimeline.bangumiSurfTimelineType == timelineType
         );
       }
-      
+
     }
 
     //Completer<bool> requestTimelineCompleter = Completer();
 
     late Future<List<Response<dynamic>>> Function() timelineFuture;
 
-    switch(timelineType){
+    switch (timelineType){
       case BangumiSurfTimelineType.all:{
         timelineFuture = () => Future.wait(
           [
@@ -70,21 +70,21 @@ class TimelineFlowModel extends ChangeNotifier {
           ]
         );
       }
-        
+
       //不完整 缺失 Reviews/Blog 但没办法了
       case BangumiSurfTimelineType.subject:{
         timelineFuture = () async {
           final response = await HttpApiClient.client.get(
             BangumiAPIUrls.latestSubjectTopics(),
             queryParameters: queryParameters?.elementAtOrNull(0) ?? BangumiQuerys.topicsQuery
-            
+
           );
 
           return [response];
-        
+
         };
       }
-        
+
       case BangumiSurfTimelineType.group:{
 
         timelineFuture = () async {
@@ -96,9 +96,9 @@ class TimelineFlowModel extends ChangeNotifier {
 
           return [response];
 
-       };
+        };
       }
-        
+
       case BangumiSurfTimelineType.timeline:{
         timelineFuture = () async {
           final response = await HttpApiClient.client.get(
@@ -108,111 +108,120 @@ class TimelineFlowModel extends ChangeNotifier {
           );
 
           return [response];
-        
+
         };
       }
-       
+
     }
 
-    await timelineFuture().then(
-      (response){
+    try{
+      await timelineFuture().then(
+        (response) {
 
-        bool emptyResponseFlag = false;
+          bool emptyResponseFlag = false;
 
-        for(int responseIndex = 0; responseIndex < response.length; responseIndex++){
-          if(response[responseIndex].statusCode == HttpStatus.ok){
+          for (int responseIndex = 0; responseIndex < response.length; responseIndex++){
+            if (response[responseIndex].statusCode == HttpStatus.ok) {
 
-            dynamic extractResponseData = 
-              response[responseIndex].requestOptions.path.contains(BangumiAPIUrls.timeline()) ?
-              response[responseIndex].data :
-              response[responseIndex].data["data"]
-            ;
+              dynamic extractResponseData = 
+                response[responseIndex].requestOptions.path.contains(BangumiAPIUrls.timeline()) ?
+                response[responseIndex].data :
+                response[responseIndex].data["data"]
+              ;
 
-            //数据返回为空——指定的时间线ID返回被服务器清空
-            if(response[responseIndex].data.isEmpty){ 
-              fallbackAction?.call(
-                "请求 ${response[responseIndex].requestOptions.path} 失败" 
-                " ${response[responseIndex].statusCode} ${response[responseIndex].data["message"]}"
-              );
-              emptyResponseFlag = true;
-            }
+              //数据返回为空——指定的时间线ID返回被服务器清空
+              if (response[responseIndex].data.isEmpty) { 
+                fallbackAction?.call(
+                  "请求 ${response[responseIndex].requestOptions.path} 失败" 
+                  " ${response[responseIndex].statusCode} ${response[responseIndex].data["message"]}"
+                );
+                emptyResponseFlag = true;
+              }
 
-
-            timelinesData.addAll(
-              loadSurfTimelineDetails(
-                extractResponseData,
-                bangumiSurfTimelineType: 
+              timelinesData.addAll(
+                loadSurfTimelineDetails(
+                  extractResponseData,
+                  bangumiSurfTimelineType: 
                   timelineType == BangumiSurfTimelineType.all ?
-                  BangumiSurfTimelineType.values[responseIndex+1] :
+                  BangumiSurfTimelineType.values[responseIndex + 1] :
                   timelineType,
 
-              )
-            );
-             
+                )
+              );
+
+            }
+
+            else {
+              requestTimelineCompleter!.complete(false);
+            }
+
           }
 
-          else{
+          if (emptyResponseFlag == true) {
             requestTimelineCompleter!.complete(false);
+            return;
           }
 
-         
-        }
+          notifyListeners();
+          requestTimelineCompleter!.complete(true);
 
-        if(emptyResponseFlag == true){
-          requestTimelineCompleter!.complete(false);
-          return;
-        }
+        });
 
-      notifyListeners();
-      requestTimelineCompleter!.complete(true);
-        
-    });
+    }
+
+    on DioException catch(e){
+      fallbackAction?.call(
+        "请求时间线内容失败 " 
+        "${e.type}"
+      );
+
+      requestTimelineCompleter!.complete(false);
+      return requestTimelineCompleter!.future;
+    }
 
     return requestTimelineCompleter!.future;
-    
+
   }
 
   Future<bool> requestTrendTopicTimeline(
-    {
-      Map<String,dynamic>? queryParameters,
-      Function(String message)? fallbackAction,
-    }
+  {
+    Map<String, dynamic>? queryParameters,
+    Function(String message)? fallbackAction,
+  }
   ) async {
 
-    if(requestTrendTopicTimelineCompleter!=null) return requestTrendTopicTimelineCompleter!.future;
+    if (requestTrendTopicTimelineCompleter != null) return requestTrendTopicTimelineCompleter!.future;
     requestTrendTopicTimelineCompleter = Completer();
 
     try {
       await HttpApiClient.client.get(
         BangumiAPIUrls.trendTopics(),
         queryParameters: queryParameters ?? BangumiQuerys.trendTopicQuery,
-        
-      ).then((response){
 
-        if(response.statusCode == HttpStatus.ok){
+      ).then((response) {
 
-          if(queryParameters == null) trendTimelinesData.clear();
+          if (response.statusCode == HttpStatus.ok) {
 
-          trendTimelinesData.addAll(
-            loadSurfTimelineDetails(
-              response.data["data"],
-              //趋势话题里面都是subjectTopic
-              bangumiSurfTimelineType: BangumiSurfTimelineType.subject
-            )
-          );
+            if (queryParameters == null) trendTimelinesData.clear();
 
-		  requestTrendTopicTimelineCompleter?.complete(true);
-          
+            trendTimelinesData.addAll(
+              loadSurfTimelineDetails(
+                response.data["data"],
+                //趋势话题里面都是subjectTopic
+                bangumiSurfTimelineType: BangumiSurfTimelineType.subject
+              )
+            );
 
-        }
+            requestTrendTopicTimelineCompleter?.complete(true);
 
-        
-      });
+          }
+
+        });
     }
 
     on DioException catch(e){
       debugPrint("[TrendTopics] ${e.response?.statusCode} error:${e.response?.data["message"]}");
-      fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
+      fallbackAction?.call('${e.type} ${e.response?.data["message"]}');
       return false;
     }
 
@@ -224,6 +233,6 @@ class TimelineFlowModel extends ChangeNotifier {
     super.notifyListeners();
   }
 
- 
+
 
 }

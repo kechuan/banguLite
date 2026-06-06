@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
@@ -12,7 +14,7 @@ import 'package:provider/provider.dart';
 
 const connectionTestUrlMap = {
   '网页主站测试': BangumiWebUrls.baseUrl,
-  'API V0 测试': BangumiAPIUrls.baseUrl,
+  'API v0 测试': BangumiAPIUrls.baseUrl,
   'API next 测试': BangumiAPIUrls.newUrl,
   'OAuth登录测试': BangumiWebUrls.oAuth,
   'turnstile回帖验证测试': "${BangumiWebUrls.nextUrl}/p1/turnstile?redirect_uri=bangulite://turnstile/callback",
@@ -63,6 +65,21 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
               child: Column(
                 children: [
 
+                  ListTile(
+                    leading: const Icon(Icons.terminal),
+                    title: const ScalableText('代理设置'),
+                    subtitle: ScalableText('默认直连 保存后生效', style: TextStyle(color: Colors.grey, fontSize: AppFontSize.s14)),
+                    trailing: TextButton(
+                      onPressed: () async {
+
+                        HttpApiClient.currentProxyAddress = httpProxyAdressEditingController.text;
+                        HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting(httpProxyAdressEditingController.text);
+                        context.read<IndexModel>().updateCurrentProxyAddress(HttpApiClient.currentProxyAddress);
+                      },
+                      child: const ScalableText('保存'),
+                    ),
+                  ),
+
                   ValueListenableBuilder(
                     valueListenable: httpProxyAdressEditingController,
                     builder: (_, textContent, child) {
@@ -87,8 +104,6 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                                 children: [
                                   const SizedBox.shrink(),
 
-                                  const ScalableText('代理设置'),
-
                                   Flexible(
                                     child: SizedBox(
                                       height: 50,
@@ -98,7 +113,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                                           scrollPhysics: const ClampingScrollPhysics(),
                                           controller: httpProxyAdressEditingController,
                                           decoration: const InputDecoration(
-                                            hintText: '格式 [IP]:[Port] 默认直连',
+                                            hintText: '格式 [IP]:[Port]',
                                             hintStyle: TextStyle(color: Colors.grey),
                                             border: OutlineInputBorder(),
 
@@ -109,16 +124,6 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                                         ),
                                       ),
                                     ),
-                                  ),
-
-                                  TextButton(
-                                    onPressed: () async {
-
-                                      HttpApiClient.currentProxyAddress = httpProxyAdressEditingController.text;
-                                      HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting(httpProxyAdressEditingController.text);
-                                      context.read<IndexModel>().updateCurrentProxyAddress(HttpApiClient.currentProxyAddress);
-                                    },
-                                    child: const ScalableText('保存'),
                                   ),
 
                                   const SizedBox.shrink(),
@@ -136,7 +141,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                                 Switch(
                                   value: indexModel.userConfig.isImgTagProxy ?? true,
                                   onChanged: (value) {
-                                    indexModel.updateImageTagProxyMode(true);
+                                    indexModel.updateImageTagProxyMode(value);
                                   }
                                 )
                               ],
@@ -149,11 +154,11 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 35),
+                    padding: const EdgeInsets.symmetric(vertical: 25),
                     child: ListTile(
                       leading: const Icon(Icons.wifi),
                       title: const ScalableText('网页与API连通性检查'),
-                      subtitle: ScalableText('代理保存后生效 点击对应项目可以单独测试', style: TextStyle(color: Colors.grey, fontSize: AppFontSize.s14)),
+                      subtitle: ScalableText('点击对应项目可以单独测试', style: TextStyle(color: Colors.grey, fontSize: AppFontSize.s14)),
                       trailing: TextButton(
                         onPressed: () {
                           Future.wait(
@@ -182,13 +187,12 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                       borderRadius: BorderRadius.circular(12),
                       color: judgeCurrentThemeColor(context).withValues(alpha: 0.15),
                     ),
+                    padding: PaddingV6,
                     child: ListView(
                       physics: const NeverScrollableScrollPhysics(),
-                      itemExtent: 55,
+                      itemExtent: kToolbarHeight,
                       shrinkWrap: true,
-                      children:
-
-                      List.generate(
+                      children: List.generate(
                         connectionTestUrlMap.length, (index) {
 
                           return ListTile(
@@ -236,7 +240,12 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
 
                               ],
                             ),
-                            subtitle: Text(connectionTestUrlMap.values.elementAt(index), style: TextStyle(color: Colors.grey, fontSize: AppFontSize.s12),),
+                            subtitle: ScalableText(
+                              connectionTestUrlMap.values.elementAt(index),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: Colors.grey, fontSize: AppFontSize.s12)
+                            ),
                             onTap: () {
 
                               latencyResultNotifierList[index].value = "loading";
@@ -276,12 +285,17 @@ Future<int> checkLatency({String targetUrl = "", String proxyAddress = ""}) asyn
 
     dio.httpClientAdapter = HttpApiClient.configHTTPProxySetting(proxyAddress);
 
-    await dio.head(targetUrl);
+    await dio.head(targetUrl).timeout(const Duration(seconds: 5));
     stopwatch.stop();
     return stopwatch.elapsedMilliseconds;
   } 
 
   on DioException {
+    stopwatch.stop();
+    return -1;
+  }
+
+  on TimeoutException {
     stopwatch.stop();
     return -1;
   }

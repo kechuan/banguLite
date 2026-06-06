@@ -28,7 +28,7 @@ class BangumiWebviewPage extends StatefulWidget {
   final String? title;
 
   final String? injectHTML;
-  
+
   final Function(String?)? onTargetUrlReached;
 
   @override
@@ -36,9 +36,8 @@ class BangumiWebviewPage extends StatefulWidget {
 }
 
 class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
-  
+
   PullToRefreshController? pullToRefreshController;
-  
 
   final urlController = TextEditingController();
   ValueNotifier<double> progressNotifier = ValueNotifier(0.0);
@@ -46,7 +45,7 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
   ValueNotifier<String> currentSurfingTitleNotifier = ValueNotifier("");
 
   int wrongRedirectCount = 0;
-  
+
   @override
   void initState() {
     super.initState();
@@ -54,23 +53,21 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
     currentSurfingTitleNotifier.value = widget.title ?? "";
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-	  final webviewModel = context.read<WebViewModel>();
+    final webviewModel = context.read<WebViewModel>();
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: (){
+          onPressed: () {
             Navigator.of(context).pop();
           }, icon: const Icon(Icons.arrow_back)
         ),
         title: ValueListenableBuilder(
           valueListenable: currentSurfingTitleNotifier,
-          builder: (_,title,__) {
-            return Text(title,style: const TextStyle(fontSize: 16));
+          builder: (_, title, __) {
+            return Text(title, style: const TextStyle(fontSize: 16));
           }
         ),
         //actions: [
@@ -80,28 +77,27 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
         //    onPressed: () {
         //      //取样=>验证
 
-
         //    },
         //  ),
-          
+
         //],
       ),
       body: SafeArea(
-          child: Column(
+        child: Column(
           spacing: 6,
           children: [
 
             ValueListenableBuilder(
               valueListenable: currentSurfingUrlNotifier,
-                builder: (_,surfingUrl,child) {
+              builder: (_, surfingUrl, child) {
                 urlController.text = surfingUrl;
 
-                  return DecoratedBox(
+                return DecoratedBox(
                   decoration: BoxDecoration(
                     border: Border.all(color: judgeCurrentThemeColor(context)),
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  
+
                   child: SizedBox(
                     height: 50,
                     child: TextField(
@@ -111,15 +107,15 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
                       readOnly: true,
                       controller: urlController,
                       keyboardType: TextInputType.url,
-                      
+
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: const Icon(MdiExtendsionIcons.web),
-                    
+
                         suffixIcon: ValueListenableBuilder(
                           valueListenable: progressNotifier,
-                          builder: (_,progress,child) {
-                            
+                          builder: (_, progress, child) {
+
                             if (progress == 0) {
                               return const SizedBox(
                                 height: 20,
@@ -127,154 +123,150 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
                                 child: CircularProgressIndicator(strokeWidth: 3)
                               );
                             }
-                            
+
                             return IconButton(
-                              icon: progress < 1.0 ? const Icon(Icons.close,size: 24,) : const Icon(Icons.refresh,size: 24,),
+                              icon: progress < 1.0 ? const Icon(Icons.close, size: 24,) : const Icon(Icons.refresh, size: 24,),
                               onPressed: () {
-                                if(progress < 1.0){
+                                if (progress < 1.0) {
                                   webviewModel.webViewController?.stopLoading();
                                 }
-                            
-                                else{
+
+                                else {
                                   webviewModel.webViewController?.reload();
                                 }
-                            
+
                                 progressNotifier.value = 0;
-                    
+
                               },
                             );
-                    
+
                           }
                         ),
-                        
+
                       ),
-                      
+
                     ),
                   ),
                 );
-                
-                },
-              
+
+              },
+
             ),
-            
+
             Expanded(
               child: Stack(
-              children: [
-                InAppWebView(
-                  webViewEnvironment: webviewModel.webViewEnvironment,
-                  initialUrlRequest: URLRequest(url: WebUri(currentSurfingUrlNotifier.value)),
-                  initialSettings: InAppWebViewSettings(
-                    isInspectable: kDebugMode,
-                    userAgent: HttpApiClient.broswerHeader["User-Agent"],
-                    useShouldInterceptRequest: true,
-                  ),
-                  pullToRefreshController: pullToRefreshController,
-                  
-                  onTitleChanged: (controller, title) {
-                    currentSurfingTitleNotifier.value = title ?? "";
-                  },
-                  onWebViewCreated: (controller) {
-                    webviewModel.webViewController = controller;
-                  },
-                  onLoadStart: (controller, url){
-                    currentSurfingUrlNotifier.value = url.toString();
-                  },
-                  shouldInterceptRequest: (controller,request){
-                    
-                    if (request.url.toString().contains(BangumiWebUrls.trunstileAuth())) {
-                      debugPrint("shouldInterceptRequest inject succ");
-                      return Future.value(WebResourceResponse(data: utf8.encode(widget.injectHTML!)));
-                    }
-                    
-                    return Future.value(null); // 其他请求正常处理
-                  },
-                  onPermissionRequest: (controller, request) async {
-                    return PermissionResponse(
-                      resources: request.resources,
-                      action: PermissionResponseAction.GRANT);
-                  },
-                  onConsoleMessage:(controller, consoleMessage) {
-                    debugPrint("Console message: ${consoleMessage.message}");
-                  },
-                  //shouldOverrideUrlLoading: (controller, navigationAction) async {
+                children: [
+                  InAppWebView(
+                    webViewEnvironment: webviewModel.webViewEnvironment,
+                    initialUrlRequest: URLRequest(url: WebUri(currentSurfingUrlNotifier.value)),
+                    initialSettings: InAppWebViewSettings(
+                      isInspectable: kDebugMode,
+                      userAgent: HttpApiClient.broswerHeader["User-Agent"],
+                      useShouldInterceptRequest: true,
+                    ),
+                    pullToRefreshController: pullToRefreshController,
 
+                    onTitleChanged: (controller, title) {
+                      currentSurfingTitleNotifier.value = title ?? "";
+                    },
+                    onWebViewCreated: (controller) {
+                      webviewModel.webViewController = controller;
+                    },
+                    onLoadStart: (controller, url) {
+                      currentSurfingUrlNotifier.value = url.toString();
+                    },
+                    shouldInterceptRequest: (controller, request) {
 
-                  //  var uri = navigationAction.request.url!;
+                      if (request.url.toString().contains(BangumiWebUrls.trunstileAuth())) {
+                        debugPrint("shouldInterceptRequest inject succ");
+                        return Future.value(WebResourceResponse(data: utf8.encode(widget.injectHTML!)));
+                      }
 
-                  //  if (!["http","https","file"].contains(uri.scheme)) {
-                  //    if (await canLaunchUrl(uri)) {
-                  //      await launchUrl(uri);
-                  //      return NavigationActionPolicy.CANCEL;
-                  //    }
-                  //  }
+                      return Future.value(null); // 其他请求正常处理
+                    },
+                    onPermissionRequest: (controller, request) async {
+                      return PermissionResponse(
+                        resources: request.resources,
+                        action: PermissionResponseAction.GRANT);
+                    },
+                    onConsoleMessage: (controller, consoleMessage) {
+                      debugPrint("Console message: ${consoleMessage.message}");
+                    },
+                    //shouldOverrideUrlLoading: (controller, navigationAction) async {
 
-                  //  return NavigationActionPolicy.ALLOW;
-                  //},
+                    //  var uri = navigationAction.request.url!;
 
-                  onReceivedError: (controller, request, error) {
-                    //fallbackAction may deal with Indicates that the connection was stopped.
+                    //  if (!["http","https","file"].contains(uri.scheme)) {
+                    //    if (await canLaunchUrl(uri)) {
+                    //      await launchUrl(uri);
+                    //      return NavigationActionPolicy.CANCEL;
+                    //    }
+                    //  }
 
-                    if(widget.url.contains(BangumiWebUrls.trunstileAuth())){
-                      debugPrint("error:${error.description}");
+                    //  return NavigationActionPolicy.ALLOW;
+                    //},
 
-                      invokePop() => Navigator.of(context).pop();
+                    onReceivedError: (controller, request, error) {
+                      //fallbackAction may deal with Indicates that the connection was stopped.
 
-                      Future.delayed(const Duration(seconds: 5), (){
+                      if (widget.url.contains(BangumiWebUrls.trunstileAuth())) {
+                        debugPrint("error:${error.description}");
 
-                        extractFallbackToken(controller).then((result){
-                          if(result != null){
-                            AccountModel.loginedUserInformations.turnsTileToken = result;
-                            invokePop();
-                            controller.dispose();
-                            
-                          }
+                        invokePop() => Navigator.of(context).pop();
 
-                          else{
-                            if(wrongRedirectCount == 3){ 
+                        Future.delayed(const Duration(seconds: 5), () {
+
+                          extractFallbackToken(controller).then((result) {
+                            if (result != null) {
+                              AccountModel.loginedUserInformations.turnsTileToken = result;
                               invokePop();
                               controller.dispose();
+
                             }
 
-                            controller.reload();
-                            wrongRedirectCount+=1;
-                          }
-                          
-                            
+                            else {
+                              if (wrongRedirectCount == 3) { 
+                                invokePop();
+                                controller.dispose();
+                              }
+
+                              controller.reload();
+                              wrongRedirectCount += 1;
+                            }
+
+                          });
+
                         });
+                      }
 
-                          
+                    },
+                    onProgressChanged: (controller, progress) {
+                      if (progress == 100) {
+                        pullToRefreshController?.endRefreshing();
+                      }
+                      progressNotifier.value = progress / 100;
 
-                      });
+                    },
+
+                  ),
+
+                  ValueListenableBuilder(
+                    valueListenable: progressNotifier,
+                    builder: (_, progress, child) {
+                      return progress < 1.0
+                        ? LinearProgressIndicator(value: progress)
+                        : Container();
                     }
-                    
-                  },
-                  onProgressChanged: (controller, progress) {
-                    if (progress == 100) {
-                      pullToRefreshController?.endRefreshing();
-                    }
-                    progressNotifier.value = progress / 100;
+                  )
 
-                  },
-
-                ),
-
-                ValueListenableBuilder(
-                  valueListenable: progressNotifier,
-                  builder: (_,progress,child){
-                    return progress < 1.0
-                    ? LinearProgressIndicator(value: progress)
-                    : Container();
-                  }
-                )
-                  
                 ],
               ),
             ),
-            
+
           ]
         )
       )
-	);
+    );
   }
 }
 
@@ -296,14 +288,14 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
 //				}
 
 //				return false;
-				
+
 //			}
 //		);
 
 //	});
 
 //	return cookieValue;
-						
+
 //}
 
 

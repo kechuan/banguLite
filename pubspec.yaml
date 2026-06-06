@@ -41,6 +41,9 @@ dependencies:
   animations: ^2.1.1
   flutter_cache_manager: ^3.4.1
   http: ^1.6.0
+  #zikzak_inappwebview: ^4.3.1
+  #zikzak_inappwebview_windows: ^4.3.1
+
   
 
 dev_dependencies:
@@ -52,9 +55,10 @@ dev_dependencies:
   hive_ce_generator: ^1.11.0
   flutter_launcher_icons: ^0.14.1
   analyzer: ^9.0.0
+  win_plugin_link_repair: ^0.1.1
 
-dependency_overrides:
-  path_provider_android: 2.2.23
+#dependency_overrides:
+#  path_provider_android: 2.2.23
 
 flutter:
   uses-material-design: true

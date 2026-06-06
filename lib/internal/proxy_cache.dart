@@ -13,24 +13,23 @@ class ProxyCacheManager extends CacheManager with ImageCacheManager {
 
   static String currentProxyAddress = '';
 
-
   @override
   ProxyCacheManager._(String proxyAddress) : super(
       proxyAddress.isEmpty
-          ? Config(key)
-          : Config(key, fileService: HttpFileService(
-              httpClient: buildProxyClient(proxyAddress),
-            )),
+        ? Config(key)
+        : Config(key, fileService: HttpFileService(
+          httpClient: buildProxyClient(proxyAddress),
+        )),
     );
 
   factory ProxyCacheManager({String proxyAddress = ''}) {
-  if (_instance == null || currentProxyAddress != proxyAddress) {
-    _instance?.emptyCache(); // 可选：切换代理时清缓存
-    _instance = ProxyCacheManager._(proxyAddress);
-    currentProxyAddress = proxyAddress;
+    if (_instance == null || currentProxyAddress != proxyAddress) {
+      //_instance?.emptyCache(); // 可选：切换代理时清缓存
+      _instance = ProxyCacheManager._(proxyAddress);
+      currentProxyAddress = proxyAddress;
+    }
+    return _instance!;
   }
-  return _instance!;
-}
 
   static http.Client buildProxyClient(String proxyAddress) {
     final ioClient = HttpClient();

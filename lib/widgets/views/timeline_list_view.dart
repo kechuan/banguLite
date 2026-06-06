@@ -8,6 +8,7 @@ import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -72,9 +73,9 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
             bangumiSurfTimelineType: widget.currentTimelineSurfType
           )
             .toList()
-            ..sort(
-              (prev, next) => next.updatedAt?.compareTo(prev.updatedAt ?? 0) ?? 0
-            );
+          ..sort(
+            (prev, next) => next.updatedAt?.compareTo(prev.updatedAt ?? 0) ?? 0
+          );
 
           return Padding(
             padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 20),
@@ -84,7 +85,7 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
               // 高度不固定 必须使用shrinkWrap
               // 这里是滚动区域 并不强制需要约束 并不用搞什么约束传给内部
               itemBuilder: (_, index) {
-            
+
                 if (currentTimelineTypeDetails.isEmpty) {
                   return const SizedBox(
                     height: 400,
@@ -92,13 +93,13 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
                       child: Text("¯\\_(ツ)_/¯"),
                     ),
                   );
-            
+
                 }
-            
+
                 if (index >= currentTimelineTypeDetails.length) {
                   return const SizedBox();
                 }
-            
+
                 return Container(
                   padding: PaddingH12,
                   color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
@@ -107,7 +108,7 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
                     child: const BangumiTimelineTile(),
                   )
                 );
-            
+
               }
             ),
           );
@@ -148,8 +149,8 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
 
     final latestSelectedSurfTypeTimeline = 
       selectedSurfTypeTimelines.isEmpty ? 
-        null :
-        selectedSurfTypeTimelines.reduce((prev, next) => (prev.updatedAt ?? 0) > (next.updatedAt ?? 0) ? prev : next)
+      null :
+      selectedSurfTypeTimelines.reduce((prev, next) => (prev.updatedAt ?? 0) > (next.updatedAt ?? 0) ? prev : next)
     ;
 
     if (isAppend == true) {
@@ -212,22 +213,23 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
     await timelineFlowModel.requestSelectedTimeLineType(
       widget.currentTimelineSurfType,
       //isAppend: isAppend,
-      queryParameters: queryParameters
+      queryParameters: queryParameters,
+      fallbackAction: (message) => showRequestSnackBar(message: message, requestStatus: false),
     ).then((result) {
-          if (result) {
-            double recordOffset = scrollController.offset;
+        if (result) {
+          double recordOffset = scrollController.offset;
 
-            if (recordOffset != 0) {
-              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                  scrollController.animateTo(recordOffset + 3 * kToolbarHeight, duration: const Duration(milliseconds: 300), curve: Curves.ease);
-                });
-            }
-
-            refreshNotifier.value += 1;
-
+          if (recordOffset != 0) {
+            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+              scrollController.animateTo(recordOffset + 3 * kToolbarHeight, duration: const Duration(milliseconds: 300), curve: Curves.ease);
+            });
           }
 
-        });
+          refreshNotifier.value += 1;
+
+        }
+
+      });
 
   }
 

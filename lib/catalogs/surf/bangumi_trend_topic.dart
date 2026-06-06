@@ -1,10 +1,11 @@
-import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
@@ -45,23 +46,22 @@ class _BangumiTrendTopicState extends State<BangumiTrendTopic> {
                 controller: scrollController,
                 itemCount: 
                 timelineFlowModel.trendTimelinesData.isEmpty ? 
-                  1 :
-                  timelineFlowModel.trendTimelinesData.length,
-                  shrinkWrap: true,
+                1 :
+                timelineFlowModel.trendTimelinesData.length,
+                shrinkWrap: true,
                 itemBuilder: (_, index) {
-              
-                  if (timelineFlowModel.trendTimelinesData.isEmpty){
+
+                  if (timelineFlowModel.trendTimelinesData.isEmpty) {
                     return const SizedBox(
                       height: 400,
                       child: Center(child: Text("¯\\_(ツ)_/¯"))
                     );
                   }
-              
-                  
+
                   if (index >= timelineFlowModel.trendTimelinesData.length) {
                     return const SizedBox();
                   }
-              
+
                   return Container(
                     padding: PaddingH12,
                     color: index % 2 == 0 ? null : Colors.grey.withValues(alpha: 0.3),
@@ -70,7 +70,7 @@ class _BangumiTrendTopicState extends State<BangumiTrendTopic> {
                       child: const BangumiTimelineTile(),
                     )
                   );
-              
+
                 }
               ),
             );
@@ -89,33 +89,37 @@ class _BangumiTrendTopicState extends State<BangumiTrendTopic> {
     final timelineFlowModel = context.read<TimelineFlowModel>();
     timelineFlowModel.requestTrendTopicTimelineCompleter = null;
 
-    invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
+    //invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
 
     Map<String, dynamic> queryParameters = 
       isAppend == true ?
-        (BangumiQuerys.trendTopicQuery..["offset"] = timelineFlowModel.trendTimelinesData.length) :
-        BangumiQuerys.trendTopicQuery 
+      (BangumiQuerys.trendTopicQuery..["offset"] = timelineFlowModel.trendTimelinesData.length) :
+      BangumiQuerys.trendTopicQuery 
     ;
 
     await timelineFlowModel.requestTrendTopicTimeline(
       queryParameters: queryParameters,
-      fallbackAction: (message) => invokeToaster(message: message),
+      fallbackAction: (message) => showRequestSnackBar(
+        requestStatus: false,
+        message: message,
+        backgroundColor: judgeCurrentThemeColor(context)
+      ),
     ).then((result) {
-          if (result) {
+        if (result) {
 
-            double recordOffset = scrollController.offset;
+          double recordOffset = scrollController.offset;
 
-            if (recordOffset != 0) {
-              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                  scrollController.animateTo(recordOffset + 3 * kToolbarHeight, duration: const Duration(milliseconds: 300), curve: Curves.ease);
-                });
-            }
-
-            refreshNotifier.value += 1;
-
+          if (recordOffset != 0) {
+            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+              scrollController.animateTo(recordOffset + 3 * kToolbarHeight, duration: const Duration(milliseconds: 300), curve: Curves.ease);
+            });
           }
 
-        });
+          refreshNotifier.value += 1;
+
+        }
+
+      });
 
   }
 }
