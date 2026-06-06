@@ -25,42 +25,48 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
       ..isFollowThemeColor = fields[6] as bool?
       ..isManuallyImageLoad = fields[7] as bool?
       ..isUpdateAlert = fields[8] as bool?
-      ..isPureDarkMode = fields[9] as bool?;
+      ..isPureDarkMode = fields[9] as bool?
+      ..currentProxyAddress = fields[10] as String?
+      ..isImgTagProxy = fields[12] as bool?;
   }
 
   @override
   void write(BinaryWriter writer, AppConfig obj) {
     writer
-      ..writeByte(9)
-      ..writeByte(0)
-      ..write(obj.currentThemeColor)
-      ..writeByte(1)
-      ..write(obj.fontScale)
-      ..writeByte(2)
-      ..write(obj.themeMode)
-      ..writeByte(3)
-      ..write(obj.customColor)
-      ..writeByte(5)
-      ..write(obj.isSelectedCustomColor)
-      ..writeByte(6)
-      ..write(obj.isFollowThemeColor)
-      ..writeByte(7)
-      ..write(obj.isManuallyImageLoad)
-      ..writeByte(8)
-      ..write(obj.isUpdateAlert)
-      ..writeByte(9)
-      ..write(obj.isPureDarkMode);
+    ..writeByte(11)
+    ..writeByte(0)
+    ..write(obj.currentThemeColor)
+    ..writeByte(1)
+    ..write(obj.fontScale)
+    ..writeByte(2)
+    ..write(obj.themeMode)
+    ..writeByte(3)
+    ..write(obj.customColor)
+    ..writeByte(5)
+    ..write(obj.isSelectedCustomColor)
+    ..writeByte(6)
+    ..write(obj.isFollowThemeColor)
+    ..writeByte(7)
+    ..write(obj.isManuallyImageLoad)
+    ..writeByte(8)
+    ..write(obj.isUpdateAlert)
+    ..writeByte(9)
+    ..write(obj.isPureDarkMode)
+    ..writeByte(10)
+    ..write(obj.currentProxyAddress)
+    ..writeByte(12)
+    ..write(obj.isImgTagProxy);
   }
 
   @override
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AppConfigAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator==(Object other) =>
+  identical(this, other) ||
+    other is AppConfigAdapter &&
+      runtimeType == other.runtimeType &&
+      typeId == other.typeId;
 }
 
 class AppThemeColorAdapter extends TypeAdapter<AppThemeColor> {
@@ -101,11 +107,11 @@ class AppThemeColorAdapter extends TypeAdapter<AppThemeColor> {
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AppThemeColorAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator==(Object other) =>
+  identical(this, other) ||
+    other is AppThemeColorAdapter &&
+      runtimeType == other.runtimeType &&
+      typeId == other.typeId;
 }
 
 class ThemeModeAdapter extends TypeAdapter<ThemeMode> {
@@ -142,11 +148,11 @@ class ThemeModeAdapter extends TypeAdapter<ThemeMode> {
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ThemeModeAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator==(Object other) =>
+  identical(this, other) ||
+    other is ThemeModeAdapter &&
+      runtimeType == other.runtimeType &&
+      typeId == other.typeId;
 }
 
 class ScaleTypeAdapter extends TypeAdapter<ScaleType> {
@@ -191,11 +197,11 @@ class ScaleTypeAdapter extends TypeAdapter<ScaleType> {
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ScaleTypeAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator==(Object other) =>
+  identical(this, other) ||
+    other is ScaleTypeAdapter &&
+      runtimeType == other.runtimeType &&
+      typeId == other.typeId;
 }
 
 class ColorAdapter extends TypeAdapter<Color> {
@@ -216,20 +222,20 @@ class ColorAdapter extends TypeAdapter<Color> {
   @override
   void write(BinaryWriter writer, Color obj) {
     writer
-      ..writeByte(1)
-      ..writeByte(0)
-      ..write(obj.toARGB32());
+    ..writeByte(1)
+    ..writeByte(0)
+    ..write(obj.toARGB32());
   }
 
   @override
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ColorAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator==(Object other) =>
+  identical(this, other) ||
+    other is ColorAdapter &&
+      runtimeType == other.runtimeType &&
+      typeId == other.typeId;
 }
 
 class StarBangumiDetailsAdapter extends TypeAdapter<StarBangumiDetails> {
@@ -258,42 +264,42 @@ class StarBangumiDetailsAdapter extends TypeAdapter<StarBangumiDetails> {
   @override
   void write(BinaryWriter writer, StarBangumiDetails obj) {
     writer
-      ..writeByte(10)
-      ..writeByte(0)
-      ..write(obj.name)
-      ..writeByte(1)
-      ..write(obj.coverUrl)
-      ..writeByte(2)
-      ..write(obj.eps)
-      ..writeByte(3)
-      ..write(obj.score)
-      ..writeByte(4)
-      ..write(obj.airDate)
-      ..writeByte(5)
-      ..write(obj.airWeekday)
-      ..writeByte(7)
-      ..write(obj.bangumiID)
-      ..writeByte(8)
-      ..write(obj.joinDate)
-      ..writeByte(9)
-      ..write(obj.finishedDate)
-      ..writeByte(10)
-      ..write(obj.rank);
+    ..writeByte(10)
+    ..writeByte(0)
+    ..write(obj.name)
+    ..writeByte(1)
+    ..write(obj.coverUrl)
+    ..writeByte(2)
+    ..write(obj.eps)
+    ..writeByte(3)
+    ..write(obj.score)
+    ..writeByte(4)
+    ..write(obj.airDate)
+    ..writeByte(5)
+    ..write(obj.airWeekday)
+    ..writeByte(7)
+    ..write(obj.bangumiID)
+    ..writeByte(8)
+    ..write(obj.joinDate)
+    ..writeByte(9)
+    ..write(obj.finishedDate)
+    ..writeByte(10)
+    ..write(obj.rank);
   }
 
   @override
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is StarBangumiDetailsAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator==(Object other) =>
+  identical(this, other) ||
+    other is StarBangumiDetailsAdapter &&
+      runtimeType == other.runtimeType &&
+      typeId == other.typeId;
 }
 
 class LoginedUserInformationsAdapter
-    extends TypeAdapter<LoginedUserInformations> {
+  extends TypeAdapter<LoginedUserInformations> {
   @override
   final typeId = 7;
 
@@ -314,28 +320,28 @@ class LoginedUserInformationsAdapter
   @override
   void write(BinaryWriter writer, LoginedUserInformations obj) {
     writer
-      ..writeByte(5)
-      ..writeByte(0)
-      ..write(obj.accessToken)
-      ..writeByte(9)
-      ..write(obj.expiredTime)
-      ..writeByte(10)
-      ..write(obj.refreshToken)
-      ..writeByte(12)
-      ..write(obj.userInformation)
-      ..writeByte(13)
-      ..write(obj.turnsTileToken);
+    ..writeByte(5)
+    ..writeByte(0)
+    ..write(obj.accessToken)
+    ..writeByte(9)
+    ..write(obj.expiredTime)
+    ..writeByte(10)
+    ..write(obj.refreshToken)
+    ..writeByte(12)
+    ..write(obj.userInformation)
+    ..writeByte(13)
+    ..write(obj.turnsTileToken);
   }
 
   @override
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is LoginedUserInformationsAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator==(Object other) =>
+  identical(this, other) ||
+    other is LoginedUserInformationsAdapter &&
+      runtimeType == other.runtimeType &&
+      typeId == other.typeId;
 }
 
 class UserInformationAdapter extends TypeAdapter<UserInformation> {
@@ -362,32 +368,32 @@ class UserInformationAdapter extends TypeAdapter<UserInformation> {
   @override
   void write(BinaryWriter writer, UserInformation obj) {
     writer
-      ..writeByte(7)
-      ..writeByte(0)
-      ..write(obj.userID)
-      ..writeByte(1)
-      ..write(obj.userName)
-      ..writeByte(2)
-      ..write(obj.nickName)
-      ..writeByte(3)
-      ..write(obj.avatarUrl)
-      ..writeByte(4)
-      ..write(obj.sign)
-      ..writeByte(5)
-      ..write(obj.joinedAtTimeStamp)
-      ..writeByte(6)
-      ..write(obj.group);
+    ..writeByte(7)
+    ..writeByte(0)
+    ..write(obj.userID)
+    ..writeByte(1)
+    ..write(obj.userName)
+    ..writeByte(2)
+    ..write(obj.nickName)
+    ..writeByte(3)
+    ..write(obj.avatarUrl)
+    ..writeByte(4)
+    ..write(obj.sign)
+    ..writeByte(5)
+    ..write(obj.joinedAtTimeStamp)
+    ..writeByte(6)
+    ..write(obj.group);
   }
 
   @override
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is UserInformationAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator==(Object other) =>
+  identical(this, other) ||
+    other is UserInformationAdapter &&
+      runtimeType == other.runtimeType &&
+      typeId == other.typeId;
 }
 
 class SurfTimelineDetailsAdapter extends TypeAdapter<SurfTimelineDetails> {
@@ -415,34 +421,34 @@ class SurfTimelineDetailsAdapter extends TypeAdapter<SurfTimelineDetails> {
   @override
   void write(BinaryWriter writer, SurfTimelineDetails obj) {
     writer
-      ..writeByte(8)
-      ..writeByte(0)
-      ..write(obj.commentDetails)
-      ..writeByte(1)
-      ..write(obj.title)
-      ..writeByte(2)
-      ..write(obj.bangumiSurfTimelineType)
-      ..writeByte(3)
-      ..write(obj.sourceTitle)
-      ..writeByte(4)
-      ..write(obj.sourceID)
-      ..writeByte(5)
-      ..write(obj.replies)
-      ..writeByte(6)
-      ..write(obj.updatedAt)
-      ..writeByte(7)
-      ..write(obj.detailID);
+    ..writeByte(8)
+    ..writeByte(0)
+    ..write(obj.commentDetails)
+    ..writeByte(1)
+    ..write(obj.title)
+    ..writeByte(2)
+    ..write(obj.bangumiSurfTimelineType)
+    ..writeByte(3)
+    ..write(obj.sourceTitle)
+    ..writeByte(4)
+    ..write(obj.sourceID)
+    ..writeByte(5)
+    ..write(obj.replies)
+    ..writeByte(6)
+    ..write(obj.updatedAt)
+    ..writeByte(7)
+    ..write(obj.detailID);
   }
 
   @override
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SurfTimelineDetailsAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator==(Object other) =>
+  identical(this, other) ||
+    other is SurfTimelineDetailsAdapter &&
+      runtimeType == other.runtimeType &&
+      typeId == other.typeId;
 }
 
 class CommentDetailsAdapter extends TypeAdapter<CommentDetails> {
@@ -465,44 +471,44 @@ class CommentDetailsAdapter extends TypeAdapter<CommentDetails> {
       ..comment = fields[5] as String?
       ..commentTimeStamp = (fields[6] as num?)?.toInt()
       ..commentReactions = (fields[7] as Map?)?.map((dynamic k, dynamic v) =>
-          MapEntry((k as num).toInt(), (v as Set).cast<String>()));
+      MapEntry((k as num).toInt(), (v as Set).cast<String>()));
   }
 
   @override
   void write(BinaryWriter writer, CommentDetails obj) {
     writer
-      ..writeByte(8)
-      ..writeByte(0)
-      ..write(obj.rate)
-      ..writeByte(1)
-      ..write(obj.type)
-      ..writeByte(2)
-      ..write(obj.contentID)
-      ..writeByte(3)
-      ..write(obj.commentID)
-      ..writeByte(4)
-      ..write(obj.userInformation)
-      ..writeByte(5)
-      ..write(obj.comment)
-      ..writeByte(6)
-      ..write(obj.commentTimeStamp)
-      ..writeByte(7)
-      ..write(obj.commentReactions);
+    ..writeByte(8)
+    ..writeByte(0)
+    ..write(obj.rate)
+    ..writeByte(1)
+    ..write(obj.type)
+    ..writeByte(2)
+    ..write(obj.contentID)
+    ..writeByte(3)
+    ..write(obj.commentID)
+    ..writeByte(4)
+    ..write(obj.userInformation)
+    ..writeByte(5)
+    ..write(obj.comment)
+    ..writeByte(6)
+    ..write(obj.commentTimeStamp)
+    ..writeByte(7)
+    ..write(obj.commentReactions);
   }
 
   @override
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CommentDetailsAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator==(Object other) =>
+  identical(this, other) ||
+    other is CommentDetailsAdapter &&
+      runtimeType == other.runtimeType &&
+      typeId == other.typeId;
 }
 
 class BangumiSurfTimelineTypeAdapter
-    extends TypeAdapter<BangumiSurfTimelineType> {
+  extends TypeAdapter<BangumiSurfTimelineType> {
   @override
   final typeId = 12;
 
@@ -540,11 +546,11 @@ class BangumiSurfTimelineTypeAdapter
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is BangumiSurfTimelineTypeAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator==(Object other) =>
+  identical(this, other) ||
+    other is BangumiSurfTimelineTypeAdapter &&
+      runtimeType == other.runtimeType &&
+      typeId == other.typeId;
 }
 
 class StarTypeAdapter extends TypeAdapter<StarType> {
@@ -593,9 +599,9 @@ class StarTypeAdapter extends TypeAdapter<StarType> {
   int get hashCode => typeId.hashCode;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is StarTypeAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  bool operator==(Object other) =>
+  identical(this, other) ||
+    other is StarTypeAdapter &&
+      runtimeType == other.runtimeType &&
+      typeId == other.typeId;
 }

@@ -105,7 +105,8 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
         titleEditingController.text.isEmpty && contentEditingController.text.isEmpty || 
         (titleEditingController.text,contentEditingController.text) == widget.preservationContent
       ) {
-          Navigator.of(context).pop();
+
+        Navigator.of(context).pop();
       }
 
       else {
@@ -113,6 +114,8 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
         showDraftContentPreserveDialog(
           context,
           widget.replyID ?? widget.contentID ?? 0,
+          title: titleEditingController.text.isEmpty ? null : titleEditingController.text,
+          content: contentEditingController.text
         );
       }
     }
@@ -131,8 +134,11 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
         return PopScope(
           canPop: false,
-          onPopInvokedWithResult: (_, __){
-            popInterceptionCallback();
+          onPopInvokedWithResult: (didPop, __){
+            if(didPop) return;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              popInterceptionCallback();
+            });
           },
           child: Scaffold(
               appBar: AppBar(
@@ -181,8 +187,14 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                   fadeToaster(context: context, message: '不允许发布空白内容');
                                   return;
                                 }
+
+
+                                
+                                  Navigator.of(context).pop((titleEditingController.text,contentEditingController.text));
+                                
+                                
           
-                                Navigator.of(context).pop((titleEditingController.text,contentEditingController.text));
+                                
           
                               }
           
@@ -192,8 +204,12 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                   fadeToaster(context: context, message: '不允许发布空白内容');
                                   return;
                                 }
+
                                 
-                                Navigator.of(context).pop(contentEditingController.text);
+                                  Navigator.of(context).pop(contentEditingController.text);
+                                
+                                
+                                
           
                               }
           

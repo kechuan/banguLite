@@ -79,7 +79,7 @@ Future<dynamic> generalRequest(
   }
 
   on DioException catch (e){
-    debugPrint('[generalRequest - ${userContentActionType?.name}]: request error: $e');
+    debugPrint('[generalRequest - $requestUrl]: request error: $e');
 
     if(e.response?.statusCode == BangumiResponseStatusCode.unauthorized.code){
       generalFallbackAction?.call('${e.response?.statusCode} 登录会话已过期 请重新登录',generalCompleter);

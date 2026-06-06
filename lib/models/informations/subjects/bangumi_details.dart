@@ -355,23 +355,30 @@ Future<Map<int,Map<String,num>>> loadStarsDetail(Iterable<int> starsIDList) asyn
       }
   };
 
+  try {
+    await Future.wait(
+      List.generate(
+        starsIDList.length,
+        (index) async {
+          await HttpApiClient.client.get("${BangumiAPIUrls.subject}/${starsIDList.elementAt(index)}").then((response){
+            final ratingList = loadDetailsData(response.data).ratingList;
 
-  await Future.wait(
-    List.generate(
-      starsIDList.length,
-      (index) async {
-        await HttpApiClient.client.get("${BangumiAPIUrls.subject}/${starsIDList.elementAt(index)}").then((response){
-          final ratingList = loadDetailsData(response.data).ratingList;
+            resultRating.values.elementAt(index)["score"] = ratingList["score"];
+            resultRating.values.elementAt(index)["rank"] = ratingList["rank"];
 
-          resultRating.values.elementAt(index)["score"] = ratingList["score"];
-          resultRating.values.elementAt(index)["rank"] = ratingList["rank"];
-
-          completeFlag -= 1;
-          if(completeFlag==0) starUpdateCompleter.complete(resultRating);
-        });
-      }
+            completeFlag -= 1;
+            if(completeFlag==0) starUpdateCompleter.complete(resultRating);
+          });
+        }
       )
-  );
+    );
+  }
+
+  on DioException catch(e){
+    debugPrint("[Error]: ${e.message}");
+    return {};
+  }
+
 
   return starUpdateCompleter.future;
 

@@ -4,7 +4,6 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/test_page.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -37,8 +36,9 @@ class SettingsPage extends StatelessWidget {
     const List<Widget> behaviourConfigList = [
       CommentImageLoadModeTile(),
 	    ImageStorageManageTile(),
-      UpdateAlertToggleTile(),
       ClearCacheTile(),
+      NetWorkConfigTile(),
+      UpdateAlertToggleTile(),
       AboutTile(),
       if(kDebugMode) TestTile()
     ];
@@ -384,7 +384,7 @@ class ColorThemeTile extends ListTile{
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("番剧详细页是否跟随主题色"),
+                const Text("番剧详细页跟随主题色"),
                 Switch(
                   value: followStatus ?? false, 
                   onChanged: (value){
@@ -502,7 +502,7 @@ class CommentImageLoadModeTile extends ListTile{
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const ScalableText("评论区是否手动加载图片"),
+                    const ScalableText("评论区手动加载图片"),
                     Switch(
                       value: manualStatus ?? true, 
                       onChanged: (value) => indexModel.updateCommentImageLoadMode(value)
@@ -605,7 +605,7 @@ class UpdateAlertToggleTile extends ListTile{
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const ScalableText("是否在启动后弹出更新通知"),
+                    const ScalableText("启动时检查更新"),
                     Switch(
                       value: manualStatus ?? true, 
                       onChanged: (value) => indexModel.updateUpdateAlertMode(value)
@@ -787,7 +787,6 @@ class TestTile extends ListTile{
               onTap: (){
                 debugPrint("${MyHive.appConfigDataBase.get("currentTheme")}");
                 //openAction();
-                downloadSticker2();
               },
               title: ScalableText("测试触发工具",style: TextStyle(fontSize: AppFontSize.s16))
             ),
@@ -800,6 +799,30 @@ class TestTile extends ListTile{
     }
 
 }
+
+class NetWorkConfigTile extends ListTile{
+  const NetWorkConfigTile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    
+    return SizedBox(
+      height: 80,
+      child: Center(
+        child: ListTile(
+          onTap: (){
+            Navigator.pushNamed(context, Routes.networkConfig);
+            
+          },
+          title: ScalableText("代理配置与连通性测试",style: TextStyle(fontSize: AppFontSize.s16))
+        ),
+      ),
+    );
+
+    }
+
+}
+
 
 void saveImageFile(DocumentFile? targetWriteDocument,DocumentFile? selectedDocFile) async {
 

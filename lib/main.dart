@@ -30,9 +30,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await listenAPPLink();
 
-  HttpApiClient.init();
-
   await MyHive.init();
+
+
+  HttpApiClient.init(
+    stroageProxyAddress: MyHive.appConfigDataBase.get('currentTheme')?.currentProxyAddress ?? ''
+  );
 
   if (Platform.isAndroid) {
     SystemChrome.setEnabledSystemUIMode(

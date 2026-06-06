@@ -1,9 +1,13 @@
 
+import 'dart:io';
+
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
+import 'package:flutter/cupertino.dart';
 
 
 
@@ -13,34 +17,68 @@ class HttpApiClient{
     connectTimeout: const Duration(seconds: 5),
   );
 
-  static Map<String,String> broswerHeader = {
+  static Map<String, String> broswerHeader = {
     "User-Agent":'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0',
   };
 
-  static Map<String,String> nonWebviewHeader = {
+  static Map<String, String> nonWebviewHeader = {
     "User-Agent":'Mozilla/5.0 (Linux; Android 13; 23049RAD8C Build/TKQ1.221114.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/128.0.6613.146 Mobile Safari/537.36'
   };
 
-  static void init(){
+  static void init({String stroageProxyAddress = ""}) {
     HttpApiClient.clientOption.baseUrl = BangumiAPIUrls.baseUrl;
     HttpApiClient.clientOption.headers = HttpApiClient.broswerHeader;
     HttpApiClient.client.options = HttpApiClient.clientOption;
+
+    currentProxyAddress = stroageProxyAddress;
+
+    HttpApiClient.client.httpClientAdapter = configHTTPProxySetting(currentProxyAddress);
   }
 
+  static String currentProxyAddress = '';
+
+  static IOHttpClientAdapter configHTTPProxySetting(String proxyAddress) {
+
+    if (proxyAddress.isEmpty) {
+      return IOHttpClientAdapter();
+    }
+
+    else {
+
+      return IOHttpClientAdapter(
+        createHttpClient: () {
+          final client = HttpClient();
+          client.badCertificateCallback = (cert, host, port) => true;
+          client.findProxy = (uri) {
+            debugPrint('[Proxy] $uri => $proxyAddress');
+            return 'PROXY $proxyAddress';
+          };
+          return client;
+        },
+      );
+    }
+
+  }
 
 
 
 }
 
-class BangumiAPIUrls {
 
+
+
+
+
+
+
+
+class BangumiAPIUrls {
 
   static Options bangumiAccessOption() => Options(
     headers: AccountModel.loginedUserInformations.accessToken != null ?
     BangumiQuerys.bearerTokenAccessQuery(AccountModel.loginedUserInformations.accessToken) :
     null
   );
-
 
   static const String baseUrl = "https://api.bgm.tv";
   static const String newUrl = "https://next.bgm.tv/p1";
@@ -79,19 +117,16 @@ class BangumiAPIUrls {
   static String groupPosts() => '${groups()}/-/posts';
 
   static String groupsTopics() => '${groups()}/-/topics';
-  
 
   static String relations(int subjectID) => '${subjects()}/$subjectID/relations';
   static String reviews(int subjectID) => '${subjects()}/$subjectID/reviews';
 
-
   static String groupTopics(String groupName) => '${groups()}/$groupName/topics';
   static String groupTopic(int groupTopicID) => '${groupsTopics()}/$groupTopicID';
 
-
   static String ep(int epID) => '${episodes()}/$epID';
   static String topic(int subjectID) => '${subjects()}/$subjectID/topics';
-  
+
   static String subjectComment(int subjectID) => '${subjects()}/$subjectID/comments';
   static String epComment(int epID) => '${episodes()}/$epID/comments';
   static String topicComment(int topicID) => '${topics()}/$topicID';
@@ -112,12 +147,11 @@ class BangumiAPIUrls {
   static String clearNotify = '$newUrl/clear-notify';
 
   static String user(String username) => '$newUrl/users/$username';
-  static String userSubjectComment(String username,int subjectID) => '$baseUrl/v0/users/$username/collections/$subjectID';
+  static String userSubjectComment(String username, int subjectID) => '$baseUrl/v0/users/$username/collections/$subjectID';
 
   static String userBlog(int blogID) => '${blogs()}/$blogID';
   static String userTimeline(String username) => '${user(username)}/timeline';
-  
-  
+
   static String blogComment(int blogID) => '${userBlog(blogID)}/comments';
   static String blogPhotos(int blogID) => '${userBlog(blogID)}/photos';
 
@@ -128,12 +162,12 @@ class BangumiAPIUrls {
   static String removeFriend(String username) => '$newUrl/friends/$username';
 
   //comment-action put/delete 目前发评论 仅支持EP/topic内容
-  
+
   /// 行为允许 POST blog目前API没有
   /// /p1/subjects/-/topics/{topicID}
 
   static String postEpComment(int epID) => epComment(epID);
-  
+
   static String postTopic(int subjectID) => topic(subjectID);
   static String postTopicComment(int topicID) => '${topicComment(topicID)}/replies';
 
@@ -144,8 +178,7 @@ class BangumiAPIUrls {
 
   static String postTimeline() => timeline();
   static String postTimelineComment(int timelineID) => '${timeline()}/$timelineID/replies';
-  
-  
+
   /// 行为允许 PUT/PATCH
   static String actionSubjectComment(int subjectID) => '$newUrl/collections/subjects/$subjectID';
 
@@ -158,15 +191,14 @@ class BangumiAPIUrls {
   /// 但实际上首楼也有自己的postID 且也能透过这种方式更改内容 这就使得用楼主的API的意义实际上并不是很大
   static String actionGroupTopicComment(int postID) => groupTopicComment(postID);
   static String actionTopicComment(int commentID) => '${subjectPosts()}/$commentID';
-  
+
   ///这个不允许GET
   static String actionBlogComment(int commentID) => '${blogs()}/-/comments/$commentID';
 
-
   /// 行为允许 PUT/DELETE
-  
+
   //static String toggleSubjectCommentLike(int commentID) => '${actionSubjectComment(commentID)}/like';
-  static String toggleSubjectCommentLike(int commentID) => '${subjects()}/-/collects/$commentID/like';  
+  static String toggleSubjectCommentLike(int commentID) => '${subjects()}/-/collects/$commentID/like';
   static String toggleEPCommentLike(int commentID) => '${actionEpComment(commentID)}/like';
   static String toggleTopicLike(int commentID) => '${actionTopicComment(commentID)}/like';
   static String toggleGroupTopicLike(int commentID) => '${actionGroupTopicComment(commentID)}/like';
@@ -174,7 +206,6 @@ class BangumiAPIUrls {
 
   ///[POST]
   static String report() => '$newUrl/report';
-
 
   //other
   static String imgurl(String imageSuffix) => '$baseResourceUrl/pic/photo/l/$imageSuffix';
@@ -187,7 +218,7 @@ class BangumiAPIUrls {
   ) => '$baseResourceUrl/r/${width}x$height/$imagePath';
 
 
-  
+
 }
 
 class BangumiWebUrls{
@@ -207,14 +238,13 @@ class BangumiWebUrls{
 
   //附带: https://bangumi.tv/index/77285/comments#post_86407
   static String indexComment(int indexID) => '$baseUrl/index/$indexID/comments';
-  
 
   static String ep(int epID) => '$baseUrl/ep/$epID';
   static String user(String username) => '$baseUrl/user/$username';
   static String userTimeline(String username) => '${user(username)}/timeline';
 
   ///relationsUser 只是一个摆设 实际上只要 timelineID 正确就行...
-  static String timelineReplies(String relationsUser,int timelineID) => '${userTimeline(relationsUser)}/status/$timelineID';
+  static String timelineReplies(String relationsUser, int timelineID) => '${userTimeline(relationsUser)}/status/$timelineID';
 
   //接受数字ID 与 name 作为参数
   static String group(dynamic groupName) => '$baseUrl/group/$groupName';
@@ -235,21 +265,19 @@ class BangumiWebUrls{
 
   static String person(int personID) => '$baseUrl/person/$personID';
   static String character(int characterID) => '$baseUrl/character/$characterID';
-  
 
   //Auth Area
 
-  static String webAuthPage(){
-    final entries =  BangumiQuerys.authorizationQuery().entries;
-        
+  static String webAuthPage() {
+    final entries = BangumiQuerys.authorizationQuery().entries;
+
     final authParams = 
-      entries.map((entry) =>'${entry.key}=${entry.value}')
-      .toList()
-      .join('&');
+      entries.map((entry) => '${entry.key}=${entry.value}')
+        .toList()
+        .join('&');
 
     return '${BangumiWebUrls.oAuth}?$authParams';
   }
-
 
   static const String oAuth = '$relativeUrl/oauth/authorize';
   static const String oAuthToken = '$relativeUrl/oauth/access_token';
@@ -260,103 +288,97 @@ class BangumiWebUrls{
 
 class BangumiQuerys {
 
-	static Map<String,String> authorizationQuery() => {
-		"client_id":APPInformationRepository.bangumiAPPID,
-		"response_type":"code",
-		"chii_referer":APPInformationRepository.bangumiOAuthCallbackUri.toString(),
-		"client_secret":APPInformationRepository.bangumiAPPSecret,
-	};
+  static Map<String, String> authorizationQuery() => {
+    "client_id":APPInformationRepository.bangumiAPPID,
+    "response_type":"code",
+    "chii_referer":APPInformationRepository.bangumiOAuthCallbackUri.toString(),
+    "client_secret":APPInformationRepository.bangumiAPPSecret,
+  };
 
-  static Map<String,String> getAccessTokenQuery(
-		String code,
-	) => {
-		"grant_type":'authorization_code',
-		"client_id":APPInformationRepository.bangumiAPPID,
-		"client_secret":APPInformationRepository.bangumiAPPSecret,
-		"code":code,
-		"redirect_uri":'banguLite://oauth/bgm_login?client_id=${APPInformationRepository.bangumiAPPID}',
-		"accept": "application/json"
-	};
+  static Map<String, String> getAccessTokenQuery(
+    String code,
+  ) => {
+    "grant_type":'authorization_code',
+    "client_id":APPInformationRepository.bangumiAPPID,
+    "client_secret":APPInformationRepository.bangumiAPPSecret,
+    "code":code,
+    "redirect_uri":'banguLite://oauth/bgm_login?client_id=${APPInformationRepository.bangumiAPPID}',
+    "accept": "application/json"
+  };
 
-	static Map<String,String> bearerTokenAccessQuery(String? accessToken) => {
-		"Authorization": 'Bearer $accessToken',
-		"accept": "application/json"
-	};
+  static Map<String, String> bearerTokenAccessQuery(String? accessToken) => {
+    "Authorization": 'Bearer $accessToken',
+    "accept": "application/json"
+  };
 
-	static Map<String,String> refreshTokenQuery(String refreshToken) => {
-		"grant_type": 'refresh_token',
-		"client_id":APPInformationRepository.bangumiAPPID,
-		"client_secret":APPInformationRepository.bangumiAPPSecret,
-		"refresh_token":refreshToken,
-		"redirect_uri":'banguLite://oauth/bgm_login?client_id=${APPInformationRepository.bangumiAPPID}',
-		
-		
-		"accept": "application/json",
-	};
+  static Map<String, String> refreshTokenQuery(String refreshToken) => {
+    "grant_type": 'refresh_token',
+    "client_id":APPInformationRepository.bangumiAPPID,
+    "client_secret":APPInformationRepository.bangumiAPPSecret,
+    "refresh_token":refreshToken,
+    "redirect_uri":'banguLite://oauth/bgm_login?client_id=${APPInformationRepository.bangumiAPPID}',
 
-	static Map<String,dynamic> searchQuery = {
-		"type":2,
-		"responseGroup":"small",
-		"start":0,
-		"max_results":10
-	};
+    "accept": "application/json",
+  };
 
-  
+  static Map<String, dynamic> searchQuery = {
+    "type":2,
+    "responseGroup":"small",
+    "start":0,
+    "max_results":10
+  };
 
-  static Map<String,dynamic> groupsQuery({
+  static Map<String, dynamic> groupsQuery({
     String? modeName,
     String? sort,
-		int? limit,
-		int? offset
+    int? limit,
+    int? offset
   }) => {
-		"mode": modeName ?? "all",
-		"limit": limit ?? 20,
-		"offset": offset ?? 0,
+    "mode": modeName ?? "all",
+    "limit": limit ?? 20,
+    "offset": offset ?? 0,
     "sort": sort ?? "members"
-	};
-  
-    // posts/topics/members/created/updated
-    
-  
+  };
 
-  static Map<String,dynamic> groupsTopicsQuery({
-		BangumiSurfGroupType? mode,
-		int? limit,
-		int? offset
-	}) => {
-		"mode": mode?.name ?? "all",
-		"limit": limit ?? 20,
-		"offset": offset ?? 0
-	};
+  // posts/topics/members/created/updated
 
+  static Map<String, dynamic> groupsTopicsQuery({
+    BangumiSurfGroupType? mode,
+    int? limit,
+    int? offset
+  }) => {
+    "mode": mode?.name ?? "all",
+    "limit": limit ?? 20,
+    "offset": offset ?? 0
+  };
 
-  static Map<String,dynamic> notificationsQuery({
-		int? limit,
-		//bool? unread,
-	}) => {
-		"limit": limit ?? 20,
-		//"unread": unread
-	};
+  static Map<String, dynamic> notificationsQuery({
+    int? limit,
+    //bool? unread,
+  }) => {
+    "limit": limit ?? 20,
+    //"unread": unread
+  };
 
-  static Map<String,dynamic> clearNotificationsQuery({
-		List<int>? notificationIDList
-	}) => {
-		"id": notificationIDList ?? []
-	};
+  static Map<String, dynamic> clearNotificationsQuery({
+    List<int>? notificationIDList
+  }) => {
+    "id": notificationIDList ?? []
+  };
 
   //until 字段 timelineID count Down 如目标为 998 那么 就要从 999 开始搜寻
-  static Map<String,dynamic> timelineQuery({
+  static Map<String, dynamic> timelineQuery({
     int? limit,
     int? until,
     BangumiTimelineSortType? mode
   }) {
 
-    Map<String,dynamic> defaultQuery = {
+    Map<String, dynamic> defaultQuery = {
       "limit":limit ?? 20,
       "mode": mode ?? "all",
     };
 
-    if(mode != null){
+    if (mode != null) {
       defaultQuery["mode"] = mode.name;
     }
 
@@ -364,32 +386,30 @@ class BangumiQuerys {
 
   }
 
-  
+  static Map<String, int> commentAccessQuery = {"limit":10,"offset":0},
+  sortQuery = {"limit":10,"offset":0},
+  topicsQuery = {"limit":30,"offset":0},
+  epQuery = {"subject_id":0,"limit":100,"offset":0},
+  relationsQuery = {"type":2,"limit":20,"offset":0},
+  reviewsQuery = {"limit":20,"offset":0},
+  groupTopicQuery = {"limit":20,"offset":0},
+  trendTopicQuery = {"limit":20,"offset":0}
 
-  static Map<String,int>  commentAccessQuery = {"limit":10,"offset":0},
-                          sortQuery = {"limit":10,"offset":0},
-                          topicsQuery = {"limit":30,"offset":0},
-                          epQuery = {"subject_id":0,"limit":100,"offset":0},
-                          relationsQuery = {"type":2,"limit":20,"offset":0},
-                          reviewsQuery = {"limit":20,"offset":0},
-                          groupTopicQuery = {"limit":20,"offset":0},
-                          trendTopicQuery = {"limit":20,"offset":0}
-                          
   ;
-                             
 
-  
+
+
 }
 
 class BangumiDatas {
 
-  static Map<String,dynamic> subjectCommentData({
+  static Map<String, dynamic> subjectCommentData({
     String? content,
     int rate = 0,
     StarType starType = StarType.want,
     bool isPrivate = false,
     List<String>? tagList
-  }){
+  }) {
     return {
       "comment": "$content",
       "type": starType.starTypeIndex,
@@ -400,42 +420,42 @@ class BangumiDatas {
     };
   }
 
-  static Map<String,dynamic> postContentData({
-		String? content,
-		String? title,
-		String? turnstileToken
-	}) => {
-		"title": title,
-		"content": content,
-		"turnstileToken": turnstileToken
-	};
+  static Map<String, dynamic> postContentData({
+    String? content,
+    String? title,
+    String? turnstileToken
+  }) => {
+    "title": title,
+    "content": content,
+    "turnstileToken": turnstileToken
+  };
 
-  static Map<String,dynamic> replyContentData({
-		String? content,
-		int? replyTo,
-		String? turnstileToken,
-	}) => {
-		"content": content,
-		"replyTo": replyTo,
-		"turnstileToken": turnstileToken
-	};
+  static Map<String, dynamic> replyContentData({
+    String? content,
+    int? replyTo,
+    String? turnstileToken,
+  }) => {
+    "content": content,
+    "replyTo": replyTo,
+    "turnstileToken": turnstileToken
+  };
 
-  static Map<String,dynamic> editContentData({
-		String? title,
-		String? content,
-	}) => {
-		"title": title ?? "",
-		"content": content,
-	};
+  static Map<String, dynamic> editContentData({
+    String? title,
+    String? content,
+  }) => {
+    "title": title ?? "",
+    "content": content,
+  };
 
   ///Detail: [ReportSubjectType]/[ReportReasonType]
-  static Map<String,dynamic> reportData(
-    {
-      required int reportID,
-      required int reportType,
-      required int reportValue,
-      String? comment
-    }
+  static Map<String, dynamic> reportData(
+  {
+    required int reportID,
+    required int reportType,
+    required int reportValue,
+    String? comment
+  }
   ) {
     return {
       "id":reportID,
@@ -445,17 +465,15 @@ class BangumiDatas {
     };
   }
 
-
-
-  static Map<String,dynamic> get sortData => {
+  static Map<String, dynamic> get sortData => {
     "keyword": '',
     "sort": 'rank',
     "filter": {
       "type": [2],
       "tag": [],
       "rank": [">2", "<=99999"],
-      "air_date": [">=${DateTime.now().year}-01-01","<${DateTime.now().toString().substring(0,10)}"],
-      "rating": [">=5","<9"],
+      "air_date": [">=${DateTime.now().year}-01-01", "<${DateTime.now().toString().substring(0, 10)}"],
+      "rating": [">=5", "<9"],
       "nsfw": false,
     }
   };
@@ -464,10 +482,10 @@ class BangumiDatas {
 
 class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
-                      projectName = "banguLite",
-                      packageName = "io.flutter.banguLite",
-                      version = "0.11.4",
-                      author = "kechuan"
+  projectName = "banguLite",
+  packageName = "io.flutter.banguLite",
+  version = "0.12.0",
+  author = "kechuan"
   ;
 
   //纯本地应用  
@@ -485,49 +503,49 @@ class APPInformationRepository{
 
 
 void downloadSticker({bool isOldType = true}) async {
-  
-  if(isOldType){
-      String authorPath = "";
 
-      await Future.wait(
-        List.generate(
-          126, (index){
+  if (isOldType) {
+    String authorPath = "";
 
-            if(index == 0) return Future((){});
+    await Future.wait(
+      List.generate(
+        126, (index) {
 
-            String suffix = "gif"; 
-            
-            if(index < 24){
-              authorPath = "01-23 dsm";
-              suffix = "png";
-              if(index == 11 || index == 23) suffix = "gif";
-            }
+          if (index == 0) return Future(()  {});
 
-            authorPath = "24-125 Cinnamor";
+          String suffix = "gif"; 
 
-            return HttpApiClient.client.download(
-              "https://bgm.tv/img/smiles/${index > 23 ? "tv" : "bgm"}/${convertDigitNumString(index > 23 ? index-23 : index)}.$suffix",
-              './assets/bangumiSticker/$authorPath/bgm${convertDigitNumString(index)}.gif',
-            );
-          
+          if (index < 24) {
+            authorPath = "01-23 dsm";
+            suffix = "png";
+            if (index == 11 || index == 23) suffix = "gif";
           }
-        )
-      );
+
+          authorPath = "24-125 Cinnamor";
+
+          return HttpApiClient.client.download(
+            "https://bgm.tv/img/smiles/${index > 23 ? "tv" : "bgm"}/${convertDigitNumString(index > 23 ? index - 23 : index)}.$suffix",
+            './assets/bangumiSticker/$authorPath/bgm${convertDigitNumString(index)}.gif',
+          );
+
+        }
+      )
+    );
 
   }
 
-  else{
+  else {
     await Future.wait(
-        List.generate(
-          39, (index){
-            return HttpApiClient.client.download(
-              "https://bgm.tv/img/smiles/tv_vs/bgm_${convertDigitNumString(index+200)}.png",
-              './assets/bangumiSticker/200-238 神戶小鳥/bgm${convertDigitNumString(index+200)}.gif',
-            );
-          
-          }
-        )
-      );
+      List.generate(
+        39, (index) {
+          return HttpApiClient.client.download(
+            "https://bgm.tv/img/smiles/tv_vs/bgm_${convertDigitNumString(index + 200)}.png",
+            './assets/bangumiSticker/200-238 神戶小鳥/bgm${convertDigitNumString(index + 200)}.gif',
+          );
+
+        }
+      )
+    );
   }
 
 }
@@ -535,24 +553,23 @@ void downloadSticker({bool isOldType = true}) async {
 
 void downloadSticker2({bool pinkVersion = true}) async {
 
-      String typePath = pinkVersion ? "musume" : "blake";
+  String typePath = pinkVersion ? "musume" : "blake";
 
-      String outputPath = pinkVersion ? "Bangumi娘 貓魚" : "Blake娘 貓魚";
+  String outputPath = pinkVersion ? "Bangumi娘 貓魚" : "Blake娘 貓魚";
 
-  
-      await Future.wait(
-          List.generate(
-            97, (index){
-              if(index == 96 && pinkVersion == true) return Future((){});
+  await Future.wait(
+    List.generate(
+      97, (index) {
+        if (index == 96 && pinkVersion == true) return Future(()  {});
 
-              return HttpApiClient.client.download(
-                "https://lain.bgm.tv/img/smiles/$typePath/${typePath}_${convertDigitNumString(index+1)}.gif",
-                './assets/bangumiSticker/$outputPath/${typePath}_${convertDigitNumString(index+1)}.gif',
-              );
-            
-            }
-          )
-      );
-  
+        return HttpApiClient.client.download(
+          "https://lain.bgm.tv/img/smiles/$typePath/${typePath}_${convertDigitNumString(index + 1)}.gif",
+          './assets/bangumiSticker/$outputPath/${typePath}_${convertDigitNumString(index + 1)}.gif',
+        );
+
+      }
+    )
+  );
+
 
 }

@@ -239,7 +239,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
                                     'contentID':widget.commentData.commentID,
                                     'postCommentType':widget.postCommentType,
                                     'title': '编辑这段评论',
-                                    'preservationContent': ("",widget.commentData.comment)
+                                    'preservationContent': indexModel.draftContent[widget.commentData.commentID] ?? ("", widget.commentData.comment),
                                 }
                             ).then((content) async{
                                 if (content is String) {

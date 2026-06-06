@@ -39,6 +39,8 @@ dependencies:
   docman: ^1.2.0
   waterfall_flow: ^3.1.1
   animations: ^2.1.1
+  flutter_cache_manager: ^3.4.1
+  http: ^1.6.0
   
 
 dev_dependencies:

@@ -24,6 +24,7 @@ import 'package:flutter/widgets.dart';
 import '../catalogs/about_page.dart';
 import '../catalogs/index/bangumi_index_page.dart';
 import '../catalogs/index/settings_page.dart';
+import '../catalogs/network_config_page.dart';
 import '../catalogs/subject/bangumi_blog_page.dart';
 import '../catalogs/subject/bangumi_comment_page.dart';
 import '../catalogs/subject/bangumi_detail_page.dart';
@@ -407,6 +408,16 @@ FFRouteSettings getRouteSettings({
         name: name,
         arguments: arguments,
         builder: () => AboutPage(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
+        ),
+      );
+    case 'networkConfig':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => NetworkConfigPage(
           key: asT<Key?>(
             safeArguments['key'],
           ),

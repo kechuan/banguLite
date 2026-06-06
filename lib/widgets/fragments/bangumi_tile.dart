@@ -174,7 +174,7 @@ class BangumiGridTile extends StatelessWidget {
   Widget build(BuildContext context) {
 
     //需要排序变动 必须watch
-    final BangumiDetails bangumiDetails = context.read<BangumiDetails>();
+    final BangumiDetails bangumiDetails = context.watch<BangumiDetails>();
     final void Function()? onTap = context.read<BangumiGridTileConfig>().onTap;
 
     return GridTile(

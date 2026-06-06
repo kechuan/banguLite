@@ -5,6 +5,7 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/internal/proxy_cache.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
@@ -502,6 +503,7 @@ abstract class BangumiContentPageState<
               child: CachedNetworkImage(
                 imageUrl: getTrailingPhotosUri()![index],
                 httpHeaders: HttpApiClient.broswerHeader,
+                cacheManager: ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress),
               ),
             );
           }

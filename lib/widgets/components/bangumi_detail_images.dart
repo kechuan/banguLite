@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/proxy_cache.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -38,6 +40,7 @@ class BuildDetailImages extends StatelessWidget {
 
       CachedNetworkImage(
         imageUrl: detailImageUrl!,
+        cacheManager: ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress),
         imageBuilder: (_,imageProvider){
       
           if(bangumiModel.imageColor==null){

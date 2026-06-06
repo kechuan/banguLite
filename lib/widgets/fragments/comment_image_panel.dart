@@ -1,5 +1,6 @@
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/proxy_cache.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/request_task_information.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
@@ -18,7 +19,7 @@ const excludeImageFormatted = [
 ];
 
 class CommentImagePanel extends StatefulWidget {
-  
+
   const CommentImagePanel({
     super.key,
     required this.imageUrl,
@@ -44,23 +45,23 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
     loadInformationFuture ??= loadByteInformation(widget.imageUrl);
 
     RequestByteInformation? pictureRequestInformation;
-    
+
     return FutureBuilder(
       future: loadInformationFuture,
-      builder: (_,snapshot) {
+      builder: (_, snapshot) {
 
-        switch(snapshot.connectionState){
+        switch (snapshot.connectionState){
 
           case ConnectionState.done:{
 
             pictureRequestInformation = snapshot.data;
 
-             bool isValid = 
+            bool isValid = 
               pictureRequestInformation?.contentLength != null ||
-              excludeImageFormatted.contains(pictureRequestInformation?.contentType?.split("/")[1]) == true
+                excludeImageFormatted.contains(pictureRequestInformation?.contentType?.split("/")[1]) == true
             ;
 
-            if(isValid && indexModel.userConfig.isManuallyImageLoad == false){
+            if (isValid && indexModel.userConfig.isManuallyImageLoad == false) {
               debugPrint("loadStatus: ${indexModel.userConfig.isManuallyImageLoad}");
               imageLoadNotifier.value = true;
             }
@@ -69,8 +70,8 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
               shadowColor: Colors.white,
               elevation: 6,
               child: UnVisibleResponse(
-                onTap: (){
-                  if(!isValid){
+                onTap: () {
+                  if (!isValid) {
                     //Navigator.pushNamed(
                     //  context,
                     //  Routes.webview,
@@ -83,21 +84,21 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                     );
                   }
 
-                  else{
+                  else {
                     imageLoadNotifier.value = true;
                   }
-                  
+
                 },
                 child: ValueListenableBuilder(
                   valueListenable: imageLoadNotifier,
-                  builder: (_,imageLoadNotifier,child) {
-              
-                    if(imageLoadNotifier == false){
+                  builder: (_, imageLoadNotifier, child) {
+
+                    if (imageLoadNotifier == false) {
                       return SizedBox(
                         height: 200,
                         width: 200,
                         child: Column(
-                          
+
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Spacer(),
@@ -118,12 +119,12 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                               child: Column(
                                 spacing: 12,
                                 children: [
-                                  const ScalableText("点击跳转以查看图片",style: TextStyle(fontWeight: FontWeight.bold)),
-                                  ScalableText("link: ${widget.imageUrl}",maxLines: 3,overflow: TextOverflow.ellipsis,textAlign: TextAlign.center,),
+                                  const ScalableText("点击跳转以查看图片", style: TextStyle(fontWeight: FontWeight.bold)),
+                                  ScalableText("link: ${widget.imageUrl}", maxLines: 3, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center,),
                                 ],
                               ),
-                            ): const SizedBox.shrink(),
-                            
+                            ) : const SizedBox.shrink(),
+
                             isValid ? Padding(
                               padding: PaddingV6,
                               child: Column(
@@ -134,7 +135,7 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                                 ],
                               ),
                             ) : const SizedBox.shrink()
-                            
+
                           ],
                         ),
                       );
@@ -142,24 +143,28 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
 
                     debugPrint("imageLink: ${pictureRequestInformation?.contentLink}");
 
-                    
-
                     return CachedNetworkImage(
                       //imageUrl: convertProxyImageUri(widget.imageUrl),
                       imageUrl: pictureRequestInformation?.contentLink ?? widget.imageUrl,
                       httpHeaders: HttpApiClient.broswerHeader,
-                      
-                      progressIndicatorBuilder: (context, url, progress){ 
-          
+                      cacheManager: ProxyCacheManager(
+                        proxyAddress: 
+                        indexModel.userConfig.isImgTagProxy == true ? 
+                        indexModel.userConfig.currentProxyAddress ?? "" : 
+                        ''
+                      ),
+
+                      progressIndicatorBuilder: (context, url, progress) { 
+
                         return LoadingCard(
-                          progress: "${((progress.progress ?? 0.0)*100).toStringAsFixed(2)}%",
+                          progress: "${((progress.progress ?? 0.0) * 100).toStringAsFixed(2)}%",
                         );
 
                       },
                       imageBuilder: (_, imageProvider) {
                         return UnVisibleResponse(
-                          onTap: (){
-                              Navigator.pushNamed(
+                          onTap: () {
+                            Navigator.pushNamed(
                               context,
                               Routes.photoView,
                               arguments: {"imageProvider":imageProvider},
@@ -169,7 +174,7 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                         );
                       },
                     );
-                    
+
                   }
                 ),
               ),
@@ -178,7 +183,7 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
           }
 
           default: {}
-            
+
         }
 
         return const LoadingCard();
@@ -205,13 +210,13 @@ class LoadingCard extends StatelessWidget {
         child: Column(
           spacing: 16,
           mainAxisAlignment: MainAxisAlignment.center,
-      
+
           children: [
-      
+
             const CircularProgressIndicator(),
-      
+
             ScalableText(progress ?? ""),
-      
+
           ],
         ),
       ),

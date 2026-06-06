@@ -1,4 +1,6 @@
 import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/proxy_cache.dart';
+import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -96,6 +98,7 @@ class StickerSelectView extends StatelessWidget {
                                             onTap: () => insertBgmSticker(stickerOffset + index,isMusume:isMusume),
                                             child: CachedNetworkImage(
                                               imageUrl: convertBangumiNetworkGirlStickerPath(stickerOffset + index,pinkVersion: isMusume),
+                                              cacheManager: ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress),
                                               progressIndicatorBuilder: (context, url, progress) => Transform.scale(
                                                 scale: 0.4,
                                                 child: CircularProgressIndicator(

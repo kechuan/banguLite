@@ -5,6 +5,8 @@ on:
   push:
     tags:
       - '*.*.*'
+      - 'beta-*'
+	  
 
 jobs:
   # 1. Windows 构建 Job (基于您的现有逻辑)
@@ -130,6 +132,7 @@ jobs:
       - name: Upload Release Asset (Android APK)
         uses: softprops/action-gh-release@v2
         with:
+          prerelease: ${{ contains(github.ref_name, 'beta') }}
           tag_name: ${{ github.ref_name }} 
           # 上传 asset 到已创建的 Release
           files: build/app/outputs/apk/production/release/*.apk

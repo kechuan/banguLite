@@ -114,15 +114,22 @@ class EpModel extends ChangeNotifier{
 
           debugPrint("currentEpsData Length:${epsData.length}");
 
+          
+
           getEpsInformationCompleter?.complete();
+          getEpsInformationCompleter = null;
 
           notifyListeners(); //完成
+
+
+          
 
         }
 
         else{
           debugPrint("getEpsInformation Error: ${response.statusCode} ${response.statusMessage}");
           getEpsInformationCompleter?.complete();
+          getEpsInformationCompleter = null;
         }
 
 

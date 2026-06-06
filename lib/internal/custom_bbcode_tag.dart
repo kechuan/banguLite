@@ -470,6 +470,8 @@ class BangumiNetStickerTag extends AdvancedTag{
           child: CachedNetworkImage(
               imageUrl:element.textContent,
               scale: 3,
+              //预留位
+              cacheManager: null,
           ),
         );
 

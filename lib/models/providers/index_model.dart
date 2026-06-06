@@ -16,11 +16,10 @@ class IndexModel extends ChangeNotifier {
     initModel();
   }
 
-
   DateTime dataTime = DateTime.now();
   int selectedYear = DateTime.now().year;
   int selectedWeekDay = DateTime.now().weekday;
-  SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month,currentTime:true);
+  SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month, currentTime: true);
 
   int starUpdateFlag = 0;
 
@@ -28,26 +27,26 @@ class IndexModel extends ChangeNotifier {
 
   //除了 星期一-日之外 还有一个 最热门 的属性存放评分7.0+的番剧
   Map<String, List<BangumiDetails>> calendarBangumis = {
-    for(var weekday in WeekDay.values) '星期${weekday.dayText}' : [],
+    for (var weekday in WeekDay.values) '星期${weekday.dayText}' : [],
     "最热门":[],
   }; 
 
   AppConfig userConfig = defaultAPPConfig();
-  
-  Map<int,Map<String,num>> starsUpdateRating = {};
+
+  Map<int, Map<String, num>> starsUpdateRating = {};
 
   // 草稿箱 [标题:内容]
   // 当然标题不一定会存在 如果不存在直接置为空就好
-  
+
   //理论上这样做的话 会有发布内容会被互相覆盖的问题
   //但我不应该响应这种情况 毕竟是DAU没两位数的项目
   //试试Record吧。。
-  final Map<dynamic,(String,String)> draftContent = {};
+  final Map<dynamic, (String,String)> draftContent = {};
 
   //用于在视觉上覆盖用户原本的评论
   Map<int, String> userCommentMap = {};
 
-  void updateUserCommentMap(int postID,String comment){
+  void updateUserCommentMap(int postID, String comment) {
     userCommentMap = {
       ...userCommentMap
       ..[postID] = comment
@@ -63,23 +62,23 @@ class IndexModel extends ChangeNotifier {
     await updateStarDetail();
   }
 
-  void loadConfigData(){
+  void loadConfigData() {
     userConfig = MyHive.appConfigDataBase.get("currentTheme") ?? defaultAPPConfig();
   }
 
-  void updateThemeMode(ThemeMode mode,{bool? config}) {
+  void updateThemeMode(ThemeMode mode, {bool? config}) {
     userConfig.themeMode = mode;
     notifyListeners();
-    if(config == true) updateConfig();    
+    if (config == true) updateConfig();    
   }
 
-  void updateThemeColor(AppThemeColor themeColor){
+  void updateThemeColor(AppThemeColor themeColor) {
     userConfig.currentThemeColor = themeColor;
-	  userConfig.isSelectedCustomColor = false;
+    userConfig.isSelectedCustomColor = false;
     updateConfig();
   }
 
-  void updateCustomColor(Color customColor){
+  void updateCustomColor(Color customColor) {
     userConfig.customColor = customColor;
     userConfig.isSelectedCustomColor = true;
     updateConfig();
@@ -91,23 +90,33 @@ class IndexModel extends ChangeNotifier {
     updateConfig();
   }
 
-  void updateFollowThemeColor(bool detailfollowStatus){
+  void updateFollowThemeColor(bool detailfollowStatus) {
     userConfig.isFollowThemeColor = detailfollowStatus;
     updateConfig();
   }
 
-  void updateCommentImageLoadMode(bool imageLoadMode){
+  void updateCommentImageLoadMode(bool imageLoadMode) {
     userConfig.isManuallyImageLoad = imageLoadMode;
     updateConfig();
   }
 
-  void updateUpdateAlertMode(bool alertMode){
+  void updateUpdateAlertMode(bool alertMode) {
     userConfig.isUpdateAlert = alertMode;
     updateConfig();
   }
 
-  void updatePureDarkMode(bool darkMode){
+  void updatePureDarkMode(bool darkMode) {
     userConfig.isPureDarkMode = darkMode;
+    updateConfig();
+  }
+
+  void updateCurrentProxyAddress(String proxyAddress) {
+    userConfig.currentProxyAddress = proxyAddress;
+    updateConfig();
+  }
+
+  void updateImageTagProxyMode(bool isImageTagProxy) {
+    userConfig.isImgTagProxy = isImageTagProxy;
     updateConfig();
   }
 
@@ -116,28 +125,25 @@ class IndexModel extends ChangeNotifier {
   Future<void> updateStarDetail() async {
     Set<int> starsList = {};
 
-	  if(MyHive.starBangumisDataBase.keys.isEmpty) return;
-
+    if (MyHive.starBangumisDataBase.keys.isEmpty) return;
 
     starsList.addAll(
       MyHive.starBangumisDataBase.values.where(
-        (bangumiData){
-          if(
-            bangumiData.rank == 0 || 
+        (bangumiData) {
+          if (
+          bangumiData.rank == 0 || 
             bangumiData.score == 0.0
-          ){
-             return true;
+          ) {
+            return true;
           }
 
           DateTime finishedTime = convertDateTime(bangumiData.finishedDate);
-          if(DateTime.now().compareTo(finishedTime) < 0) return true;
+          if (DateTime.now().compareTo(finishedTime) < 0) return true;
           return false;
         }
-      ).map((e)=>e.bangumiID!).toList()
+      ).map((e) => e.bangumiID!).toList()
     );
-    
 
-    
     starsUpdateRating = await compute(
       loadStarsDetail,
       starsList
@@ -147,14 +153,14 @@ class IndexModel extends ChangeNotifier {
 
   }
 
-  void resetConfig(){
+  void resetConfig() {
     MyHive.appConfigDataBase.clear();
     userConfig = defaultAPPConfig();
     AppFontSize.scale = ScaleType.medium;
     notifyListeners();
   }
 
-  void updateConfig(){
+  void updateConfig() {
     MyHive.appConfigDataBase.put("currentTheme", userConfig);
     notifyListeners();
   }
@@ -164,35 +170,34 @@ class IndexModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> reloadCalendar({Future<List<BangumiDetails>> Function()? switchCalendar}){
+  Future<void> reloadCalendar({Future<List<BangumiDetails>> Function()? switchCalendar}) {
     loadFuture = null;
-    return loadCalendar(switchCalendar:switchCalendar);
+    return loadCalendar(switchCalendar: switchCalendar);
   }
 
   Future<void> loadCalendar({Future<List<BangumiDetails>> Function()? switchCalendar}) async {
 
-    if(loadFuture!=null) return loadFuture!.future;
+    if (loadFuture != null) return loadFuture!.future;
 
     Completer loadCompleter = Completer();
 
     debugPrint("timestamp: ${DateTime.now()} calendar start");
     loadFuture = loadCompleter;
 
-    if(switchCalendar!=null){
+    if (switchCalendar != null) {
 
-      await switchCalendar().then((detailsList){
+      await switchCalendar().then((detailsList) {
         debugPrint("timestamp: ${DateTime.now()} calendar get");
         calendarBangumis = searchDataAdapter(detailsList);
       });
 
-
     }
 
-    else{
+    else {
 
-      await HttpApiClient.client.get(BangumiAPIUrls.calendar).then((response){
+      await HttpApiClient.client.get(BangumiAPIUrls.calendar).then((response) {
         debugPrint("timestamp: ${DateTime.now()} calendar get");
-        calendarBangumis = loadCalendarData(response,animeFilter: true);
+        calendarBangumis = loadCalendarData(response, animeFilter: true);
       });
 
     }
@@ -208,15 +213,13 @@ class IndexModel extends ChangeNotifier {
 
   }
 
-  
-
-  void updateSelectedWeekDay(int newWeekDay){
+  void updateSelectedWeekDay(int newWeekDay) {
     selectedWeekDay = newWeekDay;
     notifyListeners();
   }
 
-  void updateStar(){
-    starUpdateFlag+=1;
+  void updateStar() {
+    starUpdateFlag += 1;
     notifyListeners();
   }
 
@@ -232,7 +235,7 @@ class AppFontSize {
   static double get s12 => 12 * scale.fontScale;
   static double getScaledSize(double fontSize) => fontSize * scale.fontScale;
 
-  static void init(){
+  static void init() {
     //Hive 存放
     scale = ScaleType.medium;
   }

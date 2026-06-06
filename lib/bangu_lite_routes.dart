@@ -29,6 +29,7 @@ const List<String> routeNames = <String>[
   '/subjectTopic',
   '/webview',
   'about',
+  'networkConfig',
   'settings',
   'test',
   'userPage',
@@ -198,6 +199,11 @@ class Routes {
   ///
   /// [name] : 'about'
   static const String about = 'about';
+
+  /// 'networkConfig'
+  ///
+  /// [name] : 'networkConfig'
+  static const String networkConfig = 'networkConfig';
 
   /// 'settings'
   ///

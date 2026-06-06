@@ -1,4 +1,5 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/proxy_cache.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -35,7 +36,7 @@ class CachedImageLoader extends StatelessWidget {
 
               return CachedNetworkImage(
                 httpHeaders: HttpApiClient.broswerHeader,
-              
+                cacheManager: ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress),
                 imageUrl: imageUrl!,
                 imageBuilder: (_,imageProvider){
                   return DecoratedBox(
