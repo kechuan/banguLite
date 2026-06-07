@@ -7,6 +7,7 @@ import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/models/informations/local/star_details.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -144,12 +145,26 @@ class IndexModel extends ChangeNotifier {
       ).map((e) => e.bangumiID!).toList()
     );
 
-    starsUpdateRating = await compute(
-      loadStarsDetail,
-      starsList
-    );
+    starsUpdateRating = await loadStarsDetail(starsList);
 
     debugPrint("timestamp: ${DateTime.now()} update Star done");
+
+    if (starsUpdateRating.isNotEmpty) {
+      for (int bangumiID in starsUpdateRating.keys) {
+
+        final StarBangumiDetails? currentStorageInformation = MyHive.starBangumisDataBase.get(bangumiID);
+
+        if (currentStorageInformation == null) continue;
+
+        MyHive.starBangumisDataBase.put(
+          bangumiID,
+          currentStorageInformation
+            ..score = starsUpdateRating[bangumiID]!["score"] as double?
+            ..rank = starsUpdateRating[bangumiID]!["rank"] as int?
+        );
+
+      }
+    }
 
   }
 

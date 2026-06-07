@@ -86,12 +86,12 @@ Future<List<BangumiDetails>> bangumiTimeRangeSearch({
   final List<BangumiDetails> searchResultList = [];
 
   Completer<List<BangumiDetails>> searchCompleter = Completer();
-  int completeFlag = convertSegement(totalBangumiLength, 20);
+  int completeFlag = convertSegment(totalBangumiLength, 20);
 
 
   await Future.wait(
     List.generate(
-      convertSegement(totalBangumiLength, 20),
+      convertSegment(totalBangumiLength, 20),
       (index){
         return sortSearchHandler(
           airDateRange: airDateRange,

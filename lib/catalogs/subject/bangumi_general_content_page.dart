@@ -75,7 +75,7 @@ abstract class BangumiContentPageState<
 
   List<String>? getTrailingPhotosUri() => null;
 
-  bool isContentInitaled = false;
+  bool isContentInitialed = false;
 
   //子内容加载(评论)
   Future? contentFuture;
@@ -217,7 +217,7 @@ abstract class BangumiContentPageState<
                                   }
 
                                   // 初始化载入内容
-                                  if (!isContentInitaled) initCotent();
+                                  if (!isContentInitialed) initCotent();
 
                                   return isCommentLoading ?
                                     Skeletonizer.sliver(
@@ -350,7 +350,7 @@ abstract class BangumiContentPageState<
       resultFilterCommentList = [...currentEpCommentDetails];                                               
 
       recordHistorySurf(contentInfo, contentDetail);
-      isContentInitaled = true;
+      isContentInitialed = true;
 
       if (commentFilterTypeNotifier.value == BangumiCommentRelatedType.id) {
 
@@ -502,7 +502,7 @@ abstract class BangumiContentPageState<
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: CachedNetworkImage(
                 imageUrl: getTrailingPhotosUri()![index],
-                httpHeaders: HttpApiClient.broswerHeader,
+                httpHeaders: HttpApiClient.browserHeader,
                 cacheManager: ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress),
               ),
             );

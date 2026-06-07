@@ -35,7 +35,7 @@ class CachedImageLoader extends StatelessWidget {
               DateTime loadStartTime = DateTime.now();
 
               return CachedNetworkImage(
-                httpHeaders: HttpApiClient.broswerHeader,
+                httpHeaders: HttpApiClient.browserHeader,
                 cacheManager: ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress),
                 imageUrl: imageUrl!,
                 imageBuilder: (_,imageProvider){

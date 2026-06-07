@@ -161,7 +161,7 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
                     initialUrlRequest: URLRequest(url: WebUri(currentSurfingUrlNotifier.value)),
                     initialSettings: InAppWebViewSettings(
                       isInspectable: kDebugMode,
-                      userAgent: HttpApiClient.broswerHeader["User-Agent"],
+                      userAgent: HttpApiClient.browserHeader["User-Agent"],
                       useShouldInterceptRequest: true,
                     ),
                     pullToRefreshController: pullToRefreshController,
@@ -177,7 +177,7 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
                     },
                     shouldInterceptRequest: (controller, request) {
 
-                      if (request.url.toString().contains(BangumiWebUrls.trunstileAuth())) {
+                      if (request.url.toString().contains(BangumiWebUrls.turnstileAuth())) {
                         debugPrint("shouldInterceptRequest inject succ");
                         return Future.value(WebResourceResponse(data: utf8.encode(widget.injectHTML!)));
                       }
@@ -209,7 +209,7 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
                     onReceivedError: (controller, request, error) {
                       //fallbackAction may deal with Indicates that the connection was stopped.
 
-                      if (widget.url.contains(BangumiWebUrls.trunstileAuth())) {
+                      if (widget.url.contains(BangumiWebUrls.turnstileAuth())) {
                         debugPrint("error:${error.description}");
 
                         invokePop() => Navigator.of(context).pop();
@@ -218,7 +218,7 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
 
                           extractFallbackToken(controller).then((result) {
                             if (result != null) {
-                              AccountModel.loginedUserInformations.turnsTileToken = result;
+                              AccountModel.loginedUserInformations.turnstileToken = result;
                               invokePop();
                               controller.dispose();
 

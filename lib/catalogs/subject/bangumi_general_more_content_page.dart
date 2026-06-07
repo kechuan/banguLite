@@ -70,10 +70,10 @@ abstract class BangumiGeneralMoreContentPageState<
 
               invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
 
-              final initalLength = getContentModel().contentListData.length;
+              final initialLength = getContentModel().contentListData.length;
               loadSubjectTopics(offset: getContentModel().contentListData.length).then((_){
 
-                final int receiveLength = max(0,getContentModel().contentListData.length - initalLength);
+                final int receiveLength = max(0,getContentModel().contentListData.length - initialLength);
 
                 if(receiveLength == 0){
                   invokeToaster();
@@ -84,7 +84,7 @@ abstract class BangumiGeneralMoreContentPageState<
                 else{
 
                   animatedListKey.currentState?.insertAllItems(
-                    getContentModel().contentListData.isEmpty ? 0 : initalLength-1, 
+                    getContentModel().contentListData.isEmpty ? 0 : initialLength-1, 
                     receiveLength,
                     duration: const Duration(milliseconds: 300),
                   );

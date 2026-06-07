@@ -81,7 +81,7 @@ class _CommentCachePageState extends State<CommentCachePage> with AutomaticKeepA
 
         final commentModel = context.read<CommentModel>();
 
-        debugPrint("recived notify ${widget.currentPageIndex+1}"); 
+        debugPrint("received notify ${widget.currentPageIndex+1}"); 
 
         if(commentModel.currentPageIndex == widget.currentPageIndex+1) return true;
 

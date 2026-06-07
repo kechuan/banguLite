@@ -9,7 +9,7 @@ import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
 import 'package:bangu_lite/widgets/components/transition_container.dart';
-import 'package:bangu_lite/widgets/dialogs/inital_image_storage_dialog.dart';
+import 'package:bangu_lite/widgets/dialogs/initial_image_storage_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:docman/docman.dart';
@@ -721,7 +721,7 @@ class ImageStorageManageTile extends ListTile{
                   onPressed: () {
 
                     if (Platform.isAndroid) {
-                      initalImageStorageDialog(context).then((result) {
+                      initialImageStorageDialog(context).then((result) {
                         if (result != null) {
                           imageStoragePath = getImageStoragePath();
                           updateStorageNotifier.value += 1;

@@ -87,7 +87,7 @@ class _BangumiTrendTopicState extends State<BangumiTrendTopic> {
   ) async{
 
     final timelineFlowModel = context.read<TimelineFlowModel>();
-    timelineFlowModel.requestTrendTopicTimelineCompleter = null;
+    timelineFlowModel.requestTrendTopicTimelineFuture = null;
 
     //invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
 

@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 void animatedListAppendContentCallback(
   bool result,
-  int initalLength,
+  int initialLength,
   int receiveLength,
   {
 	  GlobalKey<dynamic>? animatedListKey,
@@ -22,7 +22,7 @@ void animatedListAppendContentCallback(
       else{
         
         animatedListKey?.currentState?.insertAllItems(
-          max(0,initalLength-1), 
+          max(0,initialLength-1), 
           receiveLength,
           duration: const Duration(milliseconds: 300),
         );

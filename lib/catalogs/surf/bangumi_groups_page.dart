@@ -298,19 +298,19 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
     groupsModel.contentListData
     ;
 
-    final initalLength = selectedGroupData.length;
+    final initialLength = selectedGroupData.length;
 
     //初始使用timeFlowModel 请求 否则使用groupsModel
     if (groupTitleNotifier.value == null) {
 
       invokeRequest = () {
 
-        timelineFlowModel.requestTimelineCompleter = null;
+        timelineFlowModel.requestTimelineFuture = null;
 
         return timelineFlowModel.requestSelectedTimeLineType(
           BangumiSurfTimelineType.group,
           //isAppend: isAppend,
-          queryParameters: [BangumiQuerys.groupsTopicsQuery(offset: initalLength)],
+          queryParameters: [BangumiQuerys.groupsTopicsQuery(offset: initialLength)],
           fallbackAction: (message) => showRequestSnackBar(
             requestStatus: false,
             message: message,
@@ -323,7 +323,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
     }
 
     else {
-      invokeRequest = () => groupsModel.loadGroupTopics(offset: initalLength);
+      invokeRequest = () => groupsModel.loadGroupTopics(offset: initialLength);
     }
 
     invokeRequest().then((result) {
@@ -341,7 +341,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 
       animatedListAppendContentCallback(
         result,
-        initalLength,
+        initialLength,
         newSelectedGroupData.length,
         animatedListKey: sliverAnimatedListKey,
         fallbackAction: invokeToaster,

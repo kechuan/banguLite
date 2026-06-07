@@ -84,7 +84,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
   final PageController toolkitPageController = PageController();
   final PageController stickerPageController = PageController();
 
-  final ValueNotifier<bool> turnsTileTokenNotifier = ValueNotifier(false);
+  final ValueNotifier<bool> turnstileTokenNotifier = ValueNotifier(false);
 
   Timer? resetTimer;
 
@@ -167,7 +167,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
             IconButton(
               onPressed: () {
 
-                if (!kDebugMode && turnsTileTokenNotifier.value == false) {
+                if (!kDebugMode && turnstileTokenNotifier.value == false) {
                   fadeToaster(context: context, message: '请通过验证以发布内容');
                   return;
                 }
@@ -300,7 +300,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                 height: 24,
                                 width: 24,
                                 child: ValueListenableBuilder(
-                                  valueListenable: turnsTileTokenNotifier,
+                                  valueListenable: turnstileTokenNotifier,
                                   builder: (_, isEffect, child) {
                                     if (isEffect) return const Icon(Icons.done);
 
@@ -316,7 +316,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                           Align(
                             alignment: Alignment.centerLeft,
                             child: ValueListenableBuilder(
-                              valueListenable: turnsTileTokenNotifier,
+                              valueListenable: turnstileTokenNotifier,
                               builder: (_, isEffect, webviewChild) {
 
                                 //虽然我觉得不会真有人这么整 就当是一个兜底了
@@ -324,7 +324,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                   resetTimer ??= Timer(
                                     const Duration(seconds: 300), () {
                                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                                        turnsTileTokenNotifier.value = false;
+                                        turnstileTokenNotifier.value = false;
                                         resetTimer = null;
                                       });
                                     }
@@ -344,7 +344,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                               },
                               child: InAppWebView(
                                 webViewEnvironment: webviewModel.webViewEnvironment,
-                                initialUrlRequest: URLRequest(url: WebUri(BangumiWebUrls.trunstileAuth())),
+                                initialUrlRequest: URLRequest(url: WebUri(BangumiWebUrls.turnstileAuth())),
                                 initialSettings: InAppWebViewSettings(
                                   isInspectable: kDebugMode,
                                   displayZoomControls: false,
@@ -360,9 +360,9 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
                                   if (navigationAction.request.url.toString().startsWith(APPInformationRepository.bangumiTurnstileCallbackUri.toString())) {
 
-                                    AccountModel.loginedUserInformations.turnsTileToken = navigationAction.request.url?.queryParameters["token"];
+                                    AccountModel.loginedUserInformations.turnstileToken = navigationAction.request.url?.queryParameters["token"];
 
-                                    turnsTileTokenNotifier.value = true;
+                                    turnstileTokenNotifier.value = true;
 
                                     return NavigationActionPolicy.CANCEL;
                                   }
@@ -370,13 +370,13 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
                                 },
                                 onWebViewCreated: (controller) {
-                                  AccountModel.loginedUserInformations.turnsTileToken = null;
+                                  AccountModel.loginedUserInformations.turnstileToken = null;
                                 },
 
                                 onLoadStart: (controller, url) async {
                                   if (url?.queryParameters["token"] != null) {
-                                    AccountModel.loginedUserInformations.turnsTileToken = url?.queryParameters["token"];
-                                    turnsTileTokenNotifier.value = true;
+                                    AccountModel.loginedUserInformations.turnstileToken = url?.queryParameters["token"];
+                                    turnstileTokenNotifier.value = true;
                                   }
                                 },
 
@@ -399,8 +399,8 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                   if (request.url.toString().contains(APPInformationRepository.bangumiTurnstileCallbackUri.toString())) {
                                     extractFallbackToken(controller).then((result) {
                                       if (result != null) {
-                                        AccountModel.loginedUserInformations.turnsTileToken = result;
-                                        turnsTileTokenNotifier.value = true;
+                                        AccountModel.loginedUserInformations.turnstileToken = result;
+                                        turnstileTokenNotifier.value = true;
                                       }
                                     });
                                   }

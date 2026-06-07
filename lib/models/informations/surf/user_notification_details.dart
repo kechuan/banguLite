@@ -2,9 +2,9 @@ import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
 
-class UserNotificaion extends ContentInfo {
+class UserNotification extends ContentInfo {
 
-  UserNotificaion({
+  UserNotification({
     super.id
   });
 
@@ -19,7 +19,7 @@ class UserNotificaion extends ContentInfo {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is UserNotificaion && other.hashCode == hashCode;
+    return other is UserNotification && other.hashCode == hashCode;
   }
 
   //理论上 notificationID 应该是 immutable 的重要参数
@@ -30,11 +30,11 @@ class UserNotificaion extends ContentInfo {
 
 }
 
-List<UserNotificaion> loadUserNotificaions(List<dynamic> bangumiNotificationsData){
-  final List<UserNotificaion> notificationsData = [];
+List<UserNotification> loadUserNotifications(List<dynamic> bangumiNotificationsData){
+  final List<UserNotification> notificationsData = [];
 
   for(Map currentNotificationMap in bangumiNotificationsData){
-		UserNotificaion currentNotification = UserNotificaion(
+		UserNotification currentNotification = UserNotification(
       id: currentNotificationMap["id"],
     );
     	

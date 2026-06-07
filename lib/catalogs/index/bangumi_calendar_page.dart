@@ -454,7 +454,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                                         selectOffstageNotifier: weekdaySelectOffstageNotifier,
                                         selectOffstageAnimatedNotifier: weekdaySelectOffstageAnimatedNotifier,
                                         selectedList: WeekDay.values,
-                                        initalIndex: indexModel.selectedWeekDay - 1,
+                                        initialIndex: indexModel.selectedWeekDay - 1,
                                         onTap:  (selectedIndex) {
                                           indexModel.updateSelectedWeekDay(selectedIndex+1);
                                         },

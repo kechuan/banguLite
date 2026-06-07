@@ -26,7 +26,7 @@ class BangumiDetailRecentReview extends StatefulWidget {
 
 class _BangumiDetailRecentReviewState extends State<BangumiDetailRecentReview> with AutomaticKeepAliveClientMixin{
 
-  final ValueNotifier<bool> collapseStatusNotifer = ValueNotifier(false);
+  final ValueNotifier<bool> collapseStatusNotifier = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +40,11 @@ class _BangumiDetailRecentReviewState extends State<BangumiDetailRecentReview> w
         builder: (_,reviewModel,child) {
 
             return ExpansionTile(
-              initiallyExpanded: !collapseStatusNotifer.value,
+              initiallyExpanded: !collapseStatusNotifier.value,
               tilePadding: const EdgeInsets.all(0),
               showTrailingIcon: false,
               shape: const Border(),
-              onExpansionChanged: (topicExpandedStatus) => collapseStatusNotifer.value = !topicExpandedStatus,
+              onExpansionChanged: (topicExpandedStatus) => collapseStatusNotifier.value = !topicExpandedStatus,
               title: Row(
                 children: [
                   Padding(
@@ -53,7 +53,7 @@ class _BangumiDetailRecentReviewState extends State<BangumiDetailRecentReview> w
                       children: [
                         const ScalableText("长评",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
                         ValueListenableBuilder(
-                          valueListenable: collapseStatusNotifer,
+                          valueListenable: collapseStatusNotifier,
                           builder: (_,topicCollapseStatus,__)=> topicCollapseStatus ? const Icon(Icons.arrow_drop_down_outlined) : const Icon(Icons.arrow_drop_up_outlined)
                         )
                       ],

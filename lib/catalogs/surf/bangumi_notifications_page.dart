@@ -55,7 +55,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                   content: "即将把所有通知标为已阅",
                   confirmAction: () {
                     
-                    accountModel.currentUserNotificaions.also((it){
+                    accountModel.currentUserNotifications.also((it){
                       for (var element in it) {
                         element.isUnRead = false;
                       }
@@ -81,12 +81,12 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
       body: EasyRefresh(
         header: const TextHeader(),
         footer: const TextFooter(),
-		    refreshOnStart: accountModel.currentUserNotificaions.isEmpty,
+		    refreshOnStart: accountModel.currentUserNotifications.isEmpty,
         onRefresh: () {
           notificationFuture = accountModel.getNotifications(
             limit: 40,
             //不为空时 逻辑上应该只请求新的部分 而非全部内容
-            unread: accountModel.currentUserNotificaions.isNotEmpty,
+            unread: accountModel.currentUserNotifications.isNotEmpty,
             fallbackAction: (message) {
               fadeToaster(context: context, message: message);
             },
@@ -111,18 +111,18 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                   default: {}
                 }
 
-                final notificationList = accountModel.currentUserNotificaions.toList().also((it){
+                final notificationList = accountModel.currentUserNotifications.toList().also((it){
                   it.sort(
                     (prev,next) => next.createdTime!.compareTo(prev.createdTime!)
                   );
                 });
 				
                 return ListView.separated(
-                  itemCount: accountModel.currentUserNotificaions.length,
+                  itemCount: accountModel.currentUserNotifications.length,
                   separatorBuilder: (_, __) => const Divider(),
                   itemBuilder: (_,index){
             
-                    //final currentNotification = accountModel.currentUserNotificaions.elementAt(index);
+                    //final currentNotification = accountModel.currentUserNotifications.elementAt(index);
 					          final currentNotification = notificationList[index];
             
                     String referenceContent = "";

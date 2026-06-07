@@ -126,7 +126,7 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
     final timelineFlowModel = context.read<TimelineFlowModel>();
     final accountModel = context.read<AccountModel>();
 
-    timelineFlowModel.requestTimelineCompleter = null;
+    timelineFlowModel.requestTimelineFuture = null;
 
     invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
 

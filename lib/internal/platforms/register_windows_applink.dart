@@ -90,7 +90,7 @@ bool handleLink(Uri uri) {
     uri.scheme == "bangulite" &&
     uri.host.startsWith('turnstile')
   ){
-    AccountModel.loginedUserInformations.turnsTileToken = uri.queryParameters["token"];
+    AccountModel.loginedUserInformations.turnstileToken = uri.queryParameters["token"];
   }
 
   return false;

@@ -50,7 +50,7 @@ class LoginedUserInformations{
   int? expiredTime;
   String? refreshToken;
 
-  String? turnsTileToken;
+  String? turnstileToken;
 
 }
 

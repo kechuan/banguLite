@@ -314,7 +314,7 @@ class LoginedUserInformationsAdapter
       ..expiredTime = (fields[9] as num?)?.toInt()
       ..refreshToken = fields[10] as String?
       ..userInformation = fields[12] as UserInformation?
-      ..turnsTileToken = fields[13] as String?;
+      ..turnstileToken = fields[13] as String?;
   }
 
   @override
@@ -330,7 +330,7 @@ class LoginedUserInformationsAdapter
     ..writeByte(12)
     ..write(obj.userInformation)
     ..writeByte(13)
-    ..write(obj.turnsTileToken);
+    ..write(obj.turnstileToken);
   }
 
   @override

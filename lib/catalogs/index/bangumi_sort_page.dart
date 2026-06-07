@@ -53,7 +53,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
 
     bus.on('sortSubmit',(arg){
       assert(arg is Map<String,dynamic>);
-      debugPrint("recived sortSubmit: $arg");
+      debugPrint("received sortSubmit: $arg");
       loadNewData(arg);
     });
     super.initState();

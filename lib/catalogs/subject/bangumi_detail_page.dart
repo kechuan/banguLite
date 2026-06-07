@@ -55,8 +55,8 @@ class BangumiDetailPage extends StatefulWidget {
 class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> with RouteLifecycleMixin  {
 
     final ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
-    final ValueNotifier<bool> reviewsCollaspeStatusNotifier = ValueNotifier(false);
-    final ValueNotifier<bool> topicsCollaspeStatusNotifier = ValueNotifier(false);
+    final ValueNotifier<bool> reviewsCollapseStatusNotifier = ValueNotifier(false);
+    final ValueNotifier<bool> topicsCollapseStatusNotifier = ValueNotifier(false);
 
     @override
     Widget build(BuildContext context) {

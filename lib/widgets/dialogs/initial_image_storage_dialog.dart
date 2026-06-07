@@ -3,7 +3,7 @@ import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:docman/docman.dart';
 import 'package:flutter/material.dart';
 
-Future<dynamic> initalImageStorageDialog(BuildContext context){
+Future<dynamic> initialImageStorageDialog(BuildContext context){
 
   invokeToaster({required String message})=> fadeToaster(context: context, message: message); 
 

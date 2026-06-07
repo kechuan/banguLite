@@ -43,12 +43,12 @@ class _SearchfilterState extends State<Searchfilter> {
   @override
   void initState() {
     bus.on(const ValueKey("monthStartSelect"),(arg){
-      debugPrint("recived start arg:$arg");
+      debugPrint("received start arg:$arg");
       monthSelect[0] = arg;
     });
 
     bus.on(const ValueKey("monthEndSelect"),(arg){
-      debugPrint("recived end arg:$arg");
+      debugPrint("received end arg:$arg");
       monthSelect[1] = arg;
     });
     

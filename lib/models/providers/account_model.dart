@@ -10,7 +10,7 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/template.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
-import 'package:bangu_lite/models/informations/surf/user_notificaion_details.dart';
+import 'package:bangu_lite/models/informations/surf/user_notification_details.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +22,7 @@ class AccountModel extends ChangeNotifier {
 
   static LoginedUserInformations loginedUserInformations = getDefaultLoginedUserInformations();
 
-  Set<UserNotificaion> currentUserNotificaions = {};
+  Set<UserNotification> currentUserNotifications = {};
   int unreadNotifications = 0;
 
   //HeadlessInAppWebView? headlessWebView;
@@ -35,7 +35,7 @@ class AccountModel extends ChangeNotifier {
     accountLoginStatus = LoginStatus.logout;
     loginedUserInformations = getDefaultLoginedUserInformations();
     updateLoginInformation(getDefaultLoginedUserInformations());
-    currentUserNotificaions.clear();
+    currentUserNotifications.clear();
     unreadNotifications = 0;
 
   }
@@ -336,14 +336,14 @@ class AccountModel extends ChangeNotifier {
 
       case UserContentActionType.post:{
 
-        if (loginedUserInformations.turnsTileToken == null) return 0;
+        if (loginedUserInformations.turnstileToken == null) return 0;
 
         contentFuture = () => HttpApiClient.client.post(
           requestUrl,
           data: BangumiDatas.postContentData(
             title: title,
             content: content,
-            turnstileToken: loginedUserInformations.turnsTileToken,
+            turnstileToken: loginedUserInformations.turnstileToken,
           ),
           options: BangumiAPIUrls.bangumiAccessOption(),
         );
@@ -472,14 +472,14 @@ class AccountModel extends ChangeNotifier {
     switch (actionType){
       case UserContentActionType.post:{
 
-        if (loginedUserInformations.turnsTileToken == null) return 0;
+        if (loginedUserInformations.turnstileToken == null) return 0;
 
         commentFuture = () => HttpApiClient.client.post(
           requestUrl,
           data: BangumiDatas.replyContentData(
             content: commentContent,
             replyTo: commentID ?? 0,
-            turnstileToken: loginedUserInformations.turnsTileToken,
+            turnstileToken: loginedUserInformations.turnstileToken,
           ),
           options: BangumiAPIUrls.bangumiAccessOption(),
         );
@@ -523,7 +523,7 @@ class AccountModel extends ChangeNotifier {
         "Query: ${BangumiDatas.replyContentData(
           content: commentContent,
           replyTo: commentID ?? 0,
-          turnstileToken: loginedUserInformations.turnsTileToken,
+          turnstileToken: loginedUserInformations.turnstileToken,
         )}"
 
       );
@@ -531,7 +531,7 @@ class AccountModel extends ChangeNotifier {
     }
 
     finally{
-      loginedUserInformations.turnsTileToken = null;
+      loginedUserInformations.turnstileToken = null;
     }
 
     return 0;
@@ -625,11 +625,11 @@ class AccountModel extends ChangeNotifier {
     Function(String)? fallbackAction
   }) async {
 
-    Completer<bool> notficationCompleter = Completer();
+    Completer<bool> notificationCompleter = Completer();
 
     if (loginedUserInformations.accessToken == null) {
       fallbackAction?.call("401 - 账号未登录");
-      notficationCompleter.complete(false);
+      notificationCompleter.complete(false);
     }
 
     Map<String, dynamic> notificationsQuery = BangumiQuerys.notificationsQuery(limit: limit);
@@ -645,18 +645,18 @@ class AccountModel extends ChangeNotifier {
 
             if (unread == true) {
 
-              final notificationsList = loadUserNotificaions(response.data["data"]);
+              final notificationsList = loadUserNotifications(response.data["data"]);
 
-              currentUserNotificaions.addAll(notificationsList);
+              currentUserNotifications.addAll(notificationsList);
               unreadNotifications += notificationsList.length;
             }
 
             else {
 
               unreadNotifications = 0;
-              currentUserNotificaions = loadUserNotificaions(response.data["data"]).toSet();
+              currentUserNotifications = loadUserNotifications(response.data["data"]).toSet();
 
-              for (final currentNotification in currentUserNotificaions){
+              for (final currentNotification in currentUserNotifications){
                 if (currentNotification.isUnRead == true) {
                   unreadNotifications += 1;
                 }
@@ -664,20 +664,20 @@ class AccountModel extends ChangeNotifier {
 
             }
 
-            notficationCompleter.complete(true);
+            notificationCompleter.complete(true);
             notifyListeners();
 
           }
 
           else {
-            notficationCompleter.complete(false);
+            notificationCompleter.complete(false);
 
             fallbackAction?.call("${response.statusCode} ${response.data["message"]}");
           }
 
         });
 
-    return notficationCompleter.future;
+    return notificationCompleter.future;
   }
 
   Future<bool> clearNotifications({
@@ -685,11 +685,11 @@ class AccountModel extends ChangeNotifier {
     Function(String)? fallbackAction
   }) async {
 
-    Completer<bool> clearNotficationCompleter = Completer();
+    Completer<bool> clearNotificationCompleter = Completer();
 
     if (loginedUserInformations.accessToken == null) {
       debugPrint("账号未登录");
-      clearNotficationCompleter.complete(false);
+      clearNotificationCompleter.complete(false);
     }
 
     await HttpApiClient.client.post(
@@ -706,29 +706,29 @@ class AccountModel extends ChangeNotifier {
             }
 
             else {
-              currentUserNotificaions = currentUserNotificaions.map((currentNotificaion) {
-                  if (notificationIDList.contains(currentNotificaion.notificationID)) {
-                    currentNotificaion.isUnRead = false;
+              currentUserNotifications = currentUserNotifications.map((currentNotification) {
+                  if (notificationIDList.contains(currentNotification.notificationID)) {
+                    currentNotification.isUnRead = false;
                     unreadNotifications -= 1;
                   }
-                  return currentNotificaion;
+                  return currentNotification;
                 }).toSet();
             }
 
-            clearNotficationCompleter.complete(true);
+            clearNotificationCompleter.complete(true);
 
             notifyListeners();
 
           }
 
           else {
-            clearNotficationCompleter.complete(false);
+            clearNotificationCompleter.complete(false);
             fallbackAction?.call("${response.data["message"]}");
           }
 
         });
 
-    return clearNotficationCompleter.future;
+    return clearNotificationCompleter.future;
   }
 
   Future<bool> reportContent(

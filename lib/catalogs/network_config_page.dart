@@ -31,7 +31,7 @@ class NetworkConfigPage extends StatefulWidget {
 
 class _NetworkConfigPageState extends State<NetworkConfigPage> {
 
-  final httpProxyAdressEditingController = TextEditingController();
+  final httpProxyAddressEditingController = TextEditingController();
   late final indexModel = context.read<IndexModel>();
 
   final List<ValueNotifier<String>> latencyResultNotifierList = List.generate(
@@ -44,8 +44,19 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
   void initState() {
     super.initState();
 
-    httpProxyAdressEditingController.text = HttpApiClient.currentProxyAddress;
+    httpProxyAddressEditingController.text = HttpApiClient.currentProxyAddress;
 
+  }
+
+  @override
+  void dispose() {
+    httpProxyAddressEditingController.dispose();
+
+    for (final latencyResultNotifier in latencyResultNotifierList) {
+      latencyResultNotifier.dispose();
+    }
+
+    super.dispose();
   }
 
   @override
@@ -72,8 +83,8 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                     trailing: TextButton(
                       onPressed: () async {
 
-                        HttpApiClient.currentProxyAddress = httpProxyAdressEditingController.text;
-                        HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting(httpProxyAdressEditingController.text);
+                        HttpApiClient.currentProxyAddress = httpProxyAddressEditingController.text;
+                        HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting(httpProxyAddressEditingController.text);
                         context.read<IndexModel>().updateCurrentProxyAddress(HttpApiClient.currentProxyAddress);
                       },
                       child: const ScalableText('保存'),
@@ -81,7 +92,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                   ),
 
                   ValueListenableBuilder(
-                    valueListenable: httpProxyAdressEditingController,
+                    valueListenable: httpProxyAddressEditingController,
                     builder: (_, textContent, child) {
                       return AnimatedContainer(
                         height: textContent.text.isEmpty ? 80 : 135,
@@ -111,7 +122,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                                         behavior: ScrollConfiguration.of(context).copyWith(physics: const NeverScrollableScrollPhysics()),
                                         child: TextField(
                                           scrollPhysics: const ClampingScrollPhysics(),
-                                          controller: httpProxyAdressEditingController,
+                                          controller: httpProxyAddressEditingController,
                                           decoration: const InputDecoration(
                                             hintText: '格式 [IP]:[Port]',
                                             hintStyle: TextStyle(color: Colors.grey),
@@ -168,7 +179,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
 
                               return checkLatency(
                                 targetUrl: connectionTestUrlMap.values.elementAt(index),
-                                proxyAddress: httpProxyAdressEditingController.text
+                                proxyAddress: httpProxyAddressEditingController.text
                               ).then((value) {
                                   debugPrint("[Network Latency] ${connectionTestUrlMap.values.elementAt(index)} $value ms");
                                   latencyResultNotifierList[index].value = "$value";
@@ -252,7 +263,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
 
                               checkLatency(
                                 targetUrl: connectionTestUrlMap.values.elementAt(index),
-                                proxyAddress: httpProxyAdressEditingController.text
+                                proxyAddress: httpProxyAddressEditingController.text
                               ).then((value) {
                                   debugPrint("[Network Latency]${connectionTestUrlMap.values.elementAt(index)} $value ms");
                                   latencyResultNotifierList[index].value = "$value";

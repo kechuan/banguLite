@@ -41,7 +41,7 @@ class BangumiStarPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final ValueNotifier<SortType> sortTypeNotifier = ValueNotifier<SortType>(SortType.joinTime);
-    final ValueNotifier<bool> reversedSortNotifer = ValueNotifier<bool>(false);
+    final ValueNotifier<bool> reversedSortNotifier = ValueNotifier<bool>(false);
 
     //final ValueNotifier<StarNetworkType> starNetworkTypeNotifier = ValueNotifier(StarNetworkType.local);
 
@@ -111,10 +111,10 @@ class BangumiStarPage extends StatelessWidget {
           const Padding(padding: PaddingH6),
 
           ValueListenableBuilder(
-            valueListenable: reversedSortNotifer,
+            valueListenable: reversedSortNotifier,
              builder: (_,reversedStatus,__) {
                return IconButton(
-                onPressed: ()=> reversedSortNotifer.value = !reversedSortNotifer.value,
+                onPressed: ()=> reversedSortNotifier.value = !reversedSortNotifier.value,
                 icon: 
                   reversedStatus ? 
                   const Icon(Icons.sort) : 
@@ -165,7 +165,7 @@ class BangumiStarPage extends StatelessWidget {
 
           return EasyRefresh(
             child: ValueListenableBuilder(
-              valueListenable: reversedSortNotifer,
+              valueListenable: reversedSortNotifier,
               builder: (_,reversedStatus,child) {
                 return ValueListenableBuilder(
                   valueListenable: sortTypeNotifier,

@@ -16,7 +16,7 @@ class WebViewModel extends ChangeNotifier {
 
   InAppWebViewSettings settings = InAppWebViewSettings(
     isInspectable: kDebugMode,
-    userAgent: HttpApiClient.broswerHeader["User-Agent"]
+    userAgent: HttpApiClient.browserHeader["User-Agent"]
   );
 
   //仅限移动端

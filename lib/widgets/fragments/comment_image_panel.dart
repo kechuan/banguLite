@@ -146,7 +146,7 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                     return CachedNetworkImage(
                       //imageUrl: convertProxyImageUri(widget.imageUrl),
                       imageUrl: pictureRequestInformation?.contentLink ?? widget.imageUrl,
-                      httpHeaders: HttpApiClient.broswerHeader,
+                      httpHeaders: HttpApiClient.browserHeader,
                       cacheManager: ProxyCacheManager(
                         proxyAddress: 
                         indexModel.userConfig.isImgTagProxy == true ? 

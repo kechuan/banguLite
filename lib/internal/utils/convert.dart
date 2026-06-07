@@ -199,7 +199,7 @@ String convertBangumiCommentSticker(String originalComment){
 									
 }
 
-int convertSegement(int totalEps, int segementRange) => convertTotalCommentPage(totalEps,segementRange);
+int convertSegment(int totalEps, int segmentRange) => convertTotalCommentPage(totalEps,segmentRange);
 int convertTotalCommentPage(int totalComments, int pageRange){
 return  totalComments % pageRange == 0 ?
         totalComments~/pageRange :

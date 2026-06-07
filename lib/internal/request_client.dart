@@ -17,7 +17,7 @@ class HttpApiClient{
     connectTimeout: const Duration(seconds: 5),
   );
 
-  static Map<String, String> broswerHeader = {
+  static Map<String, String> browserHeader = {
     "User-Agent":'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0',
   };
 
@@ -25,12 +25,12 @@ class HttpApiClient{
     "User-Agent":'Mozilla/5.0 (Linux; Android 13; 23049RAD8C Build/TKQ1.221114.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/128.0.6613.146 Mobile Safari/537.36'
   };
 
-  static void init({String stroageProxyAddress = ""}) {
+  static void init({String storageProxyAddress = ""}) {
     HttpApiClient.clientOption.baseUrl = BangumiAPIUrls.baseUrl;
-    HttpApiClient.clientOption.headers = HttpApiClient.broswerHeader;
+    HttpApiClient.clientOption.headers = HttpApiClient.browserHeader;
     HttpApiClient.client.options = HttpApiClient.clientOption;
 
-    currentProxyAddress = stroageProxyAddress;
+    currentProxyAddress = storageProxyAddress;
 
     HttpApiClient.client.httpClientAdapter = configHTTPProxySetting(currentProxyAddress);
   }
@@ -282,7 +282,7 @@ class BangumiWebUrls{
   static const String oAuth = '$relativeUrl/oauth/authorize';
   static const String oAuthToken = '$relativeUrl/oauth/access_token';
 
-  static String trunstileAuth() => '$nextUrl/p1/turnstile?redirect_uri=${APPInformationRepository.bangumiTurnstileCallbackUri.toString()}';
+  static String turnstileAuth() => '$nextUrl/p1/turnstile?redirect_uri=${APPInformationRepository.bangumiTurnstileCallbackUri.toString()}';
 
 }
 

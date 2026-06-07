@@ -107,7 +107,7 @@ types:
         index: 10
       userInformation:
         index: 12
-      turnsTileToken:
+      turnstileToken:
         index: 13
   UserInformation:
     typeId: 8

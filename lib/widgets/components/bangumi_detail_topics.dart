@@ -23,7 +23,7 @@ class BangumiDetailTopics extends StatefulWidget {
 }
 
 class _BangumiDetailTopicsState extends State<BangumiDetailTopics> with AutomaticKeepAliveClientMixin{
-  final ValueNotifier<bool> collapseStatusNotifer = ValueNotifier(false);
+  final ValueNotifier<bool> collapseStatusNotifier = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
@@ -45,11 +45,11 @@ class _BangumiDetailTopicsState extends State<BangumiDetailTopics> with Automati
             },
           builder: (_, topicsList, child) {
             return ExpansionTile(
-              initiallyExpanded: !collapseStatusNotifer.value,
+              initiallyExpanded: !collapseStatusNotifier.value,
               tilePadding: const EdgeInsets.all(0),
               showTrailingIcon: false,
               shape: const Border(),
-              onExpansionChanged: (topicExpandedStatus) => collapseStatusNotifer.value = !topicExpandedStatus,
+              onExpansionChanged: (topicExpandedStatus) => collapseStatusNotifier.value = !topicExpandedStatus,
               title: Row(
                 children: [
                   Padding(
@@ -58,7 +58,7 @@ class _BangumiDetailTopicsState extends State<BangumiDetailTopics> with Automati
                       children: [
                         const ScalableText("讨论版",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
                         ValueListenableBuilder(
-                          valueListenable: collapseStatusNotifer,
+                          valueListenable: collapseStatusNotifier,
                           builder: (_,topicCollapseStatus,child){
                             return topicCollapseStatus ?  const Icon(Icons.arrow_drop_down_outlined) : const Icon(Icons.arrow_drop_up_outlined);
                           }

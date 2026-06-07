@@ -358,7 +358,7 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
   final ValueNotifier<BangumiCommentRelatedType> commentSurfTypeNotifier = ValueNotifier(BangumiCommentRelatedType.normal);
 
   List<EpCommentDetails> resultFilterCommentList = [];
-  bool isInitaled = false;
+  bool isInitialed = false;
 
   Future? epCommentFuture;
 
@@ -377,7 +377,7 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
 			selector: (_, epModel) => epModel.epCommentData[epModel.selectedEp],
 			shouldRebuild: (previous, next){
         if(previous!=next){
-          isInitaled = false;
+          isInitialed = false;
           return true;
         }
 
@@ -422,7 +422,7 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
 
                     final originalCommentList = epModel.epCommentData[currentEp];
 
-                    if(!isInitaled){
+                    if(!isInitialed){
 
                       if(epModel.epCommentData[currentEp]?.isNotEmpty == true){
 
@@ -435,7 +435,7 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                           resultFilterCommentList = [...?originalCommentList];
                         }
 
-                        isInitaled = true;
+                        isInitialed = true;
                       }
                     }
 

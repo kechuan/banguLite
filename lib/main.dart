@@ -34,7 +34,7 @@ void main() async {
 
 
   HttpApiClient.init(
-    stroageProxyAddress: MyHive.appConfigDataBase.get('currentTheme')?.currentProxyAddress ?? ''
+    storageProxyAddress: MyHive.appConfigDataBase.get('currentTheme')?.currentProxyAddress ?? ''
   );
 
   if (Platform.isAndroid) {

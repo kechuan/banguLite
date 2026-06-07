@@ -6,7 +6,7 @@ import 'dart:ui' as ui;
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/widgets/dialogs/inital_image_storage_dialog.dart';
+import 'package:bangu_lite/widgets/dialogs/initial_image_storage_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:docman/docman.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
@@ -47,10 +47,10 @@ class _BangumiPictureViewPageState extends State<BangumiPictureViewPage> {
 
               invokeToaster({required String message})=> fadeToaster(context: context, message: message);
 
-              invokeInitalStorageDialog() => initalImageStorageDialog(context);
+              invokeInitialStorageDialog() => initialImageStorageDialog(context);
 
               saveImageFile(
-                targetWriteInPath: await getStoragePath(fallbackAction: invokeInitalStorageDialog),
+                targetWriteInPath: await getStoragePath(fallbackAction: invokeInitialStorageDialog),
                 selectedDocFileData: await getImageBytesFromImageProvider(widget.imageProvider),
                 name: widget.name
               ).then((result){

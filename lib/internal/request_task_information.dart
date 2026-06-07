@@ -38,7 +38,7 @@ Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
   await HttpApiClient.client.head(
     imageUrl,
     options: Options(
-      headers: HttpApiClient.broswerHeader,
+      headers: HttpApiClient.browserHeader,
     ))
     //短时请求
     .timeout(const Duration(seconds: 3))
@@ -52,7 +52,7 @@ Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
 		await HttpApiClient.client.head(
 			convertProxyImageUri(imageUrl),
 			options: Options(
-				headers: HttpApiClient.broswerHeader,
+				headers: HttpApiClient.browserHeader,
 			))
 			//最终请求
 			.timeout(const Duration(seconds: 5))

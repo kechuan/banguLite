@@ -33,20 +33,20 @@ class EpSelect extends StatefulWidget {
 
 class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
 
-  ValueNotifier<int> epSegementsIndexNotifier = ValueNotifier<int>(0);
+  ValueNotifier<int> epSegmentsIndexNotifier = ValueNotifier<int>(0);
   TabController? epTabController;
 
-  late final int segements;
+  late final int segments;
 
   late final EpModel epModel;
 
   @override 
   void initState() {
-    segements = convertSegement(widget.totalEps, 100);
+    segments = convertSegment(widget.totalEps, 100);
     epModel = context.read<EpModel>();
 
 
-    epTabController ??= TabController(length: segements, vsync: this);
+    epTabController ??= TabController(length: segments, vsync: this);
 
     super.initState();
   }
@@ -61,7 +61,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
           return Column(
             children: [
 
-              buildTabSegement(),
+              buildTabSegment(),
 
               buildEpList(constraint)
             ],
@@ -72,9 +72,9 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
 
   }
 
-  Widget buildTabSegement() {
+  Widget buildTabSegment() {
 
-    if (segements <= 1) {
+    if (segments <= 1) {
       if (widget.portialMode != true) return const SizedBox.shrink();
 
       return Center(
@@ -97,14 +97,14 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
           indicatorColor: Theme.of(context).scaffoldBackgroundColor,
           controller: epTabController,
           onTap: (index) {
-            epSegementsIndexNotifier.value = index;
+            epSegmentsIndexNotifier.value = index;
             
             epModel.getEpsInformation(offset: index + 1);
             
           },
           isScrollable: true,
           tabs: List.generate(
-            segements, 
+            segments, 
             (index) => SizedBox(
               height: 60,
               width: 100,
@@ -127,11 +127,11 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
     return SizedBox(
       height: widget.portialMode == true ? constraint.maxHeight - 80 : MediaQuery.sizeOf(context).width / 6,
       child: ValueListenableBuilder(
-        valueListenable: epSegementsIndexNotifier,
+        valueListenable: epSegmentsIndexNotifier,
         builder: (_, currentSegment, child) {
 
-          int currentSegementRange = (currentSegment) * 100; //范围 区域300 这个意思
-          int currentSegmentEps = min(100, widget.totalEps - (currentSegementRange)).abs();
+          int currentSegmentRange = (currentSegment) * 100; //范围 区域300 这个意思
+          int currentSegmentEps = min(100, widget.totalEps - (currentSegmentRange)).abs();
 
           //context.read区域	
           return FutureBuilder(
@@ -142,10 +142,10 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
 
               //epModel => context.watch区域
               return Selector<EpModel, bool>(
-                selector: (_, epModel) => epModel.epsData[(currentSegementRange) + 1]?.epID == null,
+                selector: (_, epModel) => epModel.epsData[(currentSegmentRange) + 1]?.epID == null,
 
                 builder: (_, loadingStatus, child) {
-                  //debugPrint(" inside enabled: ${(currentSegementRange)+1}  ${epModel.epsData[(currentSegementRange)+1]?.epID == null}");
+                  //debugPrint(" inside enabled: ${(currentSegmentRange)+1}  ${epModel.epsData[(currentSegmentRange)+1]?.epID == null}");
                   return Skeletonizer(
                     enabled: loadingStatus,
                     child: child!
@@ -165,7 +165,7 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
 
                     Color currentEpsColor = Colors.grey; //默认灰 未放送
 
-                    int currentEpIndex = (currentSegementRange) + (index) + 1;
+                    int currentEpIndex = (currentSegmentRange) + (index) + 1;
 
                     EpsInfo? currentInfo = epModel.epsData[currentEpIndex];
 

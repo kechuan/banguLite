@@ -11,7 +11,7 @@ class BangumiTabContentSelect extends StatelessWidget {
     required this.selectOffstageAnimatedNotifier,
     required this.selectedList,
 
-    this.initalIndex = 0,
+    this.initialIndex = 0,
     this.onTap,
   });
 
@@ -19,7 +19,7 @@ class BangumiTabContentSelect extends StatelessWidget {
   final ValueNotifier<bool> selectOffstageAnimatedNotifier;
 
   final List selectedList;
-  final int initalIndex;
+  final int initialIndex;
   final Function(int)? onTap;
   
 
@@ -66,7 +66,7 @@ class BangumiTabContentSelect extends StatelessWidget {
       child: ColoredBox(
         color: judgeCurrentThemeColor(context).withValues(alpha: 0.8),
         child: DefaultTabController(
-          initialIndex: initalIndex,
+          initialIndex: initialIndex,
           length: selectedList.length,
           child: TabBar(
             labelPadding: const EdgeInsets.all(0),

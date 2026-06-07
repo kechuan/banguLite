@@ -169,7 +169,7 @@ class EpModel extends ChangeNotifier{
       else{
         if(epsData[selectedEp] == null){
 
-          await getEpsInformationCompleter?.future ?? await getEpsInformation(offset: convertSegement(selectedEp.toInt(),100));
+          await getEpsInformationCompleter?.future ?? await getEpsInformation(offset: convertSegment(selectedEp.toInt(),100));
           if(epsData.isEmpty) return false;
         }
       }
