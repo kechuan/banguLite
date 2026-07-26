@@ -1,9 +1,9 @@
 
 
 import 'package:bangu_lite/internal/custom_toaster.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
@@ -23,21 +23,20 @@ import 'package:provider/provider.dart';
 class BangumiDetailIntro extends StatelessWidget {
   const BangumiDetailIntro({
     super.key,
-});
+  });
 
   @override
   Widget build(BuildContext context) {
 
-    return Selector<BangumiModel,BangumiDetails?>(
-      selector: (_, bangumiModel)=>bangumiModel.bangumiDetails,
+    return Selector<BangumiModel, BangumiDetails?>(
+      selector: (_, bangumiModel) => bangumiModel.bangumiDetails,
       shouldRebuild: (previous, next) => previous != next,
-      builder: (_, bangumiDetails,__) {
+      builder: (_, bangumiDetails, __) {
         return MediaQuery.orientationOf(context) == Orientation.portrait ?
         IntroPortrait(bangumiDetails: bangumiDetails ?? BangumiDetails()) :
         IntroLandscape(bangumiDetails: bangumiDetails ?? BangumiDetails());
       }, 
     );
-
 
   }
 }
@@ -46,7 +45,7 @@ class IntroPortrait extends StatefulWidget {
   const IntroPortrait({
     super.key,
     required this.bangumiDetails
-});
+  });
 
   final BangumiDetails bangumiDetails;
 
@@ -59,19 +58,18 @@ class _IntroPortraitState extends State<IntroPortrait> {
   Widget? cachedImages;
 
   @override
-    void initState() {
-      super.initState();
+  void initState() {
+    super.initState();
 
-      if(widget.bangumiDetails.coverUrl != null){
-        cachedImages = BuildDetailImages(
-          imageName: widget.bangumiDetails.name,
-          imageID: widget.bangumiDetails.id,
-          detailImageUrl: widget.bangumiDetails.coverUrl,
-        );
-      }
-      
-
+    if (widget.bangumiDetails.coverUrl != null) {
+      cachedImages = BuildDetailImages(
+        imageName: widget.bangumiDetails.name,
+        imageID: widget.bangumiDetails.id,
+        detailImageUrl: widget.bangumiDetails.coverUrl,
+      );
     }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,20 +81,20 @@ class _IntroPortraitState extends State<IntroPortrait> {
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-    
+
           children: [
             //Pic
             Expanded(
               flex: 2,
               child: FittedBox(
                 child: cachedImages ?? BuildDetailImages(
-                  imageName: widget.bangumiDetails.name,
-                  imageID: widget.bangumiDetails.id,
-                  detailImageUrl: widget.bangumiDetails.coverUrl,
-                )
+                    imageName: widget.bangumiDetails.name,
+                    imageID: widget.bangumiDetails.id,
+                    detailImageUrl: widget.bangumiDetails.coverUrl,
+                  )
               )
             ),
-    
+
             //Info
             Expanded(
               flex: 3,
@@ -104,22 +102,22 @@ class _IntroPortraitState extends State<IntroPortrait> {
                 padding: const EdgeInsets.only(left: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                
+
                   //detail——rating
                   children: [
-                    
+
                     Row(
                       children: [
-    
+
                         Expanded(
                           child: ListTile(
                             onTap: () {
                               Clipboard.setData(ClipboardData(text: '${widget.bangumiDetails.name}'));
-                              fadeToaster(context: context,message: "标题已复制,长按复制别称");
+                              fadeToaster(context: context, message: "标题已复制,长按复制别称");
                             },
                             onLongPress: () {
                               Clipboard.setData(ClipboardData(text: '${widget.bangumiDetails.informationList["alias"] ?? ""}'));
-                              fadeToaster(context:context,message: "别称已复制");
+                              fadeToaster(context: context, message: "别称已复制");
                             },
                             title: ScalableText(
                               "${widget.bangumiDetails.name}",
@@ -135,38 +133,37 @@ class _IntroPortraitState extends State<IntroPortrait> {
 
                       ]
                     ),
-                    
-                    BuildInfoBox(informationList: widget.bangumiDetails.informationList,type: widget.bangumiDetails.type)
+
+                    BuildInfoBox(informationList: widget.bangumiDetails.informationList, type: widget.bangumiDetails.type)
                   ]
                 )
               )
             )
-    
-            
+
           ]
         ),
 
         StarButton(bangumiDetails: widget.bangumiDetails),
-    
+
         LayoutBuilder(
-          builder: (_,constraint) {
+          builder: (_, constraint) {
             return BangumiRankBox(
               constraint: constraint,
               bangumiDetails: widget.bangumiDetails
             );
           }
         ),
-    
+
         //Entry for Portial          
         InkResponse(
           onTap: () {
-    
+
             showModalBottomSheet(
-              backgroundColor: judgeDetailRenderColor(context,context.read<BangumiModel>().bangumiThemeColor).withValues(alpha: 0.8),
+              backgroundColor: judgeDetailRenderColor(context, context.read<BangumiModel>().bangumiThemeColor).withValues(alpha: 0.8),
               constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
               context: context, //拥有model的有效context
-              
-              builder: (_){
+
+              builder: (_) {
                 //因为showDialog/showModalBottomSheet 使用的context是独立在整个体系之外的
                 //在 layout inspector 里能看到 此时它的层级关系是和 其他的Page一样直接属于materialApp的分支之下
                 //因此只能直接这样处理了
@@ -187,10 +184,10 @@ class _IntroPortraitState extends State<IntroPortrait> {
                         )
                       )
                     )
-                
+
                   ),
                 );
-    
+
               }
             );
           },
@@ -200,7 +197,7 @@ class _IntroPortraitState extends State<IntroPortrait> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.6)
-                
+
               ),
               child: Padding(
                 padding: PaddingH12,
@@ -208,65 +205,65 @@ class _IntroPortraitState extends State<IntroPortrait> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const ScalableText("放送详情"),
-                  
+
                     Row(
-                      
+
                       children: [
 
-                        Selector<EpModel,num>(
-                          selector: (_,epModel) => epModel.epsData.length,
+                        Selector<EpModel, num>(
+                          selector: (_, epModel) => epModel.epsData.length,
                           shouldRebuild: (previous, next) => previous != next,
-                          builder: (_,epCount,child){
-    
+                          builder: (_, epCount, child) {
+
                             final epModel = context.read<EpModel>();
-    
+
                             int airedEps = 0;
-    
+
                             if (
-                              widget.bangumiDetails.informationList["air_weekday"] == null || 
+                            widget.bangumiDetails.informationList["air_weekday"] == null || 
                               convertAiredEps(widget.bangumiDetails.informationList["air_date"]) >= (epCount) ||
                               epCount > 500 //不确定长度
-                            ){
+                            ) {
 
-                              if(epModel.epsData.values.first == EpsInfo.empty()) return ScalableText("暂无数据",style: TextStyle(color: Colors.grey.withValues(alpha: 0.8)));
+                              if (epModel.epsData.values.first == EpsInfo.empty()) return ScalableText("暂无数据", style: TextStyle(color: Colors.grey.withValues(alpha: 0.8)));
                               return ScalableText("共$epCount集");
                             }
-    
-                            if(epCount != 0){
-                              
-                              if(epModel.epsData[epModel.epsData.length]?.airDate != null){
-                                epModel.epsData.values.any((currentEpInfo){
-                                  
+
+                            if (epCount != 0) {
+
+                              if (epModel.epsData[epModel.epsData.length]?.airDate != null) {
+                                epModel.epsData.values.any((currentEpInfo) {
+
                                   //debugPrint("airedEps:$airedEps");
-    
+
                                   bool overlapAirDate = convertDateTime(currentEpInfo.airDate).difference(DateTime.now()) >= Duration.zero;
-                                  overlapAirDate ? null : airedEps+=1;
-    
+                                  overlapAirDate ? null : airedEps += 1;
+
                                   return overlapAirDate;
-    
+
                                 });
-    
+
                               }
                             }
-    
+
                             return ScalableText("$airedEps/$epCount");
                           }
                         ),
 
                         const Padding(
                           padding: EdgeInsets.only(left: 6),
-                          child: Icon(Icons.arrow_forward_ios,size: 16)
+                          child: Icon(Icons.arrow_forward_ios, size: 16)
                         )
                       ]
                     )
-                  
+
                   ]
                 )
               )
             )
           )
         ),
-          
+
         ConstrainedBox(
           constraints: const BoxConstraints.tightFor(width: double.infinity),
           child: Padding(
@@ -274,10 +271,10 @@ class _IntroPortraitState extends State<IntroPortrait> {
             child: BuildTags(tagsList: widget.bangumiDetails.tagsList)
           )
         )
-    
+
       ]
     );
-      
+
   }
 }
 
@@ -293,8 +290,6 @@ class IntroLandscape extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    
-
     return Column(
       spacing: 12,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,7 +298,7 @@ class IntroLandscape extends StatelessWidget {
           spacing: 6,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-        
+
             Expanded(
               child: FittedBox(
                 child: BuildDetailImages(
@@ -313,7 +308,7 @@ class IntroLandscape extends StatelessWidget {
                 )
               )
             ),
-            
+
             //Info
             Expanded(
               flex: 3,
@@ -322,20 +317,20 @@ class IntroLandscape extends StatelessWidget {
                 child: Column(
                   spacing: 12,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                
+
                   //detail——rating
                   children: [
-                        
+
                     ListTile(
                       onTap: () {
                         Clipboard.setData(ClipboardData(text: '${bangumiDetails.name}'));
-                        fadeToaster(context: context,message: "标题已复制,长按复制alias");
+                        fadeToaster(context: context, message: "标题已复制,长按复制alias");
                       },
                       onLongPress: () {
                         Clipboard.setData(ClipboardData(text: '${bangumiDetails.informationList["alias"] ?? ""}'));
-                        fadeToaster(context:context,message:"alias已复制");
+                        fadeToaster(context: context, message: "alias已复制");
                       },
-                      title: ScalableText("${bangumiDetails.name}",style: const TextStyle(fontSize: 18)),
+                      title: ScalableText("${bangumiDetails.name}", style: const TextStyle(fontSize: 18)),
                       subtitle: ScalableText(bangumiDetails.informationList["alias"] ?? ""),
                       trailing: SizedBox(
                         width: 120,
@@ -344,44 +339,43 @@ class IntroLandscape extends StatelessWidget {
                         )
                       )
                     ),
-                        
+
                     Row(
                       children: [
-                        BuildInfoBox(informationList: bangumiDetails.informationList,type: bangumiDetails.type),
-                    
+                        BuildInfoBox(informationList: bangumiDetails.informationList, type: bangumiDetails.type),
+
                         const Spacer(),
-                    
-                        BangumiRankBox(bangumiDetails: bangumiDetails, constraint: const BoxConstraints(minWidth: 300,maxWidth: 400))
+
+                        BangumiRankBox(bangumiDetails: bangumiDetails, constraint: const BoxConstraints(minWidth: 300, maxWidth: 400))
                       ]
                     ),
-                        
+
                     BuildEps(
                       subjectID: bangumiDetails.id ?? 0,
                       subjectName: bangumiDetails.name,
                       informationList: bangumiDetails.informationList
                     ),
-                        
+
                   ]
                 )
               )
             )
-        
-            ]
+
+          ]
         ),
 
         const Padding(
           padding: PaddingH12,
-          child: ScalableText("标签",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
+          child: ScalableText("标签", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         ),
-    
+
         //tags
         Padding(
           padding: PaddingH12,
           child: BuildTags(tagsList: bangumiDetails.tagsList)
         )
       ],
-    
-      
+
     );
 
   }

@@ -5,9 +5,9 @@ import 'dart:io';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/hive.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/internal/utils/template.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:bangu_lite/models/informations/surf/user_notification_details.dart';
@@ -47,7 +47,7 @@ class AccountModel extends ChangeNotifier {
 
     Duration overlapDuration = const Duration();
     await loginedUserInformations.expiredTime?.let((it) async {
-      
+
       overlapDuration = DateTime.fromMillisecondsSinceEpoch(it * 1000).difference(DateTime.now());
 
       //效果还剩3天时自动刷新令牌
@@ -55,12 +55,12 @@ class AccountModel extends ChangeNotifier {
         await updateAccessToken(loginedUserInformations.refreshToken);
       }
 
-      else if(overlapDuration < const Duration(days: 0)){
+      else if (overlapDuration < const Duration(days: 0)) {
         logout();
-        if(context.mounted){
+        if (context.mounted) {
           showRequestSnackBar(backgroundColor: judgeCurrentThemeColor(context), message: "登录已过期", requestStatus: false);
         }
-        
+
         return;
       }
 
@@ -73,14 +73,14 @@ class AccountModel extends ChangeNotifier {
       },
     ).then((status) {
 
-      if (status) {
-        debugPrint("[Session Expired countDown] :${overlapDuration.inDays} Days ${(((overlapDuration.inHours/24)%1)*24).toStringAsFixed(1)} Hours");
-        getNotifications();
+        if (status) {
+          debugPrint("[Session Expired countDown] :${overlapDuration.inDays} Days ${(((overlapDuration.inHours / 24) % 1) * 24).toStringAsFixed(1)} Hours");
+          getNotifications();
 
-      }
+        }
 
-      notifyListeners();
-    });
+        notifyListeners();
+      });
   }
 
   void logout() {
@@ -156,27 +156,27 @@ class AccountModel extends ChangeNotifier {
           }
         ).then((isValid) {
 
-              if (isValid) {
+            if (isValid) {
 
-                loginedUserInformations
-                  ..accessToken = response.data["access_token"]
-                  ..expiredTime = DateTime.now().millisecondsSinceEpoch ~/ 1000 + (response.data["expires_in"] as int)
-                  ..refreshToken = response.data["refresh_token"]
-                ;
+              loginedUserInformations
+                ..accessToken = response.data["access_token"]
+                ..expiredTime = DateTime.now().millisecondsSinceEpoch ~/ 1000 + (response.data["expires_in"] as int)
+                ..refreshToken = response.data["refresh_token"]
+              ;
 
-                updateLoginInformation(loginedUserInformations);
-                getNotifications();
-              }
+              updateLoginInformation(loginedUserInformations);
+              getNotifications();
+            }
 
-              else {
-                logout();
-              }
+            else {
+              logout();
+            }
 
-              completer.complete(isValid);
-              accountLoginStatus = LoginStatus.logined;
-              notifyListeners();
+            completer.complete(isValid);
+            accountLoginStatus = LoginStatus.logined;
+            notifyListeners();
 
-            });
+          });
       },
       generalFallbackAction: (String errorMessage, Completer<dynamic> completer) {
         fallbackAction?.call('[AccessToken] $errorMessage');
@@ -197,26 +197,26 @@ class AccountModel extends ChangeNotifier {
         BangumiWebUrls.oAuthToken,
         data: BangumiQuerys.refreshTokenQuery(refreshToken),
       ).then((response) {
-        if (response.statusCode == HttpStatus.ok) {
-          debugPrint(
-            "[LoginSession] session update succ, ${DateTime.fromMillisecondsSinceEpoch((loginedUserInformations.expiredTime ?? 0) * 1000)} => "
-            "${DateTime.now().add(Duration(seconds: response.data["expires_in"]))}"
-          );
+          if (response.statusCode == HttpStatus.ok) {
+            debugPrint(
+              "[LoginSession] session update succ, ${DateTime.fromMillisecondsSinceEpoch((loginedUserInformations.expiredTime ?? 0) * 1000)} => "
+              "${DateTime.now().add(Duration(seconds: response.data["expires_in"]))}"
+            );
 
-          loginedUserInformations
-            ..accessToken = response.data["access_token"]
-            ..expiredTime = DateTime.now().millisecondsSinceEpoch ~/ 1000 + (response.data["expires_in"] as int)
-            ..refreshToken = response.data["refresh_token"]
-          ;
-          updateLoginInformation(loginedUserInformations);
+            loginedUserInformations
+              ..accessToken = response.data["access_token"]
+              ..expiredTime = DateTime.now().millisecondsSinceEpoch ~/ 1000 + (response.data["expires_in"] as int)
+              ..refreshToken = response.data["refresh_token"]
+            ;
+            updateLoginInformation(loginedUserInformations);
 
-        }
+          }
 
-        else {
-          debugPrint("update fail. token may already expired");
-          launchUrlString(BangumiWebUrls.webAuthPage());
-        }
-      });
+          else {
+            debugPrint("update fail. token may already expired");
+            launchUrlString(BangumiWebUrls.webAuthPage());
+          }
+        });
     }
 
     on DioException catch(e){
@@ -375,16 +375,16 @@ class AccountModel extends ChangeNotifier {
       int resultCode = 0;
 
       await contentFuture().then((response) {
-          if (response.statusCode == HttpStatus.ok) {
-            //目前只有 subjectComment 返回的 data 是空的 {}
-            //应该说是PUT行为是不返回的
-            //debugPrint("postID:${response.data["id"]}");
-            //contentCompleter.complete(response.data["id"] ?? 200);
+        if (response.statusCode == HttpStatus.ok) {
+          //目前只有 subjectComment 返回的 data 是空的 {}
+          //应该说是PUT行为是不返回的
+          //debugPrint("postID:${response.data["id"]}");
+          //contentCompleter.complete(response.data["id"] ?? 200);
 
-            //那没办法 给它特殊一个返回值吧
-            resultCode = response.data["id"] ?? 1;
-          }
-        });
+          //那没办法 给它特殊一个返回值吧
+          resultCode = response.data["id"] ?? 1;
+        }
+      });
 
       return resultCode;
 
@@ -423,31 +423,31 @@ class AccountModel extends ChangeNotifier {
 
       case PostCommentType.replyEpComment:{
         requestUrl = actionType == UserContentActionType.post ?
-          BangumiAPIUrls.postEpComment(contentID!) :
-          BangumiAPIUrls.actionEpComment(commentID!);
+        BangumiAPIUrls.postEpComment(contentID!) :
+        BangumiAPIUrls.actionEpComment(commentID!);
 
       }
 
       case PostCommentType.replyTopic:{
 
         requestUrl = actionType == UserContentActionType.post ?
-          BangumiAPIUrls.postTopicComment(contentID!) :
-          BangumiAPIUrls.actionTopicComment(commentID!);
+        BangumiAPIUrls.postTopicComment(contentID!) :
+        BangumiAPIUrls.actionTopicComment(commentID!);
 
       }
 
       case PostCommentType.replyGroupTopic:{
 
         requestUrl = actionType == UserContentActionType.post ?
-          BangumiAPIUrls.postGroupTopicComment(contentID!) :
-          BangumiAPIUrls.actionGroupTopicComment(commentID!);
+        BangumiAPIUrls.postGroupTopicComment(contentID!) :
+        BangumiAPIUrls.actionGroupTopicComment(commentID!);
 
       }
 
       case PostCommentType.replyBlog:{
         requestUrl = actionType == UserContentActionType.post ?
-          BangumiAPIUrls.postBlogComment(contentID!) :
-          BangumiAPIUrls.actionBlogComment(commentID!);
+        BangumiAPIUrls.postBlogComment(contentID!) :
+        BangumiAPIUrls.actionBlogComment(commentID!);
 
       }
 
@@ -507,11 +507,11 @@ class AccountModel extends ChangeNotifier {
       int? responseID;
 
       await commentFuture().then((response) {
-          if (response.statusCode == HttpStatus.ok) {
-            debugPrint("response id:${response.data["id"]}");
-            responseID = response.data["id"] ?? 1;
-          }
-        });
+        if (response.statusCode == HttpStatus.ok) {
+          debugPrint("response id:${response.data["id"]}");
+          responseID = response.data["id"] ?? 1;
+        }
+      });
 
       return responseID ?? 1;
     }
@@ -641,41 +641,41 @@ class AccountModel extends ChangeNotifier {
       queryParameters: notificationsQuery,
       options: BangumiAPIUrls.bangumiAccessOption(),
     ).then((response) {
-          if (response.statusCode == HttpStatus.ok) {
+        if (response.statusCode == HttpStatus.ok) {
 
-            if (unread == true) {
+          if (unread == true) {
 
-              final notificationsList = loadUserNotifications(response.data["data"]);
+            final notificationsList = loadUserNotifications(response.data["data"]);
 
-              currentUserNotifications.addAll(notificationsList);
-              unreadNotifications += notificationsList.length;
-            }
-
-            else {
-
-              unreadNotifications = 0;
-              currentUserNotifications = loadUserNotifications(response.data["data"]).toSet();
-
-              for (final currentNotification in currentUserNotifications){
-                if (currentNotification.isUnRead == true) {
-                  unreadNotifications += 1;
-                }
-              }
-
-            }
-
-            notificationCompleter.complete(true);
-            notifyListeners();
-
+            currentUserNotifications.addAll(notificationsList);
+            unreadNotifications += notificationsList.length;
           }
 
           else {
-            notificationCompleter.complete(false);
 
-            fallbackAction?.call("${response.statusCode} ${response.data["message"]}");
+            unreadNotifications = 0;
+            currentUserNotifications = loadUserNotifications(response.data["data"]).toSet();
+
+            for (final currentNotification in currentUserNotifications){
+              if (currentNotification.isUnRead == true) {
+                unreadNotifications += 1;
+              }
+            }
+
           }
 
-        });
+          notificationCompleter.complete(true);
+          notifyListeners();
+
+        }
+
+        else {
+          notificationCompleter.complete(false);
+
+          fallbackAction?.call("${response.statusCode} ${response.data["message"]}");
+        }
+
+      });
 
     return notificationCompleter.future;
   }
@@ -698,35 +698,35 @@ class AccountModel extends ChangeNotifier {
       data: BangumiQuerys.clearNotificationsQuery(notificationIDList: notificationIDList)
     )
       .then((response) {
-          if (response.statusCode == HttpStatus.ok) {
+        if (response.statusCode == HttpStatus.ok) {
 
-            if (notificationIDList == null) {
-              unreadNotifications = 0;
-
-            }
-
-            else {
-              currentUserNotifications = currentUserNotifications.map((currentNotification) {
-                  if (notificationIDList.contains(currentNotification.notificationID)) {
-                    currentNotification.isUnRead = false;
-                    unreadNotifications -= 1;
-                  }
-                  return currentNotification;
-                }).toSet();
-            }
-
-            clearNotificationCompleter.complete(true);
-
-            notifyListeners();
+          if (notificationIDList == null) {
+            unreadNotifications = 0;
 
           }
 
           else {
-            clearNotificationCompleter.complete(false);
-            fallbackAction?.call("${response.data["message"]}");
+            currentUserNotifications = currentUserNotifications.map((currentNotification) {
+              if (notificationIDList.contains(currentNotification.notificationID)) {
+                currentNotification.isUnRead = false;
+                unreadNotifications -= 1;
+              }
+              return currentNotification;
+            }).toSet();
           }
 
-        });
+          clearNotificationCompleter.complete(true);
+
+          notifyListeners();
+
+        }
+
+        else {
+          clearNotificationCompleter.complete(false);
+          fallbackAction?.call("${response.data["message"]}");
+        }
+
+      });
 
     return clearNotificationCompleter.future;
   }
@@ -752,15 +752,15 @@ class AccountModel extends ChangeNotifier {
       ),
       options: BangumiAPIUrls.bangumiAccessOption(),
     ).then((response) {
-          if (response.statusCode == HttpStatus.ok) {
-            reportCompleter.complete(true);
-          }
+        if (response.statusCode == HttpStatus.ok) {
+          reportCompleter.complete(true);
+        }
 
-          else {
-            reportCompleter.complete(false);
-            fallbackAction?.call("${response.statusCode} ${response.data["message"]}");
-          }
-        });
+        else {
+          reportCompleter.complete(false);
+          fallbackAction?.call("${response.statusCode} ${response.data["message"]}");
+        }
+      });
 
     return reportCompleter.future;
   }

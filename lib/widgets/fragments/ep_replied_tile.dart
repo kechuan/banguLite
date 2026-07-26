@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
@@ -23,7 +23,6 @@ class EpRepliedTile extends ListTile {
 
     this.floorHostUserID
 
-
   });
 
   final int contentID;
@@ -38,8 +37,8 @@ class EpRepliedTile extends ListTile {
   @override
   Widget build(BuildContext context) {
 
-    if( 
-      epCommentData.repliedComment == null ||
+    if ( 
+    epCommentData.repliedComment == null ||
       epCommentData.repliedComment!.isEmpty
     ) {
       return const SizedBox.shrink();
@@ -59,130 +58,130 @@ class EpRepliedTile extends ListTile {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                
+
                 /// 拼接显示方案
                 ...List.generate(
                   min(3, epCommentData.repliedComment!.length), 
                   (index) {
                     final repliedComment = epCommentData.repliedComment![index];
 
-                      debugPrint('[epCommentData.state] ${epCommentData.state}: ${repliedComment.epCommentIndex}');
+                    debugPrint('[epCommentData.state] ${epCommentData.state}: ${repliedComment.epCommentIndex}');
 
-                      final quoteContent = quoteBBcodeContentRegexp
-                        .firstMatch(repliedComment.comment ?? "")
-                        ?.group(1) ?? ""
-                      ;
-          
-                      final mainContent = repliedComment.comment
-                        ?.split(quoteBBcodeRegexp)
-                        .last
-                        .replaceAll(bbcodeRegexp, '') ?? ""
-                      ;
-          
-                        return Padding(
-                          padding: Padding6,
-                          child: ShowCommentTap(
-                            contentID: contentID,
-                            postCommentType: postCommentType,
-                            epCommentData: epCommentData,
-                            commentIndex: index,
-                            themeColor: themeColor,
-                            floorHostUserID : floorHostUserID,
-                            
-                            child: Row(
-                              spacing: 12,
-                              crossAxisAlignment: 
-                              (
-                                quoteContent.isNotEmpty || 
-                                (mainContent.contains(RegExp(r'\(bgm\d+\)|\(blake_\d+\)|\(musume_\d+\)')) || mainContent.contains("\n") ) ||
-                                (AppFontSize.s16*mainContent.length > MediaQuery.sizeOf(context).width*2/3)
+                    final quoteContent = quoteBBcodeContentRegexp
+                      .firstMatch(repliedComment.comment ?? "")
+                      ?.group(1) ?? ""
+                    ;
 
-                              ) ? CrossAxisAlignment.end : 
-                              CrossAxisAlignment.start
-                              ,
-                              children: [
-          
-                                ScalableText(
-                                  "${repliedComment.userInformation?.nickName}:",
-                                  style:TextStyle(fontWeight: FontWeight.w600,fontSize: AppFontSize.s15)
-                                ),
-          
-                                epCommentData.repliedComment![index].state?.isNotAvaliable() == true ?
-                                const ScalableText("发言已隐藏",style: TextStyle(fontWeight: FontWeight.bold)) :
-                                Expanded(
-                                  child: RichText(  // 使用 RichText 合并文本
-                                    text: TextSpan(
-                                      style: TextStyle(
-                                        fontFamilyFallback: convertSystemFontFamily(),
-                                        fontSize: AppFontSize.s16,
-                                      ),
-                                      children: [
-                                                              
-                                        if (quoteContent.isNotEmpty) ...[
-                                          WidgetSpan(
-                                            alignment: PlaceholderAlignment.bottom,
-                                            child: DecoratedBox(
-                                              decoration: BoxDecoration(
-                                                border: Border.all(),
-                                                borderRadius: BorderRadius.circular(6),
-                                              ),
-                                              child: Padding(
-                                                padding: Padding6,
-                                                child: ScalableText(
-                                                  quoteContent.length > 30 ? 
-                                                  "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}..." : 
-                                                  quoteContent.replaceAll(bbcodeRegexp, ''),
-                                                  maxLines: 1,
-                                                  style: TextStyle(
-                                                    color: judgeDarknessMode(context) ? judgeCurrentThemeColor(context) : Colors.blueGrey,
-                                                    fontSize: AppFontSize.s14
-                                                  ),
-                                                ),
-                                              )
-                                            )
+                    final mainContent = repliedComment.comment
+                      ?.split(quoteBBcodeRegexp)
+                      .last
+                      .replaceAll(bbcodeRegexp, '') ?? ""
+                    ;
+
+                    return Padding(
+                      padding: Padding6,
+                      child: ShowCommentTap(
+                        contentID: contentID,
+                        postCommentType: postCommentType,
+                        epCommentData: epCommentData,
+                        commentIndex: index,
+                        themeColor: themeColor,
+                        floorHostUserID: floorHostUserID,
+
+                        child: Row(
+                          spacing: 12,
+                          crossAxisAlignment: 
+                          (
+                          quoteContent.isNotEmpty || 
+                            (mainContent.contains(RegExp(r'\(bgm\d+\)|\(blake_\d+\)|\(musume_\d+\)')) || mainContent.contains("\n") ) ||
+                            (AppFontSize.s16 * mainContent.length > MediaQuery.sizeOf(context).width * 2 / 3)
+
+                          ) ? CrossAxisAlignment.end : 
+                          CrossAxisAlignment.start
+                          ,
+                          children: [
+
+                            ScalableText(
+                              "${repliedComment.userInformation?.nickName}:",
+                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: AppFontSize.s15)
+                            ),
+
+                            epCommentData.repliedComment![index].state?.isNotAvaliable() == true ?
+                            const ScalableText("发言已隐藏", style: TextStyle(fontWeight: FontWeight.bold)) :
+                            Expanded(
+                              child: RichText(  // 使用 RichText 合并文本
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    fontFamilyFallback: convertSystemFontFamily(),
+                                    fontSize: AppFontSize.s16,
+                                  ),
+                                  children: [
+
+                                    if (quoteContent.isNotEmpty) ...[
+                                      WidgetSpan(
+                                        alignment: PlaceholderAlignment.bottom,
+                                        child: DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            border: Border.all(),
+                                            borderRadius: BorderRadius.circular(6),
                                           ),
-          
-                                          /// 往上面的text内容增加\n没有用 必须在这里加才生效 甚是奇怪
-                                          const TextSpan(text: "\n"),
-                                  
-                                        ],
-                                  
-                                        WidgetSpan(
-                                          child: AdapterBBCodeText(
-                                            data: convertBangumiCommentSticker(mainContent),
-                                            stylesheet: appDefaultBBStyleSheet(context,richless: true),
-                                            maxLine: 3,
+                                          child: Padding(
+                                            padding: Padding6,
+                                            child: ScalableText(
+                                              quoteContent.length > 30 ? 
+                                              "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}..." : 
+                                              quoteContent.replaceAll(bbcodeRegexp, ''),
+                                              maxLines: 1,
+                                              style: TextStyle(
+                                                color: judgeDarknessMode(context) ? judgeCurrentThemeColor(context) : Colors.blueGrey,
+                                                fontSize: AppFontSize.s14
+                                              ),
+                                            ),
                                           )
                                         )
-                                        
-                                      ],
-                                    ),
-                                    maxLines: 4,  // 引用1行 + 内容3行
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                      ),
+
+                                      /// 往上面的text内容增加\n没有用 必须在这里加才生效 甚是奇怪
+                                      const TextSpan(text: "\n"),
+
+                                    ],
+
+                                    WidgetSpan(
+                                      child: AdapterBBCodeText(
+                                        data: convertBangumiCommentSticker(mainContent),
+                                        stylesheet: appDefaultBBStyleSheet(context, richless: true),
+                                        maxLine: 3,
+                                      )
+                                    )
+
+                                  ],
                                 ),
-                              
-                              ],
+                                maxLines: 4,  // 引用1行 + 内容3行
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                        );
-                      }
+
+                          ],
+                        ),
+                      ),
+                    );
+                  }
                 ),
-                  
-                  if(epCommentData.repliedComment!.length > 3) 
-                    ShowCommentTap(
-                      contentID: contentID,
-                      themeColor: themeColor,
-                      postCommentType: postCommentType,
-                      epCommentData: epCommentData,
-                      //authorType:authorType,
-                      floorHostUserID : floorHostUserID,
-                      child: ScalableText(
-                        "> 点击查看 ${epCommentData.repliedComment!.length} 条评论",
-                        style: TextStyle(color: judgeDarknessMode(context) ? const Color.fromARGB(225, 212, 232, 215) : Colors.blueAccent),
-                      )
+
+                if(epCommentData.repliedComment!.length > 3) 
+                ShowCommentTap(
+                  contentID: contentID,
+                  themeColor: themeColor,
+                  postCommentType: postCommentType,
+                  epCommentData: epCommentData,
+                  //authorType:authorType,
+                  floorHostUserID: floorHostUserID,
+                  child: ScalableText(
+                    "> 点击查看 ${epCommentData.repliedComment!.length} 条评论",
+                    style: TextStyle(color: judgeDarknessMode(context) ? const Color.fromARGB(225, 212, 232, 215) : Colors.blueAccent),
+                  )
                 ),
-                  
+
               ],
             ),
           ),
@@ -190,7 +189,6 @@ class EpRepliedTile extends ListTile {
       ),
     );
 
-    
   }
 
 }
@@ -218,29 +216,28 @@ class ShowCommentTap extends InkResponse{
 
   final Color? themeColor;
 
-
   @override
   Widget build(BuildContext context) {
     return InkResponse(
       hoverColor: Colors.transparent,
       highlightColor: Colors.transparent,
       containedInkWell: true,
-      onTap: (){
+      onTap: () {
         showModalBottomSheet(
           isScrollControlled: true,
-          constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width,maxHeight:MediaQuery.sizeOf(context).height*3/4),
+          constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width, maxHeight: MediaQuery.sizeOf(context).height * 3 / 4),
           context: context,
-          builder: (_){
+          builder: (_) {
 
             return EpRepliedCommentBottomSheet(
               contentID: contentID,
               currentLevelComment: epCommentData,
               commentIndex: commentIndex,
-              floorHostUserID:floorHostUserID,
+              floorHostUserID: floorHostUserID,
               postCommentType: postCommentType,
               readableThemeColor: themeColor,
             );
-            
+
           }
         );
       },

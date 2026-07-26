@@ -1,18 +1,15 @@
 import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
-import 'package:bangu_lite/models/informations/subjects/blog_details.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
-
-import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
-import 'package:flutter/material.dart';
-
-
-@FFAutoImport()
-import 'package:bangu_lite/models/providers/review_model.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/models/informations/subjects/blog_details.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/informations/subjects/review_details.dart';
+@FFAutoImport()
+import 'package:bangu_lite/models/providers/review_model.dart';
+import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
+import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
+import 'package:flutter/material.dart';
 
 @FFRoute(name: '/Blog')
 class BangumiBlogPage extends StatefulWidget {
@@ -20,17 +17,16 @@ class BangumiBlogPage extends StatefulWidget {
     super.key,
     required this.reviewModel,
     required this.reviewInfo,
-    
+
     this.themeColor,
     this.referPostContentID,
 
     this.sourceTitle
   });
 
-  
   final ReviewModel reviewModel;
   final ReviewInfo reviewInfo;
-  
+
   final Color? themeColor;
   final int? referPostContentID;
 
@@ -42,12 +38,12 @@ class BangumiBlogPage extends StatefulWidget {
 
 
 class _BangumiBlogPageState extends BangumiContentPageState
-<
-	BangumiBlogPage,
-	ReviewModel,
-	ReviewInfo,
-	BlogDetails
->{
+  <
+    BangumiBlogPage,
+    ReviewModel,
+    ReviewInfo,
+    BlogDetails
+  >{
 
   @override
   String? sourceTitle() => widget.sourceTitle;
@@ -72,36 +68,36 @@ class _BangumiBlogPageState extends BangumiContentPageState
   Color? getcurrentSubjectThemeColor() => widget.themeColor;
 
   @override
-  bool isContentLoading(int? blogID){
-	return 
-		getContentModel().contentDetailData[blogID]?.blogID == null ||
-		getContentModel().contentDetailData[blogID]?.blogReplies == null
-	;
+  bool isContentLoading(int? blogID) {
+    return 
+    getContentModel().contentDetailData[blogID]?.blogID == null ||
+      getContentModel().contentDetailData[blogID]?.blogReplies == null
+    ;
   }
 
   @override
-  int? getCommentCount(BlogDetails? blogDetails, bool isLoading){
-    if(isLoading) return null;
+  int? getCommentCount(BlogDetails? blogDetails, bool isLoading) {
+    if (isLoading) return null;
     return blogDetails!.blogReplies?.length ?? 0;
 
   }
-	
-  @override
-  PostCommentType? getPostCommentType() => PostCommentType.replyBlog;
-  
-  @override
-  String getWebUrl(int? blogID)=> BangumiWebUrls.userBlog(blogID ?? 0);
 
   @override
-  Future<void> loadContent(int blogID,{bool isRefresh = false}){
+  PostCommentType? getPostCommentType() => PostCommentType.replyBlog;
+
+  @override
+  String getWebUrl(int? blogID) => BangumiWebUrls.userBlog(blogID ?? 0);
+
+  @override
+  Future<void> loadContent(int blogID, {bool isRefresh = false}) {
     return getContentModel().loadBlog(
       blogID,
       isRefresh: isRefresh,
-      fallbackAction: (message) => showRequestSnackBar(message:message,requestStatus: false,backgroundColor: judgeCurrentThemeColor(context)));
+      fallbackAction: (message) => showRequestSnackBar(message: message, requestStatus: false, backgroundColor: judgeCurrentThemeColor(context)));
   }
 
   @override
   int? getReferPostContentID() => widget.referPostContentID;
-  
+
 
 }

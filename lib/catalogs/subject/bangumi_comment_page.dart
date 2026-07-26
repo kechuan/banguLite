@@ -1,6 +1,6 @@
 
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_comments.dart';
@@ -29,36 +29,36 @@ class BangumiCommentPage extends StatelessWidget  {
   Widget build(BuildContext context) {
 
     final PageController commentPageController = PageController();
-    
+
     //给每个番剧页面都单独拉一个 CommentProvider 避免互相跳转之间打架
     return Theme(
       data: ThemeData(
         brightness: Theme.brightnessOf(context),
-        colorSchemeSeed: judgeDetailRenderColor(context,bangumiThemeColor),
-        
+        colorSchemeSeed: judgeDetailRenderColor(context, bangumiThemeColor),
+
         fontFamilyFallback: convertSystemFontFamily()
       ),
       child: ChangeNotifierProvider.value(
         value: commentModel,
-        builder: (context,child) {
+        builder: (context, child) {
           return Scaffold(
             appBar: AppBar(
               title: ScalableText(name ?? "comments Detail"),
               actions: [
                 IconButton(
-                  onPressed: ()=>showWrapPageDialog(context,commentPageController),
+                  onPressed: () => showWrapPageDialog(context, commentPageController),
                   icon: const Icon(Icons.wrap_text_outlined)
                 )
               ],
-              
+
             ),
-            
+
             body: FutureBuilder(
               future: context.read<CommentModel>().getCommentLength(subjectID), 
               //sideEffect的代价比较低 所以就不专门设立Completer或者State了
-              builder: (_,snapshot) {
-                switch(snapshot.connectionState){
-            
+              builder: (_, snapshot) {
+                switch (snapshot.connectionState){
+
                   case ConnectionState.done:{
                     return CommentView(
                       //totalPageLength: context.read<CommentModel>().commentLength,
@@ -67,21 +67,21 @@ class BangumiCommentPage extends StatelessWidget  {
                       bangumiThemeColor: bangumiThemeColor,
                       subjectID: subjectID,
                     );
-            
+
                   }
-            
+
                   default: return const CommentLoading();
-                    
+
                 }
-              
+
               }
             )
-            
+
           );
         }
       ),
     );
-     
+
   }
 
 }

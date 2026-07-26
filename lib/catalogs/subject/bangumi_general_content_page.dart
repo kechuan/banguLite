@@ -3,12 +3,12 @@ import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/hive.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/proxy_cache.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
@@ -35,10 +35,10 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 abstract class BangumiContentPageState<
-  W extends StatefulWidget,
-  M extends BaseModel,
-  I extends ContentInfo,
-  D extends ContentDetails
+    W extends StatefulWidget,
+    M extends BaseModel,
+    I extends ContentInfo,
+    D extends ContentDetails
   > extends LifecycleRouteState<W> {
 
   //widget.*信息获取
@@ -89,8 +89,8 @@ abstract class BangumiContentPageState<
   //推迟执行以允许在函数作用域之外执行 非const输入
   late final commentFilterTypeNotifier = ValueNotifier(
     getReferPostContentID() != null ? 
-      BangumiCommentRelatedType.id :
-      BangumiCommentRelatedType.normal
+    BangumiCommentRelatedType.id :
+    BangumiCommentRelatedType.normal
   );
 
   /// [Local Record] will be refreshed by selectedEP Toggle
@@ -125,15 +125,13 @@ abstract class BangumiContentPageState<
     final contentModel = getContentModel();
     final contentInfo = getContentInfo();
 
-    
-
     readableThemeColor ??= 
     !judgeDarknessMode(context) ?
-      getcurrentSubjectThemeColor()?.withValues(
-        red: 1 - getcurrentSubjectThemeColor()!.r,
-        green: 1 - getcurrentSubjectThemeColor()!.g,
-        blue: 1 - getcurrentSubjectThemeColor()!.b
-      ) : getcurrentSubjectThemeColor()
+    getcurrentSubjectThemeColor()?.withValues(
+      red: 1 - getcurrentSubjectThemeColor()!.r,
+      green: 1 - getcurrentSubjectThemeColor()!.g,
+      blue: 1 - getcurrentSubjectThemeColor()!.b
+    ) : getcurrentSubjectThemeColor()
     ;
 
     return ChangeNotifierProvider.value(
@@ -147,8 +145,8 @@ abstract class BangumiContentPageState<
               data: Theme.of(context).copyWith(
                 scaffoldBackgroundColor: 
                 judgeDarknessMode(context) ? 
-                  judgeDarkContentSurfaceColor(context) :
-                  convertFineTuneColor(getcurrentSubjectThemeColor() ?? judgeCurrentThemeColor(context), lumiScaleType: ScaleType.min)
+                judgeDarkContentSurfaceColor(context) :
+                convertFineTuneColor(getcurrentSubjectThemeColor() ?? judgeCurrentThemeColor(context), lumiScaleType: ScaleType.min)
                 ,
 
               ),
@@ -183,8 +181,8 @@ abstract class BangumiContentPageState<
                                       userCommentMap.addAll({content.$1 ?? 0:content.$2 as String});
 
                                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                                          animatedSliverListKey.currentState?.insertItem(0);
-                                        });
+                                        animatedSliverListKey.currentState?.insertItem(0);
+                                      });
 
                                     },
                                   ),
@@ -206,8 +204,8 @@ abstract class BangumiContentPageState<
                                         message: snapshot.error,
                                         onRetryAction: () {
                                           contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0, isRefresh: true).then((_) {
-                                              initCotent();
-                                            });
+                                            initCotent();
+                                          });
                                           refreshNotifier.value += 1;
 
                                         },
@@ -220,24 +218,24 @@ abstract class BangumiContentPageState<
                                   if (!isContentInitialed) initCotent();
 
                                   return isCommentLoading ?
-                                    Skeletonizer.sliver(
-                                      enabled: true,
-                                      child: SliverList(
-                                        delegate: SliverChildBuilderDelegate(
-                                          (_, index) {
-                                            if (index == 0) {
-                                              return const Padding(
-                                                padding: EdgeInsetsGeometry.only(top: 50, bottom: 125),
-                                                child: SkeletonListTileTemplate(scaleType: ScaleType.medium),
-                                              );
-                                            }
-                                            return const SkeletonListTileTemplate(scaleType: ScaleType.min);
+                                  Skeletonizer.sliver(
+                                    enabled: true,
+                                    child: SliverList(
+                                      delegate: SliverChildBuilderDelegate(
+                                        (_, index) {
+                                          if (index == 0) {
+                                            return const Padding(
+                                              padding: EdgeInsetsGeometry.only(top: 50, bottom: 125),
+                                              child: SkeletonListTileTemplate(scaleType: ScaleType.medium),
+                                            );
                                           }
-                                        ),
-
+                                          return const SkeletonListTileTemplate(scaleType: ScaleType.min);
+                                        }
                                       ),
-                                    ) :
-                                    authorContent(contentInfo, contentDetailData);
+
+                                    ),
+                                  ) :
+                                  authorContent(contentInfo, contentDetailData);
 
                                 }
                               ),
@@ -363,14 +361,14 @@ abstract class BangumiContentPageState<
         );
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
-            debugPrint("measure height:${authorContentKey.currentContext?.size?.height},result:${(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - scrollController.offset}");
-            scrollController.animateTo(
-              max(0, (authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - MediaQuery.sizeOf(context).height / 3),
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeOut,
-            );
+          debugPrint("measure height:${authorContentKey.currentContext?.size?.height},result:${(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - scrollController.offset}");
+          scrollController.animateTo(
+            max(0, (authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - MediaQuery.sizeOf(context).height / 3),
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeOut,
+          );
 
-          });
+        });
 
       }
 
@@ -380,7 +378,7 @@ abstract class BangumiContentPageState<
 
   void recordHistorySurf(I contentInfo, D? contentDetail) {
 
-    fullyRecordAction(int accessID,{String? subjectTitle,dynamic sourceID}){
+    fullyRecordAction(int accessID, {String? subjectTitle, dynamic sourceID}) {
       MyHive.historySurfDataBase.put(
         accessID,
         SurfTimelineDetails(
@@ -393,13 +391,13 @@ abstract class BangumiContentPageState<
           ..bangumiSurfTimelineType = BangumiSurfTimelineType.fromPostCommentType(getPostCommentType())
           ..replies = contentDetail?.contentRepliedComment?.length ?? 0
           ..commentDetails = (
-            CommentDetails()
-              ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
-          )
+        CommentDetails()
+          ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
+        )
       );
     }
 
-    updateRecordAction(int accessID){
+    updateRecordAction(int accessID) {
       MyHive.historySurfDataBase.put(
         accessID,
         MyHive.historySurfDataBase.get(accessID)!
@@ -452,7 +450,7 @@ abstract class BangumiContentPageState<
             updateRecordAction(accessID);
           }
 
-          else{
+          else {
             fullyRecordAction(
               accessID,
               subjectTitle: subjectTitle,
@@ -554,41 +552,41 @@ abstract class BangumiContentPageState<
       "[commentID:${currentEpCommentDetails.commentID}] "
       "[state]: ${currentEpCommentDetails.state} "
       "[text length]: ${currentEpCommentDetails.comment?.length} "
-    //"content: ${currentEpCommentDetails.comment}"
+      //"content: ${currentEpCommentDetails.comment}"
     );
 
     return Column(
       children: [
 
-         MultiProvider(
-            //排序会用得上Key的
-            key: ValueKey(currentEpCommentDetails.commentID),
-            providers: [
-              Provider<EpCommentDetails>.value(value: currentEpCommentDetails),
-              Provider<EpCommentViewConfig>.value(value: EpCommentViewConfig(
-                contentID: currentEpCommentDetails.contentID ?? getContentInfo().id ?? 0,
-                                      
-                postCommentType: getPostCommentType(),
-                /// 用户更改拥有的内容时
-                onUpdateComment: (content) {
-                  if (content != null) {
-                    context.read<IndexModel>().updateUserCommentMap(
-                      currentEpCommentDetails.commentID ?? 0,
-                      content
-                    );
-                  }
-        
-                  else{
-                    removeCommentAction(contentCommentIndex, currentEpCommentDetails);
-                  }
-                },
-                
-                authorID: contentDetail?.userInformation?.userID,
-                themeColor: readableThemeColor,
-              )),
-            ],
-            child: const EpCommentView(),
-          ),
+        MultiProvider(
+          //排序会用得上Key的
+          key: ValueKey(currentEpCommentDetails.commentID),
+          providers: [
+            Provider<EpCommentDetails>.value(value: currentEpCommentDetails),
+            Provider<EpCommentViewConfig>.value(value: EpCommentViewConfig(
+              contentID: currentEpCommentDetails.contentID ?? getContentInfo().id ?? 0,
+
+              postCommentType: getPostCommentType(),
+              /// 用户更改拥有的内容时
+              onUpdateComment: (content) {
+                if (content != null) {
+                  context.read<IndexModel>().updateUserCommentMap(
+                    currentEpCommentDetails.commentID ?? 0,
+                    content
+                  );
+                }
+
+                else {
+                  removeCommentAction(contentCommentIndex, currentEpCommentDetails);
+                }
+              },
+
+              authorID: contentDetail?.userInformation?.userID,
+              themeColor: readableThemeColor,
+            )),
+          ],
+          child: const EpCommentView(),
+        ),
 
         //BangumiGeneralContentComment(
         //  key: ValueKey(currentEpCommentDetails.commentID),
@@ -614,8 +612,8 @@ abstract class BangumiContentPageState<
           height: 1,
           color: 
           judgeDarknessMode(context) ? 
-            getcurrentSubjectThemeColor() : 
-            readableThemeColor
+          getcurrentSubjectThemeColor() : 
+          readableThemeColor
         ),
 
       ],
@@ -637,13 +635,13 @@ abstract class BangumiContentPageState<
     if (resultFilterCommentList.length != commentListCount) isFiltered = true;
 
     int newFloor = isFiltered ? 
-      commentListCount + contentCommentIndex + 1 :
-      contentCommentIndex + 1
+    commentListCount + contentCommentIndex + 1 :
+    contentCommentIndex + 1
     ;
 
     int newCommentID = isFiltered ?
-      userCommentMap.keys.elementAt(newFloor - (commentListCount + contentCommentIndex + 1)) :
-      userCommentMap.keys.elementAt(newFloor - (contentCommentIndex + 1))
+    userCommentMap.keys.elementAt(newFloor - (commentListCount + contentCommentIndex + 1)) :
+    userCommentMap.keys.elementAt(newFloor - (contentCommentIndex + 1))
     ;
 
     final currentEpCommentDetails = EpCommentDetails()
@@ -664,20 +662,20 @@ abstract class BangumiContentPageState<
             providers: [
               Provider<EpCommentDetails>.value(value: currentEpCommentDetails),
               Provider<EpCommentViewConfig>.value(value: EpCommentViewConfig(
-                  contentID: contentInfo.id ?? 0,
-                  postCommentType: getPostCommentType(),
-                  onUpdateComment: (content) {
-                    if (content == null) {
-                      userCommentMap.remove(currentEpCommentDetails.commentID);
-                      removeCommentAction(contentCommentIndex, currentEpCommentDetails);
-                    }
-                
-                    else {
-                      userCommentMap[currentEpCommentDetails.commentID ?? 0] = content;
-                    }      
-                  },
-                  themeColor: getcurrentSubjectThemeColor(),
-                )),
+                contentID: contentInfo.id ?? 0,
+                postCommentType: getPostCommentType(),
+                onUpdateComment: (content) {
+                  if (content == null) {
+                    userCommentMap.remove(currentEpCommentDetails.commentID);
+                    removeCommentAction(contentCommentIndex, currentEpCommentDetails);
+                  }
+
+                  else {
+                    userCommentMap[currentEpCommentDetails.commentID ?? 0] = content;
+                  }      
+                },
+                themeColor: getcurrentSubjectThemeColor(),
+              )),
             ],
             child: const EpCommentView(),
           ),
@@ -706,30 +704,30 @@ abstract class BangumiContentPageState<
         showRequestSnackBar(requestStatus: false, message: message, backgroundColor: judgeCurrentThemeColor(context));
       },
     ).then((resultID) {
-          if (resultID != 0) {
-            animatedSliverListKey.currentState?.removeItem(
-              contentCommentIndex,
-              duration: const Duration(milliseconds: 300),
-              (_, animation) {            
-                return fadeSizeTransition(
-                  animation: animation,
-                  child: MultiProvider(
-                    providers: [
-                      Provider<EpCommentDetails>.value(value: currentEpCommentDetails),
-                      Provider<EpCommentViewConfig>.value(value: EpCommentViewConfig(
-                        contentID: getContentInfo().id ?? 0,
-                        postCommentType: getPostCommentType(),
-                        themeColor: getcurrentSubjectThemeColor(),
-                      )),
+        if (resultID != 0) {
+          animatedSliverListKey.currentState?.removeItem(
+            contentCommentIndex,
+            duration: const Duration(milliseconds: 300),
+            (_, animation) {            
+              return fadeSizeTransition(
+                animation: animation,
+                child: MultiProvider(
+                  providers: [
+                    Provider<EpCommentDetails>.value(value: currentEpCommentDetails),
+                    Provider<EpCommentViewConfig>.value(value: EpCommentViewConfig(
+                      contentID: getContentInfo().id ?? 0,
+                      postCommentType: getPostCommentType(),
+                      themeColor: getcurrentSubjectThemeColor(),
+                    )),
 
-                    ],
-                    child: const EpCommentView(),
-                  ),
-                );
-              }
-            );
-          }
-        });
+                  ],
+                  child: const EpCommentView(),
+                ),
+              );
+            }
+          );
+        }
+      });
 
   }
 

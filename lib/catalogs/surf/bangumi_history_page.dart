@@ -4,9 +4,9 @@ import 'dart:async';
 
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/hive.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/history_model.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
@@ -76,9 +76,9 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
       begin: 1.0,
       end: 0.0,
     ).animate(CurvedAnimation(
-          parent: controller,
-          curve: Curves.easeInOut,
-        ));
+        parent: controller,
+        curve: Curves.easeInOut,
+      ));
 
     historyModel.deleteControllers[itemID] = controller;
     historyModel.deleteAnimations[itemID] = animation;
@@ -89,8 +89,8 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
     if (historyModel.deletingItems.contains(itemID)) return;
 
     setState(() {
-        historyModel.deletingItems.add(itemID);
-      });
+      historyModel.deletingItems.add(itemID);
+    });
 
     createDeleteAnimation(itemID);
 
@@ -106,8 +106,8 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
     historyModel.deleteAnimations.remove(itemID);
 
     setState(() {
-        historyModel.deletingItems.remove(itemID);
-      });
+      historyModel.deletingItems.remove(itemID);
+    });
 
     if (mounted) {
       fadeToaster(context: context, message: '记录已删除');
@@ -123,38 +123,38 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
 
     // 开始删除动画
     setState(() {
-        for (final itemID in itemsToDelete) {
-          historyModel.deletingItems.add(itemID);
-          createDeleteAnimation(itemID);
-        }
-      });
+      for (final itemID in itemsToDelete) {
+        historyModel.deletingItems.add(itemID);
+        createDeleteAnimation(itemID);
+      }
+    });
 
     // 并行执行所有动画
     await Future.wait(
       itemsToDelete.map((itemID) => historyModel.deleteControllers[itemID]!.forward())
     ).then((_) {
 
-          for (final itemID in itemsToDelete) {
-            MyHive.historySurfDataBase.delete(itemID);
-            historyModel.deleteControllers[itemID]?.dispose();
-          }
+        for (final itemID in itemsToDelete) {
+          MyHive.historySurfDataBase.delete(itemID);
+          historyModel.deleteControllers[itemID]?.dispose();
+        }
 
-          historyModel.clearAllSelectionData();
+        historyModel.clearAllSelectionData();
 
-          setState(() {
-              historyModel.toggleMultiSelectMode();
-              historyModel.multiSelectCountNotifier.value = 0;
-            });
-
-          if (mounted) {
-            fadeToaster(
-              context: context, 
-              message: '已删除 ${itemsToDelete.length} 条记录'
-            );
-
-            historyModel.initData();
-          }
+        setState(() {
+          historyModel.toggleMultiSelectMode();
+          historyModel.multiSelectCountNotifier.value = 0;
         });
+
+        if (mounted) {
+          fadeToaster(
+            context: context, 
+            message: '已删除 ${itemsToDelete.length} 条记录'
+          );
+
+          historyModel.initData();
+        }
+      });
 
   }
 
@@ -192,8 +192,8 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
       body: EasyRefresh(
         triggerAxis: Axis.vertical,
         onRefresh: () => setState(() {
-            historyModel.initData();
-          }),
+          historyModel.initData();
+        }),
         header: const TextHeader(),
 
         child: HistoryPageContent(
@@ -241,8 +241,6 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
                     debugPrint(element.toString());
                   });
 
-
-
                 },
                 icon: const Icon(Icons.auto_fix_high),
               ),
@@ -278,9 +276,9 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
                       confirmAction: () {
 
                         setState(() {
-                            historyModel.toggleMultiSelectMode(isOpen: false);
-                            MyHive.historySurfDataBase.clear();
-                          });
+                          historyModel.toggleMultiSelectMode(isOpen: false);
+                          MyHive.historySurfDataBase.clear();
+                        });
 
                         fadeToaster(context: context, message: '历史记录已清空');
                       }
@@ -446,23 +444,23 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
 
     return List.generate(historyModel.groupIndices.length, (index) {
 
-        String headerText = historyModel.groupIndices.keys.elementAt(index);
-        int startIndex = historyModel.groupIndices.values.elementAt(index);
-        int itemCount = groupCounts[index];
+      String headerText = historyModel.groupIndices.keys.elementAt(index);
+      int startIndex = historyModel.groupIndices.values.elementAt(index);
+      int itemCount = groupCounts[index];
 
-        return MultiSliver(
-          pushPinnedChildren: true,
-          children: [
-            buildSectionHeader(context, headerText),
-            buildSectionList(
-              context,
-              data: dataSource,
-              startIndex: startIndex,
-              itemCount: itemCount,
-            ),
-          ],
-        );
-      });
+      return MultiSliver(
+        pushPinnedChildren: true,
+        children: [
+          buildSectionHeader(context, headerText),
+          buildSectionList(
+            context,
+            data: dataSource,
+            startIndex: startIndex,
+            itemCount: itemCount,
+          ),
+        ],
+      );
+    });
   }
 
   // 构建分区标题
@@ -647,19 +645,19 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                     providers: [
                       Provider<SurfTimelineDetails>.value(value: item),
                       Provider<BangumiTimelineTileUIConfig>.value(value: BangumiTimelineTileUIConfig(
-                          isRecordMode: true,
-                          onInterception: () {
-                            if (historyModel.multiSelectModeNotifier.value) { 
-                              if (item.detailID != null) {
-                                historyModel.toggleItemSelection(item.detailID!);
-                              }
-
-                              return false;
+                        isRecordMode: true,
+                        onInterception: () {
+                          if (historyModel.multiSelectModeNotifier.value) { 
+                            if (item.detailID != null) {
+                              historyModel.toggleItemSelection(item.detailID!);
                             }
 
-                            return true;
-                          },
-                        ))
+                            return false;
+                          }
+
+                          return true;
+                        },
+                      ))
                     ],
                     child: const BangumiTimelineTile(),
                   )
@@ -755,10 +753,10 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                       onPressed: () {
                         if (historyModel.historyPageController.hasClients) {
                           showHistoryDateRangeSelectDialog(context, historyModel.historyPageController.page!.toInt()).then((index) {
-                              if (index != null) {
-                                historyModel.historyPageController.jumpToPage(index);
-                              }
-                            });
+                            if (index != null) {
+                              historyModel.historyPageController.jumpToPage(index);
+                            }
+                          });
                         }
                       }, 
                       icon: const Icon(Icons.date_range)

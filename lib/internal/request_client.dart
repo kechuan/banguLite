@@ -65,13 +65,6 @@ class HttpApiClient{
 }
 
 
-
-
-
-
-
-
-
 class BangumiAPIUrls {
 
   static Options bangumiAccessOption() => Options(
@@ -321,7 +314,7 @@ class BangumiQuerys {
     "accept": "application/json",
   };
 
-  static Map<String, dynamic> searchQuery = {
+  static Map<String, dynamic> get searchQuery => {
     "type":2,
     "responseGroup":"small",
     "start":0,
@@ -386,18 +379,14 @@ class BangumiQuerys {
 
   }
 
-  static Map<String, int> commentAccessQuery = {"limit":10,"offset":0},
-  sortQuery = {"limit":10,"offset":0},
-  topicsQuery = {"limit":30,"offset":0},
-  epQuery = {"subject_id":0,"limit":100,"offset":0},
-  relationsQuery = {"type":2,"limit":20,"offset":0},
-  reviewsQuery = {"limit":20,"offset":0},
-  groupTopicQuery = {"limit":20,"offset":0},
-  trendTopicQuery = {"limit":20,"offset":0}
-
-  ;
-
-
+  static Map<String, int> get commentAccessQuery => {"limit":10,"offset":0};
+  static Map<String, int> get sortQuery => {"limit":10,"offset":0};
+  static Map<String, int> get topicsQuery => {"limit":30,"offset":0};
+  static Map<String, int> get epQuery => {"subject_id":0,"limit":100,"offset":0};
+  static Map<String, int> get relationsQuery => {"type":2,"limit":20,"offset":0};
+  static Map<String, int> get reviewsQuery => {"limit":20,"offset":0};
+  static Map<String, int> get groupTopicQuery => {"limit":20,"offset":0};
+  static Map<String, int> get trendTopicQuery => {"limit":20,"offset":0};
 
 }
 
@@ -409,16 +398,14 @@ class BangumiDatas {
     StarType starType = StarType.want,
     bool isPrivate = false,
     List<String>? tagList
-  }) {
-    return {
-      "comment": "$content",
-      "type": starType.starTypeIndex,
-      "rate": rate,
-      "private": isPrivate,
-      "progress": true,
-      "tags": tagList ?? [],
-    };
-  }
+  }) => {
+    "comment": "$content",
+    "type": starType.starTypeIndex,
+    "rate": rate,
+    "private": isPrivate,
+    "progress": true,
+    "tags": tagList ?? [],
+  };
 
   static Map<String, dynamic> postContentData({
     String? content,
@@ -455,15 +442,12 @@ class BangumiDatas {
     required int reportType,
     required int reportValue,
     String? comment
-  }
-  ) {
-    return {
-      "id":reportID,
-      "type":reportType,
-      "value":reportValue,
-      "comment":comment ?? "",
-    };
-  }
+  }) => {
+    "id":reportID,
+    "type":reportType,
+    "value":reportValue,
+    "comment":comment ?? "",
+  };
 
   static Map<String, dynamic> get sortData => {
     "keyword": '',

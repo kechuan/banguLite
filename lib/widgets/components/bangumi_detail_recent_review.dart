@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/review_model.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
@@ -37,160 +37,153 @@ class _BangumiDetailRecentReviewState extends State<BangumiDetailRecentReview> w
     return Padding(
       padding: Padding16,
       child: Consumer<ReviewModel>(
-        builder: (_,reviewModel,child) {
+        builder: (_, reviewModel, child) {
 
-            return ExpansionTile(
-              initiallyExpanded: !collapseStatusNotifier.value,
-              tilePadding: const EdgeInsets.all(0),
-              showTrailingIcon: false,
-              shape: const Border(),
-              onExpansionChanged: (topicExpandedStatus) => collapseStatusNotifier.value = !topicExpandedStatus,
-              title: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8), //16
-                    child: Row(
-                      children: [
-                        const ScalableText("长评",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold)),
-                        ValueListenableBuilder(
-                          valueListenable: collapseStatusNotifier,
-                          builder: (_,topicCollapseStatus,__)=> topicCollapseStatus ? const Icon(Icons.arrow_drop_down_outlined) : const Icon(Icons.arrow_drop_up_outlined)
-                        )
-                      ],
-                    ), 
-                  ),
-        
-                  const Spacer(),
-        
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    
-                    child: TextButton(
-                      onPressed: (){
-
-                        
-
-                        Navigator.pushNamed(
-                          context,
-                          Routes.moreReviews,
-                          arguments: {
-                            "title":bangumiModel.bangumiDetails?.name,
-                            "reviewModel": reviewModel,
-                            "bangumiThemeColor":bangumiModel.bangumiThemeColor
-                          }
-                        );
-
-                      },
-                      child: const ScalableText(
-                        "更多长评 >",
-                        style: TextStyle(decoration: TextDecoration.underline)
-                      ),  
-                    )
-                  )
-            
-                ],
-              ),
+          return ExpansionTile(
+            initiallyExpanded: !collapseStatusNotifier.value,
+            tilePadding: const EdgeInsets.all(0),
+            showTrailingIcon: false,
+            shape: const Border(),
+            onExpansionChanged: (topicExpandedStatus) => collapseStatusNotifier.value = !topicExpandedStatus,
+            title: Row(
               children: [
-                Skeletonizer(
-                  enabled: reviewModel.contentListData.isEmpty,
-                  child: Builder(
-                    builder: (_) {
-                      if(reviewModel.contentListData.isEmpty) return const SkeletonListTileTemplate();
-                      if(reviewModel.contentListData.first.reviewID == 0) return const Center(child: ScalableText("该番剧暂无用户长评..."));
-            
-                      return Theme(
-                        data: ThemeData(
-                          fontFamilyFallback: convertSystemFontFamily(),
-                          brightness: judgeDarknessMode(context) ? Brightness.dark : null, 
-                        ),
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: min(3,reviewModel.contentListData.length),
-                          separatorBuilder: (_, __) => const Divider(height: 1,),
-                          itemBuilder: (context, index) {
-                                    
-                            final reviewTime = DateTime.fromMillisecondsSinceEpoch(reviewModel.contentListData[index].createdTime!*1000);
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8), //16
+                  child: Row(
+                    children: [
+                      const ScalableText("长评", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                      ValueListenableBuilder(
+                        valueListenable: collapseStatusNotifier,
+                        builder: (_, topicCollapseStatus, __) => topicCollapseStatus ? const Icon(Icons.arrow_drop_down_outlined) : const Icon(Icons.arrow_drop_up_outlined)
+                      )
+                    ],
+                  ), 
+                ),
 
+                const Spacer(),
 
-                            final previewContent = reviewModel.contentListData[index].summary
-                              ?.split(quoteBBcodeRegexp)
-                              .last
-                              .replaceAll(bbcodeRegexp, '') ?? "";
-                                        
-                            return ListTile(
-                              
-                              title: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                spacing: 16,
-                                children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
 
-                                  BuildReviewAvatar(
-                                    avatarUri: reviewModel.contentListData[index].userInformation?.avatarUrl,
-                                    userName: reviewModel.contentListData[index].userInformation?.nickName,
-                                  ),
+                  child: TextButton(
+                    onPressed: () {
 
-
-                                  Expanded(
-                                    child: Column(
-                                      spacing: 6,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        ScalableText("${reviewModel.contentListData[index].reviewTitle}",style: const TextStyle(fontWeight: FontWeight.bold),),
-
-										                    //summary 被api限制在最大 120 长度之中
-                                        ScalableText(
-                                          previewContent,
-                                          style: const TextStyle(fontSize: 14),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 6, //兼顾移动端
-                                        ),
-
-                                        Align(
-                                          alignment: Alignment.centerRight,
-                                          child: ScalableText(convertDateTimeToString(reviewTime))
-                                        ),
-                      
-                                                                
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              
-                              onTap: () {
-
-                                Navigator.pushNamed(
-                                  context,
-                                  Routes.blog,
-                                   arguments: {
-                                    "reviewModel":reviewModel,
-                                    "reviewInfo": reviewModel.contentListData[index],
-                                    "sourceTitle": bangumiModel.bangumiDetails?.name,
-                                    "themeColor":bangumiModel.bangumiThemeColor
-                                  }
-                                );
- 
-                              },
-                            );
-                                        
-                                        
-                          },
-                        ),
+                      Navigator.pushNamed(
+                        context,
+                        Routes.moreReviews,
+                        arguments: {
+                          "title":bangumiModel.bangumiDetails?.name,
+                          "reviewModel": reviewModel,
+                          "bangumiThemeColor":bangumiModel.bangumiThemeColor
+                        }
                       );
-                    }
-                  ),
-                )
-              
-              ]
-            );
 
+                    },
+                    child: const ScalableText(
+                      "更多长评 >",
+                      style: TextStyle(decoration: TextDecoration.underline)
+                    ),  
+                  )
+                )
+
+              ],
+            ),
+            children: [
+              Skeletonizer(
+                enabled: reviewModel.contentListData.isEmpty,
+                child: Builder(
+                  builder: (_) {
+                    if (reviewModel.contentListData.isEmpty) return const SkeletonListTileTemplate();
+                    if (reviewModel.contentListData.first.reviewID == 0) return const Center(child: ScalableText("该番剧暂无用户长评..."));
+
+                    return Theme(
+                      data: ThemeData(
+                        fontFamilyFallback: convertSystemFontFamily(),
+                        brightness: judgeDarknessMode(context) ? Brightness.dark : null, 
+                      ),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: min(3, reviewModel.contentListData.length),
+                        separatorBuilder: (_, __) => const Divider(height: 1,),
+                        itemBuilder: (context, index) {
+
+                          final reviewTime = DateTime.fromMillisecondsSinceEpoch(reviewModel.contentListData[index].createdTime! * 1000);
+
+                          final previewContent = reviewModel.contentListData[index].summary
+                            ?.split(quoteBBcodeRegexp)
+                            .last
+                            .replaceAll(bbcodeRegexp, '') ?? "";
+
+                          return ListTile(
+
+                            title: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 16,
+                              children: [
+
+                                BuildReviewAvatar(
+                                  avatarUri: reviewModel.contentListData[index].userInformation?.avatarUrl,
+                                  userName: reviewModel.contentListData[index].userInformation?.nickName,
+                                ),
+
+                                Expanded(
+                                  child: Column(
+                                    spacing: 6,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      ScalableText("${reviewModel.contentListData[index].reviewTitle}", style: const TextStyle(fontWeight: FontWeight.bold),),
+
+                                      //summary 被api限制在最大 120 长度之中
+                                      ScalableText(
+                                        previewContent,
+                                        style: const TextStyle(fontSize: 14),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 6, //兼顾移动端
+                                      ),
+
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: ScalableText(convertDateTimeToString(reviewTime))
+                                      ),
+
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            onTap: () {
+
+                              Navigator.pushNamed(
+                                context,
+                                Routes.blog,
+                                arguments: {
+                                  "reviewModel":reviewModel,
+                                  "reviewInfo": reviewModel.contentListData[index],
+                                  "sourceTitle": bangumiModel.bangumiDetails?.name,
+                                  "themeColor":bangumiModel.bangumiThemeColor
+                                }
+                              );
+
+                            },
+                          );
+
+                        },
+                      ),
+                    );
+                  }
+                ),
+              )
+
+            ]
+          );
 
         }
       ),
     );
   }
-  
+
   @override
   bool get wantKeepAlive => true;
 }
@@ -207,40 +200,40 @@ class BuildReviewAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
-  return UnVisibleResponse(
-    onTap: () {
-      //用户界面...
-    },
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      spacing: 24,
-      children: [
-    
-        SizedBox(
-          width: judgeLandscapeMode(context) ? 100 : 75,
-          height: judgeLandscapeMode(context) ? 100 : 75,
-          child: CachedImageLoader(
-            imageUrl: avatarUri,
-            borderDecoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(0)
+
+    return UnVisibleResponse(
+      onTap: () {
+        //用户界面...
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        spacing: 24,
+        children: [
+
+          SizedBox(
+            width: judgeLandscapeMode(context) ? 100 : 75,
+            height: judgeLandscapeMode(context) ? 100 : 75,
+            child: CachedImageLoader(
+              imageUrl: avatarUri,
+              borderDecoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(0)
+              ),
             ),
           ),
-        ),
-    
-        SizedBox(
-          width: 100,
-          
-          child: ScalableText(
-            "$userName",
-            style:const TextStyle(decoration: TextDecoration.underline),
-            textAlign: TextAlign.center,
-          ),
-        )
-    
-      ],
-    ),
-  );
+
+          SizedBox(
+            width: 100,
+
+            child: ScalableText(
+              "$userName",
+              style: const TextStyle(decoration: TextDecoration.underline),
+              textAlign: TextAlign.center,
+            ),
+          )
+
+        ],
+      ),
+    );
 
   }
 

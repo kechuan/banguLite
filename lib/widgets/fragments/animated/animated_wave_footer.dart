@@ -1,6 +1,7 @@
 import 'dart:math';
-import 'package:bangu_lite/internal/judge_condition.dart';
+
 import 'package:bangu_lite/internal/lifecycle.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:flutter/material.dart';
 
 class AnimatedWaveFooter extends StatefulWidget {
@@ -45,14 +46,12 @@ class _AnimatedWaveFooterState extends LifecycleState<AnimatedWaveFooter> with S
     super.onPause();
   }
 
-
   @override
   void dispose() {
     waveController.dispose();
     super.dispose();
   }
 
-  
   @override
   Widget build(BuildContext context) {
 
@@ -66,12 +65,12 @@ class _AnimatedWaveFooterState extends LifecycleState<AnimatedWaveFooter> with S
               waveHeight: widget.waveHeight ?? 30,
               wavePainter: widget.painter
                 ?? 
-                  Paint()
-                    //..color = const Color.fromARGB(255, 222, 238, 252)
-                    ..color = judgeCurrentThemeColor(context)
-                    ..strokeWidth = 6
-                    ..isAntiAlias = true
-                    ..style = PaintingStyle.fill
+                Paint()
+                //..color = const Color.fromARGB(255, 222, 238, 252)
+                ..color = judgeCurrentThemeColor(context)
+                ..strokeWidth = 6
+                ..isAntiAlias = true
+                ..style = PaintingStyle.fill
               ,
               animationProgress: waveController.value,
             ),
@@ -86,7 +85,7 @@ class _AnimatedWaveFooterState extends LifecycleState<AnimatedWaveFooter> with S
 class WavePainter extends CustomPainter {
 
   WavePainter({
-    
+
     required this.waveHeight,
     required this.wavePainter,
     this.animationProgress,
@@ -108,42 +107,39 @@ class WavePainter extends CustomPainter {
     Path wavePath = Path();
     Offset centerOffset = Offset(size.width / 2, waveHeight); //绘制位置
 
-
     double currentOffsetX = (offsetX ?? 0);
 
     double currentPharse = 0.0;
 
     //相位绘制法 对于缓和角度的采样精度 需求较低 所以3点采样一次
-    while(currentOffsetX < size.width){
-      if(currentOffsetX + 3 > size.width){
+    while (currentOffsetX < size.width){
+      if (currentOffsetX + 3 > size.width) {
         currentOffsetX = size.width;
       }
 
-      currentOffsetX+=3;
+      currentOffsetX += 3;
 
       currentPharse = 
-        sin(
-          (3*pi*currentOffsetX / size.width) //获取整个周期 offset内的相对相位位置 32/600 => 0.05什么的 代表频率
-          + (animationProgress!*pi) //让整个周期的相位跟随着Animation移动起来 代表速度
-        );
+      sin(
+        (3 * pi * currentOffsetX / size.width) //获取整个周期 offset内的相对相位位置 32/600 => 0.05什么的 代表频率
+          + (animationProgress! * pi) //让整个周期的相位跟随着Animation移动起来 代表速度
+      );
 
-        wavePath.lineTo(
-          currentOffsetX,
-          centerOffset.dy +
-            waveHeight * -(currentPharse.abs()) //波峰翻倍
-            - (offsetY ?? 0), //基础位移高度(负值代表上)
-        );
+      wavePath.lineTo(
+        currentOffsetX,
+        centerOffset.dy +
+          waveHeight * -(currentPharse.abs()) //波峰翻倍
+          - (offsetY ?? 0), //基础位移高度(负值代表上)
+      );
 
     }
 
     wavePath.lineTo(size.width, waveHeight);  //闭合图形
     wavePath.lineTo(0, waveHeight); //闭合图形
-    
+
     wavePath.close();
 
     canvas.drawPath(wavePath, wavePainter);
-
-
 
   }
 

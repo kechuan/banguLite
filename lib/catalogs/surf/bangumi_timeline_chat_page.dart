@@ -1,6 +1,6 @@
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/user_model.dart';
@@ -26,8 +26,6 @@ class BangumiTimelineChatPage extends StatefulWidget {
   final int timelineID;
   final Function(int)? onDeleteAction;
 
-  
-
   @override
   State<BangumiTimelineChatPage> createState() => _BangumiTimelineChatPageState();
 }
@@ -38,17 +36,16 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
   Future? timelineChatFuture;
 
   final GlobalKey<AnimatedListState> animatedListKey = GlobalKey();
-  final Map<int,String> userCommentMap = {};
+  final Map<int, String> userCommentMap = {};
 
   @override
   Widget build(BuildContext context) {
 
-    if(widget.timelineID == 0) return const SizedBox.shrink();
+    if (widget.timelineID == 0) return const SizedBox.shrink();
 
     timelineChatFuture ??= HttpApiClient.client.get(
       BangumiAPIUrls.timelineReply(widget.timelineID)
     );
-
 
     return Scaffold(
 
@@ -58,9 +55,9 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
         title: BangumiContentAppbar(
           contentID: widget.timelineID,
           titleText: '时间线ID: ${widget.timelineID} 的评论',
-          
-          webUrl: BangumiWebUrls.timelineReplies("user",widget.timelineID),
-          
+
+          webUrl: BangumiWebUrls.timelineReplies("user", widget.timelineID),
+
           postCommentType: PostCommentType.replyTimeline,
           onSendMessage: (message) {
             userCommentMap.addAll({userCommentMap.length:message.$2 as String});
@@ -78,9 +75,9 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
                 spacing: 16,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-              
+
                   Builder(
-                    
+
                     builder: (_) {
 
                       final CommentDetails currentCommentDetail = UserModel.timelineChatsData[widget.timelineID] ?? CommentDetails();
@@ -94,63 +91,60 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
                         ..commentTimeStamp = currentCommentDetail.commentTimeStamp
                         ..commentReactions = currentCommentDetail.commentReactions
                       ;
-              
+
                       return EpCommentTile(
                         contentID: widget.timelineID,
                         epCommentData: currentEpCommentDetails,
-                        
-                        postCommentType:PostCommentType.postTimeline,
+
+                        postCommentType: PostCommentType.postTimeline,
                         onUpdateComment: (content) {
-                      
+
                           final accountModel = context.read<AccountModel>();
-                      
+
                           invokePopout() => Navigator.pop(context);
-                      
-                      
-                          if(content == null){
-                      
+
+                          if (content == null) {
+
                             accountModel.postContent(
                               subjectID: widget.timelineID,
                               postContentType: PostCommentType.postTimeline,
                               actionType: UserContentActionType.delete,
-                              fallbackAction: (message){
+                              fallbackAction: (message) {
                                 showRequestSnackBar(
                                   message: message,
                                   requestStatus: false,
                                   backgroundColor: judgeCurrentThemeColor(context)
                                 );
                               },
-                            ).then((resultID){
-                              if(resultID != 0){
-                                debugPrint("timelineID: $resultID 删除成功");
-                                widget.onDeleteAction?.call(resultID);
-                                invokePopout();
-                              }
-                              
-                            });
-                            
-                            
+                            ).then((resultID) {
+                                if (resultID != 0) {
+                                  debugPrint("timelineID: $resultID 删除成功");
+                                  widget.onDeleteAction?.call(resultID);
+                                  invokePopout();
+                                }
+
+                              });
+
                           }
-                      
+
                         },
                       );
-                  
-                      
+
                     }
                   ),
-              
+
                   const Divider(),
-              
+
                   FutureBuilder(
                     future: timelineChatFuture,
-                    builder: (_,snapshot) {
-                  
-                      switch(snapshot.connectionState){
-                  
+                    builder: (_, snapshot) {
+
+                      switch (snapshot.connectionState){
+
                         case ConnectionState.done:{
-                      
+
                           List<EpCommentDetails> timelineChatData = loadEpCommentDetails(snapshot.data.data);
-                      
+
                           return AnimatedList.separated(
                             shrinkWrap: true, 
                             physics: const NeverScrollableScrollPhysics(),
@@ -159,22 +153,22 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
                             separatorBuilder: (_, index, animation) => const Divider(),
                             removedSeparatorBuilder: (_, index, animation) => const Divider(),
                             itemBuilder: (_, contentCommentIndex, animation) {
-                            
-                              if(timelineChatData.isEmpty && userCommentMap.isEmpty){
+
+                              if (timelineChatData.isEmpty && userCommentMap.isEmpty) {
                                 return const Center(
                                   child: Text('该时间线吐槽暂无回复...'),
                                 );
                               }
-                                              
-                              if(contentCommentIndex >= timelineChatData.length){
-                                final currentEpCommentDetails =  EpCommentDetails()
+
+                              if (contentCommentIndex >= timelineChatData.length) {
+                                final currentEpCommentDetails = EpCommentDetails()
                                   ..userInformation = AccountModel.loginedUserInformations.userInformation
                                   ..commentID = null
                                   ..comment = userCommentMap[contentCommentIndex - timelineChatData.length]
-                                  ..epCommentIndex = "${contentCommentIndex+2}"
-                                  ..commentTimeStamp = DateTime.now().millisecondsSinceEpoch~/1000
+                                  ..epCommentIndex = "${contentCommentIndex + 2}"
+                                  ..commentTimeStamp = DateTime.now().millisecondsSinceEpoch ~/ 1000
                                 ;
-                          
+
                                 return fadeSizeTransition(
                                   animation: animation,
                                   child: EpCommentTile(
@@ -184,31 +178,29 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
                                   )
                                 );
                               }
-                                              
+
                               return EpCommentTile(
                                 contentID: widget.timelineID,
                                 postCommentType: PostCommentType.replyTimeline,
                                 epCommentData: timelineChatData[contentCommentIndex]
-                                  ..epCommentIndex = "${contentCommentIndex+2}"
+                                  ..epCommentIndex = "${contentCommentIndex + 2}"
                                 ,
-                                
-                                
+
                               );
                             },
                           );
-                              
+
                         }
-                  
+
                         default:{
                           return const Center(child: CircularProgressIndicator());
                         }
-                          
+
                       }
-                  
-                      
+
                     }
                   ),
-                
+
                 ],
               ),
             ),

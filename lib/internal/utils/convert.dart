@@ -3,69 +3,69 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 import 'package:flutter/material.dart';
 
 List<String> convertSystemFontFamily() {
-    if (Platform.isAndroid) {
-      return ['sans-serif'];
-    } 
-    
-    else if (Platform.isIOS) {
-      return ['System'];
-    }
+  if (Platform.isAndroid) {
+    return ['sans-serif'];
+  } 
 
-    else if (Platform.isWindows) {
-      return ['MiSans','Microsoft YaHei'];
-    }
-    
-    else {
-      return ['Roboto'];
-    }
+  else if (Platform.isIOS) {
+    return ['System'];
   }
 
-String? convertAmpsSymbol(String? originalString){
-  if(originalString?.contains("&amp;") ?? false){
-   return originalString?.replaceAll("&amp;", "&");
+  else if (Platform.isWindows) {
+    return ['MiSans', 'Microsoft YaHei'];
   }
 
-  if(originalString?.contains("&quot;") ?? false){
-   return originalString?.replaceAll('&quot;', '"');
+  else {
+    return ['Roboto'];
+  }
+}
+
+String? convertAmpsSymbol(String? originalString) {
+  if (originalString?.contains("&amp;") ?? false) {
+    return originalString?.replaceAll("&amp;", "&");
+  }
+
+  if (originalString?.contains("&quot;") ?? false) {
+    return originalString?.replaceAll('&quot;', '"');
   }
 
   return originalString;
 }
 
-String convertDigitNumString(int originalNumber, {int numberBits = 2}){
+String convertDigitNumString(int originalNumber, {int numberBits = 2}) {
 
   String fillingContent = '';
 
-  if(originalNumber >= pow(10,numberBits-1)){
+  if (originalNumber >= pow(10, numberBits - 1)) {
     return '$originalNumber';
   }
 
-  else{
-    fillingContent='0'*(numberBits-('$originalNumber'.length));
+  else {
+    fillingContent = '0' * (numberBits - ('$originalNumber'.length));
     return '$fillingContent$originalNumber';
   }
 
-  
+
 }
 
-String convertDecimalDigitNumString(num originalNumber, {int numberBits = 2}){
+String convertDecimalDigitNumString(num originalNumber, {int numberBits = 2}) {
 
   String fillingContent = '.';
 
-  if(originalNumber.toString().length > (numberBits-1)){
+  if (originalNumber.toString().length > (numberBits - 1)) {
     return '$originalNumber';
   }
 
-  else{
-    for(numberBits; numberBits>1; numberBits--){
-      fillingContent+='0';
+  else {
+    for (numberBits; numberBits > 1; numberBits--){
+      fillingContent += '0';
     }
 
     return '$originalNumber$fillingContent';
@@ -73,56 +73,55 @@ String convertDecimalDigitNumString(num originalNumber, {int numberBits = 2}){
 
 }
 
-int convertStickerDatalike(int dataLikeIndex){
+int convertStickerDatalike(int dataLikeIndex) {
 
   //我也不知道为什么别人前端的里 大部分 data-like-value 的差异都是39 就只有 0 指向的是 44
   //data-like-value = 0 => "/img/smiles/tv/44.gif"
   //至于为什么是+23 那就是因为 bgm 与 tv 包的差异了 bgm包刚好是23个表情 因此偏移23
-  
+
   //但唯有 0 dataLikeIndex 是需求增加 
   //而其他的 dataLikeIndex 都是 减少偏移数值
 
   //而对于 200/500 的新版本 谢天谢地是直接数值
-  if(dataLikeIndex >= 200) return dataLikeIndex;
+  if (dataLikeIndex >= 200) return dataLikeIndex;
 
   int stickerIndex = dataLikeIndex - 39 + 23;
-      
-          
-  if(dataLikeIndex == 0){
+
+  if (dataLikeIndex == 0) {
     stickerIndex = dataLikeIndex + 44 + 23; 
   }
 
   return stickerIndex;
 }
 
-String convertBangumiStickerPath(int stickerIndex){
+String convertBangumiStickerPath(int stickerIndex) {
 
   String authorPath = "";
 
-  switch(stickerIndex){
+  switch (stickerIndex){
 
     case <=0:{
 
-      if(stickerIndex == 0){
+      if (stickerIndex == 0) {
         return "assets/bangumiSticker/貓魚/musume_intro.gif";
       }
 
-      else{
+      else {
         return "assets/bangumiSticker/貓魚/blake_intro.gif";
       }
-      
+
     }
 
     case <= 23: {
       authorPath = "01-23 dsm";
       break;
     }
-      
+
     case <= 125: {
       authorPath = "24-125 Cinnamor";
       break;
     }
-    
+
     case <= 238: {
       authorPath = "200-238 神戶小鳥";
       break;
@@ -132,63 +131,59 @@ String convertBangumiStickerPath(int stickerIndex){
       authorPath = "500-529 五行行行行行啊";
       break;
     }
-      
+
   }
 
   return "assets/bangumiSticker/$authorPath/bgm${convertDigitNumString(stickerIndex)}.gif";
 }
 
-String convertBangumiNetworkGirlStickerPath(int stickerIndex,{bool pinkVersion = true}){
+String convertBangumiNetworkGirlStickerPath(int stickerIndex, {bool pinkVersion = true}) {
 
   String typePath = pinkVersion ? "musume" : "blake";
 
   return "https://lain.bgm.tv/img/smiles/$typePath/${typePath}_${convertDigitNumString(stickerIndex)}.gif";
-  
+
 }
 
-String convertBangumiCommentSticker(String originalComment){
+String convertBangumiCommentSticker(String originalComment) {
 
   //final bgmStickerMatch = RegExp(r'(\()+bgm+(\d{2,3})(\))');
   final bgmStickerMatch = RegExp(r'(\()+(bgm|musume_|blake_)+(\d{2,3})(\))');
-  
+
   String mappedStickerComment = originalComment.replaceAllMapped(
     bgmStickerMatch, 
-    (match){
+    (match) {
 
       List<String?> resultList = [];
 
-      for(String? currentPattern in match.groups([1,2,3,4])){
-        switch(currentPattern){
+      for (String? currentPattern in match.groups([1, 2, 3, 4])){
+        switch (currentPattern){
           case '(': {
-            if(match.groups([2]).first == 'bgm'){
+            if (match.groups([2]).first == 'bgm') {
               resultList.add("[sticker]");
               resultList.add(convertBangumiStickerPath(int.parse(match.group(3)!)));
             }
-            if(match.groups([2]).first == 'musume_' || match.groups([2]).first == 'blake_'){
+            if (match.groups([2]).first == 'musume_' || match.groups([2]).first == 'blake_') {
               bool isPinkVersion = match.groups([2]).first == 'musume_' ? true : false;
               resultList.add("[net_sticker]");
-              resultList.add(convertBangumiNetworkGirlStickerPath(int.parse(match.group(3)!),pinkVersion:isPinkVersion));
+              resultList.add(convertBangumiNetworkGirlStickerPath(int.parse(match.group(3)!), pinkVersion: isPinkVersion));
             }
-            
+
             break;
-            
+
           }
           case ')': {
-            if(match.groups([2]).first == 'bgm') resultList.add("[/sticker]");
-            if(match.groups([2]).first == 'musume_' || match.groups([2]).first == 'blake_') resultList.add("[/net_sticker]");
+            if (match.groups([2]).first == 'bgm') resultList.add("[/sticker]");
+            if (match.groups([2]).first == 'musume_' || match.groups([2]).first == 'blake_') resultList.add("[/net_sticker]");
             break;
           }
-          
-          
-         
+
         }
 
       }
 
-
       return resultList.join();
 
-      
     }
   );
 
@@ -196,95 +191,103 @@ String convertBangumiCommentSticker(String originalComment){
 
   return mappedStickerComment;
 
-									
+
 }
 
-int convertSegment(int totalEps, int segmentRange) => convertTotalCommentPage(totalEps,segmentRange);
-int convertTotalCommentPage(int totalComments, int pageRange){
-return  totalComments % pageRange == 0 ?
-        totalComments~/pageRange :
-        totalComments~/pageRange + 1;
+int convertSegment(int totalEps, int segmentRange) => convertTotalCommentPage(totalEps, segmentRange);
+int convertTotalCommentPage(int totalComments, int pageRange) {
+  return totalComments % pageRange == 0 ?
+  totalComments ~/ pageRange :
+  totalComments ~/ pageRange + 1;
 }
 
-DateTime convertDateTime(String? bangumiDate){
-	if(bangumiDate == null) return DateTime(0);
+DateTime convertDateTime(String? bangumiDate) {
+  if (bangumiDate == null) return DateTime(0);
 
   DateTime? convertedDateTime;
 
   convertedDateTime = DateTime.tryParse(bangumiDate);
-  if(convertedDateTime!=null) return convertedDateTime;
+  if (convertedDateTime != null) return convertedDateTime;
 
   List<String> dateSegments = bangumiDate.split("-");
-  if(dateSegments.length != 3) return DateTime(0);
+  if (dateSegments.length != 3) return DateTime(0);
 
   int bangumiYear = int.parse(dateSegments[0]);
   int bangumiMonth = int.parse(dateSegments[1]);
   int bangumiDay = int.parse(dateSegments[2]);
 
-  return DateTime(bangumiYear,bangumiMonth,bangumiDay);
+  return DateTime(bangumiYear, bangumiMonth, bangumiDay);
 
 
 }
 
-String convertDateTimeToString(DateTime dateTime){
-  return dateTime.toIso8601String().substring(0,10);
+String convertDateTimeToString(DateTime dateTime) {
+  return dateTime.toIso8601String().substring(0, 10);
   //return "${dateTime.year}-${convertDigitNumString(dateTime.month)}-${convertDigitNumString(dateTime.day)} ${convertDigitNumString(dateTime.hour)}:${convertDigitNumString(dateTime.minute)}";
 }
 
 
-int convertAiredEps(String? bangumiDate){
-	if(bangumiDate == null) return 0;
+int convertAiredEps(String? bangumiDate) {
+  if (bangumiDate == null) return 0;
 
   bool isAired = convertDateTime(bangumiDate).isBefore(DateTime.now());
 
-  if(!isAired) return 0;
+  if (!isAired) return 0;
 
+  int residualDateTime = (DateTime.now().millisecondsSinceEpoch - convertDateTime(bangumiDate).millisecondsSinceEpoch);
 
+  //放送开始附带一集 因此+1
+  int airedEps = (residualDateTime ~/ const Duration(days: 7).inMilliseconds) + 1;
 
-	int residualDateTime = (DateTime.now().millisecondsSinceEpoch - convertDateTime(bangumiDate).millisecondsSinceEpoch);
-
-	//放送开始附带一集 因此+1
-	int airedEps = (residualDateTime ~/ const Duration(days: 7).inMilliseconds) + 1;
-
-	return airedEps;
+  return airedEps;
 }
 
-int convertPassedSeason(int year,int month){
+int convertPassedSeason(int year, int month) {
   DateTime currentTime = DateTime.now();
 
-  if(year < currentTime.year) {return 4;} 
-  
-  else if(year > currentTime.year) {return 0;}
+  if (year < currentTime.year) {return 4;
+  } 
 
-  else{
-    return judgeSeasonRange(month,currentTime: true).index;
+  else if (year > currentTime.year) {return 0;
+  }
+
+  else {
+    return judgeSeasonRange(month, currentTime: true).index;
   }
 
 }
 
-String convertTypeSize(int totalLength,{StorageSize type = StorageSize.megabytes}){
-  
+String convertTypeSize(int totalLength, {StorageSize type = StorageSize.megabytes}) {
+
   const int binary = 1024;
-  num result = totalLength/pow(binary,type.index);
+  num result = totalLength / pow(binary, type.index);
   String suffix;
 
-  switch(type){
-    case StorageSize.bytes: {suffix = StorageSize.bytes.suffix; break;}
-    case StorageSize.kilobytes: {suffix = StorageSize.kilobytes.suffix; break;}
-    case StorageSize.megabytes: {suffix = StorageSize.megabytes.suffix; break;}
-    case StorageSize.gigabytes: {suffix = StorageSize.gigabytes.suffix; break;}
+  switch (type){
+    case StorageSize.bytes: {suffix = StorageSize.bytes.suffix;
+      break;
+    }
+    case StorageSize.kilobytes: {suffix = StorageSize.kilobytes.suffix;
+      break;
+    }
+    case StorageSize.megabytes: {suffix = StorageSize.megabytes.suffix;
+      break;
+    }
+    case StorageSize.gigabytes: {suffix = StorageSize.gigabytes.suffix;
+      break;
+    }
   }
 
   return "${result.toStringAsFixed(2)}$suffix";
 }
 
-String convertSubjectType(int? type){
-  if(type == null) return "";
+String convertSubjectType(int? type) {
+  if (type == null) return "";
 
   String resultSubjectType = "";
 
-  for(SubjectType currentType in SubjectType.values){
-    if(currentType.subjectType == type){
+  for (SubjectType currentType in SubjectType.values){
+    if (currentType.subjectType == type) {
       resultSubjectType = currentType.name;
       break;
     }
@@ -294,19 +297,19 @@ String convertSubjectType(int? type){
 
 }
 
-String convertScoreRank(double? score){
+String convertScoreRank(double? score) {
 
-  if(score==null) return ScoreRank.none.rankText;
+  if (score == null) return ScoreRank.none.rankText;
 
   String resultRankText = ScoreRank.none.rankText;
 
   //为什么不用switch? 
   //Error: The property 'score' can't be accessed on the type 'ScoreRank' in a constant expression.
 
-  for(ScoreRank currentRank in ScoreRank.values){
-    if(score >= currentRank.score){
+  for (ScoreRank currentRank in ScoreRank.values){
+    if (score >= currentRank.score) {
       resultRankText = currentRank.rankText;
-      
+
     }
   }
 
@@ -316,12 +319,12 @@ String convertScoreRank(double? score){
 
 
 
-String convertEPInfoType(int? type){
+String convertEPInfoType(int? type) {
   String resultEPType = "Ep";
-  if(type == null) return resultEPType;
+  if (type == null) return resultEPType;
 
-  for(EPType currentType in EPType.values){
-    if(currentType.index == type){
+  for (EPType currentType in EPType.values){
+    if (currentType.index == type) {
       resultEPType = currentType.name;
       break;
     }
@@ -334,29 +337,29 @@ Future<int> getTotalSizeOfFilesInDir(final FileSystemEntity fileSystemEntity) as
   if (fileSystemEntity is File && fileSystemEntity.existsSync()) {
     return await fileSystemEntity.length();
   }
-  
+
   if (fileSystemEntity is Directory && fileSystemEntity.existsSync()) {
     List children = fileSystemEntity.listSync();
     int total = 0;
-    if (children.isNotEmpty){
+    if (children.isNotEmpty) {
       for (final FileSystemEntity child in children) {
         total += await getTotalSizeOfFilesInDir(child);
       }
     }
-      
+
     return total;
   }
-  
+
   return 0;
 }
 
-Map convertRankList(dynamic scoreCollection){
-  if(scoreCollection is Map){
-    if(scoreCollection.keys.first == "1"){
+Map convertRankList(dynamic scoreCollection) {
+  if (scoreCollection is Map) {
+    if (scoreCollection.keys.first == "1") {
       return scoreCollection;
     }
 
-    else if(scoreCollection.keys.first == "10"){
+    else if (scoreCollection.keys.first == "10") {
       return Map.fromEntries(
         scoreCollection.entries.toList().reversed
       );
@@ -364,11 +367,11 @@ Map convertRankList(dynamic scoreCollection){
   }
 
   return Map.from({
-    for (int index = 0; index < scoreCollection.length; index++) "${index+1}":scoreCollection[index]
+    for (int index = 0; index < scoreCollection.length; index++) "${index + 1}":scoreCollection[index]
   });
 }
 
-String convertRankBoxStandardDiffusion(int totalVotes, List<dynamic> scoreList,num score){
+String convertRankBoxStandardDiffusion(int totalVotes, List<dynamic> scoreList, num score) {
   double standardDiffusion = 0;
 
   for (var (index, item) in scoreList.indexed) {
@@ -378,48 +381,45 @@ String convertRankBoxStandardDiffusion(int totalVotes, List<dynamic> scoreList,n
   return sqrt(standardDiffusion / totalVotes).toStringAsFixed(3);
 }
 
-String covertPastedTime(int? timeStamp){
+String covertPastedTime(int? timeStamp) {
 
   String resultText = "";
 
-  if(timeStamp == null) return resultText;
+  if (timeStamp == null) return resultText;
 
   final currentTime = DateTime.now();
-  final recordTime = DateTime.fromMillisecondsSinceEpoch(timeStamp*1000);
+  final recordTime = DateTime.fromMillisecondsSinceEpoch(timeStamp * 1000);
 
   final int = currentTime.difference(recordTime).inMinutes;
 
-  if(int < 60){
+  if (int < 60) {
     resultText = "$int分钟前";
   }
-  
-  else if(int < 60 * 24){
-    resultText = "${int~/60}小时前";
+
+  else if (int < 60 * 24) {
+    resultText = "${int ~/ 60}小时前";
   }
 
-  else if(int < 60 * 24 * 2){
+  else if (int < 60 * 24 * 2) {
     resultText = "昨天 ${convertDigitNumString(recordTime.hour)}:${convertDigitNumString(recordTime.minute)}";
   }
-  
-  else if(int < 60 * 24 * 7){
-    resultText = "${int~/(60 * 24)}天前";
+
+  else if (int < 60 * 24 * 7) {
+    resultText = "${int ~/ (60 * 24)}天前";
   }
-  
-  else if(int < 60 * 24 * 30 * 12){
+
+  else if (int < 60 * 24 * 30 * 12) {
     resultText = "${convertDigitNumString(recordTime.month)}-${convertDigitNumString(recordTime.day)}";
   } 
 
-  else{
-    resultText = "${recordTime.year%100}-${convertDigitNumString(recordTime.month)}-${convertDigitNumString(recordTime.day)}";
+  else {
+    resultText = "${recordTime.year % 100}-${convertDigitNumString(recordTime.month)}-${convertDigitNumString(recordTime.day)}";
   }
-
- 
-
 
   return resultText;
 }
 
-String convertInsertContent({String originalText = '',String insertText = '',int insertOffset = 0}){
+String convertInsertContent({String originalText = '', String insertText = '', int insertOffset = 0}) {
   StringBuffer buffer = StringBuffer();
   buffer.write(originalText.substring(0, insertOffset)); // 写入前半部分
   buffer.write(insertText); // 插入内容
@@ -428,58 +428,66 @@ String convertInsertContent({String originalText = '',String insertText = '',int
   return buffer.toString();
 }
 
-String convertProxyImageUri(String imageLink){ 
+String convertProxyImageUri(String imageLink) { 
   Uri imageUri = Uri.parse(imageLink);
   return "${APPInformationRepository.banguLiteImageForwardUri}${imageUri.host}${imageUri.path}";
 }
 
 
 Color convertFineTuneColor(
-	Color originColor,
-	{
-		bool? darkMode,
-		ScaleType? lumiScaleType
-	}
-){
-    
-    Color resultColor = originColor;
+  Color originColor,
+  {
+    bool? darkMode,
+    ScaleType? lumiScaleType
+  }
+) {
 
-	double lumiScale;
+  Color resultColor = originColor;
 
-	switch(lumiScaleType){
-		case ScaleType.min: {lumiScale = 0.1; break;}
-		case ScaleType.medium: {lumiScale = 0.2; break;}
-		case ScaleType.max: {lumiScale = 0.3; break;}
-		default: {lumiScale = 0.3; break;}
-	}
+  double lumiScale;
 
-    if(darkMode==true){
-      if(resultColor.computeLuminance()>0.5){
-        HSLColor hslColor = HSLColor.fromColor(resultColor); //亮度过低 转换HSL色度
-        double newLightness = (hslColor.lightness - lumiScale).clamp(0.5-lumiScale, 0.5); // 确保不超过 1.0
-        double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.4); //偏透明色
-        HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
-
-        resultColor = newHSLColor.toColor();
-
-      }
+  switch (lumiScaleType){
+    case ScaleType.min: {lumiScale = 0.1;
+      break;
     }
-
-    else{
-      if(resultColor.computeLuminance()<0.5){
-        HSLColor hslColor = HSLColor.fromColor(resultColor);
-        double newLightness = (hslColor.lightness + lumiScale).clamp(lumiScale+0.5, 1.0);
-
-        double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.4);
-        HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
-
-        resultColor = newHSLColor.toColor();
-
-      }
+    case ScaleType.medium: {lumiScale = 0.2;
+      break;
     }
+    case ScaleType.max: {lumiScale = 0.3;
+      break;
+    }
+    default: {lumiScale = 0.3;
+      break;
+    }
+  }
 
-  	debugPrint("$resultColor, Lumi:${resultColor.computeLuminance()}");
+  if (darkMode == true) {
+    if (resultColor.computeLuminance() > 0.5) {
+      HSLColor hslColor = HSLColor.fromColor(resultColor); //亮度过低 转换HSL色度
+      double newLightness = (hslColor.lightness - lumiScale).clamp(0.5 - lumiScale, 0.5); // 确保不超过 1.0
+      double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.4); //偏透明色
+      HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
 
-    return resultColor;
+      resultColor = newHSLColor.toColor();
+
+    }
+  }
+
+  else {
+    if (resultColor.computeLuminance() < 0.5) {
+      HSLColor hslColor = HSLColor.fromColor(resultColor);
+      double newLightness = (hslColor.lightness + lumiScale).clamp(lumiScale + 0.5, 1.0);
+
+      double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.4);
+      HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
+
+      resultColor = newHSLColor.toColor();
+
+    }
+  }
+
+  debugPrint("$resultColor, Lumi:${resultColor.computeLuminance()}");
+
+  return resultColor;
 
 }

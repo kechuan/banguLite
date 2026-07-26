@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/hive.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/platforms/register_windows_applink.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
@@ -23,7 +23,7 @@ import 'package:provider/provider.dart';
 void main() async {
 
   if (kReleaseMode) {
-    debugPrint = (String? message, {int? wrapWidth}) {};
+    debugPrint = (String? message, {int? wrapWidth})  {};
   }
 
   // path_provider 初始化需要
@@ -31,7 +31,6 @@ void main() async {
   await listenAPPLink();
 
   await MyHive.init();
-
 
   HttpApiClient.init(
     storageProxyAddress: MyHive.appConfigDataBase.get('currentTheme')?.currentProxyAddress ?? ''
@@ -73,18 +72,18 @@ class MainApp extends StatelessWidget {
 
       child: Builder(
         builder: (context) {
-          return Selector<IndexModel,  (Color,ThemeMode?)>(
+          return Selector<IndexModel, (Color,ThemeMode?)>(
             selector: (_, indexModel) {
               if (indexModel.userConfig.isSelectedCustomColor == true) {
                 return (
-                indexModel.userConfig.customColor!,
-                indexModel.userConfig.themeMode
+                  indexModel.userConfig.customColor!,
+                  indexModel.userConfig.themeMode
                 );
               }
 
               return (
-              indexModel.userConfig.currentThemeColor!.color,
-              indexModel.userConfig.themeMode
+                indexModel.userConfig.currentThemeColor!.color,
+                indexModel.userConfig.themeMode
               );
             },
 
@@ -132,7 +131,7 @@ class MainApp extends StatelessWidget {
 
                   // 深链接auth访问时 跳过默认路由匹配，直接跳转到目标页面
                   if (
-                    settings.name?.contains("bgm_login") == true ||
+                  settings.name?.contains("bgm_login") == true ||
                     settings.name?.contains("turnstile") == true
                   ) {
                     return null;

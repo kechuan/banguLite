@@ -1,15 +1,14 @@
 import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_details.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
+@FFAutoImport()
+import 'package:bangu_lite/models/providers/topic_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
-
-@FFAutoImport()
-import 'package:bangu_lite/models/providers/topic_model.dart';
 
 @FFRoute(name: '/subjectTopic')
 class BangumiTopicPage extends StatefulWidget {
@@ -20,7 +19,7 @@ class BangumiTopicPage extends StatefulWidget {
     ///为什么我不直接传递Index过来?
     ///因为也有透过urlLink直接打开单个Info的时候 这样的话Index就是一个无意义的值了
     ///但你却不能反过来说 TopicModel 没用 毕竟你把加载Detail的方法都写进去了(
-	  required this.topicInfo,
+    required this.topicInfo,
     this.themeColor,
     this.referPostContentID,
 
@@ -40,12 +39,12 @@ class BangumiTopicPage extends StatefulWidget {
 }
 
 class _BangumiTopicPageState extends BangumiContentPageState 
-<
-	BangumiTopicPage,
-	TopicModel,
-	TopicInfo,
-	TopicDetails
->{
+  <
+    BangumiTopicPage,
+    TopicModel,
+    TopicInfo,
+    TopicDetails
+  >{
 
   @override
   String? sourceTitle() => widget.sourceTitle;
@@ -65,15 +64,14 @@ class _BangumiTopicPageState extends BangumiContentPageState
   @override
   PostCommentType? getPostCommentType() => PostCommentType.replyTopic;
 
-
   /// API 把 主楼信息的 content 也归类为 Replies内 也就是 Replies.first
   /// 按道理来说 是不可能会出现 .isEmpty 的情况的
   /// 隔壁的 GroupTopic 的数据也是如此
   @override
-  int? getCommentCount(TopicDetails? contentDetail, bool isLoading){
+  int? getCommentCount(TopicDetails? contentDetail, bool isLoading) {
 
-    if(!isContentLoading(contentDetail?.topicID)){
-      if(contentDetail?.topicID != null){
+    if (!isContentLoading(contentDetail?.topicID)) {
+      if (contentDetail?.topicID != null) {
         return contentDetail!.topicRepliedComment?.length ?? 0;
       }
     }
@@ -85,10 +83,10 @@ class _BangumiTopicPageState extends BangumiContentPageState
   String getWebUrl(int? topicID) => BangumiWebUrls.subjectTopic(topicID ?? 0);
 
   @override
-  Future<void> loadContent(int topicID,{bool isRefresh = false}){
+  Future<void> loadContent(int topicID, {bool isRefresh = false}) {
     return getContentModel().loadContentDetail(
       topicID,
-      isRefresh:isRefresh,
+      isRefresh: isRefresh,
       fallbackAction: (message) {
         showRequestSnackBar(
           message: message,
@@ -99,9 +97,7 @@ class _BangumiTopicPageState extends BangumiContentPageState
     );
   }
 
-  
-
   @override
   int? getReferPostContentID() => widget.referPostContentID;
-  
+
 }

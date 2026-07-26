@@ -1,5 +1,5 @@
 import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
@@ -21,11 +21,10 @@ class BangumiTabContentSelect extends StatelessWidget {
   final List selectedList;
   final int initialIndex;
   final Function(int)? onTap;
-  
 
   @override
   Widget build(BuildContext context) {
-    
+
     final currentTime = DateTime.now();
 
     return ValueListenableBuilder(
@@ -44,21 +43,21 @@ class BangumiTabContentSelect extends StatelessWidget {
                     begin: 0,
                     end: animatedStatus ? 0 : 1.0 ,
                   ),
-                  onEnd: (){
-                    if(!animatedStatus) selectOffstageNotifier.value = true;
+                  onEnd: () {
+                    if (!animatedStatus) selectOffstageNotifier.value = true;
                   },
-                  
-                  builder: (_,animationProgress,child){
+
+                  builder: (_, animationProgress, child) {
                     return Opacity(
-                      opacity: 1.0-animationProgress,
+                      opacity: 1.0 - animationProgress,
                       child: Transform.translate(
-                        offset: Offset(0, -animationProgress*60),
+                        offset: Offset(0, -animationProgress * 60),
                         child: tabRow!,
                       ),
                     );
                   }
                 );
-            }
+              }
             ),
           )
         );
@@ -75,12 +74,12 @@ class BangumiTabContentSelect extends StatelessWidget {
             indicatorSize: TabBarIndicatorSize.label,
             tabs: List.generate(
               WeekDay.values.length, 
-              (currentDay)=> Center(
+              (currentDay) => Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ScalableText(WeekDay.values[currentDay].dayText),
-                    Text("${currentTime.add(Duration(days: currentDay-currentTime.weekday+1)).month}/${currentTime.add(Duration(days: currentDay-currentTime.weekday+1)).day}")
+                    Text("${currentTime.add(Duration(days: currentDay - currentTime.weekday + 1)).month}/${currentTime.add(Duration(days: currentDay - currentTime.weekday + 1)).day}")
                   ],
                 )
               ),
@@ -88,7 +87,7 @@ class BangumiTabContentSelect extends StatelessWidget {
           ),
         ),
       ),
-                          
+
     );
   }
 }

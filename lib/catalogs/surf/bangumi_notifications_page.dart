@@ -3,10 +3,10 @@ import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
@@ -44,44 +44,44 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const ScalableText('信息通知'),
-        actions:[
+        actions: [
           IconButton(
             icon: const Icon(Icons.notifications_off),
             onPressed: () {
 
-                showTransitionAlertDialog(
-                  context,
-                  title: "一键已读",
-                  content: "即将把所有通知标为已阅",
-                  confirmAction: () {
-                    
-                    accountModel.currentUserNotifications.also((it){
-                      for (var element in it) {
-                        element.isUnRead = false;
-                      }
-                    });
+              showTransitionAlertDialog(
+                context,
+                title: "一键已读",
+                content: "即将把所有通知标为已阅",
+                confirmAction: () {
 
-                    accountModel.clearNotifications(
-                      fallbackAction: (message){
-                        fadeToaster(context: context, message: message);
-                      }
-                    ).then((result){
-                      if(result){
-                        updateNotifier.value+=1;
+                  accountModel.currentUserNotifications.also((it) {
+                    for (var element in it) {
+                      element.isUnRead = false;
+                    }
+                  });
+
+                  accountModel.clearNotifications(
+                    fallbackAction: (message) {
+                      fadeToaster(context: context, message: message);
+                    }
+                  ).then((result) {
+                      if (result) {
+                        updateNotifier.value += 1;
                       }
                     });
-                  },
-                );
+                },
+              );
 
             },
           ),
         ]
       ),
-      
+
       body: EasyRefresh(
         header: const TextHeader(),
         footer: const TextFooter(),
-		    refreshOnStart: accountModel.currentUserNotifications.isEmpty,
+        refreshOnStart: accountModel.currentUserNotifications.isEmpty,
         onRefresh: () {
           notificationFuture = accountModel.getNotifications(
             limit: 40,
@@ -92,16 +92,16 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
             },
           );
 
-          updateNotifier.value+=1;
+          updateNotifier.value += 1;
 
         },
         child: ValueListenableBuilder(
           valueListenable: updateNotifier,
-          builder: (_,__,___) {
+          builder: (_, __, ___) {
             return FutureBuilder(
               future: notificationFuture,
-              builder: (_,snapshot) {
-            
+              builder: (_, snapshot) {
+
                 switch (snapshot.connectionState) {
 
                   case ConnectionState.waiting:{
@@ -111,23 +111,23 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                   default: {}
                 }
 
-                final notificationList = accountModel.currentUserNotifications.toList().also((it){
+                final notificationList = accountModel.currentUserNotifications.toList().also((it) {
                   it.sort(
-                    (prev,next) => next.createdTime!.compareTo(prev.createdTime!)
+                    (prev, next) => next.createdTime!.compareTo(prev.createdTime!)
                   );
                 });
-				
+
                 return ListView.separated(
                   itemCount: accountModel.currentUserNotifications.length,
                   separatorBuilder: (_, __) => const Divider(),
-                  itemBuilder: (_,index){
-            
+                  itemBuilder: (_, index) {
+
                     //final currentNotification = accountModel.currentUserNotifications.elementAt(index);
-					          final currentNotification = notificationList[index];
-            
+                    final currentNotification = notificationList[index];
+
                     String referenceContent = "";
                     String referenceLink = "";
-            
+
                     switch (currentNotification.notificationType) {
                       case NotificationType.groupTopicReply:
                       case NotificationType.groupPostReply:
@@ -136,20 +136,19 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                         referenceLink = BangumiWebUrls.groupTopic(currentNotification.sourceID ?? 0);
 
                       }
-            
-            
+
                       case NotificationType.indexCommentPost:
                       case NotificationType.indexCommentReply:{
                         referenceLink = BangumiWebUrls.indexComment(currentNotification.sourceID ?? 0);
                       }
-            
+
                       case NotificationType.characterTopicReply:
                       case NotificationType.characterPostReply:
                       case NotificationType.characterTopicCall:
                       {
                         referenceLink = BangumiWebUrls.character(currentNotification.sourceID ?? 0);
                       }
-            
+
                       case NotificationType.subjectTopicReply:
                       case NotificationType.subjectTopicPostReply:
                       case NotificationType.subjectTopicCall:
@@ -162,27 +161,27 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                       case NotificationType.blogPostCall:{
                         referenceLink = BangumiWebUrls.userBlog(currentNotification.sourceID ?? 0);
                       }
-            
+
                       case NotificationType.subjectEPPost:
                       case NotificationType.subjectEPPostReply:
                       case NotificationType.subjectEPPostCall:
                       {
                         referenceLink = BangumiWebUrls.ep(currentNotification.sourceID ?? 0);
-                        
+
                       }
-            
+
                       case NotificationType.timelineReply:
                       case NotificationType.indexTimelineCall:
                       {
 
-                        if(currentNotification.contentTitle == "吐槽"){
+                        if (currentNotification.contentTitle == "吐槽") {
                           referenceLink = 
-                            '${BangumiAPIUrls.timelineReply(currentNotification.sourceID ?? 0)}'
-                            '?timelineID=${currentNotification.sourceID ?? 0}'
+                          '${BangumiAPIUrls.timelineReply(currentNotification.sourceID ?? 0)}'
+                          '?timelineID=${currentNotification.sourceID ?? 0}'
                           ;
                         }
 
-                        else{
+                        else {
                           referenceLink = BangumiWebUrls.indexComment(currentNotification.sourceID ?? 0);
                         }
 
@@ -192,27 +191,27 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                       case NotificationType.acceptFriend:{}
 
                       default:{
-                        referenceContent = '${currentNotification.contentTitle} id:${currentNotification.sourceID}' ;
+                        referenceContent = '${currentNotification.contentTitle} id:${currentNotification.sourceID}';
                       }
                     }
-            
-                    if(referenceLink.isNotEmpty){
 
-                      if(
-                        currentNotification.relatedID != null &&
+                    if (referenceLink.isNotEmpty) {
+
+                      if (
+                      currentNotification.relatedID != null &&
                         currentNotification.relatedID != 0
-                      ){
+                      ) {
                         referenceLink += "?sourceTitle=${BangumiPrivateHubType.email.typeName}";
                         referenceLink += '#post_${currentNotification.relatedID}';
-                        
+
                       }
 
                       referenceContent = '[url=$referenceLink]${currentNotification.contentTitle}[/url]';
                     }
-                    
+
                     return ValueListenableBuilder(
                       valueListenable: clearNotifier,
-                      builder: (_,__,listTile) {
+                      builder: (_, __, listTile) {
                         return Opacity(
                           opacity: (currentNotification.isUnRead == true) ? 1 : 0.65,
                           child: listTile!
@@ -220,18 +219,18 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
 
                       },
                       child: ListTile(
-                        onTap: (){
-                          if(![
+                        onTap: () {
+                          if (![
                             NotificationType.acceptFriend,
                             NotificationType.requestFriend,
                             NotificationType.unknown
                           ].contains(currentNotification.notificationType)
-                          ){
-                            bus.emit('AppRoute',referenceLink);
+                          ) {
+                            bus.emit('AppRoute', referenceLink);
 
-                            if(currentNotification.isUnRead == true){
-                              accountModel.clearNotifications(notificationIDList: [currentNotification.notificationID ?? 0]).then((result){
-                                if(result){
+                            if (currentNotification.isUnRead == true) {
+                              accountModel.clearNotifications(notificationIDList: [currentNotification.notificationID ?? 0]).then((result) {
+                                if (result) {
                                   clearNotifier.value += 1;
                                 }
                               });
@@ -242,27 +241,27 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                         title: Row(
                           spacing: 12,
                           children: [
-                                              
+
                             BangumiUserAvatar(
                               size: 50,
                               userInformation: currentNotification.userInformation,
                             ),
-                                              
+
                             Expanded(
                               child: AdapterBBCodeText(
                                 data: 
-                                  '[url=${BangumiWebUrls.user('${currentNotification.userInformation?.userName}')}]${currentNotification.userInformation?.getName()}[/url] '
-                                  '${currentNotification.notificationType?.notificationTypeName} '
-                                  '$referenceContent ' //回复的内容(可选)
-                                  '${
-                                    [
-                                      //NotificationType.unknown,
-                                      NotificationType.requestFriend,
-                                      NotificationType.acceptFriend
-                                    ].contains(currentNotification.notificationType)
-                                    ? ''
-                                    : currentNotification.notificationType?.isCall == true ? '中提及了你' : '中回复了你'
-                                  }',
+                                '[url=${BangumiWebUrls.user('${currentNotification.userInformation?.userName}')}]${currentNotification.userInformation?.getName()}[/url] '
+                                '${currentNotification.notificationType?.notificationTypeName} '
+                                '$referenceContent ' //回复的内容(可选)
+                                '${
+                                [
+                                  //NotificationType.unknown,
+                                  NotificationType.requestFriend,
+                                  NotificationType.acceptFriend
+                                ].contains(currentNotification.notificationType)
+                                  ? ''
+                                  : currentNotification.notificationType?.isCall == true ? '中提及了你' : '中回复了你'
+                                }',
                                 stylesheet: BBStylesheet(
                                   tags: allEffectTag,
                                   defaultText: TextStyle(
@@ -272,62 +271,60 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                                     color: judgeDarknessMode(context) ? Colors.white : Colors.black,
                                   )
                                 ),
-                                
+
                               ),
                             ),
-                                            
+
                             if(
-                              currentNotification.notificationType == NotificationType.requestFriend &&
+                            currentNotification.notificationType == NotificationType.requestFriend &&
                               currentNotification.isUnRead == true
                             )
-                              Row(
-                                children: [
-                                            
-                                  IconButton(
-                                    onPressed: (){
-                                            
-                                      accountModel.userRelationAction(currentNotification.userInformation?.userName).then((result){
-                                        accountModel.clearNotifications(
-                                          notificationIDList: [currentNotification.id ?? 0],
-                                          fallbackAction: (message){
-                                            fadeToaster(context: context,message: message);
-                                          }
-                                        ).then((result){
-                                          clearNotifier.value +=1;
-                                        });
-                                      });
-                                            
-                                      
-                                    }, 
-                                    icon: const Icon(Icons.done)
-                                  ),
-                                            
-                                  IconButton(
-                                    onPressed: (){
-										
-                                            
+                            Row(
+                              children: [
+
+                                IconButton(
+                                  onPressed: () {
+
+                                    accountModel.userRelationAction(currentNotification.userInformation?.userName).then((result) {
                                       accountModel.clearNotifications(
                                         notificationIDList: [currentNotification.id ?? 0],
-                                        fallbackAction: (message){
-                                          fadeToaster(context: context,message: message);
+                                        fallbackAction: (message) {
+                                          fadeToaster(context: context, message: message);
                                         }
-                                      ).then((result){
-                                        clearNotifier.value +=1;
+                                      ).then((result) {
+                                          clearNotifier.value += 1;
+                                        });
+                                    });
+
+                                  }, 
+                                  icon: const Icon(Icons.done)
+                                ),
+
+                                IconButton(
+                                  onPressed: () {
+
+                                    accountModel.clearNotifications(
+                                      notificationIDList: [currentNotification.id ?? 0],
+                                      fallbackAction: (message) {
+                                        fadeToaster(context: context, message: message);
+                                      }
+                                    ).then((result) {
+                                        clearNotifier.value += 1;
                                       });
-                                            
-                                    }, 
-                                    icon: const Icon(Icons.close)
-                                  ),
-                                ],
-                              ),
-                        
+
+                                  }, 
+                                  icon: const Icon(Icons.close)
+                                ),
+                              ],
+                            ),
+
                             ScalableText(covertPastedTime(currentNotification.createdTime))
-                                            
+
                           ],
                         ),
                       ),
                     );
-                  
+
                   }
                 );
               }

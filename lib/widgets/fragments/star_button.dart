@@ -1,14 +1,14 @@
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
-import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/hive.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/models/informations/local/star_details.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
-import 'package:bangu_lite/models/informations/local/star_details.dart';
 import 'package:bangu_lite/widgets/dialogs/star_subject_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -19,11 +19,10 @@ class StarButton extends StatefulWidget{
   const StarButton({
     super.key,
     required this.bangumiDetails,
-    
+
   });
 
   final BangumiDetails bangumiDetails;
-  
 
   @override
   State<StarButton> createState() => _StarButtonState();
@@ -38,10 +37,10 @@ class _StarButtonState extends State<StarButton> {
   @override
   Widget build(BuildContext context) {
 
-    return Selector<CommentModel,CommentDetails?>(
+    return Selector<CommentModel, CommentDetails?>(
       selector: (_, commentModel) => commentModel.userCommentDetails,
       shouldRebuild: (previous, next) => previous != next,
-      builder: (_,userCommentDetails,child) {
+      builder: (_, userCommentDetails, child) {
         return ElevatedButton(
           style: ButtonStyle(
             elevation: const WidgetStatePropertyAll(0),
@@ -49,43 +48,41 @@ class _StarButtonState extends State<StarButton> {
             overlayColor: WidgetStatePropertyAll(judgeCurrentThemeColor(context)),
           ),
           onPressed: () {
-        
+
             final bangumiModel = context.read<BangumiModel>();
-        
+
             /// context 环节迁移到 button 区域 而非 Dialog区域(特指)
             /// 以免造成 deactive Context use.
-            
+
             invokeLocalUpdateStaredBangumi() => updateLocalStaredBangumi(
               context,
               starInformationNotifier,
               widget.bangumiDetails,
             );
-        
-            invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
+
+            invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
               message: message,
               requestStatus: requestStatus,
               backgroundColor: judgeCurrentThemeColor(context)
             );
-        
+
             showStarSubjectDialog(
               context,
               bangumiDetails: widget.bangumiDetails,
-              onUpdateLocalStar:invokeLocalUpdateStaredBangumi,
+              onUpdateLocalStar: invokeLocalUpdateStaredBangumi,
               onUpdateBangumiStar: invokeRequestSnackBar,
-              
-              commentDetails:
-                userCommentDetails?..type = 
-                  localStarType ?? userCommentDetails.type
-              ,
-              themeColor:judgeDetailRenderColor(context, bangumiModel.imageColor)
-            ).then((result){
 
-              
-              starInformationNotifier.value += 1;
-              localStarType = result;
-            });
-        
-        
+              commentDetails:
+              userCommentDetails?..type = 
+              localStarType ?? userCommentDetails.type
+              ,
+              themeColor: judgeDetailRenderColor(context, bangumiModel.imageColor)
+            ).then((result) {
+
+                starInformationNotifier.value += 1;
+                localStarType = result;
+              });
+
           },
           child: Container(
             height: 40,
@@ -96,20 +93,20 @@ class _StarButtonState extends State<StarButton> {
             ),
             child: ValueListenableBuilder(
               valueListenable: starInformationNotifier,
-              builder: (_,__,child){
-                
+              builder: (_, __, child) {
+
                 //会出现 账号收藏 本地未收藏的状态...
                 final isStared = MyHive.starBangumisDataBase.containsKey(widget.bangumiDetails.id);
-          
+
                 String starText = "已收藏";
 
-                if(!isStared){starText = "加入收藏";}
-          
-                if(userCommentDetails != null){
+                if (!isStared) {starText = "加入收藏";
+                }
+
+                if (userCommentDetails != null) {
                   starText = (localStarType ?? userCommentDetails.type ?? StarType.none).starTypeName;
                 }
-                
-          
+
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 6,
@@ -133,18 +130,18 @@ void updateLocalStaredBangumi(
   BuildContext context,
   ValueNotifier<int> starNotifier,
   BangumiDetails bangumiDetails
-){
+) {
 
   final indexModel = context.read<IndexModel>();
   final epModel = context.read<EpModel>();
 
   final isStared = MyHive.starBangumisDataBase.containsKey(bangumiDetails.id);
 
-  if(isStared){
+  if (isStared) {
     MyHive.starBangumisDataBase.delete(bangumiDetails.id);
   }
 
-  else{
+  else {
 
     debugPrint("lastEP: ${epModel.epsData.values.last.airDate}");
 
@@ -155,27 +152,26 @@ void updateLocalStaredBangumi(
         ..name = bangumiDetails.name
         ..rank = bangumiDetails.ratingList["rank"]
         ..coverUrl = bangumiDetails.coverUrl
-        ..eps =  bangumiDetails.informationList["eps"]
+        ..eps = bangumiDetails.informationList["eps"]
         ..score = bangumiDetails.ratingList["score"]?.toDouble()
-        ..joinDate = DateTime.now().toIso8601String().substring(0,10)
+        ..joinDate = DateTime.now().toIso8601String().substring(0, 10)
         ..airDate = bangumiDetails.informationList["air_date"]
         ..finishedDate = epModel.epsData.values.last.airDate
         ..airWeekday = bangumiDetails.informationList["air_weekday"]
     );
 
     indexModel.starsUpdateRating.addAll(
-      {
-        bangumiDetails.id!: {
-          "score": bangumiDetails.ratingList["score"],
-          "rank": bangumiDetails.ratingList["rank"]
-        }
+    {
+      bangumiDetails.id!: {
+        "score": bangumiDetails.ratingList["score"],
+        "rank": bangumiDetails.ratingList["rank"]
       }
+    }
     );
 
-    
   }
 
-  starNotifier.value+=1;
+  starNotifier.value += 1;
 
   indexModel.updateStar();
 }

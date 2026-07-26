@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
@@ -36,7 +36,7 @@ class BangumiContentAppbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
+
     final indexModel = context.read<IndexModel>();
     final accountModel = context.read<AccountModel>();
 
@@ -47,15 +47,15 @@ class BangumiContentAppbar extends StatelessWidget {
         spacing: 12,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-      
+
           IconButton(
-            onPressed: (){
+            onPressed: () {
               debugPrint("back Trigger");
               Navigator.of(context).maybePop();
             },
             icon: const Icon(Icons.arrow_back),
           ),
-            
+
           Expanded(
             child: ScalableText(
               '$titleText',
@@ -63,33 +63,32 @@ class BangumiContentAppbar extends StatelessWidget {
             ),
           ),
 
-
           if(kDebugMode)
-            IconButton(
-              onPressed: (){
-                debugPrint('new replied in UI');
-                onSendMessage?.call(
-                  (
-                    //null,
-                    Random().nextInt(65535),
-                    "一个回帖测试"
-                  )
-                );
-              }, 
-              icon: const Icon(Icons.download_outlined)
-            ),
-            
           IconButton(
-            onPressed: (){
+            onPressed: () {
+              debugPrint('new replied in UI');
+              onSendMessage?.call(
+                (
+                  //null,
+                  Random().nextInt(65535),
+                  "一个回帖测试"
+                )
+              );
+            }, 
+            icon: const Icon(Icons.download_outlined)
+          ),
 
-              invokeToaster({String? message})=> fadeToaster(context: context, message: message ?? "请求中");
+          IconButton(
+            onPressed: () {
 
-              if(postCommentType == PostCommentType.postBlog){
+              invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "请求中");
+
+              if (postCommentType == PostCommentType.postBlog) {
                 invokeToaster(message: '暂不支持发送长评');
                 return;
               }
 
-              invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
+              invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
                 message: message,
                 requestStatus: requestStatus,
                 backgroundColor: judgeCurrentThemeColor(context)
@@ -99,8 +98,8 @@ class BangumiContentAppbar extends StatelessWidget {
                 contentID: contentID,
                 commentContent: message,
                 postCommentType: postCommentType,
-                actionType : UserContentActionType.post,
-                fallbackAction: (errorMessage)=> invokeRequestSnackBar(message: errorMessage,requestStatus: false)
+                actionType: UserContentActionType.post,
+                fallbackAction: (errorMessage) => invokeRequestSnackBar(message: errorMessage, requestStatus: false)
               );
 
               invokePostContent((String,String) content) => accountModel.postContent(
@@ -108,16 +107,15 @@ class BangumiContentAppbar extends StatelessWidget {
                 title: content.$1,
                 content: content.$2,
                 postContentType: postCommentType,
-                actionType : UserContentActionType.post,
-                fallbackAction: (errorMessage)=> invokeRequestSnackBar(message: errorMessage,requestStatus: false)
+                actionType: UserContentActionType.post,
+                fallbackAction: (errorMessage) => invokeRequestSnackBar(message: errorMessage, requestStatus: false)
               );
 
-              if(accountModel.isLogined() == false){
+              if (accountModel.isLogined() == false) {
                 invokeToaster(message: "评论功能需要先经过登录");
                 return;
               }
 
-                
               Navigator.of(context).pushNamed(
                 Routes.sendComment,
                 arguments: {
@@ -128,79 +126,79 @@ class BangumiContentAppbar extends StatelessWidget {
                 }
               ).then((content) async {
 
-                debugPrint("[PostContent] id:$contentID/$postCommentType");
+                  debugPrint("[PostContent] id:$contentID/$postCommentType");
 
-                //invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
-                //onSendMessage?.call(content as String);
+                  //invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
+                  //onSendMessage?.call(content as String);
 
-                if(content is String){
+                  if (content is String) {
 
-                  //网络层 Callback
-                  await invokeSendComment(content).then((result){
-                    debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
-                    //UI层 Callback
-                    if(result != 0){
-                      invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
-                      onSendMessage?.call((result,content));
-                    }
+                    //网络层 Callback
+                    await invokeSendComment(content).then((result) {
+                      debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
+                      //UI层 Callback
+                      if (result != 0) {
+                        invokeRequestSnackBar(message: "回帖成功", requestStatus: true);
+                        onSendMessage?.call((result,content));
+                      }
 
-                    else{
-                      invokeToaster(message: "因错误未能发送 内容已保留至草稿纸");
+                      else {
+                        invokeToaster(message: "因错误未能发送 内容已保留至草稿纸");
 
-                      indexModel.draftContent.addAll({
-                        contentID : ("",content)
-                      });
+                        indexModel.draftContent.addAll({
+                          contentID : ("",content)
+                        });
 
-                    }
-                    
-                  });
+                      }
 
-                }
+                    });
 
-                if(content is (String,String)){
+                  }
 
-                  //invokeRequestSnackBar(message: "UI回帖成功",requestStatus: true);
-                  //onSendMessage?.call((result,content));
+                  if (content is (String,String)) {
 
-                  await invokePostContent(content).then((result){
-                    debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
-                    //UI层 Callback
-                    if(result != 0){
-                      invokeRequestSnackBar(message: "回帖成功",requestStatus: true);
-                      onSendMessage?.call((result,content));
-                    }
+                    //invokeRequestSnackBar(message: "UI回帖成功",requestStatus: true);
+                    //onSendMessage?.call((result,content));
 
-                    else{
-                      invokeToaster(message: "因错误而未能发送 内容已保留至草稿纸");
+                    await invokePostContent(content).then((result) {
+                      debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
+                      //UI层 Callback
+                      if (result != 0) {
+                        invokeRequestSnackBar(message: "回帖成功", requestStatus: true);
+                        onSendMessage?.call((result,content));
+                      }
 
-                      indexModel.draftContent.addAll({
-                        contentID : (content.$1,content.$2)
-                      });
+                      else {
+                        invokeToaster(message: "因错误而未能发送 内容已保留至草稿纸");
 
-                    }
-                    
-                  });
+                        indexModel.draftContent.addAll({
+                          contentID : (content.$1,content.$2)
+                        });
 
-                }
-                
-              });
+                      }
+
+                    });
+
+                  }
+
+                });
             },
-            icon: Icon(Icons.edit_document,color: accountModel.isLogined() ? null : Colors.grey)
+            icon: Icon(Icons.edit_document, color: accountModel.isLogined() ? null : Colors.grey)
           ),
 
           if(webUrl != null)
-            IconButton(
-              onPressed: () async {
-                if(await canLaunchUrlString(webUrl ?? '')){
-                  await launchUrlString(webUrl ?? '');
-                }
-              },
-              icon: const Icon(Icons.link)
-            ),
+          IconButton(
+            onPressed: () async {
+              if (await canLaunchUrlString(webUrl ?? '')) {
+                await launchUrlString(webUrl ?? '');
+              }
+            },
+            icon: const Icon(Icons.link)
+          ),
 
         ],
       ),
     );
-                                    
+
   }
 }

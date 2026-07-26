@@ -1,8 +1,8 @@
-import 'dart:async';
+﻿import 'dart:async';
 
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:dio/dio.dart';
@@ -119,9 +119,9 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                                     child: SizedBox(
                                       height: 50,
                                       child: ScrollConfiguration(
-                                        behavior: ScrollConfiguration.of(context).copyWith(physics: const NeverScrollableScrollPhysics()),
+                                        //隔离EasyRefresh所带来的滚动影响 只给TextField传递 scrollPhysics 是不能完全抵消这种影响的
+                                        behavior: ScrollConfiguration.of(context).copyWith(physics: const ClampingScrollPhysics()),
                                         child: TextField(
-                                          scrollPhysics: const ClampingScrollPhysics(),
                                           controller: httpProxyAddressEditingController,
                                           decoration: const InputDecoration(
                                             hintText: '格式 [IP]:[Port]',

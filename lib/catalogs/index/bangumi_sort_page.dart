@@ -6,9 +6,9 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/subject/bangumi_detail_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/widgets/components/search_filter.dart';
 import 'package:bangu_lite/widgets/components/transition_container.dart';
@@ -51,15 +51,14 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
   @override
   void initState() {
 
-    bus.on('sortSubmit',(arg){
-      assert(arg is Map<String,dynamic>);
+    bus.on('sortSubmit', (arg) {
+      assert(arg is Map<String, dynamic>);
       debugPrint("received sortSubmit: $arg");
       loadNewData(arg);
     });
     super.initState();
 
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -69,40 +68,40 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
       footer: const TextFooter(),
 
       onLoad: () {
-        if(messageList.isEmpty) return;
+        if (messageList.isEmpty) return;
         loadMoreData(currentSearchConfig);
       },
-      
-      childBuilder: (_,physic){ // scroll Action by: CustomScrollView. just sync notice the physicAction.
+
+      childBuilder: (_, physic) { // scroll Action by: CustomScrollView. just sync notice the physicAction.
 
         //debugPrint("${MediaQuery.devicePixelRatioOf(context)}");
         return Scaffold(
           body: NotificationListener<ScrollUpdateNotification>(
             onNotification: (notification) {
-              
+
               final double scrollOffset = notification.metrics.pixels;
               //debugPrint("NotificationListener:$scrollOffset");
               scrollOffset >= 95 ? appBarTitleNotifier.value = "筛选动画" : appBarTitleNotifier.value = "";
               return true;
             },
-            
+
             child: CustomScrollView(
               controller: sortScrollController,
               physics: physic,
               slivers: [
-          
+
                 SliverPadding(
                   padding: const EdgeInsets.only(top: 24),
                   sliver: SliverAppBar(
                     leadingWidth: 12,
                     title: Padding(
                       padding: const EdgeInsets.only(right: 16),
-          
+
                       child: ValueListenableBuilder(
                         valueListenable: browserSortTypeNotifier,
                         builder: (_, browserSortType, child) {
                           return Row(
-                          
+
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
 
@@ -110,26 +109,24 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                 hoverColor: Colors.transparent,
                                 splashColor: Colors.transparent,
                                 child: Wrap(
-                                  
-                                  crossAxisAlignment : WrapCrossAlignment.center,
+
+                                  crossAxisAlignment: WrapCrossAlignment.center,
                                   spacing: 12,
-                                  children:  [
-                                
+                                  children: [
+
                                     const ScalableText("筛选动画"),
-                                
-                                    Icon(Icons.filter_list,size: min(35,MediaQuery.sizeOf(context).width/20)),
+
+                                    Icon(Icons.filter_list, size: min(35, MediaQuery.sizeOf(context).width / 20)),
                                   ],
                                 ),
                                 onTap: () => filterShowNotifier.value = !filterShowNotifier.value,
                               ),
-                           
-                              
 
                               Wrap(
                                 crossAxisAlignment: WrapCrossAlignment.center,
                                 spacing: 16,
                                 children: [
-          
+
                                   Container(
                                     height: 35,
                                     decoration: const BoxDecoration(
@@ -139,70 +136,70 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                       containedInkWell: true,
                                       highlightColor: Colors.transparent,
                                       radius: 12,
-                                      onTap: (){
-                                        viewTypeNotifier.value ==  ViewType.gridView ? 
+                                      onTap: () {
+                                        viewTypeNotifier.value == ViewType.gridView ? 
                                         viewTypeNotifier.value = ViewType.listView :
-                                        viewTypeNotifier.value = ViewType.gridView ;
+                                        viewTypeNotifier.value = ViewType.gridView;
                                       },
                                       child: ValueListenableBuilder(
                                         valueListenable: viewTypeNotifier,
-                                        builder: (_,viewType,child) {
-                                          return  Padding(
+                                        builder: (_, viewType, child) {
+                                          return Padding(
                                             padding: const EdgeInsets.only(right: 16),
-                                            child:  viewType == ViewType.gridView ? 
-                                                    Icon(Icons.grid_view,size: min(35,MediaQuery.sizeOf(context).width/20)) : 
-                                                    Icon(Icons.format_list_bulleted,size: min(35,MediaQuery.sizeOf(context).width/20)),
+                                            child: viewType == ViewType.gridView ? 
+                                            Icon(Icons.grid_view, size: min(35, MediaQuery.sizeOf(context).width / 20)) : 
+                                            Icon(Icons.format_list_bulleted, size: min(35, MediaQuery.sizeOf(context).width / 20)),
                                           );
                                         }
                                       ),
                                     ),
                                   ),
-                                                  
+
                                   AnimatedSortSelector(
                                     currentType: browserSortType,
                                     selectedType: SortType.rank,
-                                    onTap: (){
+                                    onTap: () {
 
                                       browserSortTypeNotifier.value = SortType.rank;
-                                      if(currentSearchConfig.isEmpty) return;
+                                      if (currentSearchConfig.isEmpty) return;
                                       loadNewData(currentSearchConfig);
-          
+
                                     },
                                     labelIcon: Icons.leaderboard_outlined,
                                     labelText: "排名",
                                   ),
-                                                  
+
                                   AnimatedSortSelector(
                                     currentType: browserSortType,
                                     selectedType: SortType.heat,
-                                    onTap: (){
-                                      
+                                    onTap: () {
+
                                       browserSortTypeNotifier.value = SortType.heat;
-                                      if(currentSearchConfig.isEmpty) return;
+                                      if (currentSearchConfig.isEmpty) return;
                                       loadNewData(currentSearchConfig);
-                                    
+
                                     },
                                     labelIcon: Icons.favorite_outline,
                                     labelText: "收藏",
                                   ),
-                                                  
+
                                   AnimatedSortSelector(
                                     currentType: browserSortType,
                                     selectedType: SortType.score,
-                                    onTap: (){
-        
+                                    onTap: () {
+
                                       browserSortTypeNotifier.value = SortType.score;
-                                      if(currentSearchConfig.isEmpty) return;
+                                      if (currentSearchConfig.isEmpty) return;
                                       loadNewData(currentSearchConfig);
-                                      
+
                                     },
                                     labelIcon: Icons.numbers,
                                     labelText: "分数",
                                   )
-                                                  
+
                                 ],
                               ),
-                          
+
                             ],
                           );
                         }
@@ -211,10 +208,10 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                     leading: const SizedBox.shrink(),
                   ),
                 ),
-          
+
                 ValueListenableBuilder(
                   valueListenable: filterShowNotifier,
-                  builder: (_,filterShow,child) {
+                  builder: (_, filterShow, child) {
                     return SliverToBoxAdapter(
                       child: AnimatedContainer(
                         height: filterShow ? (kDebugMode ? 400 : 300) : 0,
@@ -228,7 +225,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                             );
                           },
                           child: filterShow ? const Searchfilter() : const SizedBox.shrink()
-                          
+
                         ),
                       ),
                     );
@@ -237,39 +234,39 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
 
                 ValueListenableBuilder(
                   valueListenable: viewTypeNotifier,
-                  builder: (_,viewType,child){
+                  builder: (_, viewType, child) {
 
                     return ValueListenableBuilder(
                       valueListenable: loadCountNotifier,
-                      builder: (_,loadCount,child) {
+                      builder: (_, loadCount, child) {
                         return SliverStack(
                           children: [
-                        
+
                             SliverOffstage(
                               offstage: viewType != ViewType.listView || loadCount == 0,
                               sliver: SliverAnimatedList(
                                 key: messageListStreamKey,
                                 initialItemCount: messageList.isEmpty ? 1 : messageList.length,
-                                
+
                                 itemBuilder: (_, index, animation) {
 
-                                  if(viewType != ViewType.listView) return const SizedBox.shrink();
-                        
+                                  if (viewType != ViewType.listView) return const SizedBox.shrink();
+
                                   //debugPrint("index:$index");
-                              
-                                  if(messageList.isEmpty){
+
+                                  if (messageList.isEmpty) {
                                     return const Center(child: ScalableText("没有搜索到内容.."));
                                   }
-                                      
-                                  if(index>messageList.length - 1){
+
+                                  if (index > messageList.length - 1) {
                                     debugPrint("prevent strangeOverFlow rebuild");
                                     return const SizedBox.shrink();
                                   }
-                        
+
                                   return FadeTransition(
                                     opacity: animation,
                                     child: TransitionContainer(
-                                      builder:(_,openAction){
+                                      builder: (_, openAction) {
                                         return MultiProvider(
                                           providers: [
                                             Provider<BangumiDetails?>.value(value: messageList[index]),
@@ -280,11 +277,10 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                       },
                                       next: BangumiDetailPage(subjectID: messageList[index].id ?? 0),
                                     )
-                              
-                                  
+
                                   );
-                                  
-                                  },
+
+                                },
                               ),
                             ),
 
@@ -303,54 +299,49 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                                   ),
                                   itemBuilder: (context, currentBangumiIndex, animation) {
 
-                                    if(viewType != ViewType.gridView) return const SizedBox.shrink();
-                                
-                                    if(currentBangumiIndex > messageList.length - 1){
+                                    if (viewType != ViewType.gridView) return const SizedBox.shrink();
+
+                                    if (currentBangumiIndex > messageList.length - 1) {
                                       debugPrint("prevent strangeOverFlow rebuild: $currentBangumiIndex/${messageList.length}");
                                       return const SizedBox.shrink();
                                     }
-                                
+
                                     debugPrint("gridIndex:$currentBangumiIndex");
-                                
+
                                     return NotificationListener<ScrollUpdateNotification>(
                                       onNotification: (notification) => true,
-                                        child:  FadeTransition(
+                                      child: FadeTransition(
                                         opacity: animation,
-                                          child:  MultiProvider(
-                                            providers: [
-                                              Provider<BangumiDetails?>.value(
-                                                value: messageList.elementAtOrNull(currentBangumiIndex),
-                                              ),
-                                              Provider<BangumiGridTileConfig?>.value(
-                                                value: BangumiGridTileConfig(
-                                                  onTap: () {
-                                                    if(messageList.elementAtOrNull(currentBangumiIndex)?.name!=null){
-                                                                                
-                                                      Navigator.pushNamed(
-                                                        context,
-                                                        Routes.subjectDetail,
-                                                        arguments: {"subjectID":messageList[currentBangumiIndex].id},
-                                                      );
-                                                    }
+                                        child: MultiProvider(
+                                          providers: [
+                                            Provider<BangumiDetails?>.value(
+                                              value: messageList.elementAtOrNull(currentBangumiIndex),
+                                            ),
+                                            Provider<BangumiGridTileConfig?>.value(
+                                              value: BangumiGridTileConfig(
+                                                onTap: () {
+                                                  if (messageList.elementAtOrNull(currentBangumiIndex)?.name != null) {
+
+                                                    Navigator.pushNamed(
+                                                      context,
+                                                      Routes.subjectDetail,
+                                                      arguments: {"subjectID":messageList[currentBangumiIndex].id},
+                                                    );
                                                   }
-                                                )
+                                                }
                                               )
-                                            ],
-                                            child: const BangumiGridTile(),
-                                          )
+                                            )
+                                          ],
+                                          child: const BangumiGridTile(),
+                                        )
                                       )
                                     );
                                   },
                                 ),
                               )
 
-                     
-
-
                             )
 
-                         
-                        
                           ],
                         );
                       }
@@ -358,23 +349,22 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
 
                   }
                 ),
-      
-          
+
                 const SliverPadding(padding: EdgeInsets.only(bottom: 60)),
 
                 SliverToBoxAdapter(
-                //SliverFillRemaining(
+                  //SliverFillRemaining(
                   child: ValueListenableBuilder(
                     valueListenable: loadCountNotifier,
-                    builder: (_,loadCount,child) {
-          
+                    builder: (_, loadCount, child) {
+
                       String showMessage = loadCount == 0 ? "透过筛选以获取番剧信息" : "已经到底了 上滑载入更多信息";
-          
+
                       return Stack(
                         children: [
 
                           Offstage(
-                            offstage: loadCount==0,
+                            offstage: loadCount == 0,
                             child: Padding(
                               padding: const EdgeInsets.only(top: 20),
                               child: AnimatedWaveFooter(
@@ -396,61 +386,57 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                     }
                   ),
                 ),
-          
-          
-                
+
               ],
             ),
           ),
           floatingActionButton: 
-            ValueListenableBuilder(
-              valueListenable: appBarTitleNotifier,
-              builder: (_,appBarTitleNotifierContent,child) {
-                return AnimatedOpacity(
-                  opacity: appBarTitleNotifierContent.isEmpty ? 0 : 1,
-                  duration: const Duration(milliseconds: 150),
-                  child: child!
-                );
+          ValueListenableBuilder(
+            valueListenable: appBarTitleNotifier,
+            builder: (_, appBarTitleNotifierContent, child) {
+              return AnimatedOpacity(
+                opacity: appBarTitleNotifierContent.isEmpty ? 0 : 1,
+                duration: const Duration(milliseconds: 150),
+                child: child!
+              );
+            },
+            child: FloatingActionButton.extended(
+              backgroundColor: judgeCurrentThemeColor(context),
+              label: const Row(
+                spacing: 12,
+                children: [
+                  Text("回顶部"),
+                  Icon(Icons.arrow_upward)
+                ],
+              ),
+              onPressed: () {
+                messageList.length > 30 ?
+                sortScrollController.jumpTo(0) :
+                sortScrollController.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.linear);
               },
-              child: FloatingActionButton.extended(
-                backgroundColor: judgeCurrentThemeColor(context),
-                label: const Row(
-                  spacing: 12,
-                  children: [
-                    Text("回顶部"),
-                    Icon(Icons.arrow_upward)
-                  ],
-                ),
-                onPressed: (){
-                  messageList.length > 30 ?
-                  sortScrollController.jumpTo(0) :
-                  sortScrollController.animateTo(0,duration: const Duration(milliseconds: 300), curve: Curves.linear);
-                },
-           
-              )
-            ),
+
+            )
+          ),
         );
       }
     );
   }
 
-
   void loadData(
-    {
-      String? keyword,
-      SortType? sortType,
-      int? searchOffset,
-      List<String>? tagsList,
+  {
+    String? keyword,
+    SortType? sortType,
+    int? searchOffset,
+    List<String>? tagsList,
 
-      List<String>? airDateRange,
-      List<String>? rankRange,
-      List<String>? ratingRange,
-    }
+    List<String>? airDateRange,
+    List<String>? rankRange,
+    List<String>? ratingRange,
+  }
 
-  ){
+  ) {
 
     int recordLength = messageList.length;
-
 
     sortSearchHandler(
       keyword: keyword,
@@ -460,59 +446,56 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
       tagsList: tagsList,
 
       sortType: sortType?.name,
-      searchOffset:searchOffset,
+      searchOffset: searchOffset,
 
-      
-    ).then((searchResponse){
+    ).then((searchResponse) {
 
-      if(searchResponse.data!=null){
-        
-        messageList.addAll(loadSearchData(searchResponse.data));
+        if (searchResponse.data != null) {
 
-        //debugPrint("bangumiSort: ${messageList}");
+          messageList.addAll(loadSearchData(searchResponse.data));
 
-        messageListStreamKey.currentState?.insertAllItems(
-          recordLength == 0 ? 0 : recordLength - 1 ,
-          messageList.length - recordLength,
-          duration: const Duration(milliseconds: 500)
-        );
+          //debugPrint("bangumiSort: ${messageList}");
 
-        messageGridStreamKey.currentState?.insertAllItems(
-          recordLength == 0 ? 0 : recordLength - 1 ,
-          messageList.length - recordLength,
-          duration: const Duration(milliseconds: 500)
-        );
-
-
-        loadCountNotifier.value+=1;
-
-        WidgetsBinding.instance.addPostFrameCallback((timestamp){
-          if(searchResponse.data.isEmpty) return;
-
-          sortScrollController.animateTo(
-            sortScrollController.position.pixels + (166*3), // BangumiListTile的iconSize是150 加上padding就是 166
-            //sortScrollController.position.maxScrollExtent, //直接滚到底部
-            duration: const Duration(milliseconds: 150),  
-            //滚动实际效果和动画时间相关。越长实际滚的offset越低 这实在太离谱了
-            curve: Curves.linear
+          messageListStreamKey.currentState?.insertAllItems(
+            recordLength == 0 ? 0 : recordLength - 1,
+            messageList.length - recordLength,
+            duration: const Duration(milliseconds: 500)
           );
-        });
-        
-      }
 
-      
-    });
+          messageGridStreamKey.currentState?.insertAllItems(
+            recordLength == 0 ? 0 : recordLength - 1,
+            messageList.length - recordLength,
+            duration: const Duration(milliseconds: 500)
+          );
+
+          loadCountNotifier.value += 1;
+
+          WidgetsBinding.instance.addPostFrameCallback((timestamp) {
+            if (searchResponse.data.isEmpty) return;
+
+            sortScrollController.animateTo(
+              sortScrollController.position.pixels + (166 * 3), // BangumiListTile的iconSize是150 加上padding就是 166
+              //sortScrollController.position.maxScrollExtent, //直接滚到底部
+              duration: const Duration(milliseconds: 150),  
+              //滚动实际效果和动画时间相关。越长实际滚的offset越低 这实在太离谱了
+              curve: Curves.linear
+            );
+          });
+
+        }
+
+      });
   }
 
-  void loadNewData(Map configData){
+  void loadNewData(Map configData) {
 
-    loadCountNotifier.value=0;
+    loadCountNotifier.value = 0;
     messageList.clear();
 
     messageListStreamKey.currentState?.removeAllItems(
-      (_,animation){
+      (_, animation) {
         return FadeTransition(
-          opacity: animation.drive(Tween<double>(begin: 1, end:0)),
+          opacity: animation.drive(Tween<double>(begin: 1, end: 0)),
           child: const SizedBox.shrink() ,
         );
       },
@@ -528,29 +511,28 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
       }
     );
 
-    
     loadData(
       sortType: browserSortTypeNotifier.value,
-      searchOffset: loadCountNotifier.value*10,
-      airDateRange:configData["air_date"],
-      rankRange:configData["rank"],
-      ratingRange:configData["rating"],
-      tagsList:configData["tag"],
+      searchOffset: loadCountNotifier.value * 10,
+      airDateRange: configData["air_date"],
+      rankRange: configData["rank"],
+      ratingRange: configData["rating"],
+      tagsList: configData["tag"],
     );
 
   }
 
-  void loadMoreData(Map configData){
+  void loadMoreData(Map configData) {
 
-    loadCountNotifier.value+=1;
+    loadCountNotifier.value += 1;
 
     loadData(
       sortType: browserSortTypeNotifier.value,
-      searchOffset: loadCountNotifier.value*10,
-      airDateRange:configData["air_date"],
-      rankRange:configData["rank"],
-      ratingRange:configData["rating"],
-      tagsList:configData["tag"],
+      searchOffset: loadCountNotifier.value * 10,
+      airDateRange: configData["air_date"],
+      rankRange: configData["rank"],
+      ratingRange: configData["rating"],
+      tagsList: configData["tag"],
     );
 
   }

@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/proxy_cache.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -22,7 +22,6 @@ class BuildDetailImages extends StatelessWidget {
   final int? imageID;
   final String? imageName;
   final String? detailImageUrl;
-  
 
   @override
   Widget build(BuildContext context) {
@@ -38,78 +37,78 @@ class BuildDetailImages extends StatelessWidget {
 
     return detailImageUrl != null ?
 
-      CachedNetworkImage(
-        imageUrl: detailImageUrl!,
-        cacheManager: ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress),
-        imageBuilder: (_,imageProvider){
-      
-          if(bangumiModel.imageColor==null){
-            ColorScheme.fromImageProvider(provider: imageProvider).then((coverScheme){
-      
-              debugPrint("parse Picture:${coverScheme.primary}");
-              bangumiModel.getThemeColor(coverScheme.primary,darkMode: darkMode);
-            });
-          }
-      
-          return UnVisibleResponse(
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                Routes.photoView,
-                arguments: {
-                  "imageProvider":imageProvider,
-                  "name": imageName
-                },
-              );
+    CachedNetworkImage(
+      imageUrl: detailImageUrl!,
+      cacheManager: ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress),
+      imageBuilder: (_, imageProvider) {
 
-            },
-            child: Container(
-              constraints: imageConstraint,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: imageProvider,
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: BorderRadius.circular(16)
-              ),
-            ),
-          );
-        },
-        errorWidget: (context, url, error) {
-          return Container(
+        if (bangumiModel.imageColor == null) {
+          ColorScheme.fromImageProvider(provider: imageProvider).then((coverScheme) {
+
+            debugPrint("parse Picture:${coverScheme.primary}");
+            bangumiModel.getThemeColor(coverScheme.primary, darkMode: darkMode);
+          });
+        }
+
+        return UnVisibleResponse(
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              Routes.photoView,
+              arguments: {
+                "imageProvider":imageProvider,
+                "name": imageName
+              },
+            );
+
+          },
+          child: Container(
             constraints: imageConstraint,
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                color: Colors.grey.withValues(alpha: 0.5),
+              image: DecorationImage(
+                image: imageProvider,
+                fit: BoxFit.cover,
               ),
-            child: const Center(child: ScalableText("Image Not Available")),
-          );
-        },
-        
-        progressIndicatorBuilder: (_, __, progress) {
-        
-          return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: Colors.grey,
+              borderRadius: BorderRadius.circular(16)
             ),
-      
-            constraints: imageConstraint,
-            
-            child: const Center(
-              child: ScalableText("loading..."),
-            ),
-          );
-        
-        },
-      )
-    :  
-	
-	Image.asset(
-		'assets/icons/icon.png',
-		width: max(MediaQuery.sizeOf(context).height*1/4,MediaQuery.sizeOf(context).width*1/6),
-		height: max(MediaQuery.sizeOf(context).height*1/4,MediaQuery.sizeOf(context).width*1/6),
-	);
-	
+          ),
+        );
+      },
+      errorWidget: (context, url, error) {
+        return Container(
+          constraints: imageConstraint,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            color: Colors.grey.withValues(alpha: 0.5),
+          ),
+          child: const Center(child: ScalableText("Image Not Available")),
+        );
+      },
+
+      progressIndicatorBuilder: (_, __, progress) {
+
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.grey,
+          ),
+
+          constraints: imageConstraint,
+
+          child: const Center(
+            child: ScalableText("loading..."),
+          ),
+        );
+
+      },
+    )
+      :  
+
+      Image.asset(
+        'assets/icons/icon.png',
+        width: max(MediaQuery.sizeOf(context).height * 1 / 4, MediaQuery.sizeOf(context).width * 1 / 6),
+        height: max(MediaQuery.sizeOf(context).height * 1 / 4, MediaQuery.sizeOf(context).width * 1 / 6),
+      );
+
   }
 }

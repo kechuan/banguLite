@@ -1,8 +1,8 @@
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -57,14 +57,14 @@ class _CommentReactionState extends State<CommentReaction> {
     localCommentReactions = widget.commentReactions ?? {};
 
     localCommentReactions.entries.any((userList) {
-        if (userList.value.contains(AccountModel.loginedUserInformations.userInformation?.getName())) {
-          widget.reactDataLikeNotifier.value = userList.key;
-          selectedRecordDataLike = userList.key;
-          return true;
-        }
+      if (userList.value.contains(AccountModel.loginedUserInformations.userInformation?.getName())) {
+        widget.reactDataLikeNotifier.value = userList.key;
+        selectedRecordDataLike = userList.key;
+        return true;
+      }
 
-        return false;
-      });
+      return false;
+    });
 
     reactionStickerGroupCount = localCommentReactions.length;
 
@@ -101,24 +101,22 @@ class _CommentReactionState extends State<CommentReaction> {
     );
 
     const double chipWidth = 80;
-    const double separatorWidth = 6*2;
-    
-    
+    const double separatorWidth = 6 * 2;
+
     // 内容实际需要的宽度
     final double contentWidth = 
-        reactionStickerGroupCount * chipWidth + (reactionStickerGroupCount - 1) * separatorWidth;
+      reactionStickerGroupCount * chipWidth + (reactionStickerGroupCount - 1) * separatorWidth;
 
     // 可用宽度上限，留出 item 左右 padding
     final double maxWidth = 
-        MediaQuery.sizeOf(context).width - 32; // 按你的 item 内边距调整
-
+      MediaQuery.sizeOf(context).width - 32; // 按你的 item 内边距调整
 
     return SizedBox(
       height: 40,
-       width: contentWidth.clamp(0, maxWidth), // ← 给定有界宽度
+      width: contentWidth.clamp(0, maxWidth), // ← 给定有界宽度
       child: AnimatedList.separated(
         key: widget.animatedReactionsListKey,
-        
+
         //shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         physics: const ClampingScrollPhysics(),
@@ -148,21 +146,21 @@ class _CommentReactionState extends State<CommentReaction> {
                   ),
                   onPressed: () {
                     debugPrint("dataLikeIndex:$dataLikeIndex, stickerIndex:$stickerIndex");
-          
+
                     if (!isReactAble) return;
-          
+
                     invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
                       message: message,
                       requestStatus: requestStatus,
                       backgroundColor: judgeCurrentThemeColor(context)
                     );
-          
+
                     debugPrint("widget.reactDataLikeNotifier.value:$widget.reactDataLikeNotifier.value, dataLikeIndex:$dataLikeIndex, subject:${widget.commentID}");
-          
+
                     //invokeRequestSnackBar(message: "UI贴条成功",requestStatus: true);
-          
+
                     invokeRequestSnackBar();
-          
+
                     accountModel.toggleCommentLike(
                       widget.commentID,
                       dataLikeIndex,
@@ -172,24 +170,24 @@ class _CommentReactionState extends State<CommentReaction> {
                         invokeRequestSnackBar(message: message, requestStatus: false);
                       }
                     ).then((result) {
-                          if (result) {
-          
-                            if (widget.reactDataLikeNotifier.value == dataLikeIndex) {
-                              widget.reactDataLikeNotifier.value = unExistID;
-                            }
-          
-                            else {
-                              widget.reactDataLikeNotifier.value = dataLikeIndex;
-                            }
-          
-                            invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
-          
+                        if (result) {
+
+                          if (widget.reactDataLikeNotifier.value == dataLikeIndex) {
+                            widget.reactDataLikeNotifier.value = unExistID;
                           }
-          
-                        });
-          
+
+                          else {
+                            widget.reactDataLikeNotifier.value = dataLikeIndex;
+                          }
+
+                          invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
+
+                        }
+
+                      });
+
                     debugPrint("postCommentType:${widget.postCommentType}, id: ${widget.commentID}");
-          
+
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -198,7 +196,7 @@ class _CommentReactionState extends State<CommentReaction> {
                         convertBangumiStickerPath(stickerIndex),
                         scale: 0.8,
                       ),
-          
+
                       Tooltip(
                         triggerMode: TooltipTriggerMode.tap,
                         message: 
@@ -207,19 +205,19 @@ class _CommentReactionState extends State<CommentReaction> {
                         textStyle: TextStyle(
                           color: judgeDarknessMode(context) ? Colors.black : Colors.white
                         ),
-          
+
                         child: ScalableText(
                           "${localCommentReactions[dataLikeIndex]?.length ?? 0}"
                         )
                       ),
-          
+
                     ],
                   )
                 ),
-          
+
               ),
             ),
-          
+
           );
 
         },
@@ -258,6 +256,6 @@ class _CommentReactionState extends State<CommentReaction> {
 
     selectedRecordDataLike = widget.reactDataLikeNotifier.value;
 
-    setState(() {});
+    setState(()  {});
   }
 }

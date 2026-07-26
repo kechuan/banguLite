@@ -1,7 +1,7 @@
 import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_details.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
@@ -17,7 +17,7 @@ class BangumiGroupTopicPage extends StatefulWidget {
     super.key,
     required this.groupsModel,
     required this.groupTopicInfo,
-    
+
     this.themeColor,
     this.referPostContentID,
     this.sourceTitle
@@ -35,12 +35,12 @@ class BangumiGroupTopicPage extends StatefulWidget {
 }
 
 class _BangumiGroupTopicPageState extends BangumiContentPageState 
-<
-	BangumiGroupTopicPage,
-	GroupsModel,
-	GroupTopicInfo,
-	GroupTopicDetails
->{
+  <
+    BangumiGroupTopicPage,
+    GroupsModel,
+    GroupTopicInfo,
+    GroupTopicDetails
+  >{
 
   @override
   GroupTopicInfo getContentInfo() => widget.groupTopicInfo;
@@ -61,9 +61,9 @@ class _BangumiGroupTopicPageState extends BangumiContentPageState
   String? sourceTitle() => widget.sourceTitle;
 
   @override
-  int? getCommentCount(GroupTopicDetails? contentDetail, bool isLoading){
-    if(!isContentLoading(contentDetail?.groupTopicID)){
-      if(contentDetail?.groupTopicID != null){
+  int? getCommentCount(GroupTopicDetails? contentDetail, bool isLoading) {
+    if (!isContentLoading(contentDetail?.groupTopicID)) {
+      if (contentDetail?.groupTopicID != null) {
         return contentDetail!.contentRepliedComment?.length ?? 0;
       }
     }
@@ -74,15 +74,15 @@ class _BangumiGroupTopicPageState extends BangumiContentPageState
   String getWebUrl(int? groupTopicID) => BangumiWebUrls.groupTopic(groupTopicID ?? 0);
 
   @override
-  Future<void> loadContent(int groupTopicID,{bool isRefresh = false}){
+  Future<void> loadContent(int groupTopicID, {bool isRefresh = false}) {
     return getContentModel().loadContentDetail(
       groupTopicID, 
       isRefresh: isRefresh,
-      fallbackAction: (message) => showRequestSnackBar(message:message,requestStatus: false,backgroundColor: judgeCurrentThemeColor(context)),
+      fallbackAction: (message) => showRequestSnackBar(message: message, requestStatus: false, backgroundColor: judgeCurrentThemeColor(context)),
     );
   }
 
   @override
   int? getReferPostContentID() => widget.referPostContentID;
-  
+
 }

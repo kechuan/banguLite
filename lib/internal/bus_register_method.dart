@@ -1,6 +1,6 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
-import 'package:bangu_lite/internal/judge_condition.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
 import 'package:bangu_lite/models/informations/subjects/review_details.dart';
@@ -20,15 +20,15 @@ final pathRegExp = RegExp(r'^[^?]*');
 // 424493#post_3306858
 final anchorRegExp = RegExp(r'#post_(\d+)');
 
-void appRouteMethodListener(BuildContext context,String link,{dynamic data}){
+void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
 
   final appRouteUri = Uri.parse(link);
 
-  if(
-    link.startsWith(BangumiWebUrls.baseUrl) || 
+  if (
+  link.startsWith(BangumiWebUrls.baseUrl) || 
     link.startsWith(BangumiWebUrls.relativeUrl) ||
     link.startsWith(BangumiAPIUrls.newUrl)
-  ){
+  ) {
 
     debugPrint("detected BangumiUrls: $link");
 
@@ -39,123 +39,117 @@ void appRouteMethodListener(BuildContext context,String link,{dynamic data}){
     final matchResult = RegExp(r'\d+').allMatches(matchPath);
 
     final int resID = matchResult.isEmpty ? 0 :
-      int.tryParse(
-        matchResult.first.group(0) ?? ""
-      ) ?? 0
+    int.tryParse(
+      matchResult.first.group(0) ?? ""
+    ) ?? 0
     ;
 
     final int? postReferID = int.tryParse(anchorRegExp.firstMatch(link)?.group(1) ?? "");
     postReferID;
 
+    if (
+    link == BangumiWebUrls.subject(resID) ||
+      link == BangumiWebUrls.relativeSubject(resID)
+    ) {
+      if (context.mounted) Navigator.pushNamed(context, Routes.subjectDetail, arguments: {"subjectID":resID});
+    }
 
-      if(
-        link == BangumiWebUrls.subject(resID) ||
-        link == BangumiWebUrls.relativeSubject(resID)
-      ){
-        if(context.mounted) Navigator.pushNamed(context, Routes.subjectDetail,arguments: {"subjectID":resID});
+    else if (
+    link.startsWith(BangumiWebUrls.ep(resID)) ||
+      link.startsWith(BangumiWebUrls.relativeEp(resID)) 
+    ) {
+      if (context.mounted) {
+        //EpModel(subjectID: widget.subjectID,selectedEp: 1)
+        //难点在于怎么传递 subjectID 信息 答案: Params传递  
+
+        debugPrint("ep link: $link");
+
+        int subjectID = int.tryParse(appRouteUri.queryParameters['subjectID'] ?? "") ?? 0;
+        num selectedEp = num.tryParse(appRouteUri.queryParameters['selectedEp'] ?? "") ?? 0;
+
+        Navigator.pushNamed(
+          context, Routes.subjectEp,
+          arguments: {
+            /// 单EP模式
+            //'epModel': EpModel(
+            //  injectEpID: resID,
+            //),
+
+            // 正常模式
+            'epModel': EpModel(
+              subjectID: subjectID,
+              selectedEp: selectedEp,
+              injectEpID: subjectID == 0 ? resID : 0,
+            ),
+
+            "referPostContentID": postReferID,
+          }
+        );
+
       }
 
-      
-      else if(
-        link.startsWith(BangumiWebUrls.ep(resID)) ||
-        link.startsWith(BangumiWebUrls.relativeEp(resID)) 
-      ){
-        if(context.mounted){
-          //EpModel(subjectID: widget.subjectID,selectedEp: 1)
-          //难点在于怎么传递 subjectID 信息 答案: Params传递  
+    }
 
-          debugPrint("ep link: $link");
+    else if (
+    link.startsWith(BangumiWebUrls.subjectTopic(resID)) ||
+      link.startsWith(BangumiWebUrls.relativeSubjectTopic(resID)) 
+    ) {
+      if (context.mounted) {
 
-            int subjectID = int.tryParse(appRouteUri.queryParameters['subjectID'] ?? "") ?? 0;
-            num selectedEp = num.tryParse(appRouteUri.queryParameters['selectedEp'] ?? "") ?? 0;
+        debugPrint("topic link: $link");
 
-            Navigator.pushNamed(
-            context, Routes.subjectEp,
-            arguments: {
-              /// 单EP模式
-              //'epModel': EpModel(
-              //  injectEpID: resID,
-              //),
+        Navigator.pushNamed(
+          context, 
+          Routes.subjectTopic,
+          arguments: {
+            //单链接触发 固定为 0(生效范围: URL链接跳转/ 历史模式进入)
+            "topicModel":TopicModel(subjectID: 0),
+            "topicInfo":TopicInfo(id: resID, contentTitle: appRouteUri.queryParameters['topicTitle'] ?? "topicID: $resID"),
+            "sourceTitle": appRouteUri.queryParameters['sourceTitle'],
+            "referPostContentID": postReferID,
+            "themeColor":judgeCurrentThemeColor(context),
+          }
+        );
 
-              // 正常模式
-              'epModel': EpModel(
-                subjectID: subjectID,
-                selectedEp: selectedEp,
-                injectEpID: subjectID == 0 ? resID : 0,
-              ),
-              
-              "referPostContentID": postReferID,
-            }
-          );
-
-
-        }
-        
       }
+    }
 
-      else if(
-        link.startsWith(BangumiWebUrls.subjectTopic(resID)) ||
-        link.startsWith(BangumiWebUrls.relativeSubjectTopic(resID)) 
-      ){
-        if(context.mounted){
+    else if (
+    link.startsWith(BangumiWebUrls.groupTopic(resID)) ||
+      link.startsWith(BangumiWebUrls.relativeGroupTopic(resID)) 
+    ) {
+      if (context.mounted) {
 
-          debugPrint("topic link: $link");
+        //那topic呢。。 一般的topic链接是不会拥有 subject/group 这种信息的
+        //只有单独的 topic/postID
 
-          
+        debugPrint("groupTopic link: $link,refer: $postReferID");
 
-          Navigator.pushNamed(
-            context, 
-            Routes.subjectTopic,
-            arguments: {
-              //单链接触发 固定为 0(生效范围: URL链接跳转/ 历史模式进入)
-              "topicModel":TopicModel(subjectID: 0),
-              "topicInfo":TopicInfo(id: resID,contentTitle: appRouteUri.queryParameters['topicTitle'] ?? "topicID: $resID"),
-              "sourceTitle": appRouteUri.queryParameters['sourceTitle'],
-              "referPostContentID": postReferID,
-              "themeColor":judgeCurrentThemeColor(context),
-            }
-          );
+        Navigator.pushNamed(
+          context, 
+          Routes.groupTopic,
+          arguments: {
+            "groupsModel":GroupsModel(subjectID: appRouteUri.queryParameters['sorceID']),
+            "groupTopicInfo":
+            GroupTopicInfo(id: resID)
+              ..contentTitle = appRouteUri.queryParameters['groupTopicTitle']
+            ,
+            'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
+            "referPostContentID": postReferID,
+            "themeColor":judgeCurrentThemeColor(context),
+          }
 
-        }
+        );
+
       }
+    }
 
-      else if(
-        link.startsWith(BangumiWebUrls.groupTopic(resID)) ||
-        link.startsWith(BangumiWebUrls.relativeGroupTopic(resID)) 
-      ){
-        if(context.mounted){
-
-          //那topic呢。。 一般的topic链接是不会拥有 subject/group 这种信息的
-          //只有单独的 topic/postID
-
-          debugPrint("groupTopic link: $link,refer: $postReferID");
-
-          Navigator.pushNamed(
-            context, 
-            Routes.groupTopic,
-            arguments: {
-              "groupsModel":GroupsModel(subjectID: appRouteUri.queryParameters['sorceID']),
-              "groupTopicInfo":
-                  GroupTopicInfo(id: resID)
-                  ..contentTitle = appRouteUri.queryParameters['groupTopicTitle']
-              ,
-              'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
-              "referPostContentID": postReferID,
-              "themeColor":judgeCurrentThemeColor(context),
-            }
-
-          );
-
-        }
-      }
-
-
-      else if(
-        link.startsWith(BangumiWebUrls.userBlog(resID)) ||
-        link.startsWith(BangumiWebUrls.relativeBlog(resID)) 
-      ){
-        if(context.mounted){
-          Navigator.pushNamed(
+    else if (
+    link.startsWith(BangumiWebUrls.userBlog(resID)) ||
+      link.startsWith(BangumiWebUrls.relativeBlog(resID)) 
+    ) {
+      if (context.mounted) {
+        Navigator.pushNamed(
           context,
           Routes.blog,
           arguments: {
@@ -166,95 +160,92 @@ void appRouteMethodListener(BuildContext context,String link,{dynamic data}){
             "themeColor":judgeCurrentThemeColor(context),
           }
         );
-        }
       }
+    }
 
-      else if(
-        link.startsWith(BangumiWebUrls.group(matchLink?.split(RegExp('/')).last)) ||
-        link.startsWith(BangumiWebUrls.relativeGroup(matchLink?.split(RegExp('/')).last)) 
-      ){
+    else if (
+    link.startsWith(BangumiWebUrls.group(matchLink?.split(RegExp('/')).last)) ||
+      link.startsWith(BangumiWebUrls.relativeGroup(matchLink?.split(RegExp('/')).last)) 
+    ) {
 
-		  final groupNameRegexp = RegExp('group/([^&]+)');
+      final groupNameRegexp = RegExp('group/([^&]+)');
 
-        debugPrint(
-          "groupName:${groupNameRegexp.firstMatch(link)?.group(1)}"
-          "groupTitle:${link.split('groupTitle=').last}"
-          "referPostContentID: $postReferID"
-        );
+      debugPrint(
+        "groupName:${groupNameRegexp.firstMatch(link)?.group(1)}"
+        "groupTitle:${link.split('groupTitle=').last}"
+        "referPostContentID: $postReferID"
+      );
 
+      if (context.mounted) {
 
-        if(context.mounted){
-
-          Navigator.pushNamed(
-            context,
-            Routes.groups,
-            arguments: {
-              "selectedGroupInfo": GroupInfo()
+        Navigator.pushNamed(
+          context,
+          Routes.groups,
+          arguments: {
+            "selectedGroupInfo": GroupInfo()
               ..groupName = groupNameRegexp.firstMatch(link)?.group(1)
               ..groupTitle = link.split('groupTitle=').last
             ,
             "referPostContentID": postReferID,
-            }
-          );
-        }
+          }
+        );
       }
+    }
 
-      else if(
-        //特殊状况
-        link.startsWith(BangumiAPIUrls.timelineReply(int.parse(appRouteUri.queryParameters['timelineID'] ?? '0')))
-      ){
+    else if (
+    //特殊状况
+    link.startsWith(BangumiAPIUrls.timelineReply(int.parse(appRouteUri.queryParameters['timelineID'] ?? '0')))
+    ) {
 
-        /// 因为跳转的时候 一般会拥有 用户信息 那么传个userName什么的也没有问题
+      /// 因为跳转的时候 一般会拥有 用户信息 那么传个userName什么的也没有问题
 
-        if(context.mounted){
+      if (context.mounted) {
 
+        //stupid way. but general...
+        Navigator.pushNamed(
+          context,
+          Routes.timelineChat,
+          arguments: {
+            'timelineID':appRouteUri.queryParameters['timelineID'],
+            'onDeleteAction':(int resultID) {
 
-          //stupid way. but general...
-          Navigator.pushNamed(
-            context,
-            Routes.timelineChat,
-            arguments: {
-              'timelineID':appRouteUri.queryParameters['timelineID'],
-              'onDeleteAction':(int resultID){
+              if (resultID != 0) {
+                showRequestSnackBar(
+                  message: '删除成功',
+                  requestStatus: true,
+                );
+              }
+            },
 
-                if(resultID!=0){
-                  showRequestSnackBar(
-                    message: '删除成功',
-                    requestStatus: true,
-                  );
-                }
-              },
+          }
+        );
 
-            }
-          );
-
-        }
       }
+    }
 
-      else{
-        launchUrlString(link);
-      }
+    else {
+      launchUrlString(link);
+    }
 
-        
   }
 
-  else{
-	  launchUrlString(link);
+  else {
+    launchUrlString(link);
   }
 }
 
-void appLoginMethodListener(BuildContext context,String link){
+void appLoginMethodListener(BuildContext context, String link) {
   final accountModel = context.read<AccountModel>();
-  
+
   debugPrint("detected BangumiLogin: $link");
 
-  if(link.startsWith(APPInformationRepository.bangumiOAuthCallbackUri.scheme)){
+  if (link.startsWith(APPInformationRepository.bangumiOAuthCallbackUri.scheme)) {
     final code = link.split("code=").last;
     accountModel.getAccessToken(
-		code,
-		fallbackAction: (message){
-			showRequestSnackBar(message: message, requestStatus: false,backgroundColor: judgeCurrentThemeColor(context));
-		}
-	);
+      code,
+      fallbackAction: (message) {
+        showRequestSnackBar(message: message, requestStatus: false, backgroundColor: judgeCurrentThemeColor(context));
+      }
+    );
   }
 }
