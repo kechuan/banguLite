@@ -63,6 +63,13 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
   final List<double> itemOffsets = [];
 
   @override
+  void dispose() {
+    scrollViewController.dispose();
+    offsetNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     return ChangeNotifierProvider.value(

@@ -27,13 +27,14 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
       ..isUpdateAlert = fields[8] as bool?
       ..isPureDarkMode = fields[9] as bool?
       ..currentProxyAddress = fields[10] as String?
-      ..isImgTagProxy = fields[12] as bool?;
+      ..isImgTagProxy = fields[12] as bool?
+      ..isProxyMode = fields[13] as bool?;
   }
 
   @override
   void write(BinaryWriter writer, AppConfig obj) {
     writer
-    ..writeByte(11)
+    ..writeByte(12)
     ..writeByte(0)
     ..write(obj.currentThemeColor)
     ..writeByte(1)
@@ -55,7 +56,9 @@ class AppConfigAdapter extends TypeAdapter<AppConfig> {
     ..writeByte(10)
     ..write(obj.currentProxyAddress)
     ..writeByte(12)
-    ..write(obj.isImgTagProxy);
+    ..write(obj.isImgTagProxy)
+    ..writeByte(13)
+    ..write(obj.isProxyMode);
   }
 
   @override

@@ -43,7 +43,6 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
   @override
   void initState() {
     super.initState();
-
     httpProxyAddressEditingController.text = HttpApiClient.currentProxyAddress;
 
   }
@@ -51,16 +50,15 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
   @override
   void dispose() {
     httpProxyAddressEditingController.dispose();
-
-    for (final latencyResultNotifier in latencyResultNotifierList) {
-      latencyResultNotifier.dispose();
-    }
+    latencyResultNotifierList.map((latencyNotifier) => latencyNotifier.dispose());
 
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+
+    debugPrint("[NetworkConfigPage] Rebuild");
 
     return Scaffold(
       appBar: AppBar(
@@ -80,88 +78,110 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                     leading: const Icon(Icons.terminal),
                     title: const ScalableText('代理设置'),
                     subtitle: ScalableText('默认直连 保存后生效', style: TextStyle(color: Colors.grey, fontSize: AppFontSize.s14)),
-                    trailing: TextButton(
-                      onPressed: () async {
+                    trailing: SizedBox(
+                      width: 50,
+                      child: Switch(
+                        value: indexModel.userConfig.isProxyMode ?? false,
+                        onChanged: (value) {
+                          //确保输入框跟随保存内容
+                          httpProxyAddressEditingController.text = HttpApiClient.currentProxyAddress;
+                          indexModel.updateProxyMode(value);
 
-                        HttpApiClient.currentProxyAddress = httpProxyAddressEditingController.text;
-                        HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting(httpProxyAddressEditingController.text);
-                        context.read<IndexModel>().updateCurrentProxyAddress(HttpApiClient.currentProxyAddress);
-                      },
-                      child: const ScalableText('保存'),
+                          if (value) {
+                            HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting(HttpApiClient.currentProxyAddress);
+                          }
+
+                          else {
+                            HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting("");
+                          }
+                        }
+                      )
                     ),
                   ),
 
-                  ValueListenableBuilder(
-                    valueListenable: httpProxyAddressEditingController,
-                    builder: (_, textContent, child) {
-                      return AnimatedContainer(
-                        height: textContent.text.isEmpty ? 80 : 135,
-                        padding: Padding6,
-                        duration: const Duration(milliseconds: 300),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: judgeCurrentThemeColor(context).withValues(alpha: 0.3),
-                        ),
+                  IgnorePointer(
+                    ignoring: !(indexModel.userConfig.isProxyMode ?? false),
+                    child: ValueListenableBuilder(
+                      valueListenable: httpProxyAddressEditingController,
+                      builder: (_, textContent, textFieldChild) {
+                        return AnimatedContainer(
+                          height: textContent.text.isEmpty ? 80 : 135,
+                          padding: Padding6,
+                          duration: const Duration(milliseconds: 300),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: 
+                            (indexModel.userConfig.isProxyMode ?? false) ? 
+                            judgeCurrentThemeColor(context).withValues(alpha: 0.3) : 
+                            Colors.grey.shade700
+                          ),
 
-                        child: Column(
-                          spacing: 6,
-                          children: [
+                          child: Column(
+                            spacing: 6,
+                            children: [
 
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              Expanded(child: textFieldChild!),
+
+                              textContent.text.isEmpty ? 
+                              const SizedBox.shrink() :
+                              Row(
                                 spacing: 12,
-
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  const SizedBox.shrink(),
-
-                                  Flexible(
-                                    child: SizedBox(
-                                      height: 50,
-                                      child: ScrollConfiguration(
-                                        //隔离EasyRefresh所带来的滚动影响 只给TextField传递 scrollPhysics 是不能完全抵消这种影响的
-                                        behavior: ScrollConfiguration.of(context).copyWith(physics: const ClampingScrollPhysics()),
-                                        child: TextField(
-                                          controller: httpProxyAddressEditingController,
-                                          decoration: const InputDecoration(
-                                            hintText: '格式 [IP]:[Port]',
-                                            hintStyle: TextStyle(color: Colors.grey),
-                                            border: OutlineInputBorder(),
-
-                                          ),
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter.deny(RegExp(r'\\|\/|http|socks')),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  const SizedBox.shrink(),
+                                  const Text("使外链(img标签)图片加载也使用代理流量"),
+                                  Switch(
+                                    value: indexModel.userConfig.isImgTagProxy ?? true,
+                                    onChanged: (value) {
+                                      indexModel.updateImageTagProxyMode(value);
+                                    }
+                                  )
                                 ],
                               ),
-                            ),
 
-                            textContent.text.isEmpty ? 
-                            const SizedBox.shrink() :
-                            Row(
-                              spacing: 12,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                const Text("使外链(img标签)图片加载也使用代理流量"),
-                                Switch(
-                                  value: indexModel.userConfig.isImgTagProxy ?? true,
-                                  onChanged: (value) {
-                                    indexModel.updateImageTagProxyMode(value);
-                                  }
-                                )
-                              ],
-                            ),
+                            ],
+                          )
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        spacing: 12,
 
-                          ],
-                        )
-                      );
-                    }
+                        children: [
+                          const SizedBox.shrink(),
+
+                          Flexible(
+                            child: SizedBox(
+                              height: 50,
+                              child: ScrollConfiguration(
+                                //隔离EasyRefresh所带来的滚动影响 只给TextField传递 scrollPhysics 是不能完全抵消这种影响的
+                                behavior: ScrollConfiguration.of(context).copyWith(physics: const ClampingScrollPhysics()),
+                                child: TextField(
+                                  controller: httpProxyAddressEditingController,
+                                  decoration: const InputDecoration(
+                                    hintText: '格式 [IP]:[Port]',
+                                    hintStyle: TextStyle(color: Colors.grey),
+                                    border: OutlineInputBorder(),
+
+                                  ),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.deny(RegExp(r'\\|\/|http|socks')),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          TextButton(
+                            onPressed: () async {
+                              HttpApiClient.currentProxyAddress = httpProxyAddressEditingController.text;
+                              HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting(httpProxyAddressEditingController.text);
+                              context.read<IndexModel>().updateCurrentProxyAddress(HttpApiClient.currentProxyAddress);
+                            },
+                            child: const ScalableText('保存'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
 
                   Padding(
@@ -179,7 +199,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
 
                               return checkLatency(
                                 targetUrl: connectionTestUrlMap.values.elementAt(index),
-                                proxyAddress: httpProxyAddressEditingController.text
+                                proxyAddress: (indexModel.userConfig.isProxyMode ?? false) ? httpProxyAddressEditingController.text : null
                               ).then((value) {
                                   debugPrint("[Network Latency] ${connectionTestUrlMap.values.elementAt(index)} $value ms");
                                   latencyResultNotifierList[index].value = "$value";
@@ -287,14 +307,14 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
   }
 }
 
-Future<int> checkLatency({String targetUrl = "", String proxyAddress = ""}) async {
+Future<int> checkLatency({String targetUrl = "", String? proxyAddress}) async {
   final stopwatch = Stopwatch()..start();
 
   try {
 
     final dio = Dio();
 
-    dio.httpClientAdapter = HttpApiClient.configHTTPProxySetting(proxyAddress);
+    dio.httpClientAdapter = HttpApiClient.configHTTPProxySetting(proxyAddress ?? "");
 
     await dio.head(targetUrl).timeout(const Duration(seconds: 5));
     stopwatch.stop();

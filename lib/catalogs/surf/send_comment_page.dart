@@ -100,6 +100,25 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    resetTimer?.cancel();
+
+    titleEditingController.dispose();
+    contentEditingController.dispose();
+    hexColorEditingController.dispose();
+
+    textEditingFocus.dispose();
+
+    toolkitPageController.dispose();
+    stickerPageController.dispose();
+
+    expandedToolKitNotifier.dispose();
+    turnstileTokenNotifier.dispose();
+
+    super.dispose();
+  }
+
   void popInterceptionCallback() {
     if (
     titleEditingController.text.isEmpty && contentEditingController.text.isEmpty || 

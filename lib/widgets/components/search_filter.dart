@@ -40,19 +40,43 @@ class _SearchfilterState extends State<Searchfilter> {
 
   final ValueNotifier<bool> tagsListEmptyNotifier = ValueNotifier<bool>(false);
 
+  //event的具象 方便后续拔除事件
+  late final void Function(dynamic) monthStartListener;
+  late final void Function(dynamic) monthEndListener;
+
   @override
   void initState() {
-    bus.on(const ValueKey("monthStartSelect"), (arg) {
+
+    monthStartListener = (arg) {
       debugPrint("received start arg:$arg");
       monthSelect[0] = arg;
-    });
+    };
 
-    bus.on(const ValueKey("monthEndSelect"), (arg) {
+    monthEndListener = (arg) {
       debugPrint("received end arg:$arg");
       monthSelect[1] = arg;
-    });
+    };
+
+    bus.on(const ValueKey("monthStartSelect"), monthStartListener);
+    bus.on(const ValueKey("monthEndSelect"), monthEndListener);
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    bus.off(const ValueKey("monthStartSelect"), monthStartListener);
+    bus.off(const ValueKey("monthEndSelect"), monthEndListener);
+
+    yearEditingControllerStart.dispose();
+    yearEditingControllerEnd.dispose();
+    tagsEditingController.dispose();
+    rankEditingControllerStart.dispose();
+    rankEditingControllerEnd.dispose();
+
+    tagsListEmptyNotifier.dispose();
+
+    super.dispose();
   }
 
   @override

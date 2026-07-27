@@ -15,6 +15,7 @@ class AppConfig extends HiveObject{
   bool? isUpdateAlert = true;
   bool? isPureDarkMode = true;
 
+  bool? isProxyMode = false;
   String? currentProxyAddress = '';
   bool? isImgTagProxy = true;
 
@@ -33,8 +34,10 @@ class AppConfig extends HiveObject{
       follow:$isFollowThemeColor
       ManuallyImageLoad:$isManuallyImageLoad
       isUpdateAlert:$isUpdateAlert
+      isProxyMode:$isProxyMode
       currentProxyAddress:$currentProxyAddress
       isImgProxy:$isImgTagProxy
+      
     ]""";
   }
 }

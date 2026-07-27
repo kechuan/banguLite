@@ -54,6 +54,15 @@ class _BangumiWebviewPageState extends LifecycleRouteState<BangumiWebviewPage>{
   }
 
   @override
+  void dispose() {
+    urlController.dispose();
+    progressNotifier.dispose();
+    currentSurfingUrlNotifier.dispose();
+    currentSurfingTitleNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final webviewModel = context.read<WebViewModel>();
 

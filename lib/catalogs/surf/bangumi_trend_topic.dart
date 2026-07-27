@@ -25,6 +25,13 @@ class _BangumiTrendTopicState extends State<BangumiTrendTopic> {
   final refreshNotifier = ValueNotifier(0);
 
   @override
+  void dispose() {
+    scrollController.dispose();
+    refreshNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Bangumi 热点话题')),

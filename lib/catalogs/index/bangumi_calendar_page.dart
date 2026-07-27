@@ -46,6 +46,10 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
   final ValueNotifier<bool> weekdaySelectOffstageNotifier = ValueNotifier<bool>(true);
   final ValueNotifier<bool> weekdaySelectOffstageAnimatedNotifier = ValueNotifier<bool>(false);
 
+  //[eventBus] 具名行为的注册与注销
+  late final Function appRouteListener;
+  late final void Function(dynamic) loginRouteListener;
+
   Timer generateScrollList() {
     return Timer.periodic(const Duration(milliseconds: 3600), (timer) {
 
@@ -82,15 +86,19 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
     //real init For provider context
     context.read<AccountModel>().initModel(context);
 
-    //由 轮换页进行 监听 AppRoute 
-    bus.on('AppRoute', (link, {data}) {
+    //由 轮换页进行 监听 AppRoute
+    appRouteListener = (link, {data}) {
       if (!mounted) return;
       appRouteMethodListener(context, link, data: data);
-    });
+    };
 
-    bus.on('LoginRoute', (link) {
+    loginRouteListener = (link) {
+      if (!mounted) return;
       appLoginMethodListener(context, link);
-    });
+    };
+
+    bus.on('AppRoute', appRouteListener);
+    bus.on('LoginRoute', loginRouteListener);
 
     //更新检查逻辑
     cleanInstalledPackageCache(APPInformationRepository.version);
@@ -140,6 +148,21 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
     carouselSpinTimer();
     super.onResume();
 
+  }
+
+  @override
+  void dispose() {
+    bus.off('AppRoute', appRouteListener);
+    bus.off('LoginRoute', loginRouteListener);
+
+    carouselTimer?.cancel();
+    infiniteScrollController.dispose();
+
+    transitionalSeasonNotifier.dispose();
+    weekdaySelectOffstageNotifier.dispose();
+    weekdaySelectOffstageAnimatedNotifier.dispose();
+
+    super.dispose();
   }
 
   @override

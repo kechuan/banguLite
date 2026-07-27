@@ -39,7 +39,7 @@ class BuildDetailImages extends StatelessWidget {
 
     CachedNetworkImage(
       imageUrl: detailImageUrl!,
-      cacheManager: ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress),
+      cacheManager: judgeIsProxyMode(context) ? ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress) : null,
       imageBuilder: (_, imageProvider) {
 
         if (bangumiModel.imageColor == null) {

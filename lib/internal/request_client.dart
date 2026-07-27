@@ -39,28 +39,20 @@ class HttpApiClient{
 
   static IOHttpClientAdapter configHTTPProxySetting(String proxyAddress) {
 
-    if (proxyAddress.isEmpty) {
-      return IOHttpClientAdapter();
-    }
+    if (proxyAddress.isEmpty) return IOHttpClientAdapter();
 
-    else {
-
-      return IOHttpClientAdapter(
-        createHttpClient: () {
-          final client = HttpClient();
-          client.badCertificateCallback = (cert, host, port) => true;
-          client.findProxy = (uri) {
-            debugPrint('[Proxy] $uri => $proxyAddress');
-            return 'PROXY $proxyAddress';
-          };
-          return client;
-        },
-      );
-    }
-
+    return IOHttpClientAdapter(
+      createHttpClient: () {
+        final client = HttpClient();
+        client.badCertificateCallback = (cert, host, port) => true;
+        client.findProxy = (uri) {
+          debugPrint('[Proxy] $uri => $proxyAddress');
+          return 'PROXY $proxyAddress';
+        };
+        return client;
+      },
+    );
   }
-
-
 
 }
 

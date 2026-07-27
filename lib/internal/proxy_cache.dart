@@ -33,7 +33,12 @@ class ProxyCacheManager extends CacheManager with ImageCacheManager {
 
   static http.Client buildProxyClient(String proxyAddress) {
     final ioClient = HttpClient();
-    ioClient.findProxy = (uri) => 'PROXY $proxyAddress';
+
+    ioClient.findProxy = (uri) {
+      if (proxyAddress.isNotEmpty) return 'PROXY $proxyAddress';
+      return 'DIRECT';
+    };
+
     ioClient.badCertificateCallback = (cert, host, port) => true;
     return IOClient(ioClient);
   }

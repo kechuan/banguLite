@@ -4,26 +4,26 @@ import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-bool judgeInSeasonBangumi(String? bangumiAirDate){
+bool judgeInSeasonBangumi(String? bangumiAirDate) {
 
-  if(bangumiAirDate == null) return false;
+  if (bangumiAirDate == null) return false;
   final convertedTime = DateTime.parse(bangumiAirDate);
 
   return DateTime.now().difference(convertedTime) < const Duration(days: 90);
 
 }
 
-bool judgeTransitionalSeason(){
+bool judgeTransitionalSeason() {
 
   final currentTime = DateTime.now();
 
-  return SeasonType.values.any((currentSeason){
+  return SeasonType.values.any((currentSeason) {
     final DateTime convertedTime = DateTime.parse("${currentTime.year}-${convertDigitNumString(currentSeason.month)}-01");
 
-    if(
-      currentTime.month == currentSeason.month &&
+    if (
+    currentTime.month == currentSeason.month &&
       currentTime.difference(convertedTime) < const Duration(days: 5)
-    ){
+    ) {
       return true;
     }
 
@@ -32,13 +32,12 @@ bool judgeTransitionalSeason(){
 
 }
 
-Color judgeCurrentThemeColor(BuildContext context){
+Color judgeCurrentThemeColor(BuildContext context) {
   final IndexModel indexModel = context.read<IndexModel>();
 
-  if(indexModel.userConfig.isSelectedCustomColor == true){
+  if (indexModel.userConfig.isSelectedCustomColor == true) {
     return indexModel.userConfig.customColor!;
   }
-
 
   return indexModel.userConfig.currentThemeColor!.color;
 
@@ -46,13 +45,13 @@ Color judgeCurrentThemeColor(BuildContext context){
 
 Color? judgeDarkContentSurfaceColor(
   BuildContext context,
-){
+) {
   final indexModel = context.watch<IndexModel>();
 
-  if(indexModel.userConfig.isPureDarkMode == false){
+  if (indexModel.userConfig.isPureDarkMode == false) {
 
     //debugPrint("lumi: ${Colors.grey.withValues(alpha: 0.1).computeLuminance()} / ${Color(0xFF2C2C2C).computeLuminance()}");
-    
+
     //更浅
     //return Colors.grey.withValues(alpha: 0.15);
 
@@ -64,22 +63,22 @@ Color? judgeDarkContentSurfaceColor(
   }
 
   return null;
-  
+
 
 }
 
-Color judgeDetailRenderColor(BuildContext context,Color? imageColor){
+Color judgeDetailRenderColor(BuildContext context, Color? imageColor) {
 
   final IndexModel indexModel = context.read<IndexModel>();
 
   Color renderColor;
 
-  if(indexModel.userConfig.isFollowThemeColor == true){
+  if (indexModel.userConfig.isFollowThemeColor == true) {
     renderColor = judgeCurrentThemeColor(context);
-    
+
   }
 
-  else{
+  else {
     renderColor = imageColor ?? judgeCurrentThemeColor(context);
   }
 
@@ -88,26 +87,26 @@ Color judgeDetailRenderColor(BuildContext context,Color? imageColor){
 }
 
 
-SeasonType judgeSeasonRange(int currentMonth,{bool? currentTime}){
+SeasonType judgeSeasonRange(int currentMonth, {bool? currentTime}) {
 
   SeasonType currentSeasonType = SeasonType.winter;
 
   // 5
   // 1 4 7 10
 
-  SeasonType.values.any((currentSeason){
+  SeasonType.values.any((currentSeason) {
 
-    if(currentTime == true){
-      if(currentMonth >= currentSeason.month){
+    if (currentTime == true) {
+      if (currentMonth >= currentSeason.month) {
         currentSeasonType = currentSeason;
         return false;
       }
 
       return true;
     }
-    
-    else{
-      if(currentMonth > currentSeason.month){
+
+    else {
+      if (currentMonth > currentSeason.month) {
         return false;
       }
 
@@ -116,14 +115,19 @@ SeasonType judgeSeasonRange(int currentMonth,{bool? currentTime}){
 
     }
 
-    
-
   });
-
-
 
   return currentSeasonType;
 }
 
 bool judgeDarknessMode(BuildContext context) => Theme.brightnessOf(context) == Brightness.dark ? true : false;
 bool judgeLandscapeMode(BuildContext context) => MediaQuery.orientationOf(context) == Orientation.landscape ? true : false;
+
+bool judgeIsProxyMode(BuildContext context) {
+
+  final userConfig = context.read<IndexModel>().userConfig;
+
+  //null/true 放行
+  if (userConfig.isProxyMode != false && userConfig.currentProxyAddress != null && userConfig.currentProxyAddress!.isNotEmpty) return true;
+  return false;
+}

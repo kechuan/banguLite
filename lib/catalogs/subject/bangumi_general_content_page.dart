@@ -119,6 +119,15 @@ abstract class BangumiContentPageState<
   }
 
   @override
+  void dispose() {
+    scrollController.dispose();
+    refreshNotifier.dispose();
+    commentFilterTypeNotifier.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     //widget.获取
@@ -501,7 +510,7 @@ abstract class BangumiContentPageState<
               child: CachedNetworkImage(
                 imageUrl: getTrailingPhotosUri()![index],
                 httpHeaders: HttpApiClient.browserHeader,
-                cacheManager: ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress),
+                cacheManager: judgeIsProxyMode(context) ? ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress) : null,
               ),
             );
           }

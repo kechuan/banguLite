@@ -110,7 +110,7 @@ class StickerSelectView extends StatelessWidget {
                         onTap: () => insertBgmSticker(stickerOffset + index, isMusume: isMusume),
                         child: CachedNetworkImage(
                           imageUrl: convertBangumiNetworkGirlStickerPath(stickerOffset + index, pinkVersion: isMusume),
-                          cacheManager: ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress),
+                          cacheManager: judgeIsProxyMode(context) ? ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress) : null,
                           progressIndicatorBuilder: (context, url, progress) => Transform.scale(
                             scale: 0.4,
                             child: CircularProgressIndicator(

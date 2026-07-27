@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
@@ -20,36 +21,84 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+///感觉zone内容对于我这个项目还是太超标了 有错误还是老老实实扔在我的debug阶段吧
+
+///[Claude] 新增 - 最近若干条运行期错误的内存缓冲
+/// release 下 debugPrint 被置空(见下方), 线上任何异常原本不留任何痕迹, 用户报"卡住了"时无从定位.
+/// 这里只在内存中保留最近 50 条, 不落盘、不上报; 后续若要加"导出日志"入口可直接读这个列表.
+//class RuntimeErrorRecorder {
+//  const RuntimeErrorRecorder._();
+
+//  static const int maxRecordCount = 50;
+//  static final List<String> records = [];
+
+//  static void record(String scope, Object error, StackTrace? stack) {
+//    if (records.length >= maxRecordCount) records.removeAt(0);
+//    records.add('[$scope] $error\n$stack');
+
+//    // debug 下仍然照常打印, 保持原有排查手感
+//    debugPrint('[$scope] $error');
+//  }
+//}
+
 void main() async {
 
-  if (kReleaseMode) {
-    debugPrint = (String? message, {int? wrapWidth})  {};
-  }
+  ///[Claude] 整体包进 runZonedGuarded, 捕获原本会静默逃逸的异步异常
+  /// 注意 WidgetsFlutterBinding.ensureInitialized() 必须与 runApp 处在同一个 zone 内, 故一并移入.
+  runZonedGuarded(
+    () async {
 
-  // path_provider 初始化需要
-  WidgetsFlutterBinding.ensureInitialized();
-  await listenAPPLink();
+      if (kReleaseMode) {
+        debugPrint = (String? message, {int? wrapWidth})  {};
+      }
 
-  await MyHive.init();
+      // path_provider 初始化需要
+      WidgetsFlutterBinding.ensureInitialized();
 
-  HttpApiClient.init(
-    storageProxyAddress: MyHive.appConfigDataBase.get('currentTheme')?.currentProxyAddress ?? ''
+      ///[Claude] 新增 - Widget 构建/布局/绘制期异常的统一入口
+      //FlutterError.onError = (details) {
+      //  RuntimeErrorRecorder.record('FlutterError', details.exception, details.stack);
+      //  FlutterError.presentError(details);
+      //};
+
+      /////[Claude] 新增 - 平台层未捕获的异步异常(返回 true 表示已处理, 避免直接终止)
+      //PlatformDispatcher.instance.onError = (error, stack) {
+      //  RuntimeErrorRecorder.record('PlatformDispatcher', error, stack);
+      //  return true;
+      //};
+
+      await listenAPPLink();
+
+      await MyHive.init();
+
+      //兼容性调整 只要不明确为false 即可采用 即使是空的也是默认DIRECT
+      HttpApiClient.init(
+        storageProxyAddress: 
+        MyHive.appConfigDataBase.get('currentTheme')?.isProxyMode != false ? 
+        MyHive.appConfigDataBase.get('currentTheme')?.currentProxyAddress ?? '' :
+        ''
+      );
+
+      if (Platform.isAndroid) {
+        SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.edgeToEdge,  // 使用 edgeToEdge 模式
+        );
+
+        SystemChrome.setSystemUIOverlayStyle(
+          const SystemUiOverlayStyle(
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarDividerColor: Colors.transparent,
+          ),
+        );
+      }
+
+      runApp(const MainApp());
+
+    },
+
+    //(error, stack) => RuntimeErrorRecorder.record('Zone', error, stack),
+    (error, stack) => debugPrint('Zone: $error'),
   );
-
-  if (Platform.isAndroid) {
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.edgeToEdge,  // 使用 edgeToEdge 模式
-    );
-
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarDividerColor: Colors.transparent,
-      ),
-    );
-  }
-
-  runApp(const MainApp());
 
 }
 

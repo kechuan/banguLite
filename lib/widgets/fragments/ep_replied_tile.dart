@@ -65,7 +65,7 @@ class EpRepliedTile extends ListTile {
                   (index) {
                     final repliedComment = epCommentData.repliedComment![index];
 
-                    debugPrint('[epCommentData.state] ${epCommentData.state}: ${repliedComment.epCommentIndex}');
+                    debugPrint('[epCommentData.state] ${repliedComment.state}: ${repliedComment.epCommentIndex}');
 
                     final quoteContent = quoteBBcodeContentRegexp
                       .firstMatch(repliedComment.comment ?? "")

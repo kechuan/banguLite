@@ -111,6 +111,11 @@ class IndexModel extends ChangeNotifier {
     updateConfig();
   }
 
+  void updateProxyMode(bool proxyMode) {
+    userConfig.isProxyMode = proxyMode;
+    updateConfig();
+  }
+
   void updateCurrentProxyAddress(String proxyAddress) {
     userConfig.currentProxyAddress = proxyAddress;
     updateConfig();

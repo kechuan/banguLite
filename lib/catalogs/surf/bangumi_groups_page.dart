@@ -55,6 +55,13 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
   }
 
   @override
+  void dispose() {
+    animatedGroupTopicsListController.dispose();
+    groupTitleNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     final timelineFlowModel = context.read<TimelineFlowModel>();

@@ -773,10 +773,10 @@ class ImageStorageManageTile extends ListTile{
                         }
 
                         case ConnectionState.done:{
-                          resultText = snapshot.data ?? "";
+                          resultText = snapshot.hasError ? "读取失败: ${snapshot.error}" : (snapshot.data ?? "未设置");
                         }
 
-                        default:{} 
+                        default:{}
                       }
 
                       return ScalableText("存储目录: $resultText");
@@ -800,6 +800,7 @@ class ImageStorageManageTile extends ListTile{
     if (Platform.isAndroid) {
 
       final androidPermissionsList = await DocMan.perms.list();
+      if (androidPermissionsList.isEmpty) return "未设置";
 
       androidPermissionsList.sort((a, b) => b.time.compareTo(a.time));
       resultPath = androidPermissionsList.first.uri;

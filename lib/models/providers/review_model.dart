@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/blog_details.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
-import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/models/informations/subjects/review_details.dart';
+import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 
@@ -15,14 +15,14 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
   ReviewModel({
     required super.subjectID
   }){
-    if(subjectID == "blog") return;
+    if (subjectID == "blog") return;
     loadSubjectReviews();
   }
 
   Future<void> loadSubjectReviews({int? offset = 0}) async {
     await loadSubjectContentList(
       queryParameters: BangumiQuerys.reviewsQuery
-        ..["offset"] = offset ?? 0
+      ..["offset"] = offset ?? 0
     );
   }
 
@@ -34,53 +34,63 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
     }
   ) async {
 
-    if(selectedBlogID == 0 || selectedBlogID == -1) return;
+    if (selectedBlogID == 0 || selectedBlogID == -1) return;
 
-    Completer blogFullContentCompleter = Completer();
-
-    await Future.wait(
+    final responseList = await Future.wait(
       [
-        loadContentDetail(selectedBlogID,isRefresh: isRefresh,fallbackAction: fallbackAction),
+        loadContentDetail(selectedBlogID, isRefresh: isRefresh, fallbackAction: fallbackAction),
         loadBlogComment(selectedBlogID),
         loadBlogPhotos(selectedBlogID),
       ]
-    ).then((responseList){
-      final commentResponse = responseList[1] as Response;
-      final photoResponse = responseList[2] as Response;
+    );
 
-      if (commentResponse.data != null && photoResponse.data != null) {
-        debugPrint("blog: $selectedBlogID load blogComment done");
-        contentDetailData[selectedBlogID]?.blogReplies = loadEpCommentDetails(commentResponse.data);
-        contentDetailData[selectedBlogID]?.trailingPhotosUri = loadBlogPhotoDetails(photoResponse.data);
-        
-        blogFullContentCompleter.complete();
-        notifyListeners();
-      }
-      
-    });
+    final commentResponse = responseList[1] as Response;
+    final photoResponse = responseList[2] as Response;
 
-    return blogFullContentCompleter.future;
+    if (commentResponse.data != null) {
+      debugPrint("blog: $selectedBlogID load blogComment done");
+      contentDetailData[selectedBlogID]?.blogReplies = loadEpCommentDetails(commentResponse.data);
+    }
+
+    if (photoResponse.data != null) {
+      contentDetailData[selectedBlogID]?.trailingPhotosUri = loadBlogPhotoDetails(photoResponse.data);
+    }
+
+    notifyListeners();
 
   }
 
   Future<Response> loadBlogComment(int blogID) async {
-    if(blogID == 0) return Response(requestOptions: RequestOptions());
+    if (blogID == 0) return Response(requestOptions: RequestOptions());
 
-    return await HttpApiClient.client.get(
-      BangumiAPIUrls.blogComment(blogID),
-      options: BangumiAPIUrls.bangumiAccessOption()
-    );
+    try{
+      return await HttpApiClient.client.get(
+        BangumiAPIUrls.blogComment(blogID),
+        options: BangumiAPIUrls.bangumiAccessOption()
+      );
+    }
+
+    catch(e){
+      debugPrint("[loadBlogComment] $blogID failed: $e");
+      return Response(requestOptions: RequestOptions());
+    }
   }
 
   Future<Response> loadBlogPhotos(int blogID) async {
-    if(blogID == 0) return Response(requestOptions: RequestOptions());
+    if (blogID == 0) return Response(requestOptions: RequestOptions());
 
-    return await HttpApiClient.client.get(
-      BangumiAPIUrls.blogPhotos(blogID),
-      options: BangumiAPIUrls.bangumiAccessOption()
-    );
+    try{
+      return await HttpApiClient.client.get(
+        BangumiAPIUrls.blogPhotos(blogID),
+        options: BangumiAPIUrls.bangumiAccessOption()
+      );
+    }
+
+    catch(e){
+      debugPrint("[loadBlogPhotos] $blogID failed: $e");
+      return Response(requestOptions: RequestOptions());
+    }
   }
-
 
   @override
   List<ReviewInfo> createEmptyInfoList() => [ReviewInfo.empty()];
@@ -94,7 +104,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
   @override
   List<ReviewInfo> convertResponseToList(Response subContentListResponseData) => loadReviewsDetails(subContentListResponseData);
   @override
-  BlogDetails convertResponseToDetail(Map<String,dynamic> contentResponseData) => loadBlogDetails(contentResponseData);
+  BlogDetails convertResponseToDetail(Map<String, dynamic> contentResponseData) => loadBlogDetails(contentResponseData);
 
 
 }

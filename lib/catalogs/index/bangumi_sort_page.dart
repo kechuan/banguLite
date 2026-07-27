@@ -48,16 +48,38 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
   final List<BangumiDetails> messageList = [];
   final Map currentSearchConfig = {};
 
+  late final void Function(dynamic) sortSubmitListener;
+
   @override
   void initState() {
 
-    bus.on('sortSubmit', (arg) {
+    ///[Claude]原先直接注册匿名闭包且本 State 没有 dispose, 每进一次排序页就多一个监听器,
+    ///实际上因为使用这个页面是 IndexedStack/首页PageView+const实现 一般来说并不会出现什么进一次排序页就多一个的情况
+    ///不过既然前面的可重复进页面都这么写了 就那样吧
+    sortSubmitListener = (arg) {
+      if (!mounted) return;
       assert(arg is Map<String, dynamic>);
       debugPrint("received sortSubmit: $arg");
       loadNewData(arg);
-    });
+    };
+
+    bus.on('sortSubmit', sortSubmitListener);
     super.initState();
 
+  }
+
+  @override
+  void dispose() {
+    bus.off('sortSubmit', sortSubmitListener);
+
+    sortScrollController.dispose();
+    viewTypeNotifier.dispose();
+    browserSortTypeNotifier.dispose();
+    appBarTitleNotifier.dispose();
+    filterShowNotifier.dispose();
+    loadCountNotifier.dispose();
+
+    super.dispose();
   }
 
   @override
