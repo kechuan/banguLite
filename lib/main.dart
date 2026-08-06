@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
@@ -45,60 +44,60 @@ void main() async {
 
   ///[Claude] 整体包进 runZonedGuarded, 捕获原本会静默逃逸的异步异常
   /// 注意 WidgetsFlutterBinding.ensureInitialized() 必须与 runApp 处在同一个 zone 内, 故一并移入.
-  runZonedGuarded(
-    () async {
+  /// (error, stack) => RuntimeErrorRecorder.record('Zone', error, stack),
+  //  (error, stack) => debugPrint('Zone: $error'),
+  //);
+  /// 拒绝采用
 
-      if (kReleaseMode) {
-        debugPrint = (String? message, {int? wrapWidth})  {};
-      }
+  if (kReleaseMode) {
+    debugPrint = (String? message, {int? wrapWidth})  {};
+  }
 
-      // path_provider 初始化需要
-      WidgetsFlutterBinding.ensureInitialized();
+  // path_provider 初始化需要
+  WidgetsFlutterBinding.ensureInitialized();
 
-      ///[Claude] 新增 - Widget 构建/布局/绘制期异常的统一入口
-      //FlutterError.onError = (details) {
-      //  RuntimeErrorRecorder.record('FlutterError', details.exception, details.stack);
-      //  FlutterError.presentError(details);
-      //};
+  ///[Claude] 新增 - Widget 构建/布局/绘制期异常的统一入口
+  //FlutterError.onError = (details) {
+  //  RuntimeErrorRecorder.record('FlutterError', details.exception, details.stack);
+  //  FlutterError.presentError(details);
+  //};
 
-      /////[Claude] 新增 - 平台层未捕获的异步异常(返回 true 表示已处理, 避免直接终止)
-      //PlatformDispatcher.instance.onError = (error, stack) {
-      //  RuntimeErrorRecorder.record('PlatformDispatcher', error, stack);
-      //  return true;
-      //};
+  /////[Claude] 新增 - 平台层未捕获的异步异常(返回 true 表示已处理, 避免直接终止)
+  //PlatformDispatcher.instance.onError = (error, stack) {
+  //  RuntimeErrorRecorder.record('PlatformDispatcher', error, stack);
+  //  return true;
+  //};
 
-      await listenAPPLink();
+  await listenAPPLink();
 
-      await MyHive.init();
+  await MyHive.init();
 
-      //兼容性调整 只要不明确为false 即可采用 即使是空的也是默认DIRECT
-      HttpApiClient.init(
-        storageProxyAddress: 
-        MyHive.appConfigDataBase.get('currentTheme')?.isProxyMode != false ? 
-        MyHive.appConfigDataBase.get('currentTheme')?.currentProxyAddress ?? '' :
-        ''
-      );
-
-      if (Platform.isAndroid) {
-        SystemChrome.setEnabledSystemUIMode(
-          SystemUiMode.edgeToEdge,  // 使用 edgeToEdge 模式
-        );
-
-        SystemChrome.setSystemUIOverlayStyle(
-          const SystemUiOverlayStyle(
-            systemNavigationBarColor: Colors.transparent,
-            systemNavigationBarDividerColor: Colors.transparent,
-          ),
-        );
-      }
-
-      runApp(const MainApp());
-
-    },
-
-    //(error, stack) => RuntimeErrorRecorder.record('Zone', error, stack),
-    (error, stack) => debugPrint('Zone: $error'),
+  //兼容性调整 只要不明确为false 即可采用 即使是空的也是默认DIRECT
+  HttpApiClient.init(
+    storageProxyAddress: 
+    MyHive.appConfigDataBase.get('currentTheme')?.isProxyMode != false ? 
+    MyHive.appConfigDataBase.get('currentTheme')?.currentProxyAddress ?? '' :
+    ''
   );
+
+  if (Platform.isAndroid) {
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,  // 使用 edgeToEdge 模式
+    );
+
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+    );
+  }
+
+  runApp(const MainApp());
+
+
+
+
 
 }
 
