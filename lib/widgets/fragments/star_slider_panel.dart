@@ -8,26 +8,25 @@ class StarSliderPanel extends StatelessWidget {
     super.key,
     required this.valueNotifier,
     required this.onChanged,
-	  this.themeColor,
+    this.themeColor,
   });
-  
 
   final ValueNotifier<double> valueNotifier;
   final Function(double) onChanged;
   final Color? themeColor;
 
-@override
+  @override
   Widget build(BuildContext context) {
 
     return ValueListenableBuilder(
       valueListenable: valueNotifier,
-      builder: (_, score, child){
+      builder: (_, score, child) {
 
-        if(score~/1 > 1){
-          WidgetsBinding.instance.addPostFrameCallback((_){
-            valueNotifier.value = score/10;
+        if (score ~/ 1 > 1) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            valueNotifier.value = score / 10;
           });
-          
+
         }
 
         return Column(
@@ -40,10 +39,10 @@ class StarSliderPanel extends StatelessWidget {
                 children: [
                   Positioned(
                     child: StarScoreList(
-                      ratingScore: score*10~/1,
+                      ratingScore: score * 10 ~/ 1,
                       showEmpty: true,
                       itemExtent: 30,
-					            themeColor: themeColor,
+                      themeColor: themeColor,
                     ),
                   ),
 
@@ -53,32 +52,29 @@ class StarSliderPanel extends StatelessWidget {
                       width: 200,
                       child: Slider(
                         value: score.clamp(0.0, 1.0),
-                        onChanged: (value)=> valueNotifier.value = value,
+                        onChanged: (value) => valueNotifier.value = value,
                         divisions: 10,
                       ),
                     ),
                   ),
 
-
                 ],
               ),
             ),
 
-            ScalableText("${score*10~/1}  ${convertScoreRank((score*10~/1).toDouble())}"),
+            ScalableText("${score * 10 ~/ 1}  ${convertScoreRank((score * 10 ~/ 1).toDouble())}"),
 
             Offstage(
-              offstage: score~/1 >= 1,
+              offstage: score * 10 ~/ 1 >= 1,
               child: const ScalableText("(在星星栏滑动以进行评分)"),
             )
-
 
           ],
         );
       },
-      
+
     );
 
-    
   }
 }
 

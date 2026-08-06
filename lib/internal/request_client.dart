@@ -472,6 +472,16 @@ class APPInformationRepository{
   static final Uri bangumiTurnstileCallbackUri = Uri.parse('bangulite://turnstile/callback');
 
   //cloudflare workers / github pages 都不行 一个 400 一个网络访问太太慢
+  //还是wordpress比较好 
+
+  //本来打算用list来多弄点服务来摊一下请求 但一想到DAU就那样了 还不如不要额外引入更多的麻烦因素
+
+  //不过备选还是能记录一下的 使用形式和各种节点
+
+  ///(webp.se /3000免费额度一天) https://([Domain] -> [generated proxy domain])/[Path],
+  ///(wordpress i0~3节点 目前感觉i1节点最友好) https://i1.wp.com/[Domain]
+  ///(广西龙讯) https://collect34.longsunhd.com/source/plugin/yzs1013_pldr/getimg.php?url=(scheme://[Domain]/[Path])
+
   static const String banguLiteImageForwardUri = 'https://i1.wp.com/';
 
 }

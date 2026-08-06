@@ -1,6 +1,7 @@
 
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
+import 'package:bangu_lite/internal/proxy_cache.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/callback.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
@@ -465,11 +466,16 @@ class BangumiNetStickerTag extends AdvancedTag{
     final image = SizedBox(
       height: 65,
       width: 65,
-      child: CachedNetworkImage(
-        imageUrl: element.textContent,
-        scale: 3,
-        //预留位
-        cacheManager: null,
+
+      child: Builder(
+        builder: (context) {
+          return CachedNetworkImage(
+            imageUrl: element.textContent,
+            scale: 3,
+            //这里没有context环境 只能自己Builder标一个了
+            cacheManager: judgeIsProxyMode(context) ? ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress) : null,
+          );
+        }
       ),
     );
 

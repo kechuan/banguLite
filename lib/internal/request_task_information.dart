@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 class RequestByteInformation{
 
   String? contentLink;
-  
+
   int? rangeStart;
   int? rangeEnd;
   int? contentLength;
@@ -22,8 +22,8 @@ class RequestByteInformation{
   void printInformation() => debugPrint("contentLength:$contentLength fileName:$fileName contentType:$contentType");
 
 }
-  
-int contentRangeByteParse(String bytesRangeValue){
+
+int contentRangeByteParse(String bytesRangeValue) {
   // "bytes 0-7/36" => "0-7/36" => "36"
   return int.parse(bytesRangeValue.split(" ")[1].split("/")[1]);
 }
@@ -35,6 +35,8 @@ Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
   //二段流程
   Completer<RequestByteInformation> byteInformationCompleter = Completer();
 
+  debugPrint("[Head Request] $imageUrl");
+
   await HttpApiClient.client.head(
     imageUrl,
     options: Options(
@@ -42,50 +44,47 @@ Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
     ))
     //短时请求
     .timeout(const Duration(seconds: 3))
-    .then((response){
+    .then((response) {
 
-      if(response.data!=null){
-		    byteInformationCompleter.complete(extractPictureRequest(response,imageUrl));
+      if (response.data != null) {
+        byteInformationCompleter.complete(extractPictureRequest(response, imageUrl));
       }
 
     }).catchError((error) async {
-		await HttpApiClient.client.head(
-			convertProxyImageUri(imageUrl),
-			options: Options(
-				headers: HttpApiClient.browserHeader,
-			))
-			//最终请求
-			.timeout(const Duration(seconds: 5))
-			.then((response){
-				byteInformationCompleter.complete(extractPictureRequest(response,convertProxyImageUri(imageUrl)));
-			})
-			.catchError((error){
 
-				switch (error.type) {
-					case DioExceptionType.badResponse: {
-						debugPrint('${convertProxyImageUri(imageUrl)} 图片不存在或拒绝访问'); 
-						pictureRequestInformation.statusMessage = "图片不存在或拒绝访问";
-						break;
-					}
-					case DioExceptionType.connectionTimeout:
-					case DioExceptionType.sendTimeout:
-					case DioExceptionType.receiveTimeout: {
-						debugPrint('${convertProxyImageUri(imageUrl)} 超时');
-						pictureRequestInformation.statusMessage = "请求超时";
-						break;
-					}
-				}
+      debugPrint("[Head WordPress Request] $imageUrl");
 
-			
-			byteInformationCompleter.complete(pictureRequestInformation);
+      await HttpApiClient.client.head(
+        convertProxyImageUri(imageUrl),
+        options: Options(
+          headers: HttpApiClient.browserHeader,
+        ))
+        //最终请求
+        .timeout(const Duration(seconds: 5))
+        .then((response) {
+          byteInformationCompleter.complete(extractPictureRequest(response, convertProxyImageUri(imageUrl)));
+        })
+        .catchError((error) {
 
+          switch (error.type) {
+            case DioExceptionType.badResponse: {
+              debugPrint('${convertProxyImageUri(imageUrl)} 图片不存在或拒绝访问'); 
+              pictureRequestInformation.statusMessage = "图片不存在或拒绝访问";
+              break;
+            }
+            case DioExceptionType.connectionTimeout:
+            case DioExceptionType.sendTimeout:
+            case DioExceptionType.receiveTimeout: {
+              debugPrint('${convertProxyImageUri(imageUrl)} 超时');
+              pictureRequestInformation.statusMessage = "请求超时";
+              break;
+            }
+          }
+
+          byteInformationCompleter.complete(pictureRequestInformation);
 
         });
     });
-
-
-
-
 
   return byteInformationCompleter.future;
 }

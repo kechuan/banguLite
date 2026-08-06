@@ -45,7 +45,6 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
     segments = convertSegment(widget.totalEps, 100);
     epModel = context.read<EpModel>();
 
-
     epTabController ??= TabController(length: segments, vsync: this);
 
     super.initState();
@@ -98,9 +97,9 @@ class _EpSelectState extends State<EpSelect> with TickerProviderStateMixin {
           controller: epTabController,
           onTap: (index) {
             epSegmentsIndexNotifier.value = index;
-            
+
             epModel.getEpsInformation(offset: index + 1);
-            
+
           },
           isScrollable: true,
           tabs: List.generate(

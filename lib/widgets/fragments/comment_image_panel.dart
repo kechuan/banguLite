@@ -5,6 +5,7 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/request_task_information.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -141,18 +142,15 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                       );
                     }
 
-                    debugPrint("imageLink: ${pictureRequestInformation?.contentLink}");
+                    debugPrint("[CommentImage Link]: ${pictureRequestInformation?.contentLink}");
 
                     return CachedNetworkImage(
-                      //imageUrl: convertProxyImageUri(widget.imageUrl),
                       imageUrl: pictureRequestInformation?.contentLink ?? widget.imageUrl,
                       httpHeaders: HttpApiClient.browserHeader,
-                      cacheManager: ProxyCacheManager(
-                        proxyAddress: 
-                        indexModel.userConfig.isImgTagProxy == true ? 
-                        indexModel.userConfig.currentProxyAddress ?? "" : 
-                        ''
-                      ),
+                      cacheManager: 
+                      (pictureRequestInformation?.contentLink ?? widget.imageUrl).contains("lain.bgm.tv") ? 
+                      ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress) : 
+                      judgeIsProxyMode(context, isOuterImageProxy: indexModel.userConfig.isImgTagProxy) ? ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress) : null,
 
                       progressIndicatorBuilder: (context, url, progress) { 
 

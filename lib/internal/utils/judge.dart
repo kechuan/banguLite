@@ -123,11 +123,18 @@ SeasonType judgeSeasonRange(int currentMonth, {bool? currentTime}) {
 bool judgeDarknessMode(BuildContext context) => Theme.brightnessOf(context) == Brightness.dark ? true : false;
 bool judgeLandscapeMode(BuildContext context) => MediaQuery.orientationOf(context) == Orientation.landscape ? true : false;
 
-bool judgeIsProxyMode(BuildContext context) {
+/// 外链图片代理在 AppConfig 中默认为 true
+bool judgeIsProxyMode(BuildContext context, {bool? isOuterImageProxy}) {
 
   final userConfig = context.read<IndexModel>().userConfig;
 
   //null/true 放行
-  if (userConfig.isProxyMode != false && userConfig.currentProxyAddress != null && userConfig.currentProxyAddress!.isNotEmpty) return true;
+  if (userConfig.isProxyMode != false) {
+    if (userConfig.currentProxyAddress != null && userConfig.currentProxyAddress!.isNotEmpty) { 
+      if (isOuterImageProxy == false) return false;
+      return true;
+    }
+  }
+
   return false;
 }

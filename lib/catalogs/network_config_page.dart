@@ -3,6 +3,7 @@
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/template.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:dio/dio.dart';
@@ -18,7 +19,12 @@ const connectionTestUrlMap = {
   'API next 测试': BangumiAPIUrls.newUrl,
   'OAuth登录测试': BangumiWebUrls.oAuth,
   'turnstile回帖验证测试': "${BangumiWebUrls.nextUrl}/p1/turnstile?redirect_uri=bangulite://turnstile/callback",
-  'bgm内置图片源测试': '${BangumiAPIUrls.baseResourceUrl}/img/smiles/blake/blake_01.gif'
+  'bgm内置图片源测试': '${BangumiAPIUrls.baseResourceUrl}/img/smiles/blake/blake_01.gif',
+
+  // 不规范实现的图片源 只有path 靠浏览器自动推断返回内容 结果也没有head请求 导致直接请求失败
+  // 遇到这种类型拉取写恐怕还得要独立完整的get请求 但那样估计又重起来了 只能说还得是wordpress这些转发请求好
+  //'Debug':"https://i1.wp.com/note.072158.xyz/img"
+  //'Debug':"https://note.072158.xyz/img"
 };
 
 @FFRoute(name: 'networkConfig')
@@ -158,7 +164,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                                 child: TextField(
                                   controller: httpProxyAddressEditingController,
                                   decoration: const InputDecoration(
-                                    hintText: '格式 [IP]:[Port]',
+                                    hintText: '格式 [IP]:[(HTTP)Port]',
                                     hintStyle: TextStyle(color: Colors.grey),
                                     border: OutlineInputBorder(),
 
@@ -167,7 +173,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                                     FilteringTextInputFormatter.deny(RegExp(r'\\|\/|http|socks')),
                                   ],
                                 ),
-                              ),
+                              ),  
                             ),
                           ),
 
@@ -283,9 +289,9 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
 
                               checkLatency(
                                 targetUrl: connectionTestUrlMap.values.elementAt(index),
-                                proxyAddress: httpProxyAddressEditingController.text
+                                proxyAddress: judgeIsProxyMode(context) ? httpProxyAddressEditingController.text : null
                               ).then((value) {
-                                  debugPrint("[Network Latency]${connectionTestUrlMap.values.elementAt(index)} $value ms");
+                                  debugPrint("[Network Latency] ${connectionTestUrlMap.values.elementAt(index)} $value ms");
                                   latencyResultNotifierList[index].value = "$value";
                                 });
 
@@ -316,12 +322,15 @@ Future<int> checkLatency({String targetUrl = "", String? proxyAddress}) async {
 
     dio.httpClientAdapter = HttpApiClient.configHTTPProxySetting(proxyAddress ?? "");
 
-    await dio.head(targetUrl).timeout(const Duration(seconds: 5));
+    await dio.head(
+      targetUrl,
+    ).timeout(const Duration(seconds: 5));
     stopwatch.stop();
     return stopwatch.elapsedMilliseconds;
   } 
 
-  on DioException {
+  on DioException catch (e) {
+    debugPrint("[Network Latency] ${extractDioException(e)}");
     stopwatch.stop();
     return -1;
   }

@@ -59,10 +59,11 @@ class EpRepliedTile extends ListTile {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
-                /// 拼接显示方案
-                ...List.generate(
-                  min(3, epCommentData.repliedComment!.length), 
-                  (index) {
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: min(3, epCommentData.repliedComment!.length),
+                  itemBuilder: (_, index) {
                     final repliedComment = epCommentData.repliedComment![index];
 
                     debugPrint('[epCommentData.state] ${repliedComment.state}: ${repliedComment.epCommentIndex}');
@@ -165,8 +166,17 @@ class EpRepliedTile extends ListTile {
                         ),
                       ),
                     );
-                  }
+
+                  },
+                  separatorBuilder: (_, index) => const Divider(height: 0.5),
                 ),
+
+                /// 拼接显示方案
+                //...List.generate(
+                //  min(3, epCommentData.repliedComment!.length), 
+                //  (index) {
+                //    }
+                //),
 
                 if(epCommentData.repliedComment!.length > 3) 
                 ShowCommentTap(
