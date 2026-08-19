@@ -8,12 +8,12 @@ import 'package:provider/provider.dart';
 class ToggleThemeModeButton extends StatelessWidget {
   const ToggleThemeModeButton({
     super.key,
-    this.isDetailText,
+    this.isDescriptionDisplay = false,
     this.onThen
   });
 
   final void Function()? onThen;
-  final bool? isDetailText;
+  final bool isDescriptionDisplay;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class ToggleThemeModeButton extends StatelessWidget {
           indexModel.updateThemeMode(ThemeMode.dark);
         }
 
-        if (onThen != null) onThen!();
+        onThen?.call();
 
       },
       child: Selector<IndexModel, ThemeMode>(
@@ -40,7 +40,7 @@ class ToggleThemeModeButton extends StatelessWidget {
 
         builder: (_, currentTheme, child) {
 
-          if (isDetailText == true) {
+          if (isDescriptionDisplay == true) {
             return ListTile(
               leading: Icon(
                 judgeDarknessMode(context) ? 

@@ -318,7 +318,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                               ],
                             ),
 
-                            ScalableText(covertPastedTime(currentNotification.createdTime))
+                            ScalableText(covertDisplayRecordTime(currentNotification.createdTime))
 
                           ],
                         ),

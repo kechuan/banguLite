@@ -4,6 +4,7 @@ import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
@@ -94,25 +95,26 @@ class _CommentReactionState extends State<CommentReaction> {
 
     final reactionBoxDecoration = BoxDecoration(
       border: Border.all(
-        color: widget.themeColor ?? Colors.grey.withValues(alpha: 0.8),
-        width: 1.5
+        color: Colors.transparent,
+
       ),
-      borderRadius: BorderRadius.circular(20)
+      borderRadius: BorderRadius.circular(20),
+      color: widget.themeColor?.withValues(alpha: 0.15) ?? Colors.grey.withValues(alpha: 0.15),
     );
-
-    const double chipWidth = 80;
-    const double separatorWidth = 6 * 2;
-
-    // 内容实际需要的宽度
-    final double contentWidth = 
-      reactionStickerGroupCount * chipWidth + (reactionStickerGroupCount - 1) * separatorWidth;
 
     // 可用宽度上限，留出 item 左右 padding
     final double maxWidth = 
       MediaQuery.sizeOf(context).width - 32; // 按你的 item 内边距调整
 
+    const double chipWidth = 65;
+    const double separatorWidth = 6;
+
+    // 内容实际需要的宽度
+    final double contentWidth = 
+      reactionStickerGroupCount * chipWidth + (reactionStickerGroupCount - 1) * separatorWidth;
+
     return SizedBox(
-      height: 40,
+      height: chipWidth / 2,
       width: contentWidth.clamp(0, maxWidth), // ← 给定有界宽度
       child: AnimatedList.separated(
         key: widget.animatedReactionsListKey,
@@ -138,8 +140,9 @@ class _CommentReactionState extends State<CommentReaction> {
             child: FadeTransition(
               opacity: animation,
               child: Container(
+
                 decoration: reactionBoxDecoration,
-                width: 80,
+                width: chipWidth,
                 child: TextButton(
                   style: const ButtonStyle(
                     padding: WidgetStatePropertyAll(EdgeInsets.zero),
@@ -194,7 +197,7 @@ class _CommentReactionState extends State<CommentReaction> {
                     children: [
                       Image.asset(
                         convertBangumiStickerPath(stickerIndex),
-                        scale: 0.8,
+                        scale: 1,
                       ),
 
                       Tooltip(
@@ -207,7 +210,10 @@ class _CommentReactionState extends State<CommentReaction> {
                         ),
 
                         child: ScalableText(
-                          "${localCommentReactions[dataLikeIndex]?.length ?? 0}"
+                          "${localCommentReactions[dataLikeIndex]?.length ?? 0}",
+                          style: TextStyle(
+                            fontSize: AppFontSize.s14,
+                          ),
                         )
                       ),
 

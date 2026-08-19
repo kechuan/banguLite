@@ -4,11 +4,13 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
+import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -64,18 +66,37 @@ class BangumiContentAppbar extends StatelessWidget {
           ),
 
           if(kDebugMode)
-          IconButton(
-            onPressed: () {
-              debugPrint('new replied in UI');
-              onSendMessage?.call(
-                (
-                  //null,
-                  Random().nextInt(65535),
-                  "一个回帖测试"
-                )
-              );
-            }, 
-            icon: const Icon(Icons.download_outlined)
+
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.grey.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(12)
+
+            ),
+            child: Padding(
+              padding: PaddingH6,
+              child: Row(
+                spacing: 6,
+                children: [
+                  const ToggleThemeModeButton(),
+
+                  IconButton(
+                    onPressed: () {
+                      debugPrint('new replied in UI');
+                      onSendMessage?.call(
+                        (
+                          //null,
+                          Random().nextInt(65535),
+                          "一个回帖测试"
+                        )
+                      );
+                    }, 
+                    icon: const Icon(Icons.download_outlined, size: 30)
+                  ),
+
+                ]
+              ),
+            ),
           ),
 
           IconButton(

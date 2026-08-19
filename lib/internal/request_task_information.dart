@@ -35,8 +35,6 @@ Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
   //二段流程
   Completer<RequestByteInformation> byteInformationCompleter = Completer();
 
-  debugPrint("[Head Request] $imageUrl");
-
   await HttpApiClient.client.head(
     imageUrl,
     options: Options(
@@ -47,12 +45,12 @@ Future<RequestByteInformation> loadByteInformation(String imageUrl) async {
     .then((response) {
 
       if (response.data != null) {
+        debugPrint("[Head Request Succ] $imageUrl");
         byteInformationCompleter.complete(extractPictureRequest(response, imageUrl));
       }
 
     }).catchError((error) async {
-
-      debugPrint("[Head WordPress Request] $imageUrl");
+      debugPrint("[Head Request Failed => WordPress] ${convertProxyImageUri(imageUrl)}");      
 
       await HttpApiClient.client.head(
         convertProxyImageUri(imageUrl),

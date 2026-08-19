@@ -120,23 +120,17 @@ class _EpCommentTileState extends State<EpCommentTile> {
                                   color: widget.epCommentData.userInformation?.getName() == AccountModel.loginedUserInformations.userInformation?.getName()
                                     ? judgeCurrentThemeColor(context)
                                     //: Colors.blue,
-                                    : widget.readableThemeColor
+                                    : widget.readableThemeColor,
+                                  fontSize: AppFontSize.s14
 
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
 
-                              Row(
-                                spacing: 6,
-                                children: [
-
-                                  ScalableText(
-                                    covertPastedTime(commentStamp.millisecondsSinceEpoch ~/ 1000),
-                                    style: TextStyle(fontSize: AppFontSize.s12)
-                                  ),
-
-                                ],
+                              ScalableText(
+                                "@${widget.epCommentData.userInformation?.userName ?? "no data"}",
+                                style: TextStyle(fontSize: AppFontSize.s12, color: widget.readableThemeColor?.withValues(alpha: 0.5),)
                               ),
 
                             ],
@@ -147,9 +141,10 @@ class _EpCommentTileState extends State<EpCommentTile> {
                         if(widget.authorType?.typeName != null)
                         ScalableText(
                           "(${widget.authorType?.typeName})",
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.grey,
-                            fontWeight: FontWeight.bold
+                            fontWeight: FontWeight.bold,
+                            fontSize: AppFontSize.s14
                           ),
 
                         ),
@@ -159,11 +154,23 @@ class _EpCommentTileState extends State<EpCommentTile> {
                   ),
 
                   //优先完整实现 size约束盒
-                  ScalableText(
-                    widget.epCommentData.epCommentIndex == null ? "" : "#${widget.epCommentData.epCommentIndex}",
-                    style: TextStyle(
-                      color: widget.readableThemeColor,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+
+                      ScalableText(
+                        widget.epCommentData.epCommentIndex == null ? "" : "#${widget.epCommentData.epCommentIndex}",
+                        style: TextStyle(
+                          color: widget.readableThemeColor,
+                          fontSize: AppFontSize.s14
+                        ),
+                      ),
+
+                      ScalableText(
+                        covertDisplayRecordTime(commentStamp.millisecondsSinceEpoch ~/ 1000),
+                        style: TextStyle(fontSize: AppFontSize.s12, color: widget.readableThemeColor?.withValues(alpha: 0.5))
+                      ),
+                    ],
                   ),
 
                   BangumiCommentActionButton(

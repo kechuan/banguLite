@@ -251,7 +251,7 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
 
-                const ToggleThemeModeButton(isDetailText: true),
+                const ToggleThemeModeButton(isDescriptionDisplay: true),
 
                 ListTile(
                   leading: const Icon(Icons.settings),

@@ -20,25 +20,25 @@ class UserInformation {
   String getName() => nickName ?? userName ?? '$userID';
 
   factory UserInformation.empty() => UserInformation(userID: 0);
-  
+
 }
 
 class UserDetails{
 
-	UserInformation? userInfomation;
+  UserInformation? userInfomation;
 
-	String? introduction;
+  String? introduction;
 
-	//site 字段 也会算在 这里面 计入为 home
+  //site 字段 也会算在 这里面 计入为 home
 
-	//UserInfo
-	//Map? subjectStat;
-	Map? subjectStat;
-	List<SocialDetails>? socialAccounts;
-	//Timeline
-	List<TimelineDetails>? timelineActions;
+  //UserInfo
+  //Map? subjectStat;
+  Map? subjectStat;
+  List<SocialDetails>? socialAccounts;
+  //Timeline
+  List<TimelineDetails>? timelineActions;
 
-	
+
 }
 
 
@@ -56,15 +56,15 @@ class LoginedUserInformations{
 
 
 
-UserInformation getDefaultUserInformations()=> UserInformation();
+UserInformation getDefaultUserInformations() => UserInformation();
 LoginedUserInformations getDefaultLoginedUserInformations() => LoginedUserInformations();
 
 
-UserInformation loadUserInformations(Map<String,dynamic>? bangumiUserData){
+UserInformation loadUserInformations(Map<String, dynamic>? bangumiUserData) {
 
   final userInformation = UserInformation.empty();
 
-  if(bangumiUserData == null || bangumiUserData.isEmpty) return userInformation;
+  if (bangumiUserData == null || bangumiUserData.isEmpty) return userInformation;
 
   userInformation
     ..userID = bangumiUserData["id"]
@@ -75,27 +75,27 @@ UserInformation loadUserInformations(Map<String,dynamic>? bangumiUserData){
     ..joinedAtTimeStamp = bangumiUserData["joinedAt"]
     ..group = bangumiUserData["group"]
   ;
-  
+
   return userInformation;
 }
 
 
 UserDetails loadUserDetails(
-	Map<String,dynamic>? bangumiUserDetailsData,
-	{UserInformation? currentUserInformation}
-){
-  if(bangumiUserDetailsData == null || bangumiUserDetailsData.isEmpty) return UserDetails();
+  Map<String, dynamic>? bangumiUserDetailsData,
+  {UserInformation? currentUserInformation}
+) {
+  if (bangumiUserDetailsData == null || bangumiUserDetailsData.isEmpty) return UserDetails();
 
-	UserDetails userDetails = UserDetails();
+  UserDetails userDetails = UserDetails();
 
-	userDetails
-		..userInfomation = currentUserInformation ?? loadUserInformations(bangumiUserDetailsData)
-		..introduction = bangumiUserDetailsData["bio"]
-		..socialAccounts = loadSocialDetails(bangumiUserDetailsData["networkServices"])
-		..subjectStat = bangumiUserDetailsData["stats"]["subject"]
-	;
+  userDetails
+    ..userInfomation = currentUserInformation ?? loadUserInformations(bangumiUserDetailsData)
+    ..introduction = bangumiUserDetailsData["bio"]
+    ..socialAccounts = loadSocialDetails(bangumiUserDetailsData["networkServices"])
+    ..subjectStat = bangumiUserDetailsData["stats"]["subject"]
+  ;
 
-	return userDetails;
+  return userDetails;
 
 
 }
@@ -105,9 +105,9 @@ List<dynamic> convertSubjectStat(
   {
     SubjectType subjectType = SubjectType.anime
   }
-){
+) {
 
-  if(statData == null) return List.filled(5, 0);
+  if (statData == null) return List.filled(5, 0);
 
-  return statData['${subjectType.subjectType}']?.values.toList()  ?? List.filled(5, 0);
+  return statData['${subjectType.subjectType}']?.values.toList() ?? List.filled(5, 0);
 }

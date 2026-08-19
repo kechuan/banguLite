@@ -17,11 +17,11 @@ class EpCommentView extends StatelessWidget {
     //this.onUpdateComment,
     //this.authorID, 
     //this.themeColor
-    
+
   });
 
   //final int contentID;
-  
+
   //final EpCommentDetails epCommentData;
   //final PostCommentType? postCommentType;
   //final Function(String?)? onUpdateComment;
@@ -29,7 +29,7 @@ class EpCommentView extends StatelessWidget {
   //final int? authorID;
 
   //final Color? themeColor;
-  
+
   @override
   Widget build(BuildContext context) {
 
@@ -41,24 +41,22 @@ class EpCommentView extends StatelessWidget {
     final Function(String?)? onUpdateComment = context.read<EpCommentViewConfig>().onUpdateComment;
     final int? authorID = context.read<EpCommentViewConfig>().authorID;
     final Color? themeColor = context.read<EpCommentViewConfig>().themeColor;
-    
+
     /// [BangumiCommentAuthorType] 楼顶端
     BangumiCommentAuthorType? authorType;
 
     epCommentData.userInformation?.let(
-      (it){
+      (it) {
         //自身 大于 楼主 大于 层主
-        if(it.userID == authorID ){
+        if (it.userID == authorID) {
           authorType = BangumiCommentAuthorType.author;
         }
 
-
-        if(it.userID == AccountModel.loginedUserInformations.userInformation?.userID ){
+        if (it.userID == AccountModel.loginedUserInformations.userInformation?.userID) {
           authorType = BangumiCommentAuthorType.self;
         }
       }
     );
-
 
     return Column(
       spacing: 6,
@@ -66,7 +64,7 @@ class EpCommentView extends StatelessWidget {
         EpCommentTile(
           contentID: contentID,
           epCommentData: epCommentData,
-          postCommentType:postCommentType,
+          postCommentType: postCommentType,
           readableThemeColor: themeColor,
           onUpdateComment: onUpdateComment,
           authorType: authorType,
@@ -75,19 +73,19 @@ class EpCommentView extends StatelessWidget {
           contentID: contentID,
           epCommentData: epCommentData,
           floorHostUserID: authorID,
+          readableThemeColor: themeColor,
         )
       ]
-    
+
     );
-      
- 
+
   }
 }
 
 class EpCommentViewConfig{
   EpCommentViewConfig({
     required this.contentID,
-    
+
     this.postCommentType,
     this.onUpdateComment,
     this.authorID,
@@ -95,7 +93,7 @@ class EpCommentViewConfig{
   });
 
   final int contentID;
-  
+
   final PostCommentType? postCommentType;
   final Function(String?)? onUpdateComment;
   final int? authorID;

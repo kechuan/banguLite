@@ -224,7 +224,7 @@ class UserInformationDialog extends StatelessWidget {
                                   children: [
 
                                     ScalableText(
-                                      "${covertPastedTime(timelineActions?.elementAtOrNull(0)?.timelineCreatedAt)} 来过",
+                                      "${covertDisplayRecordTime(timelineActions?.elementAtOrNull(0)?.timelineCreatedAt)} 来过",
                                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                                     ),
 
@@ -287,7 +287,7 @@ class UserInformationDialog extends StatelessWidget {
                                           children: [
 
                                             ScalableText(
-                                              covertPastedTime(timelineActions![index].timelineCreatedAt),
+                                              covertDisplayRecordTime(timelineActions![index].timelineCreatedAt),
                                               style: const TextStyle(color: Colors.blueGrey, fontSize: 14),
                                             ),
 

@@ -381,7 +381,7 @@ String convertRankBoxStandardDiffusion(int totalVotes, List<dynamic> scoreList, 
   return sqrt(standardDiffusion / totalVotes).toStringAsFixed(3);
 }
 
-String covertPastedTime(int? timeStamp) {
+String covertDisplayRecordTime(int? timeStamp) {
 
   String resultText = "";
 

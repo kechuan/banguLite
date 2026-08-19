@@ -249,9 +249,11 @@ class AppFontSize {
   static ScaleType scale = ScaleType.medium;
 
   static double get s18 => 18 * scale.fontScale;
+  static double get s17 => 17 * scale.fontScale;
   static double get s16 => 16 * scale.fontScale;
   static double get s15 => 15 * scale.fontScale;
   static double get s14 => 14 * scale.fontScale;
+  static double get s13 => 13 * scale.fontScale;
   static double get s12 => 12 * scale.fontScale;
   static double getScaledSize(double fontSize) => fontSize * scale.fontScale;
 

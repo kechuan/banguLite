@@ -18,10 +18,11 @@ class EpRepliedTile extends ListTile {
     required this.contentID,
     required this.epCommentData,
     this.postCommentType,
-    this.themeColor, 
+    this.themeColor,
+    this.readableThemeColor,
     this.onUpdateComment,
 
-    this.floorHostUserID
+    this.floorHostUserID, 
 
   });
 
@@ -30,6 +31,7 @@ class EpRepliedTile extends ListTile {
   final EpCommentDetails epCommentData;
   final PostCommentType? postCommentType;
   final Color? themeColor;
+  final Color? readableThemeColor;
   final Function(String?)? onUpdateComment;
 
   final int? floorHostUserID;
@@ -45,21 +47,23 @@ class EpRepliedTile extends ListTile {
     }
 
     return Padding(
-      padding: Padding16,
+      padding: const EdgeInsets.all(12).subtract(const EdgeInsets.only(top: 12)),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(),
           borderRadius: BorderRadius.circular(12),
-          color: judgeDarknessMode(context) ? const Color.fromARGB(255, 118, 121, 119) : const Color.fromARGB(225, 212, 232, 215),
+          //color: judgeDarknessMode(context) ? const Color.fromARGB(255, 118, 121, 119).withValues(alpha: 0.4) : readableThemeColor?.withValues(alpha: 0.2),
+          color: readableThemeColor?.withValues(alpha: 0.2),
         ),
         child: Padding(
-          padding: Padding16,
+          padding: Padding12,
           child: Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
                 ListView.separated(
+                  //孩子们 我忘记listview在安卓端会展示默认的padding了
+                  padding: EdgeInsets.zero,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: min(3, epCommentData.repliedComment!.length),
@@ -76,7 +80,10 @@ class EpRepliedTile extends ListTile {
                     final mainContent = repliedComment.comment
                       ?.split(quoteBBcodeRegexp)
                       .last
-                      .replaceAll(bbcodeRegexp, '') ?? ""
+                      .replaceAll(bbcodeRegexp, '')
+                      //正则会匹配到\n符号 额外剔除它
+                      .trimLeft()
+                      ?? ""
                     ;
 
                     return Padding(
@@ -87,62 +94,60 @@ class EpRepliedTile extends ListTile {
                         epCommentData: epCommentData,
                         commentIndex: index,
                         themeColor: themeColor,
+                        readableThemeColor: readableThemeColor,
                         floorHostUserID: floorHostUserID,
 
                         child: Row(
                           spacing: 12,
-                          crossAxisAlignment: 
-                          (
-                          quoteContent.isNotEmpty || 
-                            (mainContent.contains(RegExp(r'\(bgm\d+\)|\(blake_\d+\)|\(musume_\d+\)')) || mainContent.contains("\n") ) ||
-                            (AppFontSize.s16 * mainContent.length > MediaQuery.sizeOf(context).width * 2 / 3)
-
-                          ) ? CrossAxisAlignment.end : 
-                          CrossAxisAlignment.start
-                          ,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
 
                             ScalableText(
                               "${repliedComment.userInformation?.nickName}:",
-                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: AppFontSize.s15)
+                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: AppFontSize.s14)
                             ),
 
                             epCommentData.repliedComment![index].state?.isNotAvaliable() == true ?
-                            const ScalableText("发言已隐藏", style: TextStyle(fontWeight: FontWeight.bold)) :
+                            ScalableText("发言已隐藏", style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppFontSize.s14)) :
                             Expanded(
                               child: RichText(  // 使用 RichText 合并文本
                                 text: TextSpan(
                                   style: TextStyle(
                                     fontFamilyFallback: convertSystemFontFamily(),
-                                    fontSize: AppFontSize.s16,
+                                    fontSize: AppFontSize.s14,
                                   ),
+
                                   children: [
 
                                     if (quoteContent.isNotEmpty) ...[
                                       WidgetSpan(
                                         alignment: PlaceholderAlignment.bottom,
-                                        child: DecoratedBox(
-                                          decoration: BoxDecoration(
-                                            border: Border.all(),
-                                            borderRadius: BorderRadius.circular(6),
-                                          ),
-                                          child: Padding(
-                                            padding: Padding6,
-                                            child: ScalableText(
-                                              quoteContent.length > 30 ? 
-                                              "${quoteContent.substring(0, 30).replaceAll(bbcodeRegexp, '')}..." : 
-                                              quoteContent.replaceAll(bbcodeRegexp, ''),
-                                              maxLines: 1,
-                                              style: TextStyle(
-                                                color: judgeDarknessMode(context) ? judgeCurrentThemeColor(context) : Colors.blueGrey,
-                                                fontSize: AppFontSize.s14
-                                              ),
+                                        child: Padding(
+                                          padding: PaddingV6,
+                                          child: DecoratedBox(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(6),
+                                              //color: judgeDarknessMode(context) ? judgeCurrentThemeColor(context).withValues(alpha: 0.4) : Colors.blueGrey.withValues(alpha: 0.4),
+                                              color: readableThemeColor?.withValues(alpha: 0.3),
                                             ),
-                                          )
+                                            child: Padding(
+                                              padding: Padding6,
+                                              child: ScalableText(
+                                                quoteContent.length > 40 ? 
+                                                "${quoteContent.substring(0, 40).replaceAll(bbcodeRegexp, '')}..." : 
+                                                quoteContent.replaceAll(bbcodeRegexp, ''),
+                                                maxLines: 1,
+                                                style: TextStyle(
+                                                  //color: judgeDarknessMode(context) ? judgeCurrentThemeColor(context) : Colors.blueGrey,
+                                                  fontSize: AppFontSize.s13
+                                                ),
+                                              ),
+                                            )
+                                          ),
                                         )
                                       ),
 
-                                      /// 往上面的text内容增加\n没有用 必须在这里加才生效 甚是奇怪
+                                      /// 往上面的text内容增加\n没有用 必须在这里加才生效 因为上面已经规定了maxLine为1了
                                       const TextSpan(text: "\n"),
 
                                     ],
@@ -150,7 +155,7 @@ class EpRepliedTile extends ListTile {
                                     WidgetSpan(
                                       child: AdapterBBCodeText(
                                         data: convertBangumiCommentSticker(mainContent),
-                                        stylesheet: appDefaultBBStyleSheet(context, richless: true),
+                                        stylesheet: appDefaultBBStyleSheet(context, richless: true, fontSize: AppFontSize.s14),
                                         maxLine: 3,
                                       )
                                     )
@@ -171,24 +176,18 @@ class EpRepliedTile extends ListTile {
                   separatorBuilder: (_, index) => const Divider(height: 0.5),
                 ),
 
-                /// 拼接显示方案
-                //...List.generate(
-                //  min(3, epCommentData.repliedComment!.length), 
-                //  (index) {
-                //    }
-                //),
-
                 if(epCommentData.repliedComment!.length > 3) 
                 ShowCommentTap(
                   contentID: contentID,
                   themeColor: themeColor,
+                  readableThemeColor: readableThemeColor,
                   postCommentType: postCommentType,
                   epCommentData: epCommentData,
                   //authorType:authorType,
                   floorHostUserID: floorHostUserID,
                   child: ScalableText(
                     "> 点击查看 ${epCommentData.repliedComment!.length} 条评论",
-                    style: TextStyle(color: judgeDarknessMode(context) ? const Color.fromARGB(225, 212, 232, 215) : Colors.blueAccent),
+                    style: TextStyle(color: judgeDarknessMode(context) ? const Color.fromARGB(225, 212, 232, 215) : Colors.blueAccent, fontSize: AppFontSize.s14),
                   )
                 ),
 
@@ -212,6 +211,7 @@ class ShowCommentTap extends InkResponse{
     this.commentIndex,
     this.postCommentType,
     this.themeColor, 
+    this.readableThemeColor,
     this.floorHostUserID, 
 
   });
@@ -226,6 +226,8 @@ class ShowCommentTap extends InkResponse{
 
   final Color? themeColor;
 
+  final Color? readableThemeColor;
+
   @override
   Widget build(BuildContext context) {
     return InkResponse(
@@ -237,6 +239,7 @@ class ShowCommentTap extends InkResponse{
           isScrollControlled: true,
           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width, maxHeight: MediaQuery.sizeOf(context).height * 3 / 4),
           context: context,
+          backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
           builder: (_) {
 
             return EpRepliedCommentBottomSheet(
@@ -245,7 +248,7 @@ class ShowCommentTap extends InkResponse{
               commentIndex: commentIndex,
               floorHostUserID: floorHostUserID,
               postCommentType: postCommentType,
-              readableThemeColor: themeColor,
+              readableThemeColor: readableThemeColor,
             );
 
           }
