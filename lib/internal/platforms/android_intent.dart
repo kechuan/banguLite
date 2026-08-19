@@ -1,18 +1,20 @@
+import 'dart:io';
+
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
+import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'dart:io';
 
-Future<void> installApk(File downloadedApkFile,{Function()? fallback}) async {
+Future<void> installApk(File downloadedApkFile, {Function()? fallback}) async {
 
   // 请求安装权限（Android 8.0+）
   if (await checkInstallPermission()) {
     await launchInstallIntent(downloadedApkFile);
   }
 
-  else{
+  else {
     //后备行为
     fallback?.call();
 
@@ -22,7 +24,7 @@ Future<void> installApk(File downloadedApkFile,{Function()? fallback}) async {
 
 // 检查并请求安装未知来源权限
 Future<bool> checkInstallPermission() async {
-  
+
   if (Platform.isAndroid) {
     final status = await Permission.requestInstallPackages.status;
     if (!status.isGranted) {
@@ -41,12 +43,16 @@ Future<bool> checkInstallPermission() async {
 Future<String> getApkContentProviderUri(File apkFile) async {
 
   if (Platform.isAndroid) {
-    
-      const authority = '${APPInformationRepository.packageName}.fileprovider';
-      final filePath = apkFile.absolute.path;
 
-      return 'content://$authority/external_files/downloads/${filePath.split('/downloads/').last}';
-    
+    const authority = '${APPInformationRepository.packageName}.fileprovider';
+    final filePath = apkFile.absolute.path;
+
+    final downloadFolderName =
+      MyHive.downloadDir!.absolute.path.split(Platform.pathSeparator).last;
+
+    return 'content://$authority/external_files/$downloadFolderName/${filePath.split('/').last}';
+    //return 'content://$authority/external_files/downloads/${filePath.split('/downloads/').last}';
+
   }
   // Android 7.0 以下使用 file://
   return 'file://${apkFile.path}';
@@ -60,9 +66,6 @@ Future<void> launchInstallIntent(File apkFile) async {
 
   //content://io.flutter.banguLite.fileprovider/external_files/downloads/banguLite-arm64-v8a-v0.5.2-release.apk
 
-  //content://io.flutter.banguLite.fileprovider/external_files/downloads/banguLite-arm64-v8a-v0.5.2-release.apk
-
-  
   final intent = AndroidIntent(
     action: 'android.intent.action.INSTALL_PACKAGE',
     //action: ACTION_INSTALL_PACKAGE,
@@ -75,7 +78,7 @@ Future<void> launchInstallIntent(File apkFile) async {
   try {
     await intent.launch();
   } 
-  
+
   catch (e) {
     debugPrint('启动安装界面失败: $e');
   }
