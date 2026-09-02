@@ -101,10 +101,12 @@ class MaskDisplay extends StatelessWidget {
           builder: (_, activedStatus, __) {
             return DecoratedBox(
               decoration: BoxDecoration(
-                color: isDarkMode ? AppThemeColor.macha.color : Colors.black,
+                //color: isDarkMode ? AppThemeColor.macha.color : Colors.black,
+                color: isDarkMode ? judgeCurrentThemeColor(context) : Colors.black,
                 boxShadow: [
                   BoxShadow(
-                    color: isDarkMode ? AppThemeColor.macha.color : Colors.black,
+                    //color: isDarkMode ? AppThemeColor.macha.color : Colors.black,
+                    color: isDarkMode ? judgeCurrentThemeColor(context) : Colors.black,
                     blurRadius: 2,
                     spreadRadius: 1
                   )
@@ -113,8 +115,11 @@ class MaskDisplay extends StatelessWidget {
               child: TweenAnimationBuilder<Color?>(
                 duration: const Duration(milliseconds: 300),
                 tween: ColorTween(
-                  begin: isDarkMode ? AppThemeColor.macha.color : Colors.black,
-                  end: isDarkMode ? (activedStatus ? Colors.black : AppThemeColor.macha.color) : (activedStatus ? Colors.white : Colors.black),
+                  //begin: isDarkMode ? AppThemeColor.macha.color : Colors.black,
+                  //end: isDarkMode ? (activedStatus ? Colors.black : AppThemeColor.macha.color) : (activedStatus ? Colors.white : Colors.black),
+
+                  begin: isDarkMode ? judgeCurrentThemeColor(context) : Colors.black,
+                  end: isDarkMode ? (activedStatus ? Colors.black : judgeCurrentThemeColor(context)) : (activedStatus ? Colors.white : Colors.black),
                 ),
 
                 builder: (_, color, __) {
@@ -414,7 +419,7 @@ class PatchItalicTag extends AdvancedTag {
         baseline: TextBaseline.alphabetic,
         child: Transform(
           // -0.1 是非常克制的倾斜，看起来既有斜体感，又不会像系统默认的那样“躺倒”
-          transform: Matrix4.skewX(-0.2), 
+          transform: Matrix4.skewX(-0.2),
           child: ScalableText(
             textItalicContent,
           ),

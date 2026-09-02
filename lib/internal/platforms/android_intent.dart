@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
 import 'package:bangu_lite/internal/hive.dart';
-import 'package:bangu_lite/internal/request_client.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -44,14 +43,20 @@ Future<String> getApkContentProviderUri(File apkFile) async {
 
   if (Platform.isAndroid) {
 
-    const authority = '${APPInformationRepository.packageName}.fileprovider';
+    final realPackageName = MyHive.downloadDir!.absolute.path
+      .split('/Android/data/').last
+      .split('/').first;  // io.flutter.banguLite.dev
+
+    final authority = '$realPackageName.fileprovider';
+    //const authority = '${APPInformationRepository.packageName}.fileprovider';
+
     final filePath = apkFile.absolute.path;
 
     final downloadFolderName =
       MyHive.downloadDir!.absolute.path.split(Platform.pathSeparator).last;
 
     return 'content://$authority/external_files/$downloadFolderName/${filePath.split('/').last}';
-    //return 'content://$authority/external_files/downloads/${filePath.split('/downloads/').last}';
+    //return 'content://$authority/external_files/$downloadFolderName/${filePath.split('/').last}';
 
   }
   // Android 7.0 以下使用 file://

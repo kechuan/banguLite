@@ -9,6 +9,7 @@ import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/history_model.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:bangu_lite/widgets/dialogs/history_range_select_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
@@ -219,30 +220,29 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
             children: [
 
               if(kDebugMode)
-              IconButton(
-                onPressed: () {
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: judgeCurrentThemeColor(context).withValues(alpha: 0.8),
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
 
-                  debugPrint(
-                    "totalCount:${historyModel.dataSource.length}\n"
-                    "localHistoryPageMap:${historyModel.localHistoryPageMap}"
-                  );
+                        debugPrint(
+                          "totalCount:${historyModel.dataSource.length}\n"
+                          "localHistoryPageMap:${historyModel.localHistoryPageMap}"
+                        );
 
-                },
-                icon: const Icon(Icons.date_range),
-              ),
-
-              if(kDebugMode)
-              IconButton(
-                onPressed: () {
-
-                  debugPrint("输出前5个最新的数据");
-
-                  historyModel.dataSource.sublist(0, 5).forEach((element) {
-                    debugPrint(element.toString());
-                  });
-
-                },
-                icon: const Icon(Icons.auto_fix_high),
+                      },
+                      icon: const Icon(Icons.date_range),
+                    ),
+                  ],
+                ),
               ),
 
               if (multiSelectMode) 
@@ -698,10 +698,10 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
           children: [
 
             Container(
+              padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 color: judgeCurrentThemeColor(context).withValues(alpha: 0.5),
-
               ),
 
               child: Row(
@@ -733,14 +733,14 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                       }
 
                       return Row(
-                        spacing: 12,
+                        spacing: 16,
                         children: [
 
                           ScalableText(
                             "${historyModel.groupIndices.keys.elementAtOrNull(startIndex) ?? ""}"
                             " ~ "
                             "${historyModel.groupIndices.keys.elementAtOrNull(endIndex) ?? ""}",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppFontSize.s16),
                           ),
 
                           rangeButton!
@@ -749,17 +749,23 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
 
                     },
 
-                    child: IconButton(
-                      onPressed: () {
-                        if (historyModel.historyPageController.hasClients) {
-                          showHistoryDateRangeSelectDialog(context, historyModel.historyPageController.page!.toInt()).then((index) {
-                            if (index != null) {
-                              historyModel.historyPageController.jumpToPage(index);
-                            }
-                          });
-                        }
-                      }, 
-                      icon: const Icon(Icons.date_range)
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: judgeCurrentThemeColor(context).withValues(alpha: 0.5),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          if (historyModel.historyPageController.hasClients) {
+                            showHistoryDateRangeSelectDialog(context, historyModel.historyPageController.page!.toInt()).then((index) {
+                              if (index != null) {
+                                historyModel.historyPageController.jumpToPage(index);
+                              }
+                            });
+                          }
+                        }, 
+                        icon: const Icon(Icons.date_range)
+                      ),
                     ),
                   ),
 

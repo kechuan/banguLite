@@ -87,7 +87,7 @@ class _CommentReactionState extends State<CommentReaction> {
   @override
   Widget build(BuildContext context) {
     final accountModel = context.read<AccountModel>();
-    bool isReactAble = accountModel.isLogined() && widget.commentID != null;
+    bool isAllowReact = accountModel.isLogined() && widget.commentID != null;
 
     if (localCommentReactions.isEmpty) {
       return const SizedBox.shrink();
@@ -104,10 +104,10 @@ class _CommentReactionState extends State<CommentReaction> {
 
     // 可用宽度上限，留出 item 左右 padding
     final double maxWidth = 
-      MediaQuery.sizeOf(context).width - 32; // 按你的 item 内边距调整
+      MediaQuery.sizeOf(context).width - 32;
 
     const double chipWidth = 65;
-    const double separatorWidth = 6;
+    const double separatorWidth = 6; //separatorBuilder 的 PaddingH6
 
     // 内容实际需要的宽度
     final double contentWidth = 
@@ -150,7 +150,7 @@ class _CommentReactionState extends State<CommentReaction> {
                   onPressed: () {
                     debugPrint("dataLikeIndex:$dataLikeIndex, stickerIndex:$stickerIndex");
 
-                    if (!isReactAble) return;
+                    if (!isAllowReact) return;
 
                     invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
                       message: message,

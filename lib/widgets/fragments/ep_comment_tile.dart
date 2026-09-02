@@ -74,15 +74,16 @@ class _EpCommentTileState extends State<EpCommentTile> {
 
   @override
   Widget build(BuildContext context) {
+
+    DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch((widget.epCommentData.commentTimeStamp ?? 0) * 1000);
     bool commentBlockStatus = false;
 
     if (
-    widget.epCommentData.state != null && (widget.epCommentData.state?.isNotAvaliable() ?? true)
+    widget.epCommentData.state != null && 
+      (widget.epCommentData.state?.isContentNerf() ?? true)
     ) {
       commentBlockStatus = true;
     }
-
-    DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch((widget.epCommentData.commentTimeStamp ?? 0) * 1000);
 
     return Padding(
       padding: Padding12,
@@ -111,27 +112,40 @@ class _EpCommentTileState extends State<EpCommentTile> {
                       children: [
 
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Row(
+                            spacing: 16,
                             children: [
-                              ScalableText(
-                                widget.epCommentData.userInformation?.nickName ?? widget.epCommentData.userInformation?.userName ?? "no data",
-                                style: TextStyle(
-                                  color: widget.epCommentData.userInformation?.getName() == AccountModel.loginedUserInformations.userInformation?.getName()
-                                    ? judgeCurrentThemeColor(context)
-                                    //: Colors.blue,
-                                    : widget.readableThemeColor,
-                                  fontSize: AppFontSize.s14
 
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ScalableText(
+                                    widget.epCommentData.userInformation?.nickName ?? widget.epCommentData.userInformation?.userName ?? "no data",
+                                    style: TextStyle(
+                                      color: widget.epCommentData.userInformation?.getName() == AccountModel.loginedUserInformations.userInformation?.getName()
+                                        ? judgeCurrentThemeColor(context)
+                                        //: Colors.blue,
+                                        : widget.readableThemeColor,
+                                      fontSize: AppFontSize.s14
+
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+
+                                  ScalableText(
+                                    "@${widget.epCommentData.userInformation?.userName ?? "no data"}",
+                                    style: TextStyle(fontSize: AppFontSize.s12, color: widget.readableThemeColor?.withValues(alpha: 0.5),)
+                                  ),
+
+                                ],
                               ),
 
-                              ScalableText(
-                                "@${widget.epCommentData.userInformation?.userName ?? "no data"}",
-                                style: TextStyle(fontSize: AppFontSize.s12, color: widget.readableThemeColor?.withValues(alpha: 0.5),)
-                              ),
+                              if(commentBlockStatus) 
+                              Transform(
+                                transform: Matrix4.skewX(-0.2),
+                                child: ScalableText("${widget.epCommentData.state?.reason}了楼层", style: const TextStyle(decoration: TextDecoration.underline))
+                              )
 
                             ],
                           ),
@@ -173,6 +187,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
                     ],
                   ),
 
+                  if(!commentBlockStatus)
                   BangumiCommentActionButton(
                     contentID: widget.contentID,
                     commentData: widget.epCommentData,
@@ -245,7 +260,11 @@ class _EpCommentTileState extends State<EpCommentTile> {
               ),
 
               Builder(builder: (_) {
-                if (widget.epCommentData.userInformation?.sign == null || widget.epCommentData.userInformation!.sign!.isEmpty) {
+                if (
+                commentBlockStatus ||
+                  widget.epCommentData.userInformation?.sign == null || 
+                  widget.epCommentData.userInformation!.sign!.isEmpty
+                ) {
                   return const SizedBox.shrink();
                 }
                 return Padding(
@@ -257,6 +276,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
             ],
           ),
 
+          if(!commentBlockStatus)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 6,
@@ -407,4 +427,5 @@ class _EpCommentTileState extends State<EpCommentTile> {
     );
 
   }
+
 }

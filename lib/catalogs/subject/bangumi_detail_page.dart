@@ -1,5 +1,6 @@
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
@@ -29,6 +30,7 @@ import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -137,6 +139,10 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                       if (await canLaunchUrlString(BangumiWebUrls.subject(widget.subjectID))) {
                         await launchUrlString(BangumiWebUrls.subject(widget.subjectID));
                       }
+                    },
+                    onLongPress: () {
+                      Clipboard.setData(ClipboardData(text: BangumiWebUrls.subject(widget.subjectID)));
+                      fadeToaster(context: context, message: "已复制链接");              
                     },
                     icon: const Icon(Icons.link)
                   )

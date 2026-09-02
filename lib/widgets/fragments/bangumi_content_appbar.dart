@@ -13,6 +13,7 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -213,6 +214,10 @@ class BangumiContentAppbar extends StatelessWidget {
               if (await canLaunchUrlString(webUrl ?? '')) {
                 await launchUrlString(webUrl ?? '');
               }
+            },
+            onLongPress: () {
+              Clipboard.setData(ClipboardData(text: webUrl ?? ''));
+              fadeToaster(context: context, message: "已复制链接");              
             },
             icon: const Icon(Icons.link)
           ),

@@ -194,7 +194,9 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
 
     else if (
     //特殊状况
-    link.startsWith(BangumiAPIUrls.timelineReply(int.parse(appRouteUri.queryParameters['timelineID'] ?? '0')))
+    link.startsWith(BangumiAPIUrls.timelineReply(int.parse(appRouteUri.queryParameters['timelineID'] ?? '0'))) 
+    //不启用这个分支
+    //|| RegExp(r'https://bangumi.tv/user/\w+:?/timeline/status').hasMatch(link)
     ) {
 
       /// 因为跳转的时候 一般会拥有 用户信息 那么传个userName什么的也没有问题
@@ -206,7 +208,7 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
           context,
           Routes.timelineChat,
           arguments: {
-            'timelineID':appRouteUri.queryParameters['timelineID'],
+            'timelineID':appRouteUri.queryParameters['timelineID'] ?? resID,
             'onDeleteAction':(int resultID) {
 
               if (resultID != 0) {

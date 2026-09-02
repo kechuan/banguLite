@@ -13,7 +13,7 @@ import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
+/// 当前页面仅限从用户动态点进去 因为评论的正文强依赖 UserModel 
 @FFRoute(name: '/TimelineChat')
 class BangumiTimelineChatPage extends StatefulWidget {
   const BangumiTimelineChatPage({

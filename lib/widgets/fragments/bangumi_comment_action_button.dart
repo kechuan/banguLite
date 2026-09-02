@@ -84,270 +84,274 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
 
     final ModalRoute<dynamic>? currentRoute = ModalRoute.of(context);
 
-    return CompositedTransformTarget(
-      link: stickerLayerLink,
-      child: PopupMenuButton<CommentActionType>(
-        constraints: const BoxConstraints(
-          maxHeight: 3.25 * kToolbarHeight
-        ),
-        iconSize: 22,
-        style: const ButtonStyle(
-          alignment: Alignment.bottomCenter,
+    return SizedBox(
+      height: 30,
+      width: 30,
+      child: CompositedTransformTarget(
+        link: stickerLayerLink,
+        child: PopupMenuButton<CommentActionType>(
+          constraints: const BoxConstraints(
+            maxHeight: 3.25 * kToolbarHeight
+          ),
+          iconSize: 20,
+          style: const ButtonStyle(
+            alignment: Alignment.center,
 
-        ),
-        onOpened: () {
-          debugPrint("contentID: ${widget.contentID}, reply:${widget.commentData.commentID}, action:${widget.postCommentType}");
+          ),
+          onOpened: () {
+            debugPrint("contentID: ${widget.contentID}, reply:${widget.commentData.commentID}, action:${widget.postCommentType}");
 
-          stickerSelectOverlay ??= StickerSelectOverlay(
-            context: context,
-            buttonLayerLink: stickerLayerLink,
-            postCommentType: widget.postCommentType,
-            onStick: widget.onSticker
-          );
+            stickerSelectOverlay ??= StickerSelectOverlay(
+              context: context,
+              buttonLayerLink: stickerLayerLink,
+              postCommentType: widget.postCommentType,
+              onStick: widget.onSticker
+            );
 
-          debugPrint("content Done");
-        },
-        onSelected: (commentAction) {
+            debugPrint("content Done");
+          },
+          onSelected: (commentAction) {
 
-          debugPrint("${currentRoute.runtimeType}");
+            debugPrint("${currentRoute.runtimeType}");
 
-          invokeCommentToggle(String message) => accountModel.toggleComment(
-            /// widget.commentData.contentID 并不可靠 因为部分获取的字段并不包含它
-            contentID: widget.contentID,
-            commentID: widget.commentData.commentID,
-            commentContent: message,
-            postCommentType: widget.postCommentType,
-            actionType: commentAction == CommentActionType.edit ? UserContentActionType.edit : UserContentActionType.post,
-            fallbackAction: (errorMessage) {
+            invokeCommentToggle(String message) => accountModel.toggleComment(
+              /// widget.commentData.contentID 并不可靠 因为部分获取的字段并不包含它
+              contentID: widget.contentID,
+              commentID: widget.commentData.commentID,
+              commentContent: message,
+              postCommentType: widget.postCommentType,
+              actionType: commentAction == CommentActionType.edit ? UserContentActionType.edit : UserContentActionType.post,
+              fallbackAction: (errorMessage) {
 
-              debugPrint("[ToggleContent] ${widget.contentID} SendContent: $errorMessage");
+                debugPrint("[ToggleContent] ${widget.contentID} SendContent: $errorMessage");
 
-              if (currentRoute is ModalBottomSheetRoute) {
-                invokeToaster(message: "[草稿已保存] $errorMessage");
+                if (currentRoute is ModalBottomSheetRoute) {
+                  invokeToaster(message: "[草稿已保存] $errorMessage");
+                }
+
+                else {
+                  invokeRequestSnackBar(
+                    message: "[草稿已保存] $errorMessage",
+                    requestStatus: false,
+                  );
+                }
+
+                indexModel.draftContent.addAll({
+                  widget.contentID : ("",message)
+                });
+
+              }
+            ); 
+
+            switch (commentAction){
+
+              case CommentActionType.copy:{
+
+                Clipboard.setData(
+                  ClipboardData(
+                    text: extractBBCodeSelectableContent(widget.commentData.comment ?? "")
+                  )
+                );
+
               }
 
-              else {
-                invokeRequestSnackBar(
-                  message: "[草稿已保存] $errorMessage",
-                  requestStatus: false,
+              case CommentActionType.reply:{
+
+                Navigator.pushNamed(
+                  context,
+                  Routes.sendComment,
+                  arguments: {
+                    'contentID':widget.contentID,
+                    'replyID':widget.commentData.commentID,
+                    'postCommentType':widget.postCommentType,
+                    'title': '回复 ${widget.commentData.userInformation?.nickName ?? widget.commentData.userInformation?.userName}',
+                    'referenceObject': '${widget.commentData.comment}',
+                    'preservationContent': indexModel.draftContent[widget.commentData.commentID]
+                  }
+                ).then((content) async {
+
+                    /// 此处回复的内容应只有 content 也就是 String
+
+                    if (content is String) {
+
+                      invokeRequestSnackBar();
+
+                      //网络层 Callback
+                      await invokeCommentToggle(content).then((resultID) {
+
+                        if (resultID != 0) {
+                          debugPrint("[PostContent] sendMessageresultID:$resultID SendContent: $content");
+                          //UI层 Callback
+
+                          widget.onReplyComment?.call(widget.commentData.commentID!, content);
+
+                          if (currentRoute is ModalBottomSheetRoute) {
+                            invokeToaster(message: "回复成功");
+                          }
+
+                          else {
+                            invokeRequestSnackBar(requestStatus: true);
+                          }
+
+                        }
+
+                      });
+
+                    }
+                  });
+
+              }
+
+              case CommentActionType.sticker:{
+                stickerSelectOverlay?.showStickerSelectOverlay(
+                  widget.commentData.commentID
                 );
               }
 
-              indexModel.draftContent.addAll({
-                widget.contentID : ("",message)
-              });
+              case CommentActionType.report:{                            
+                showReportDialog(
+                  context,
+                  contentID: widget.contentID,
+                  postCommentType: widget.postCommentType!
+                );
+              }
 
-            }
-          ); 
+              case CommentActionType.edit:{
 
-          switch (commentAction){
+                //invokeToaster({String? message})=> fadeToaster(context: context, message: message ?? "修改成功");
 
-            case CommentActionType.copy:{
+                final throwFlag = widget.commentData.takeCondition((it) {
+                  if (it is EpCommentDetails) {
+                    if (it.repliedComment?.isNotEmpty == true) {
+                      invokeToaster(message: "一般用户无法更改携带回复的评论");
 
-              Clipboard.setData(
-                ClipboardData(
-                  text: extractBBCodeSelectableContent(widget.commentData.comment ?? "")
-                )
-              );
-
-            }
-
-            case CommentActionType.reply:{
-
-              Navigator.pushNamed(
-                context,
-                Routes.sendComment,
-                arguments: {
-                  'contentID':widget.contentID,
-                  'replyID':widget.commentData.commentID,
-                  'postCommentType':widget.postCommentType,
-                  'title': '回复 ${widget.commentData.userInformation?.nickName ?? widget.commentData.userInformation?.userName}',
-                  'referenceObject': '${widget.commentData.comment}',
-                  'preservationContent': indexModel.draftContent[widget.commentData.commentID]
-                }
-              ).then((content) async {
-
-                  /// 此处回复的内容应只有 content 也就是 String
-
-                  if (content is String) {
-
-                    invokeRequestSnackBar();
-
-                    //网络层 Callback
-                    await invokeCommentToggle(content).then((resultID) {
-
-                      if (resultID != 0) {
-                        debugPrint("[PostContent] sendMessageresultID:$resultID SendContent: $content");
-                        //UI层 Callback
-
-                        widget.onReplyComment?.call(widget.commentData.commentID!, content);
-
-                        if (currentRoute is ModalBottomSheetRoute) {
-                          invokeToaster(message: "回复成功");
-                        }
-
-                        else {
-                          invokeRequestSnackBar(requestStatus: true);
-                        }
-
-                      }
-
-                    });
-
+                      return true;
+                    }
                   }
+
+                  return false;
                 });
 
-            }
+                if (throwFlag == true) return;
 
-            case CommentActionType.sticker:{
-              stickerSelectOverlay?.showStickerSelectOverlay(
-                widget.commentData.commentID
-              );
-            }
-
-            case CommentActionType.report:{                            
-              showReportDialog(
-                context,
-                contentID: widget.contentID,
-                postCommentType: widget.postCommentType!
-              );
-            }
-
-            case CommentActionType.edit:{
-
-              //invokeToaster({String? message})=> fadeToaster(context: context, message: message ?? "修改成功");
-
-              final throwFlag = widget.commentData.takeCondition((it) {
-                if (it is EpCommentDetails) {
-                  if (it.repliedComment?.isNotEmpty == true) {
-                    invokeToaster(message: "一般用户无法更改携带回复的评论");
-
-                    return true;
+                Navigator.pushNamed(
+                  context,
+                  Routes.sendComment,
+                  arguments: {
+                    'contentID':widget.commentData.commentID,
+                    'postCommentType':widget.postCommentType,
+                    'title': '编辑这段评论',
+                    'preservationContent': indexModel.draftContent[widget.commentData.commentID] ?? ("", widget.commentData.comment),
                   }
-                }
+                ).then((content) async{
+                    if (content is String) {
 
-                return false;
-              });
-
-              if (throwFlag == true) return;
-
-              Navigator.pushNamed(
-                context,
-                Routes.sendComment,
-                arguments: {
-                  'contentID':widget.commentData.commentID,
-                  'postCommentType':widget.postCommentType,
-                  'title': '编辑这段评论',
-                  'preservationContent': indexModel.draftContent[widget.commentData.commentID] ?? ("", widget.commentData.comment),
-                }
-              ).then((content) async{
-                  if (content is String) {
-
-                    if (currentRoute is ModalBottomSheetRoute) {
-                      invokeToaster(message: "请求中",);
-                    }
-
-                    else {
-                      invokeRequestSnackBar();
-                    }
-
-                    //invokeRequestSnackBar();
-
-                    //widget.onUpdateComment?.call(content);
-
-                    //网络层 Callback
-                    await invokeCommentToggle(content).then((resultID) {
-                      debugPrint("[EditContent] sendMessageresultID:$resultID SendContent: $content");
-
-                      if (resultID != 0) {
-                        //UI层 Callback
-                        widget.onUpdateComment?.call(content);
-
-                        if (currentRoute is ModalBottomSheetRoute) {
-                          invokeToaster(message: "发送成功");
-                        }
-
-                        else {
-                          invokeRequestSnackBar(requestStatus: true);
-                        }
-
+                      if (currentRoute is ModalBottomSheetRoute) {
+                        invokeToaster(message: "请求中",);
                       }
 
-                    });
+                      else {
+                        invokeRequestSnackBar();
+                      }
 
-                  }
-                });
+                      //invokeRequestSnackBar();
+
+                      //widget.onUpdateComment?.call(content);
+
+                      //网络层 Callback
+                      await invokeCommentToggle(content).then((resultID) {
+                        debugPrint("[EditContent] sendMessageresultID:$resultID SendContent: $content");
+
+                        if (resultID != 0) {
+                          //UI层 Callback
+                          widget.onUpdateComment?.call(content);
+
+                          if (currentRoute is ModalBottomSheetRoute) {
+                            invokeToaster(message: "发送成功");
+                          }
+
+                          else {
+                            invokeRequestSnackBar(requestStatus: true);
+                          }
+
+                        }
+
+                      });
+
+                    }
+                  });
+
+              }
+
+              case CommentActionType.delete:{
+
+                showTransitionAlertDialog(
+                  context,
+                  title: "删除内容确认",
+                  content: "确认删除这条内容吗?",
+                  confirmAction: () {
+                    widget.onUpdateComment?.call(null);
+                  },
+                );
+
+              }
 
             }
 
-            case CommentActionType.delete:{
+          },
+          itemBuilder: (_) {
+            return List.generate(
+              accountModel.isLogined() ? CommentActionType.values.length : 1,
+              //CommentActionType.values.length,
+              (index) {
 
-              showTransitionAlertDialog(
-                context,
-                title: "删除内容确认",
-                content: "确认删除这条内容吗?",
-                confirmAction: () {
-                  widget.onUpdateComment?.call(null);
-                },
-              );
+                CommentActionType currentCommentActionType = CommentActionType.values[index];
 
-            }
+                bool isActionAvaliable = !(widget.commentBlockStatus ?? false);
 
+                if (
+                isActionAvaliable && 
+                  accountModel.isLogined() &&
+                  widget.commentData.commentID != null
+                ) {
+                  isActionAvaliable = judgeActionAvaliable(currentCommentActionType);
+                }
+
+                else {
+                  isActionAvaliable = currentCommentActionType == CommentActionType.copy ? true : false;
+                }
+
+                return PopupMenuItem(
+                  height: 50,
+                  enabled: isActionAvaliable,
+                  value: CommentActionType.values[index],
+                  child: Builder(
+                    builder: (_) {
+
+                      if (CommentActionType.values[index] == CommentActionType.sticker) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+
+                            ScalableText(CommentActionType.values[index].actionTypeString),
+
+                            Transform.rotate(
+                              angle: 90 * pi / 180,
+                              child: const Icon(Icons.arrow_drop_up)
+                            )
+                          ]
+                        );
+                      }
+
+                      return ScalableText(CommentActionType.values[index].actionTypeString);
+
+                    }
+                  ),
+                );
+              }
+            );
           }
-
-        },
-        itemBuilder: (_) {
-          return List.generate(
-            accountModel.isLogined() ? CommentActionType.values.length : 1,
-            //CommentActionType.values.length,
-            (index) {
-
-              CommentActionType currentCommentActionType = CommentActionType.values[index];
-
-              bool isActionAvaliable = !(widget.commentBlockStatus ?? false);
-
-              if (
-              isActionAvaliable && 
-                accountModel.isLogined() &&
-                widget.commentData.commentID != null
-              ) {
-                isActionAvaliable = judgeActionAvaliable(currentCommentActionType);
-              }
-
-              else {
-                isActionAvaliable = currentCommentActionType == CommentActionType.copy ? true : false;
-              }
-
-              return PopupMenuItem(
-                height: 50,
-                enabled: isActionAvaliable,
-                value: CommentActionType.values[index],
-                child: Builder(
-                  builder: (_) {
-
-                    if (CommentActionType.values[index] == CommentActionType.sticker) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-
-                          ScalableText(CommentActionType.values[index].actionTypeString),
-
-                          Transform.rotate(
-                            angle: 90 * pi / 180,
-                            child: const Icon(Icons.arrow_drop_up)
-                          )
-                        ]
-                      );
-                    }
-
-                    return ScalableText(CommentActionType.values[index].actionTypeString);
-
-                  }
-                ),
-              );
-            }
-          );
-        }
+        ),
       ),
     );
 

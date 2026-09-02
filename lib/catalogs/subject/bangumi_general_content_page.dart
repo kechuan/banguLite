@@ -166,7 +166,7 @@ abstract class BangumiContentPageState<
                   builder: (_, contentDetailData, contentComment) => Scrollbar(
                     thumbVisibility: true,
                     interactive: true,
-                    thickness: 4,
+                    thickness: 3,
                     controller: scrollController,
                     child: SelectionArea(
                       child: CustomScrollView(

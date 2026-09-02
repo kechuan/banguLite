@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/test_page.dart';
+import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
@@ -279,21 +280,21 @@ class ColorThemeTile extends ListTile{
 
           Flexible(
             child: SizedBox(
-              width: 50 * (AppThemeColor.values.length + 1),
-              height: 50,
+              width: 45 * (AppThemeColor.values.length + 1),
+              height: 45,
               child: ListView.builder(
                 physics: const ClampingScrollPhysics(),
                 scrollDirection: Axis.horizontal,
                 itemCount: AppThemeColor.values.length + 1,
-                itemExtent: 50,
+                itemExtent: 45,
                 itemBuilder: (_, index) {
 
                   return Stack(
                     children: [
 
                       SizedBox(
-                        width: 50,
-                        height: 50,
+                        width: 45,
+                        height: 45,
                         child: Padding(
                           padding: PaddingH6,
                           child: UnVisibleResponse(
@@ -820,23 +821,62 @@ class TestTile extends ListTile{
 
   @override
   Widget build(BuildContext context) {
+
+    final TextEditingController urlController = TextEditingController();
+
+    List<Widget> testWidgets = [
+
+      SizedBox(
+        height: 60,
+        child: Row(
+          spacing: 12,
+          children: [
+            const ScalableText("AppRoute 跳转:"),
+
+            Flexible(
+              child: TextField(
+                controller: urlController,
+                decoration: const InputDecoration(
+                  hintText: "请输入URL",
+                  border: UnderlineInputBorder(),
+                ),
+              ),
+            ),
+
+            TextButton(
+              onPressed: () async {
+                if (urlController.text.isEmpty) return;
+                if (await canLaunchUrlString(urlController.text) != true) return;
+
+                bus.emit('AppRoute', urlController.text);
+              },
+              child: const ScalableText("跳转")
+            ),
+
+          ],
+        ),
+      ),
+
+    ];
+
     return TransitionContainer(
       builder: (_, openAction) {
         return SizedBox(
-          height: 80,
+          height: testWidgets.length * 50 + 60,
           child: Center(
             child: ListTile(
-              onTap: () {
-                debugPrint("${MyHive.appConfigDataBase.get("currentTheme")}");
-                //openAction();
-              },
+              onLongPress: openAction,
               title: Row(
                 spacing: 12,
                 children: [
                   const Icon(Icons.developer_board),
-                  ScalableText("(Debug)测试触发工具", style: TextStyle(fontSize: AppFontSize.s16)),
+                  ScalableText("(Debug)测试触发工具 - 长按进入实验场", style: TextStyle(fontSize: AppFontSize.s16)),
                 ],
-              )
+              ),
+              subtitle: Column(
+                spacing: 6,
+                children: testWidgets
+              ),
             ),
           ),
         );

@@ -107,7 +107,7 @@ class EpRepliedTile extends ListTile {
                               style: TextStyle(fontWeight: FontWeight.w600, fontSize: AppFontSize.s14)
                             ),
 
-                            epCommentData.repliedComment![index].state?.isNotAvaliable() == true ?
+                            epCommentData.repliedComment![index].state?.isContentNerf() == true ?
                             ScalableText("发言已隐藏", style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppFontSize.s14)) :
                             Expanded(
                               child: RichText(  // 使用 RichText 合并文本
