@@ -267,6 +267,39 @@ TODO(按必要性的优先级排列)
 
 
 
+### 项目Release发布配置
+
+
+
+#### 本地(配置受 app/build.gradle 影响)
+
+| 签名文件            | 默认路径                                    |
+| ------------------- | ------------------------------------------- |
+| keystore.properties | ./android/sign/keystore.properties          |
+| *.keystore          | (跟随你自己的 `keystore.properties` 的配置) |
+
+
+
+#### githubAction渠道
+
+
+
+本质是配置 `android/sign/keystore.properties`
+
+| 个人Secrets配置                    | 说明                         |
+| ---------------------------------- | ---------------------------- |
+| *android/sign/banguLite.keystore*  |                              |
+| secrets.KEYSTORE_BASE64            | 你的keystore文件编码成base64 |
+|                                    |                              |
+| *android/sign/keystore.properties* |                              |
+| secrets.keyAlias                   | keyAlias                     |
+| secrets.keyPassword                | keyPassword                  |
+| secrets.storePassword              | storePassword                |
+
+
+
+****
+
 #### 致谢
 
 ##### API
