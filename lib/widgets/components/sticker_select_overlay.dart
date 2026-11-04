@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
@@ -173,7 +174,7 @@ class StickerSelectOverlay{
                                             invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
                                               message: message,
                                               requestStatus: requestStatus,
-                                              backgroundColor: judgeCurrentThemeColor(context)
+                                              backgroundColor: getCurrentThemeColor(context)
                                             );
 
                                             final accountModel = context.read<AccountModel>();

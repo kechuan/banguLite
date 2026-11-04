@@ -5,7 +5,7 @@ import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
@@ -270,7 +270,7 @@ class SelectSeasonPortrait extends StatelessWidget {
                               builder: (_, seasonType, child) {
                                 return Offstage(
                                   offstage: seasonTypeIndex != seasonType.index,
-                                  child: Icon(Icons.done, color: judgeCurrentThemeColor(context))
+                                  child: Icon(Icons.done, color: getCurrentThemeColor(context))
                                 );
                               }
                             );
@@ -306,7 +306,7 @@ void showSeasonDialog(
   {Future? calendarLoadFuture}
 ) {
 
-  invokeAsyncToasterExec() => fadeToaster(context: context, message: "正在切换季节番剧信息");
+  invokeAsyncToasterExec() => fadeToaster(color: getCurrentThemeColor(context), context: context, message: "正在切换季节番剧信息");
 
   final indexModel = context.read<IndexModel>();
 
@@ -330,7 +330,7 @@ void showSeasonDialog(
 
       if (
       selectSeason.year == currentTime.year &&
-        judgeSeasonRange(selectSeason.month) == judgeSeasonRange(currentTime.month)
+        getSeasonRange(selectSeason.month) == getSeasonRange(currentTime.month)
       ) {
         calendarLoadFuture = indexModel.reloadCalendar();
       }
@@ -368,7 +368,7 @@ void showSeasonDialog(
       }
 
       indexModel.selectedYear = selectSeason.year;
-      indexModel.selectedSeason = judgeSeasonRange(selectSeason.month, currentTime: true);
+      indexModel.selectedSeason = getSeasonRange(selectSeason.month, currentTime: true);
 
     });
 

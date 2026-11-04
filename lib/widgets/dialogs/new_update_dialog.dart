@@ -9,6 +9,7 @@ import 'package:bangu_lite/internal/update_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -140,7 +141,7 @@ class NewUpdateDialog extends StatelessWidget {
 
                     onLongPress: () async {
                       Clipboard.setData(ClipboardData(text: latestRelease.assets![index].browserDownloadUrl ?? ""));
-                      fadeToaster(context: context, message: "下载链接已复制剪切板");
+                      fadeToaster(color: getCurrentThemeColor(context), context: context, message: "下载链接已复制剪切板");
                     },
 
                     title: Row(
@@ -159,7 +160,7 @@ class NewUpdateDialog extends StatelessWidget {
                       onPressed: () {
 
                         if (UpdateClient.updateClient.speedTimer != null) {
-                          fadeToaster(context: context, message: "已存在进行中的任务");
+                          fadeToaster(color: getCurrentThemeColor(context), context: context, message: "已存在进行中的任务");
                           //初次安装授权取消后的处理
                           if (Platform.isAndroid) {
                             installApk(File("${MyHive.downloadDir!.path}${Platform.pathSeparator}${latestRelease.assets![index].name}"));
@@ -167,7 +168,7 @@ class NewUpdateDialog extends StatelessWidget {
                           return;
                         }
 
-                        fadeToaster(context: context, message: "开始下载 ${latestRelease.assets![index].name}");
+                        fadeToaster(color: getCurrentThemeColor(context), context: context, message: "开始下载 ${latestRelease.assets![index].name}");
 
                         UpdateClient.getInstance().totalSize = latestRelease.assets![index].size ?? 0;
                         downloadApplication(

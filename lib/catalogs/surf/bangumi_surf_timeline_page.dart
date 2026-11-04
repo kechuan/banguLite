@@ -3,7 +3,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
@@ -76,7 +76,7 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
           invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
             message: message,
             requestStatus: requestStatus,
-            backgroundColor: judgeCurrentThemeColor(context)
+            backgroundColor: getCurrentThemeColor(context)
           );
 
           invokeSendComment(String message) => accountModel.postContent(

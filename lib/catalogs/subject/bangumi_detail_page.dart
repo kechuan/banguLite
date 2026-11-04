@@ -5,6 +5,7 @@ import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
@@ -90,8 +91,8 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
 
           return Theme(
             data: Theme.of(context).copyWith(
-              primaryColor: judgeDetailRenderColor(context, linearColor),
-              scaffoldBackgroundColor: judgeDetailRenderColor(context, linearColor),
+              primaryColor: getDetailRenderColor(context, linearColor),
+              scaffoldBackgroundColor: getDetailRenderColor(context, linearColor),
             ),
 
             child: detailScaffold!,
@@ -125,7 +126,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                   ToggleThemeModeButton(
                     onThen: () {
                       bangumiModel.getThemeColor(
-                        judgeDetailRenderColor(context, bangumiModel.imageColor),
+                        getDetailRenderColor(context, bangumiModel.imageColor),
                         darkMode: !judgeDarknessMode(context) 
                         //这里是为了 切换。是 target! 而不是状态 因此得取反向的值。
                       );
@@ -142,7 +143,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                     },
                     onLongPress: () {
                       Clipboard.setData(ClipboardData(text: BangumiWebUrls.subject(widget.subjectID)));
-                      fadeToaster(context: context, message: "已复制链接");              
+                      fadeToaster(color: getCurrentThemeColor(context), context: context, message: "已复制链接");              
                     },
                     icon: const Icon(Icons.link)
                   )
@@ -240,8 +241,8 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
 
                                     return TweenAnimationBuilder<Color?>(
                                       tween: ColorTween(
-                                        begin: judgeCurrentThemeColor(context),
-                                        end: judgeDarknessMode(context) ? Colors.black : judgeDetailRenderColor(context, linearColor),
+                                        begin: getCurrentThemeColor(context),
+                                        end: judgeDarknessMode(context) ? Colors.black : getDetailRenderColor(context, linearColor),
                                       ),
                                       duration: const Duration(milliseconds: 500),
                                       builder: (_, linearColor, __) {

@@ -1,6 +1,6 @@
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_timeline_tile.dart';
@@ -96,7 +96,7 @@ class _BangumiTrendTopicState extends State<BangumiTrendTopic> {
     final timelineFlowModel = context.read<TimelineFlowModel>();
     timelineFlowModel.requestTrendTopicTimelineFuture = null;
 
-    //invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
+    //invokeToaster({String? message}) => fadeToaster(color: getCurrentThemeColor(context),context: context, message: message ?? "没有更多内容了");
 
     Map<String, dynamic> queryParameters = 
       isAppend == true ?
@@ -109,7 +109,7 @@ class _BangumiTrendTopicState extends State<BangumiTrendTopic> {
       fallbackAction: (message) => showRequestSnackBar(
         requestStatus: false,
         message: message,
-        backgroundColor: judgeCurrentThemeColor(context)
+        backgroundColor: getCurrentThemeColor(context)
       ),
     ).then((result) {
         if (result) {

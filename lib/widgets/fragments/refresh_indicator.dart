@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -140,7 +140,7 @@ class TextIndicatorState extends State<TextIndicator> {
       width: _axis == Axis.horizontal ? _actualTriggerOffset : double.infinity,
       child: Container(
         decoration: BoxDecoration(
-          color: judgeCurrentThemeColor(context),
+          color: getCurrentThemeColor(context),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(

@@ -1,6 +1,6 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
 import 'package:bangu_lite/models/informations/subjects/review_details.dart';
@@ -107,7 +107,7 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
             "topicInfo":TopicInfo(id: resID, contentTitle: appRouteUri.queryParameters['topicTitle'] ?? "topicID: $resID"),
             "sourceTitle": appRouteUri.queryParameters['sourceTitle'],
             "referPostContentID": postReferID,
-            "themeColor":judgeCurrentThemeColor(context),
+            "themeColor":getCurrentThemeColor(context),
           }
         );
 
@@ -136,7 +136,7 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
             ,
             'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
             "referPostContentID": postReferID,
-            "themeColor":judgeCurrentThemeColor(context),
+            "themeColor":getCurrentThemeColor(context),
           }
 
         );
@@ -157,7 +157,7 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
             "reviewInfo": ReviewInfo(id: resID),
             'sourceTitle': appRouteUri.queryParameters['sourceTitle'],
             "referPostContentID": postReferID,
-            "themeColor":judgeCurrentThemeColor(context),
+            "themeColor":getCurrentThemeColor(context),
           }
         );
       }
@@ -246,7 +246,7 @@ void appLoginMethodListener(BuildContext context, String link) {
     accountModel.getAccessToken(
       code,
       fallbackAction: (message) {
-        showRequestSnackBar(message: message, requestStatus: false, backgroundColor: judgeCurrentThemeColor(context));
+        showRequestSnackBar(message: message, requestStatus: false, backgroundColor: getCurrentThemeColor(context));
       }
     );
   }

@@ -6,6 +6,7 @@ import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/history_model.dart';
@@ -111,7 +112,7 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
     });
 
     if (mounted) {
-      fadeToaster(context: context, message: '记录已删除');
+      fadeToaster(color: getCurrentThemeColor(context), context: context, message: '记录已删除');
       historyModel.initData();
     }
   }
@@ -223,7 +224,7 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
               DecoratedBox(
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: judgeCurrentThemeColor(context).withValues(alpha: 0.8),
+                    color: getCurrentThemeColor(context).withValues(alpha: 0.8),
                     width: 1,
                   ),
                   borderRadius: BorderRadius.circular(8),
@@ -280,7 +281,7 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
                           MyHive.historySurfDataBase.clear();
                         });
 
-                        fadeToaster(context: context, message: '历史记录已清空');
+                        fadeToaster(color: getCurrentThemeColor(context), context: context, message: '历史记录已清空');
                       }
 
                     );
@@ -701,7 +702,7 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: judgeCurrentThemeColor(context).withValues(alpha: 0.5),
+                color: getCurrentThemeColor(context).withValues(alpha: 0.5),
               ),
 
               child: Row(
@@ -752,7 +753,7 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: judgeCurrentThemeColor(context).withValues(alpha: 0.5),
+                        color: getCurrentThemeColor(context).withValues(alpha: 0.5),
                       ),
                       child: IconButton(
                         onPressed: () {

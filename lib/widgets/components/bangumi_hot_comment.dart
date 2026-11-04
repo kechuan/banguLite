@@ -2,6 +2,7 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
@@ -103,7 +104,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> with AutomaticKee
                                 Provider<BangumiCommentTileConfig>.value(
                                   value: BangumiCommentTileConfig(
                                     contentID: commentListData[index].contentID ?? 0,
-                                    themeColor: judgeDetailRenderColor(context, bangumiModel.imageColor)
+                                    themeColor: getDetailRenderColor(context, bangumiModel.imageColor)
                                   )
                                 )
                               ],
@@ -111,7 +112,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> with AutomaticKee
 
                               //return BangumiCommentTile(
                               //  contentID: commentListData[index].contentID ?? 0,
-                              //  themeColor:judgeDetailRenderColor(context,bangumiModel.imageColor)
+                              //  themeColor:getDetailRenderColor(context,bangumiModel.imageColor)
                               //  commentData: commentListData[index],
                               //);
                             );

@@ -2,7 +2,7 @@
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/local/star_details.dart';
 
 abstract class SortStrategy {
@@ -22,7 +22,7 @@ class AirDateSortStrategy implements SortStrategy {
 
     final DateTime convertTime = DateTime.fromMillisecondsSinceEpoch(airTimestamp.toInt());
 
-    final season = judgeSeasonRange(convertTime.month);
+    final season = getSeasonRange(convertTime.month);
 
     return '${convertTime.year}年 ${season.seasonText}';
   }
@@ -92,7 +92,7 @@ class JoinTimeSortStrategy implements SortStrategy {
 
     final DateTime convertTime = DateTime.fromMillisecondsSinceEpoch(joinms.toInt());
 
-    final season = judgeSeasonRange(convertTime.month, currentTime: true);
+    final season = getSeasonRange(convertTime.month, currentTime: true);
     return '${convertTime.year}年 ${season.seasonText}';
   }
 

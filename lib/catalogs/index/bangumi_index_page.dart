@@ -1,7 +1,7 @@
 
 import 'dart:async';
 
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/views/index_landscape.dart';
 import 'package:bangu_lite/widgets/views/index_portial.dart';
@@ -49,7 +49,7 @@ class _BangumiIndexPageState extends State<BangumiIndexPage>{
 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                backgroundColor: judgeCurrentThemeColor(context),
+                backgroundColor: getCurrentThemeColor(context),
                 content: const ScalableText("再返回一次以退出", style: TextStyle(color: Colors.black)),
                 duration: const Duration(seconds: 3),
               )

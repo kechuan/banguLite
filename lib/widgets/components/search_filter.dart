@@ -5,6 +5,7 @@ import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/widgets/fragments/date_range_select.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -340,7 +341,7 @@ class _SearchfilterState extends State<Searchfilter> {
                 ElevatedButton(
                   onPressed: () {
 
-                    fadeToaster(context: context, message: "开始搜索");
+                    fadeToaster(color: getCurrentThemeColor(context), context: context, message: "开始搜索");
 
                     bus.emit('sortSubmit',
                       searchFilter['filter'] = {

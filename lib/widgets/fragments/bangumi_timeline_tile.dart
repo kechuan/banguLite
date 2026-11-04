@@ -9,7 +9,7 @@ import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
@@ -109,7 +109,7 @@ class BangumiTimelineTile extends StatelessWidget{
                       ..contentTitle = surfTimelineDetails.title
                     ,
                     'sourceTitle': surfTimelineDetails.sourceTitle,
-                    "themeColor":judgeCurrentThemeColor(context),
+                    "themeColor":getCurrentThemeColor(context),
                   }
                 );
 
@@ -171,7 +171,7 @@ class BangumiTimelineTile extends StatelessWidget{
                           height: 50,
                           child: StarScoreList(
                             ratingScore: surfTimelineDetails.commentDetails?.rate ?? 0,
-                            //themeColor: judgeCurrentThemeColor(context),
+                            //themeColor: getCurrentThemeColor(context),
                           )
                         )
                       ],

@@ -6,7 +6,7 @@ import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/local/star_details.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:flutter/foundation.dart';
@@ -20,7 +20,7 @@ class IndexModel extends ChangeNotifier {
   DateTime dataTime = DateTime.now();
   int selectedYear = DateTime.now().year;
   int selectedWeekDay = DateTime.now().weekday;
-  SeasonType selectedSeason = judgeSeasonRange(DateTime.now().month, currentTime: true);
+  SeasonType selectedSeason = getSeasonRange(DateTime.now().month, currentTime: true);
 
   int starUpdateFlag = 0;
 

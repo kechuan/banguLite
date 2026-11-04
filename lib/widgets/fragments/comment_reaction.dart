@@ -3,6 +3,7 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -158,10 +159,10 @@ class _CommentReactionState extends State<CommentReaction> {
                     invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
                       message: message,
                       requestStatus: requestStatus,
-                      backgroundColor: judgeCurrentThemeColor(context)
+                      backgroundColor: getCurrentThemeColor(context)
                     );
 
-                    invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "贴条失败");
+                    invokeToaster({String? message}) => fadeToaster(color: getCurrentThemeColor(context), context: context, message: message ?? "贴条失败");
 
                     debugPrint("""
                       [postCommentType]:${widget.postCommentType}

@@ -6,7 +6,7 @@ import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/surf/timeline_details.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -76,7 +76,7 @@ class UserInformationDialog extends StatelessWidget {
                       child: UnVisibleResponse(
                         onTap: () {
                           Clipboard.setData(ClipboardData(text: '${userInformation?.userName}'));
-                          fadeToaster(context: context, message: "已复制用户ID");
+                          fadeToaster(color: getCurrentThemeColor(context), context: context, message: "已复制用户ID");
                         },
                         child: ScalableText(
                           userInformation?.nickName ?? userInformation?.userName ?? "no data",
@@ -123,7 +123,7 @@ class UserInformationDialog extends StatelessWidget {
                             UnVisibleResponse(
                               onTap: () {
                                 if (blockStatus) return;
-                                fadeToaster(context: context, message: "暂未开放");
+                                fadeToaster(color: getCurrentThemeColor(context), context: context, message: "暂未开放");
                               },
                               child: Icon(
                                 Icons.email_outlined,
@@ -143,7 +143,7 @@ class UserInformationDialog extends StatelessWidget {
                                   content: "确定对用户 ${userInformation?.getName()} 发送好友请求吗?",
                                   confirmAction: () async {
 
-                                    invokeAsyncSnacker(String message) => showRequestSnackBar(message: message, backgroundColor: judgeCurrentThemeColor(context));
+                                    invokeAsyncSnacker(String message) => showRequestSnackBar(message: message, backgroundColor: getCurrentThemeColor(context));
 
                                     accountModel.userRelationAction(
                                       userInformation?.userName,
@@ -174,7 +174,7 @@ class UserInformationDialog extends StatelessWidget {
                                   content: "确定拉入用户 ${userInformation?.getName()} 进黑名单吗?",
                                   confirmAction: () async {
 
-                                    invokeAsyncToaster(String message) => fadeToaster(context: context, message: message);
+                                    invokeAsyncToaster(String message) => fadeToaster(color: getCurrentThemeColor(context), context: context, message: message);
 
                                     accountModel.userRelationAction(
                                       userInformation?.userName,

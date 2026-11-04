@@ -32,96 +32,14 @@ bool judgeTransitionalSeason() {
 
 }
 
-Color judgeCurrentThemeColor(BuildContext context) {
-  final IndexModel indexModel = context.read<IndexModel>();
-
-  if (indexModel.userConfig.isSelectedCustomColor == true) {
-    return indexModel.userConfig.customColor!;
-  }
-
-  return indexModel.userConfig.currentThemeColor!.color;
-
-}
-
-Color? judgeDarkContentSurfaceColor(
-  BuildContext context,
-) {
-  final indexModel = context.watch<IndexModel>();
-
-  if (indexModel.userConfig.isPureDarkMode == false) {
-
-    //debugPrint("lumi: ${Colors.grey.withValues(alpha: 0.1).computeLuminance()} / ${Color(0xFF2C2C2C).computeLuminance()}");
-
-    //更浅
-    //return Colors.grey.withValues(alpha: 0.15);
-
-    //更深
-    return const Color(0xFF2C2C2C);
-
-    //[DEBUG]
-    //return Colors.grey.withValues(alpha: 0.5);
-  }
-
-  return null;
-
-
-}
-
 bool judgeIsFollowThemeColor(BuildContext context) {
   final IndexModel indexModel = context.read<IndexModel>();
 
   return indexModel.userConfig.isFollowThemeColor == true;
 }
 
-Color judgeDetailRenderColor(BuildContext context, Color? imageColor) {
-
-  Color renderColor;
-
-  if (judgeIsFollowThemeColor(context) == true) {
-    renderColor = judgeCurrentThemeColor(context);
-  }
-
-  else {
-    renderColor = imageColor ?? judgeCurrentThemeColor(context);
-  }
-
-  return renderColor;  
-
-}
 
 
-SeasonType judgeSeasonRange(int currentMonth, {bool? currentTime}) {
-
-  SeasonType currentSeasonType = SeasonType.winter;
-
-  // 5
-  // 1 4 7 10
-
-  SeasonType.values.any((currentSeason) {
-
-    if (currentTime == true) {
-      if (currentMonth >= currentSeason.month) {
-        currentSeasonType = currentSeason;
-        return false;
-      }
-
-      return true;
-    }
-
-    else {
-      if (currentMonth > currentSeason.month) {
-        return false;
-      }
-
-      currentSeasonType = currentSeason;
-      return true;
-
-    }
-
-  });
-
-  return currentSeasonType;
-}
 
 bool judgeDarknessMode(BuildContext context) => Theme.brightnessOf(context) == Brightness.dark ? true : false;
 bool judgeLandscapeMode(BuildContext context) => MediaQuery.orientationOf(context) == Orientation.landscape ? true : false;

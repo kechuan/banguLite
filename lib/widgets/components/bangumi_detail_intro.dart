@@ -3,7 +3,7 @@
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
@@ -113,11 +113,13 @@ class _IntroPortraitState extends State<IntroPortrait> {
                           child: ListTile(
                             onTap: () {
                               Clipboard.setData(ClipboardData(text: '${widget.bangumiDetails.name}'));
-                              fadeToaster(context: context, message: "标题已复制,长按复制别称");
+
+                              fadeToaster(color: getCurrentThemeColor(context), context: context, message: "标题已复制,长按复制别称");
+
                             },
                             onLongPress: () {
                               Clipboard.setData(ClipboardData(text: '${widget.bangumiDetails.informationList["alias"] ?? ""}'));
-                              fadeToaster(context: context, message: "别称已复制");
+                              fadeToaster(color: getCurrentThemeColor(context), context: context, message: "别称已复制");
                             },
                             title: ScalableText(
                               "${widget.bangumiDetails.name}",
@@ -160,7 +162,7 @@ class _IntroPortraitState extends State<IntroPortrait> {
           onTap: () {
 
             showModalBottomSheet(
-              backgroundColor: judgeDetailRenderColor(context, context.read<BangumiModel>().bangumiThemeColor).withValues(alpha: 0.8),
+              backgroundColor: getDetailRenderColor(context, context.read<BangumiModel>().bangumiThemeColor).withValues(alpha: 0.8),
               constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
               context: context, //拥有model的有效context
 
@@ -325,11 +327,11 @@ class IntroLandscape extends StatelessWidget {
                     ListTile(
                       onTap: () {
                         Clipboard.setData(ClipboardData(text: '${bangumiDetails.name}'));
-                        fadeToaster(context: context, message: "标题已复制,长按复制alias");
+                        fadeToaster(color: getCurrentThemeColor(context), context: context, message: "标题已复制,长按复制alias");
                       },
                       onLongPress: () {
                         Clipboard.setData(ClipboardData(text: '${bangumiDetails.informationList["alias"] ?? ""}'));
-                        fadeToaster(context: context, message: "alias已复制");
+                        fadeToaster(color: getCurrentThemeColor(context), context: context, message: "alias已复制");
                       },
                       title: ScalableText("${bangumiDetails.name}", style: const TextStyle(fontSize: 18)),
                       subtitle: ScalableText(bangumiDetails.informationList["alias"] ?? ""),

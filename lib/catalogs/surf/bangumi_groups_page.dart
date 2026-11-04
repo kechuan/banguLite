@@ -5,7 +5,7 @@ import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/callback.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
@@ -91,7 +91,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                 invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
                   message: message,
                   requestStatus: requestStatus,
-                  backgroundColor: judgeCurrentThemeColor(context)
+                  backgroundColor: getCurrentThemeColor(context)
                 );
 
                 invokeSendComment((String,String) message) => accountModel.postContent(
@@ -117,12 +117,12 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                       ..groupInfo = groupsModel.selectedGroupInfo
 
                     ,
-                    "themeColor": judgeCurrentThemeColor(context),
+                    "themeColor": getCurrentThemeColor(context),
                   }
                 );
 
                 if (groupTitleNotifier.value == null) {
-                  fadeToaster(context: context, message: "请先选择对应的小组");
+                  fadeToaster(color: getCurrentThemeColor(context), context: context, message: "请先选择对应的小组");
                 }
 
                 //debugPrint("groupTitleNotifier.value: ${groupTitleNotifier.value} name:${groupsModel.selectedGroupInfo?.groupName} id:${groupsModel.selectedGroupInfo?.groupID}");
@@ -293,7 +293,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
     final timelineFlowModel = context.read<TimelineFlowModel>();
     final groupsModel = context.read<GroupsModel>();
 
-    invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
+    invokeToaster({String? message}) => fadeToaster(color: getCurrentThemeColor(context), context: context, message: message ?? "没有更多内容了");
 
     final Future<bool> Function() invokeRequest;
 
@@ -321,7 +321,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
           fallbackAction: (message) => showRequestSnackBar(
             requestStatus: false,
             message: message,
-            backgroundColor: judgeCurrentThemeColor(context)
+            backgroundColor: getCurrentThemeColor(context)
           )
 
         );

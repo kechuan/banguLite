@@ -1,6 +1,7 @@
 import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_details.dart';
 @FFAutoImport()
@@ -49,7 +50,7 @@ class _BangumiGroupTopicPageState extends BangumiContentPageState
   GroupsModel getContentModel() => widget.groupsModel;
 
   @override
-  Color? getcurrentSubjectThemeColor() => judgeIsFollowThemeColor(context) ? judgeCurrentThemeColor(context) : widget.themeColor;
+  Color? getcurrentSubjectThemeColor() => judgeIsFollowThemeColor(context) ? getCurrentThemeColor(context) : widget.themeColor;
 
   @override
   GroupTopicDetails createEmptyDetailData() => GroupTopicDetails.empty();
@@ -78,7 +79,7 @@ class _BangumiGroupTopicPageState extends BangumiContentPageState
     return getContentModel().loadContentDetail(
       groupTopicID, 
       isRefresh: isRefresh,
-      fallbackAction: (message) => showRequestSnackBar(message: message, requestStatus: false, backgroundColor: judgeCurrentThemeColor(context)),
+      fallbackAction: (message) => showRequestSnackBar(message: message, requestStatus: false, backgroundColor: getCurrentThemeColor(context)),
     );
   }
 

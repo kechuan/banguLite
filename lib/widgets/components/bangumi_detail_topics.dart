@@ -4,6 +4,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
@@ -104,7 +105,7 @@ class _BangumiDetailTopicsState extends State<BangumiDetailTopics> with Automati
                     if (topicsList.isEmpty) return const SkeletonListTileTemplate();
                     if (topicsList.first.id == 0) return const Center(child: ScalableText("该番剧暂无讨论版..."));
 
-                    final cardThemeColor = judgeDetailRenderColor(context, bangumiModel.bangumiThemeColor);
+                    final cardThemeColor = getDetailRenderColor(context, bangumiModel.bangumiThemeColor);
 
                     return Theme(
                       data: ThemeData(
@@ -141,7 +142,7 @@ class _BangumiDetailTopicsState extends State<BangumiDetailTopics> with Automati
                                     arguments: {
                                       "topicModel":topicModel,
                                       "topicInfo":topicModel.contentListData[index],
-                                      "themeColor":judgeDetailRenderColor(context, bangumiModel.bangumiThemeColor),
+                                      "themeColor":getDetailRenderColor(context, bangumiModel.bangumiThemeColor),
                                       "sourceTitle":bangumiModel.bangumiDetails?.name
                                     }
                                   );

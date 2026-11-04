@@ -5,7 +5,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
@@ -103,7 +103,7 @@ class BangumiContentAppbar extends StatelessWidget {
           IconButton(
             onPressed: () {
 
-              invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "请求中");
+              invokeToaster({String? message}) => fadeToaster(color: getCurrentThemeColor(context), context: context, message: message ?? "请求中");
 
               if (postCommentType == PostCommentType.postBlog) {
                 invokeToaster(message: '暂不支持发送长评');
@@ -113,7 +113,7 @@ class BangumiContentAppbar extends StatelessWidget {
               invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
                 message: message,
                 requestStatus: requestStatus,
-                backgroundColor: judgeCurrentThemeColor(context)
+                backgroundColor: getCurrentThemeColor(context)
               );
 
               invokeSendComment(String message) => accountModel.toggleComment(
@@ -217,7 +217,7 @@ class BangumiContentAppbar extends StatelessWidget {
             },
             onLongPress: () {
               Clipboard.setData(ClipboardData(text: webUrl ?? ''));
-              fadeToaster(context: context, message: "已复制链接");              
+              fadeToaster(color: getCurrentThemeColor(context), context: context, message: "已复制链接");              
             },
             icon: const Icon(Icons.link)
           ),

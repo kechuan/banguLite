@@ -12,6 +12,7 @@ import 'package:bangu_lite/internal/request_client.dart';
 @FFAutoImport()
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/extract.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/webview_model.dart';
@@ -168,7 +169,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
             },
             icon: const Icon(Icons.arrow_back),
           ),
-          backgroundColor: judgeCurrentThemeColor(context).withValues(alpha: 0.8),
+          backgroundColor: getCurrentThemeColor(context).withValues(alpha: 0.8),
           title: ScalableText(widget.title ?? '吐槽 ${widget.title}', style: const TextStyle(fontSize: 18)),
           actions: [
 
@@ -188,7 +189,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
               onPressed: () {
 
                 if (!kDebugMode && turnstileTokenNotifier.value == false) {
-                  fadeToaster(context: context, message: '请通过验证以发布内容');
+                  fadeToaster(color: getCurrentThemeColor(context), context: context, message: '请通过验证以发布内容');
                   return;
                 }
 
@@ -205,8 +206,8 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                     titleEditingController.text.isEmpty ||
                     contentEditingController.text.isEmpty
                   ) {
-                    if (accountModel.isLogined() == false) return fadeToaster(context: context, message: '请先登录以发布内容');
-                    fadeToaster(context: context, message: '不允许发布空白内容');
+                    if (accountModel.isLogined() == false) return fadeToaster(color: getCurrentThemeColor(context), context: context, message: '请先登录以发布内容');
+                    fadeToaster(color: getCurrentThemeColor(context), context: context, message: '不允许发布空白内容');
                     return;
                   }
 
@@ -216,8 +217,8 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
                 else {
 
-                  if (accountModel.isLogined() == false) return fadeToaster(context: context, message: '请先登录以发布内容');
-                  if (contentEditingController.text.isEmpty) return fadeToaster(context: context, message: '不允许发布空白内容');
+                  if (accountModel.isLogined() == false) return fadeToaster(color: getCurrentThemeColor(context), context: context, message: '请先登录以发布内容');
+                  if (contentEditingController.text.isEmpty) return fadeToaster(color: getCurrentThemeColor(context), context: context, message: '不允许发布空白内容');
 
                   Navigator.of(context).pop(contentEditingController.text);
 
@@ -472,7 +473,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                         },
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                            color: judgeCurrentThemeColor(context).withValues(alpha: 0.9),
+                            color: getCurrentThemeColor(context).withValues(alpha: 0.9),
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(16))
                           ),
                           child: Column(

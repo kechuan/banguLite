@@ -6,6 +6,7 @@ import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
@@ -63,7 +64,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
 
                   accountModel.clearNotifications(
                     fallbackAction: (message) {
-                      fadeToaster(context: context, message: message);
+                      fadeToaster(color: getCurrentThemeColor(context), context: context, message: message);
                     }
                   ).then((result) {
                       if (result) {
@@ -88,7 +89,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
             //不为空时 逻辑上应该只请求新的部分 而非全部内容
             unread: accountModel.currentUserNotifications.isNotEmpty,
             fallbackAction: (message) {
-              fadeToaster(context: context, message: message);
+              fadeToaster(color: getCurrentThemeColor(context), context: context, message: message);
             },
           );
 
@@ -289,7 +290,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                                       accountModel.clearNotifications(
                                         notificationIDList: [currentNotification.id ?? 0],
                                         fallbackAction: (message) {
-                                          fadeToaster(context: context, message: message);
+                                          fadeToaster(color: getCurrentThemeColor(context), context: context, message: message);
                                         }
                                       ).then((result) {
                                           clearNotifier.value += 1;
@@ -306,7 +307,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                                     accountModel.clearNotifications(
                                       notificationIDList: [currentNotification.id ?? 0],
                                       fallbackAction: (message) {
-                                        fadeToaster(context: context, message: message);
+                                        fadeToaster(color: getCurrentThemeColor(context), context: context, message: message);
                                       }
                                     ).then((result) {
                                         clearNotifier.value += 1;

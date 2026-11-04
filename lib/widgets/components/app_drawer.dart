@@ -3,7 +3,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
@@ -100,6 +100,7 @@ class AppDrawer extends StatelessWidget {
                           if(loginedStatus == LoginStatus.logined)
                           ElevatedButton(
                             onPressed: () => accountModel.logout(),
+
                             child: const Row(
                               children: [
                                 Icon(Icons.logout),
@@ -164,7 +165,7 @@ class AppDrawer extends StatelessWidget {
                                           Container(
                                             width: 25,
                                             decoration: BoxDecoration(
-                                              color: judgeCurrentThemeColor(context),
+                                              color: getCurrentThemeColor(context),
                                               borderRadius: BorderRadius.circular(12)
                                             ),
                                             child: Center(

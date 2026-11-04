@@ -3,7 +3,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/subject/bangumi_general_more_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/subjects/blog_details.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/informations/subjects/review_details.dart';
@@ -93,7 +93,7 @@ class MoreReviewsPageState extends BangumiGeneralMoreContentPageState
       arguments: {
         "reviewModel":getContentModel(),
         "reviewInfo": getContentModel().contentListData.last,
-        "themeColor": judgeDetailRenderColor(context, bangumiThemeColor),
+        "themeColor": getDetailRenderColor(context, bangumiThemeColor),
 
         "sourceTitle":widget.title
       }

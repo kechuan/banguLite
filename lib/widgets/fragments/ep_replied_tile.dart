@@ -128,7 +128,7 @@ class EpRepliedTile extends ListTile {
                                           child: DecoratedBox(
                                             decoration: BoxDecoration(
                                               borderRadius: BorderRadius.circular(6),
-                                              //color: judgeDarknessMode(context) ? judgeCurrentThemeColor(context).withValues(alpha: 0.4) : Colors.blueGrey.withValues(alpha: 0.4),
+                                              //color: judgeDarknessMode(context) ? getCurrentThemeColor(context).withValues(alpha: 0.4) : Colors.blueGrey.withValues(alpha: 0.4),
                                               color: readableThemeColor?.withValues(alpha: 0.3),
                                             ),
                                             child: Padding(
@@ -139,7 +139,7 @@ class EpRepliedTile extends ListTile {
                                                 quoteContent.replaceAll(bbcodeRegexp, ''),
                                                 maxLines: 1,
                                                 style: TextStyle(
-                                                  //color: judgeDarknessMode(context) ? judgeCurrentThemeColor(context) : Colors.blueGrey,
+                                                  //color: judgeDarknessMode(context) ? getCurrentThemeColor(context) : Colors.blueGrey,
                                                   fontSize: AppFontSize.s13
                                                 ),
                                               ),

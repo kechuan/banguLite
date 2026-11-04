@@ -7,7 +7,7 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/template.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:bangu_lite/models/informations/surf/user_notification_details.dart';
@@ -58,7 +58,7 @@ class AccountModel extends ChangeNotifier {
       else if (overlapDuration < const Duration(days: 0)) {
         logout();
         if (context.mounted) {
-          showRequestSnackBar(backgroundColor: judgeCurrentThemeColor(context), message: "登录已过期", requestStatus: false);
+          showRequestSnackBar(backgroundColor: getCurrentThemeColor(context), message: "登录已过期", requestStatus: false);
         }
 
         return;
@@ -69,7 +69,7 @@ class AccountModel extends ChangeNotifier {
     verifySessionValidity(
       loginedUserInformations.accessToken,
       fallbackAction: (message) {
-        showRequestSnackBar(backgroundColor: judgeCurrentThemeColor(context), message: message, requestStatus: false);
+        showRequestSnackBar(backgroundColor: getCurrentThemeColor(context), message: message, requestStatus: false);
       },
     ).then((status) {
 

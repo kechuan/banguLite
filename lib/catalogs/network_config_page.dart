@@ -2,6 +2,7 @@
 
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/internal/utils/template.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -118,7 +119,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                             borderRadius: BorderRadius.circular(12),
                             color: 
                             (indexModel.userConfig.isProxyMode ?? false) ? 
-                            judgeCurrentThemeColor(context).withValues(alpha: 0.3) : 
+                            getCurrentThemeColor(context).withValues(alpha: 0.3) : 
                             Colors.grey.shade700
                           ),
 
@@ -222,7 +223,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color: judgeCurrentThemeColor(context).withValues(alpha: 0.15),
+                      color: getCurrentThemeColor(context).withValues(alpha: 0.15),
                     ),
                     padding: PaddingV6,
                     child: ListView(

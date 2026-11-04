@@ -6,6 +6,7 @@ import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
@@ -79,7 +80,7 @@ class SettingsPage extends StatelessWidget {
           )
         ],
       ),
-      backgroundColor: judgeDarknessMode(context) ? judgeDarkContentSurfaceColor(context) : null,
+      backgroundColor: judgeDarknessMode(context) ? getDarkContentSurfaceColor(context) : null,
       body: EasyRefresh(
         child: Padding(
           padding: PaddingH24,
@@ -94,7 +95,7 @@ class SettingsPage extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
-                    color: judgeCurrentThemeColor(context).withValues(alpha: 0.2)
+                    color: getCurrentThemeColor(context).withValues(alpha: 0.2)
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,7 +134,7 @@ class SettingsPage extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
-                    color: judgeCurrentThemeColor(context).withValues(alpha: 0.2)
+                    color: getCurrentThemeColor(context).withValues(alpha: 0.2)
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,14 +266,14 @@ class ColorThemeTile extends ListTile{
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Selector<IndexModel, Color?>(
-            selector: (_, indexModel) => judgeCurrentThemeColor(context),
+            selector: (_, indexModel) => getCurrentThemeColor(context),
 
             builder: (_, currentColor, child) {
               return Row(
                 spacing: 12,
                 children: [
                   const Icon(Icons.border_color),
-                  ScalableText("主题色设置", style: TextStyle(color: judgeCurrentThemeColor(context).withValues(alpha: 0.8)))
+                  ScalableText("主题色设置", style: TextStyle(color: getCurrentThemeColor(context).withValues(alpha: 0.8)))
                 ]
               );
             }
@@ -361,13 +362,13 @@ class ColorThemeTile extends ListTile{
                                   if (index == AppThemeColor.values.length) {
                                     return Offstage(
                                       offstage: !(indexModel.userConfig.isSelectedCustomColor == true),
-                                      child: Icon(Icons.done, color: judgeCurrentThemeColor(context))
+                                      child: Icon(Icons.done, color: getCurrentThemeColor(context))
                                     );
                                   }
 
                                   return Offstage(
                                     offstage: !(themeColor == AppThemeColor.values.elementAt(index) && indexModel.userConfig.isSelectedCustomColor == false),
-                                    child: Icon(Icons.done, color: judgeCurrentThemeColor(context))
+                                    child: Icon(Icons.done, color: getCurrentThemeColor(context))
                                   );
                                 }
                               ),

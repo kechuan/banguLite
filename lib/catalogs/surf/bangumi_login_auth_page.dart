@@ -4,6 +4,7 @@ import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
@@ -93,7 +94,7 @@ class BangumiAuthPage extends StatelessWidget {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  color: judgeCurrentThemeColor(context).withValues(alpha: 0.2)
+                  color: getCurrentThemeColor(context).withValues(alpha: 0.2)
                 ),
                 child: Padding(
                   padding: Padding16,

@@ -1,11 +1,12 @@
 import 'package:bangu_lite/internal/custom_toaster.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/widgets/dialogs/general_transition_dialog.dart';
 import 'package:docman/docman.dart';
 import 'package:flutter/material.dart';
 
-Future<dynamic> initialImageStorageDialog(BuildContext context){
+Future<dynamic> initialImageStorageDialog(BuildContext context) {
 
-  invokeToaster({required String message})=> fadeToaster(context: context, message: message); 
+  invokeToaster({required String message}) => fadeToaster(color: getCurrentThemeColor(context), context: context, message: message); 
 
   return showTransitionAlertDialog(
     context,
@@ -23,17 +24,17 @@ Future<dynamic> initialImageStorageDialog(BuildContext context){
         initDir: "content://com.android.externalstorage.documents/tree/primary%3ADownload"
       ).then((selectedDir) {
 
-        debugPrint("selectedDir: $selectedDir");
+          debugPrint("selectedDir: $selectedDir");
 
-        if(selectedDir == null){
-          invokeToaster(message: "已取消目录选择");
-        }
+          if (selectedDir == null) {
+            invokeToaster(message: "已取消目录选择");
+          }
 
-        return selectedDir!.uri;
+          return selectedDir!.uri;
 
-      });
+        });
 
     },
-    
+
   );
 }

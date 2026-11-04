@@ -6,7 +6,7 @@ import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
@@ -46,7 +46,7 @@ abstract class BangumiGeneralMoreContentPageState<
     return Theme(
       data: ThemeData(
         brightness: Theme.brightnessOf(context),
-        colorSchemeSeed: judgeDetailRenderColor(context, bangumiThemeColor),
+        colorSchemeSeed: getDetailRenderColor(context, bangumiThemeColor),
         fontFamilyFallback: convertSystemFontFamily(),
       ),
       child: Scaffold(
@@ -69,7 +69,7 @@ abstract class BangumiGeneralMoreContentPageState<
           footer: const TextFooter(),
           onLoad: () {
 
-            invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
+            invokeToaster({String? message}) => fadeToaster(color: getCurrentThemeColor(context), context: context, message: message ?? "没有更多内容了");
 
             final initialLength = getContentModel().contentListData.length;
             loadSubjectTopics(offset: getContentModel().contentListData.length).then((_) {
@@ -125,7 +125,7 @@ abstract class BangumiGeneralMoreContentPageState<
                           initialItemCount: contentListDataLength,
                           itemBuilder: (_, index, animation) {
 
-                            final cardThemeColor = judgeDetailRenderColor(context, bangumiThemeColor);
+                            final cardThemeColor = getDetailRenderColor(context, bangumiThemeColor);
 
                             if (contentList.first.id == 0) return const SizedBox.shrink();
                             return Card(

@@ -1,7 +1,7 @@
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/local/star_details.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
@@ -45,7 +45,7 @@ class _StarButtonState extends State<StarButton> {
           style: ButtonStyle(
             elevation: const WidgetStatePropertyAll(0),
             padding: const WidgetStatePropertyAll(EdgeInsets.zero),
-            overlayColor: WidgetStatePropertyAll(judgeCurrentThemeColor(context)),
+            overlayColor: WidgetStatePropertyAll(getCurrentThemeColor(context)),
           ),
           onPressed: () {
 
@@ -63,7 +63,7 @@ class _StarButtonState extends State<StarButton> {
             invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
               message: message,
               requestStatus: requestStatus,
-              backgroundColor: judgeCurrentThemeColor(context)
+              backgroundColor: getCurrentThemeColor(context)
             );
 
             showStarSubjectDialog(
@@ -76,7 +76,7 @@ class _StarButtonState extends State<StarButton> {
               userCommentDetails?..type = 
               localStarType ?? userCommentDetails.type
               ,
-              themeColor: judgeDetailRenderColor(context, bangumiModel.imageColor)
+              themeColor: getDetailRenderColor(context, bangumiModel.imageColor)
             ).then((result) {
 
                 starInformationNotifier.value += 1;

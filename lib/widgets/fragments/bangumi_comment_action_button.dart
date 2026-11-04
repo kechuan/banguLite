@@ -5,7 +5,7 @@ import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dar
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/extract.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
@@ -68,12 +68,12 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
   //    super.dispose();
   //}
 
-  void invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "请求中");
+  void invokeToaster({String? message}) => fadeToaster(color: getCurrentThemeColor(context), context: context, message: message ?? "请求中");
 
   void invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
     message: message,
     requestStatus: requestStatus,
-    backgroundColor: judgeCurrentThemeColor(context)
+    backgroundColor: getCurrentThemeColor(context)
   );
 
   @override
@@ -218,7 +218,7 @@ class _BangumiCommentActionButtonState extends State<BangumiCommentActionButton>
 
               case CommentActionType.edit:{
 
-                //invokeToaster({String? message})=> fadeToaster(context: context, message: message ?? "修改成功");
+                //invokeToaster({String? message})=> fadeToaster(color: getCurrentThemeColor(context),context: context, message: message ?? "修改成功");
 
                 final throwFlag = widget.commentData.takeCondition((it) {
                   if (it is EpCommentDetails) {

@@ -1,5 +1,6 @@
 import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/widgets/dialogs/new_update_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -15,7 +16,7 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  
+
     return EasyRefresh(
       child: Scaffold(
         appBar: AppBar(
@@ -31,89 +32,89 @@ class AboutPage extends StatelessWidget {
                 height: 200,
                 width: 200,
               ),
-          
+
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 50),
-                child: Center(child: ScalableText('BanguLite, Lite to Surf Bangumi.',style: TextStyle(fontStyle: FontStyle.italic,color: Colors.blueGrey))),
+                child: Center(child: ScalableText('BanguLite, Lite to Surf Bangumi.', style: TextStyle(fontStyle: FontStyle.italic, color: Colors.blueGrey))),
               ),
 
               ListView(
                 prototypeItem: const ListTile(title: Text("data")),
                 shrinkWrap: true,
                 children: [
-              
+
                   const ListTile(
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ScalableText('作者'),
-                        ScalableText("kechuan",style:TextStyle(color: Colors.grey)),
+                        ScalableText("kechuan", style: TextStyle(color: Colors.grey)),
                       ],
                     ),
                   ),
-              
+
                   const ListTile(
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ScalableText('版本号'),
-                        ScalableText(APPInformationRepository.version,style:TextStyle(color: Colors.grey)),
+                        ScalableText(APPInformationRepository.version, style: TextStyle(color: Colors.grey)),
                       ],
                     ),
                   ),
-              
+
                   ListTile(
                     title: const ScalableText('检查更新'),
                     onTap: () async {
 
-                      invokeAsyncToaster() => fadeToaster(context: context, message: "暂无更新");
-                      invokeShowUpdateDialog(latestRelease) => showUpdateDialog(context,latestRelease);
-                      
-                      fadeToaster(context: context, message: "检查中...");
+                      invokeAsyncToaster() => fadeToaster(color: getCurrentThemeColor(context), context: context, message: "暂无更新");
+                      invokeShowUpdateDialog(latestRelease) => showUpdateDialog(context, latestRelease);
 
-                      await pullLatestRelease().then((latestRelease){
+                      fadeToaster(color: getCurrentThemeColor(context), context: context, message: "检查中...");
 
-                        if(
-                          latestRelease==null ||
+                      await pullLatestRelease().then((latestRelease) {
+
+                        if (
+                        latestRelease == null ||
                           APPInformationRepository.version == latestRelease.tagName
 
-                        ){ invokeAsyncToaster();}
+                        ) { invokeAsyncToaster();
+                        }
 
-                        else{
+                        else {
                           invokeShowUpdateDialog(latestRelease);
                         }
-                        
+
                       });
 
-                      
                     },
                   ),
-              
+
                   ListTile(
                     onTap: () => launchUrlString("https://github.com/kechuan/banguLite/issues"),
                     title: const ScalableText('意见反馈'),
                   ),
-              
+
                 ],
               ),
             ],
           ),
         ),
-        
+
       ),
     );
   }
 }
 
-void showUpdateDialog(BuildContext context,Release? latestRelease){
-  if(latestRelease==null) return;
+void showUpdateDialog(BuildContext context, Release? latestRelease) {
+  if (latestRelease == null) return;
 
   showModalBottomSheet(
     context: context, 
     constraints: BoxConstraints(
-      maxWidth: MediaQuery.sizeOf(context).width*5/6,
-      maxHeight: MediaQuery.sizeOf(context).height*3/5+MediaQuery.paddingOf(context).bottom+20
+      maxWidth: MediaQuery.sizeOf(context).width * 5 / 6,
+      maxHeight: MediaQuery.sizeOf(context).height * 3 / 5 + MediaQuery.paddingOf(context).bottom + 20
     ),
-    builder: (_)=> NewUpdateDialog(latestRelease:latestRelease)
+    builder: (_) => NewUpdateDialog(latestRelease: latestRelease)
   );
 }

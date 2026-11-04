@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/lifecycle.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:flutter/material.dart';
 
 class AnimatedWaveFooter extends StatefulWidget {
@@ -67,7 +67,7 @@ class _AnimatedWaveFooterState extends LifecycleState<AnimatedWaveFooter> with S
                 ?? 
                 Paint()
                 //..color = const Color.fromARGB(255, 222, 238, 252)
-                ..color = judgeCurrentThemeColor(context)
+                ..color = getCurrentThemeColor(context)
                 ..strokeWidth = 6
                 ..isAntiAlias = true
                 ..style = PaintingStyle.fill

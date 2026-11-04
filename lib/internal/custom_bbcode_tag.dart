@@ -6,6 +6,7 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/callback.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/comment_image_panel.dart';
@@ -102,11 +103,11 @@ class MaskDisplay extends StatelessWidget {
             return DecoratedBox(
               decoration: BoxDecoration(
                 //color: isDarkMode ? AppThemeColor.macha.color : Colors.black,
-                color: isDarkMode ? judgeCurrentThemeColor(context) : Colors.black,
+                color: isDarkMode ? getCurrentThemeColor(context) : Colors.black,
                 boxShadow: [
                   BoxShadow(
                     //color: isDarkMode ? AppThemeColor.macha.color : Colors.black,
-                    color: isDarkMode ? judgeCurrentThemeColor(context) : Colors.black,
+                    color: isDarkMode ? getCurrentThemeColor(context) : Colors.black,
                     blurRadius: 2,
                     spreadRadius: 1
                   )
@@ -118,8 +119,8 @@ class MaskDisplay extends StatelessWidget {
                   //begin: isDarkMode ? AppThemeColor.macha.color : Colors.black,
                   //end: isDarkMode ? (activedStatus ? Colors.black : AppThemeColor.macha.color) : (activedStatus ? Colors.white : Colors.black),
 
-                  begin: isDarkMode ? judgeCurrentThemeColor(context) : Colors.black,
-                  end: isDarkMode ? (activedStatus ? Colors.black : judgeCurrentThemeColor(context)) : (activedStatus ? Colors.white : Colors.black),
+                  begin: isDarkMode ? getCurrentThemeColor(context) : Colors.black,
+                  end: isDarkMode ? (activedStatus ? Colors.black : getCurrentThemeColor(context)) : (activedStatus ? Colors.white : Colors.black),
                 ),
 
                 builder: (_, color, __) {
@@ -219,7 +220,7 @@ class AdapterQuoteDisplay extends StatelessWidget{
                     fadeToaster(
                       context: context,
                       message: "引用内容已复制到剪切板",
-                      color: judgeCurrentThemeColor(context).withValues(alpha: 0.6)
+                      color: getCurrentThemeColor(context).withValues(alpha: 0.6)
                     );
                   },
                   child: Container(

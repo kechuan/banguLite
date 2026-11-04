@@ -6,7 +6,7 @@ import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 import 'package:flutter/material.dart';
 
@@ -255,7 +255,7 @@ int convertPassedSeason(int year, int month) {
   }
 
   else {
-    return judgeSeasonRange(month, currentTime: true).index;
+    return getSeasonRange(month, currentTime: true).index;
   }
 
 }

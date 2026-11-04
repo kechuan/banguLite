@@ -7,6 +7,7 @@ import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/extract.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -123,7 +124,7 @@ class _EpCommentTileState extends State<EpCommentTile> {
                                     widget.epCommentData.userInformation?.nickName ?? widget.epCommentData.userInformation?.userName ?? "no data",
                                     style: TextStyle(
                                       color: widget.epCommentData.userInformation?.getName() == AccountModel.loginedUserInformations.userInformation?.getName()
-                                        ? judgeCurrentThemeColor(context)
+                                        ? getCurrentThemeColor(context)
                                         //: Colors.blue,
                                         : widget.readableThemeColor,
                                       fontSize: AppFontSize.s14

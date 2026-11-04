@@ -8,7 +8,7 @@ import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/widgets/components/search_filter.dart';
 import 'package:bangu_lite/widgets/components/transition_container.dart';
@@ -380,7 +380,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                     valueListenable: loadCountNotifier,
                     builder: (_, loadCount, child) {
 
-                      String showMessage = loadCount == 0 ? "透过筛选以获取番剧信息" : "已经到底了 上滑载入更多信息";
+                      String showMessage = loadCount == 0 ? "透过筛选以获取番剧信息\n搜索入口🔍在右上角" : "已经到底了 上滑载入更多信息";
 
                       return Stack(
                         children: [
@@ -399,7 +399,11 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                           SizedBox(
                             height: 80,
                             child: Center(
-                              child: ScalableText(showMessage),
+                              child: ScalableText(
+                                showMessage,
+                                textAlign: TextAlign.center,
+                                strutStyle: const StrutStyle(height: 2.5),
+                              ),
                             ),
                           ),
 
@@ -423,7 +427,7 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
               );
             },
             child: FloatingActionButton.extended(
-              backgroundColor: judgeCurrentThemeColor(context),
+              backgroundColor: getCurrentThemeColor(context),
               label: const Row(
                 spacing: 12,
                 children: [

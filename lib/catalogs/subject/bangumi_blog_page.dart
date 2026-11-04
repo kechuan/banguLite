@@ -1,6 +1,7 @@
 import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/blog_details.dart';
 @FFAutoImport()
@@ -65,7 +66,7 @@ class _BangumiBlogPageState extends BangumiContentPageState
   BlogDetails createEmptyDetailData() => BlogDetails.empty();
 
   @override
-  Color? getcurrentSubjectThemeColor() => judgeIsFollowThemeColor(context) ? judgeCurrentThemeColor(context) : widget.themeColor;
+  Color? getcurrentSubjectThemeColor() => judgeIsFollowThemeColor(context) ? getCurrentThemeColor(context) : widget.themeColor;
 
   @override
   bool isContentLoading(int? blogID) {
@@ -93,7 +94,7 @@ class _BangumiBlogPageState extends BangumiContentPageState
     return getContentModel().loadBlog(
       blogID,
       isRefresh: isRefresh,
-      fallbackAction: (message) => showRequestSnackBar(message: message, requestStatus: false, backgroundColor: judgeCurrentThemeColor(context)));
+      fallbackAction: (message) => showRequestSnackBar(message: message, requestStatus: false, backgroundColor: getCurrentThemeColor(context)));
   }
 
   @override

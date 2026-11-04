@@ -6,7 +6,7 @@ import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/platforms/register_windows_applink.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
@@ -157,7 +157,7 @@ class MainApp extends StatelessWidget {
                     ),
                   ),
 
-                  scaffoldBackgroundColor: judgeDarkContentSurfaceColor(context),
+                  scaffoldBackgroundColor: getDarkContentSurfaceColor(context),
 
                   colorScheme: ColorScheme.dark(
                     primary: currentRecord.$1,

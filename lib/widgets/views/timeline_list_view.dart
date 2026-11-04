@@ -3,6 +3,7 @@ import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/timeline_flow_model.dart';
@@ -128,7 +129,7 @@ class _BangumiTimelineContentView extends LifecycleRouteState<BangumiTimelineCon
 
     timelineFlowModel.requestTimelineFuture = null;
 
-    invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
+    invokeToaster({String? message}) => fadeToaster(color: getCurrentThemeColor(context), context: context, message: message ?? "没有更多内容了");
 
     if (accountModel.isLogined() == false) {
       if (

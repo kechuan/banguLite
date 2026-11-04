@@ -8,6 +8,7 @@ import 'package:bangu_lite/internal/proxy_cache.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
@@ -163,8 +164,8 @@ abstract class BangumiContentPageState<
               data: Theme.of(context).copyWith(
                 scaffoldBackgroundColor: 
                 judgeDarknessMode(context) ? 
-                judgeDarkContentSurfaceColor(context) :
-                convertFineTuneColor(getcurrentSubjectThemeColor() ?? judgeCurrentThemeColor(context), lumiScaleType: ScaleType.min)
+                getDarkContentSurfaceColor(context) :
+                convertFineTuneColor(getcurrentSubjectThemeColor() ?? getCurrentThemeColor(context), lumiScaleType: ScaleType.min)
                 ,
 
               ),
@@ -711,7 +712,7 @@ abstract class BangumiContentPageState<
       actionType: UserContentActionType.delete,
       postCommentType: getPostCommentType(),
       fallbackAction: (message) {
-        showRequestSnackBar(requestStatus: false, message: message, backgroundColor: judgeCurrentThemeColor(context));
+        showRequestSnackBar(requestStatus: false, message: message, backgroundColor: getCurrentThemeColor(context));
       },
     ).then((resultID) {
         if (resultID != 0) {

@@ -5,6 +5,7 @@ import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/callback.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
@@ -188,7 +189,7 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
     int index,
     {bool? isAppend}
   ) {
-    invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "没有更多内容了");
+    invokeToaster({String? message}) => fadeToaster(color: getCurrentThemeColor(context), context: context, message: message ?? "没有更多内容了");
 
     final groupsModel = context.read<GroupsModel>();
     final accountModel = context.read<AccountModel>();

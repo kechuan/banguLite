@@ -8,6 +8,8 @@ import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
@@ -121,7 +123,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
 
             ),
 
-            backgroundColor: judgeCurrentThemeColor(getContext())
+            backgroundColor: getCurrentThemeColor(getContext())
           )
         );
 
@@ -177,7 +179,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
 
         if (
         indexModel.selectedYear == DateTime.now().year &&
-          indexModel.selectedSeason.seasonText == judgeSeasonRange(DateTime.now().month).seasonText
+          indexModel.selectedSeason.seasonText == getSeasonRange(DateTime.now().month).seasonText
         ) {
           calendarLoadFuture = indexModel.reloadCalendar();
         }
@@ -230,20 +232,30 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
 
                                   const ScalableText("本季热番", style: TextStyle(fontSize: 24)),
                                   //const Spacer(),
-                                  InkResponse(
+                                  UnVisibleResponse(
+
                                     containedInkWell: true,
                                     onTap: () => showSeasonDialog(context, calendarLoadFuture: calendarLoadFuture),
-                                    focusColor: Colors.transparent,
-                                    child: Row(
-                                      children: [
-                                        //重建代价低
-                                        Consumer<IndexModel>(
-                                          builder: (_, indexModel, child) {
-                                            return ScalableText("${indexModel.selectedYear} ${indexModel.selectedSeason.seasonText}", style: const TextStyle(fontSize: 24));
-                                          }
+
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: judgeDarknessMode(context) == true ? Colors.grey.withValues(alpha: 0.2) : Theme.of(context).colorScheme.surface.darken()
+                                      ),
+                                      child: Padding(
+                                        padding: Padding6,
+                                        child: Row(
+                                          children: [
+                                            //重建代价低
+                                            Consumer<IndexModel>(
+                                              builder: (_, indexModel, child) {
+                                                return ScalableText("${indexModel.selectedYear} ${indexModel.selectedSeason.seasonText}", style: const TextStyle(fontSize: 24));
+                                              }
+                                            ),
+                                            const Icon(Icons.arrow_drop_down)
+                                          ],
                                         ),
-                                        const Icon(Icons.arrow_drop_down)
-                                      ],
+                                      ),
                                     ),
                                   )
 
@@ -382,7 +394,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                                               offset: const Offset(0, -12),
                                               child: Container(
                                                 height: 50,
-                                                color: judgeCurrentThemeColor(context).withValues(alpha: 0.6),
+                                                color: getCurrentThemeColor(context).withValues(alpha: 0.6),
 
                                                 child: Row(
 
@@ -429,25 +441,20 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                             children: [
 
                               SliverPinnedHeader(
-                                child: ValueListenableBuilder(
-                                  valueListenable: weekdaySelectOffstageNotifier,
-                                  builder: (_, weekDayOffstage, child) {
-                                    return SizedBox(
-                                      height: !weekDayOffstage ? 120 : 60,
-                                      child: child!
-                                    );
-                                  },
-                                  child: DecoratedBox(
 
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: Divider.createBorderSide(context)
-                                      ),
-                                      color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
-                                    ),
-
+                                child: ColoredBox(
+                                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
+                                  child: ValueListenableBuilder(
+                                    valueListenable: weekdaySelectOffstageNotifier,
+                                    builder: (_, weekDayOffstage, child) {
+                                      return SizedBox(
+                                        height: !weekDayOffstage ? 133 : 73,
+                                        child: child!
+                                      );
+                                    },
                                     child: Column(
-
+                                      spacing: 6,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
 
                                         Padding(
@@ -455,10 +462,41 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                                           child: SizedBox(
                                             height: 59, // Border:bottom = 1
                                             child: Row(
+                                              spacing: 6,
+
                                               children: [
 
                                                 ScalableText("星期${WeekDay.values[selectedDay - 1].dayText}", style: const TextStyle(fontSize: 18)),
-                                                selectChild!
+
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(12),
+                                                    color: judgeDarknessMode(context) == true ? Colors.grey.withValues(alpha: 0.2) : Theme.of(context).colorScheme.surface.darken()
+                                                  ),
+                                                  child: InkResponse(
+                                                    focusColor: Theme.of(context).colorScheme.surface,
+                                                    hoverColor: Colors.transparent,     // 悬浮时圆点
+                                                    highlightColor: Theme.of(context).colorScheme.surface, // 点击时的圆点
+                                                    splashColor: Theme.of(context).colorScheme.surface,    // 扩散水圈
+
+                                                    //containedInkWell: true,
+                                                    child: const Icon(Icons.arrow_drop_down),
+
+                                                    onTap: () {
+                                                      if (weekdaySelectOffstageNotifier.value) {
+                                                        weekdaySelectOffstageNotifier.value = false;
+                                                      }
+
+                                                      if (weekdaySelectOffstageAnimatedNotifier.value) {
+                                                        weekdaySelectOffstageAnimatedNotifier.value = false;
+                                                      }
+
+                                                      else {
+                                                        weekdaySelectOffstageAnimatedNotifier.value = true;
+                                                      }
+                                                    },
+                                                  ),
+                                                )
 
                                               ],
                                             ),
@@ -474,7 +512,9 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                                             indexModel.updateSelectedWeekDay(selectedIndex + 1);
                                           },
 
-                                        )
+                                        ),
+
+                                        const Divider(height: 1)
 
                                       ],
                                     ),
@@ -493,31 +533,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                             ]
 
                           );
-                        },
-                        child: InkResponse(
-                          borderRadius: BorderRadius.circular(24),
-                          containedInkWell: true,
-                          hoverColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () {
-                            debugPrint("show seasons Select");
-
-                            if (weekdaySelectOffstageNotifier.value) {
-                              weekdaySelectOffstageNotifier.value = false;
-                            }
-
-                            if (weekdaySelectOffstageAnimatedNotifier.value) {
-                              weekdaySelectOffstageAnimatedNotifier.value = false;
-                            }
-
-                            else {
-                              weekdaySelectOffstageAnimatedNotifier.value = true;
-                            }
-
-                          },
-                          child: const Icon(Icons.arrow_drop_down, size: 32),
-                        ),
+                        }
 
                       ),
 

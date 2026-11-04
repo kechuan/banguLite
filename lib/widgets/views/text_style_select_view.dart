@@ -3,6 +3,7 @@ import 'package:bangu_lite/internal/max_number_input_formatter.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/widgets/components/color_palette.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
@@ -33,7 +34,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
 
   @override
   void initState() {
-    hexColorEditingController = TextEditingController(text: judgeCurrentThemeColor(context).hex);
+    hexColorEditingController = TextEditingController(text: getCurrentThemeColor(context).hex);
     super.initState();
   }
 
@@ -46,7 +47,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
           Expanded(
             flex: 2,
             child: ColoredBox(
-              color: judgeCurrentThemeColor(context).withValues(alpha: 0.33),
+              color: getCurrentThemeColor(context).withValues(alpha: 0.33),
               child: Padding(
                 padding: PaddingH12,
                 child: GridView(
@@ -239,7 +240,7 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                       Color selectedColor = Color(int.parse('0xFF${colorEditingValue.text}'));
 
                       if (colorEditingValue.text.isEmpty && colorEditingValue.text.length < 6) {
-                        selectedColor = judgeCurrentThemeColor(context);
+                        selectedColor = getCurrentThemeColor(context);
                       }
 
                       return Row(

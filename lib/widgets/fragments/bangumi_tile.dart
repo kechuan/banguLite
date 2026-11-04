@@ -1,5 +1,6 @@
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
@@ -66,7 +67,7 @@ class BangumiListTile extends StatelessWidget {
                             color: judgeDarknessMode(context) ? Colors.white : Colors.black,
                           ),
                           borderRadius: BorderRadius.circular(6),
-                          color: judgeCurrentThemeColor(context).withValues(alpha: 0.2)
+                          color: getCurrentThemeColor(context).withValues(alpha: 0.2)
                         ),
                         child: Padding(
                           padding: PaddingH12V6,

@@ -1,6 +1,6 @@
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/user_model.dart';
@@ -135,7 +135,7 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
                                 showRequestSnackBar(
                                   message: message,
                                   requestStatus: false,
-                                  backgroundColor: judgeCurrentThemeColor(context)
+                                  backgroundColor: getCurrentThemeColor(context)
                                 );
                               },
                             ).then((resultID) {

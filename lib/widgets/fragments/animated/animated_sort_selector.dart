@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
@@ -32,7 +32,7 @@ class AnimatedSortSelector extends StatelessWidget {
     return Theme(
       data: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: judgeCurrentThemeColor(context),
+          seedColor: getCurrentThemeColor(context),
           brightness: Theme.brightnessOf(context)
         )
       ),
@@ -40,7 +40,7 @@ class AnimatedSortSelector extends StatelessWidget {
         children: [
 
           AnimatedContainer(
-            color: currentType == selectedType ? judgeCurrentThemeColor(context) : null,
+            color: currentType == selectedType ? getCurrentThemeColor(context) : null,
             height: currentType == selectedType ? min(30, MediaQuery.sizeOf(context).width / 20) : min(40, MediaQuery.sizeOf(context).width / 20),
             width: currentType == selectedType ? min(30, MediaQuery.sizeOf(context).width / 20) : min(40, MediaQuery.sizeOf(context).width / 20),
             duration: const Duration(milliseconds: 150),

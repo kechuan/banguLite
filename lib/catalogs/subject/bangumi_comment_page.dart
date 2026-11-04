@@ -1,6 +1,6 @@
 
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/providers/comment_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_comments.dart';
@@ -34,7 +34,7 @@ class BangumiCommentPage extends StatelessWidget  {
     return Theme(
       data: ThemeData(
         brightness: Theme.brightnessOf(context),
-        colorSchemeSeed: judgeDetailRenderColor(context, bangumiThemeColor),
+        colorSchemeSeed: getDetailRenderColor(context, bangumiThemeColor),
 
         fontFamilyFallback: convertSystemFontFamily()
       ),

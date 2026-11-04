@@ -1,6 +1,7 @@
 import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_details.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
@@ -56,7 +57,7 @@ class _BangumiTopicPageState extends BangumiContentPageState
   TopicModel getContentModel() => widget.topicModel;
 
   @override
-  Color? getcurrentSubjectThemeColor() => judgeIsFollowThemeColor(context) ? judgeCurrentThemeColor(context) : widget.themeColor;
+  Color? getcurrentSubjectThemeColor() => judgeIsFollowThemeColor(context) ? getCurrentThemeColor(context) : widget.themeColor;
 
   @override
   TopicDetails createEmptyDetailData() => TopicDetails.empty();
@@ -91,7 +92,7 @@ class _BangumiTopicPageState extends BangumiContentPageState
         showRequestSnackBar(
           message: message,
           requestStatus: false,
-          backgroundColor: judgeCurrentThemeColor(context)
+          backgroundColor: getCurrentThemeColor(context)
         );
       },
     );

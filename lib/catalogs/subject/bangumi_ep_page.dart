@@ -8,7 +8,7 @@ import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 @FFAutoImport()
@@ -88,7 +88,7 @@ class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteL
             return Theme(
               data: ThemeData(
                 brightness: Theme.brightnessOf(context),
-                colorSchemeSeed: judgeDetailRenderColor(context, widget.bangumiThemeColor),
+                colorSchemeSeed: getDetailRenderColor(context, widget.bangumiThemeColor),
                 fontFamilyFallback: convertSystemFontFamily(),
               ),
               child: Scaffold( //Listview need materialDesign

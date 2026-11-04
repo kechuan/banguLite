@@ -1,5 +1,5 @@
 import 'package:bangu_lite/internal/utils/const.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
@@ -62,28 +62,33 @@ class BangumiTabContentSelect extends StatelessWidget {
           )
         );
       },
-      child: ColoredBox(
-        color: judgeCurrentThemeColor(context).withValues(alpha: 0.8),
-        child: DefaultTabController(
-          initialIndex: initialIndex,
-          length: selectedList.length,
-          child: TabBar(
-            labelPadding: const EdgeInsets.all(0),
-            onTap: onTap,
-            dividerColor: Colors.transparent,
-            indicatorSize: TabBarIndicatorSize.label,
-            tabs: List.generate(
-              WeekDay.values.length, 
-              (currentDay) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ScalableText(WeekDay.values[currentDay].dayText),
-                    Text("${currentTime.add(Duration(days: currentDay - currentTime.weekday + 1)).month}/${currentTime.add(Duration(days: currentDay - currentTime.weekday + 1)).day}")
-                  ],
-                )
-              ),
-            )
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(12),
+        ),
+        child: ColoredBox(
+          color: getCurrentThemeColor(context).withValues(alpha: 0.8),
+          child: DefaultTabController(
+            initialIndex: initialIndex,
+            length: selectedList.length,
+            child: TabBar(
+              labelPadding: const EdgeInsets.all(0),
+              onTap: onTap,
+              dividerColor: Colors.transparent,
+              indicatorSize: TabBarIndicatorSize.label,
+              tabs: List.generate(
+                WeekDay.values.length, 
+                (currentDay) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ScalableText(WeekDay.values[currentDay].dayText),
+                      Text("${currentTime.add(Duration(days: currentDay - currentTime.weekday + 1)).month}/${currentTime.add(Duration(days: currentDay - currentTime.weekday + 1)).day}")
+                    ],
+                  )
+                ),
+              )
+            ),
           ),
         ),
       ),
