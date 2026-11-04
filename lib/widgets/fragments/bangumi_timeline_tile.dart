@@ -113,22 +113,6 @@ class BangumiTimelineTile extends StatelessWidget{
                   }
                 );
 
-                //Navigator.pushNamed(
-                //  context,
-                //  Routes.groupTopic,
-                //  arguments: {
-                //    "groupID":surfTimelineDetails.detailID
-                //  },
-                //);  
-
-                //bus.emit(
-                //  "AppRoute",
-                //  '${BangumiWebUrls.groupTopic(surfTimelineDetails.detailID!)}'
-                //  '?groupTopicTitle=${surfTimelineDetails.title}'
-                //  '&sourceTitle=${surfTimelineDetails.sourceTitle}'
-                //  '&sourceID=${surfTimelineDetails.sourceID}'
-                //);
-
               }
 
             }

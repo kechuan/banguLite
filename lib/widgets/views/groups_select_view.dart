@@ -10,6 +10,7 @@ import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/groups_model.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
+import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -83,7 +84,7 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
         ),
 
         SizedBox(
-          height: 200,
+          height: 300,
           child: PageView.builder(
             controller: groupPageController,
             physics: const NeverScrollableScrollPhysics(),
@@ -98,6 +99,7 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
 
                     //EasyRefresh 配合 滚动 onPageChanged 冲突 
                     int currentGroupCount = groupsModel.groupsData[BangumiSurfGroupType.values[index]]?.length ?? 0;
+                    int displayCrossAxisCount = MediaQuery.sizeOf(context).width >= 800 ? 4 : 2;
 
                     return EasyRefresh(
                       footer: const TextFooter(),
@@ -106,6 +108,7 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
                       child: 
                       currentGroupCount == 0 ? 
                       const Center(child: Text("¯\\_(ツ)_/¯")) :
+
                       GridView.builder(
                         scrollDirection: Axis.vertical,
                         primary: false,
@@ -114,21 +117,26 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
                         currentGroupCount == 0 ? 
                         1 : 
                         currentGroupCount,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          mainAxisExtent: 180
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: displayCrossAxisCount,
+                          crossAxisSpacing: 4,
+                          mainAxisSpacing: 4,
+                          mainAxisExtent: 100
                         ),
                         itemBuilder: (_, index) {
 
-                          return Column(
-                            spacing: 20,
-                            children: [
+                          int currentRow = (index / displayCrossAxisCount).floor();
+                          int currentColumn = index % displayCrossAxisCount;
 
-                              Expanded(
-                                child: InkResponse(
-                                  containedInkWell: true,
+                          return Container(
+                            color: (currentRow + currentColumn) % 2 == 0 ? Colors.grey.withValues(alpha: 0.3) : null,
+                            child: Column(
+
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+
+                                ListTile(
+
                                   onTap: () {
 
                                     String recordGroupTitle = widget.groupTitleNotifier.value ?? "";
@@ -138,40 +146,52 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
                                     widget.loadGroupTopicCallback?.call(context, recordGroupTitle);
                                   },
 
-                                  highlightColor: Colors.transparent,
-                                  child: ConstrainedBox(
-                                    constraints: const BoxConstraints(
-                                      minWidth: 100,
-                                      minHeight: 120,
-                                    ),
-
+                                  leading: SizedBox(
+                                    width: 50,
+                                    height: 50,
                                     child: CachedImageLoader(
                                       imageUrl: groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].groupAvatar,
                                       borderDecoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
                                     ),
                                   ),
-                                ),
-                              ),
 
-                              SizedBox(
-                                height: 65,
-                                child: Center(
+                                  title: Row(
+                                    spacing: 6,
+                                    children: [
 
-                                  child: Text(
-                                    "${groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].groupTitle}"
-                                    "\n(${groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].membersCount}成员)",
-                                    textAlign: TextAlign.center,
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
+                                      Flexible(
+                                        child: ScalableText(
+                                          "${groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].groupTitle}",
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
                                   ),
 
-                                )
-                              ),
+                                ),
 
-                            ],
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  spacing: 3,
+                                  children: [
+                                    const Icon(Icons.people, size: 16, color: Colors.grey),
+
+                                    Text(
+                                      "${groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].membersCount}",
+
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           );
+
                         }
                       ),
+
                     );
                   },
 
