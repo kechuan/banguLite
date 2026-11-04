@@ -7,7 +7,7 @@ void fadeToaster({
   required String message,
   Duration? duration,
   Color? color
-}){
+}) {
   showToastWidget(
     duration: duration,
     animDuration: const Duration(milliseconds: 200),
@@ -21,11 +21,11 @@ void fadeToaster({
           color: color ?? Colors.grey,
           borderRadius: BorderRadius.circular(16)
         ),
-        child: Center(child: ScalableText(message,style: const TextStyle(color: Colors.white))),
+        child: Center(child: ScalableText(message, style: const TextStyle(color: Colors.white))),
       ),
     ),
     context: context,
-    
+
   );
 
 }

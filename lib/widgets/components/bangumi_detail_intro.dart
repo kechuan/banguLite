@@ -145,6 +145,7 @@ class _IntroPortraitState extends State<IntroPortrait> {
 
         StarButton(bangumiDetails: widget.bangumiDetails),
 
+        //RankBox
         LayoutBuilder(
           builder: (_, constraint) {
             return BangumiRankBox(
@@ -340,6 +341,7 @@ class IntroLandscape extends StatelessWidget {
                       )
                     ),
 
+                    //RankBox
                     Row(
                       children: [
                         BuildInfoBox(informationList: bangumiDetails.informationList, type: bangumiDetails.type),

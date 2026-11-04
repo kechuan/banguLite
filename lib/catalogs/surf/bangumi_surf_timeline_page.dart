@@ -91,7 +91,7 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
             Routes.timelineChat,
             arguments: {
               'timelineID':timelineID, //时间线独有ID
-              'comment':message,
+              'message':message,
             }
           );
 
@@ -108,15 +108,10 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
 
               if (content is String) {
 
-                //invokeRequestSnackBar(message: "UI回帖成功",requestStatus: true);
-                //onSendMessage?.call(content);
-                //  await accountModel.getTrunsTileToken().then((result){
-                //    debugPrint("$result");
-                //  });
+                //仅UI层测试
+                //onPostContent(1, content);
 
-                invokeRequestSnackBar();
-
-                //网络层 Callback
+                //正常行为
                 await invokeSendComment(content).then((resultID) {
                   debugPrint("[PostContent] sendMessageresultID:$resultID SendContent: $content");
                   if (resultID != 0) {

@@ -115,6 +115,9 @@ FFRouteSettings getRouteSettings({
           timelineID: asT<int>(
             safeArguments['timelineID'],
           )!,
+          message: asT<String?>(
+            safeArguments['message'],
+          ),
           onDeleteAction: asT<Function(int)?>(
             safeArguments['onDeleteAction'],
           ),

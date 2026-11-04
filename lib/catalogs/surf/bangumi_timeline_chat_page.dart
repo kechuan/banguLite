@@ -13,17 +13,19 @@ import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-/// 当前页面仅限从用户动态点进去 因为评论的正文强依赖 UserModel 
+/// 当前页面仅限从用户动态 与自身发帖时能点进去 因为评论的正文强依赖 UserModel 
 @FFRoute(name: '/TimelineChat')
 class BangumiTimelineChatPage extends StatefulWidget {
   const BangumiTimelineChatPage({
     super.key,
     required this.timelineID,
+    this.message,
     this.onDeleteAction,
 
   });
 
   final int timelineID;
+  final String? message;
   final Function(int)? onDeleteAction;
 
   @override
@@ -41,7 +43,13 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
   @override
   Widget build(BuildContext context) {
 
-    if (widget.timelineID == 0) return const SizedBox.shrink();
+    if (widget.timelineID == 0) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('时间线ID错误'),
+        ),
+      );
+    }
 
     timelineChatFuture ??= HttpApiClient.client.get(
       BangumiAPIUrls.timelineReply(widget.timelineID)
@@ -80,7 +88,21 @@ class _BangumiTimelineChatPageState extends State<BangumiTimelineChatPage> {
 
                     builder: (_) {
 
-                      final CommentDetails currentCommentDetail = UserModel.timelineChatsData[widget.timelineID] ?? CommentDetails();
+                      final CommentDetails currentCommentDetail;
+
+                      if (widget.message != null) {
+                        currentCommentDetail = 
+                        CommentDetails()
+                          ..comment = widget.message
+                          ..userInformation = AccountModel.loginedUserInformations.userInformation
+                          ..commentTimeStamp = DateTime.now().millisecondsSinceEpoch ~/ 1000
+                          ..commentReactions = {}
+                        ;
+                      }
+
+                      else {
+                        currentCommentDetail = UserModel.timelineChatsData[widget.timelineID] ?? CommentDetails();
+                      }
 
                       final currentEpCommentDetails = EpCommentDetails(
                         commentID: widget.timelineID
