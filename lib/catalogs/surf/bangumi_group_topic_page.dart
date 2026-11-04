@@ -49,7 +49,7 @@ class _BangumiGroupTopicPageState extends BangumiContentPageState
   GroupsModel getContentModel() => widget.groupsModel;
 
   @override
-  Color? getcurrentSubjectThemeColor() => widget.themeColor;
+  Color? getcurrentSubjectThemeColor() => judgeIsFollowThemeColor(context) ? judgeCurrentThemeColor(context) : widget.themeColor;
 
   @override
   GroupTopicDetails createEmptyDetailData() => GroupTopicDetails.empty();

@@ -145,6 +145,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
     debugPrint("[Enter SendCommentPage] id:${widget.contentID} type:${widget.postCommentType} replyTo:${widget.replyID}");
 
     final webviewModel = context.read<WebViewModel>();
+    final accountModel = context.read<AccountModel>();
 
     if (widget.preservationContent != null && contentEditingController.text.isEmpty) {
       titleEditingController.text = widget.preservationContent?.$1 ?? "";
@@ -200,9 +201,11 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                 ) {
 
                   if (
-                  titleEditingController.text.isEmpty ||
+                  accountModel.isLogined() == false ||
+                    titleEditingController.text.isEmpty ||
                     contentEditingController.text.isEmpty
                   ) {
+                    if (accountModel.isLogined() == false) return fadeToaster(context: context, message: '请先登录以发布内容');
                     fadeToaster(context: context, message: '不允许发布空白内容');
                     return;
                   }
@@ -213,10 +216,8 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
                 else {
 
-                  if (contentEditingController.text.isEmpty) {
-                    fadeToaster(context: context, message: '不允许发布空白内容');
-                    return;
-                  }
+                  if (accountModel.isLogined() == false) return fadeToaster(context: context, message: '请先登录以发布内容');
+                  if (contentEditingController.text.isEmpty) return fadeToaster(context: context, message: '不允许发布空白内容');
 
                   Navigator.of(context).pop(contentEditingController.text);
 
@@ -334,75 +335,77 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
                           Align(
                             alignment: Alignment.centerLeft,
-                            child: ValueListenableBuilder(
-                              valueListenable: turnstileTokenNotifier,
-                              builder: (_, isEffect, webviewChild) {
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: ValueListenableBuilder(
+                                valueListenable: turnstileTokenNotifier,
+                                builder: (_, isEffect, webviewChild) {
 
-                                //虽然我觉得不会真有人这么整 就当是一个兜底了
-                                if (isEffect) {
-                                  resetTimer ??= Timer(
-                                    const Duration(seconds: 300), () {
-                                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                                        turnstileTokenNotifier.value = false;
-                                        resetTimer = null;
-                                      });
-                                    }
+                                  //虽然我觉得不会真有人这么整 就当是一个兜底了
+                                  if (isEffect) {
+                                    resetTimer ??= Timer(
+                                      const Duration(seconds: 300), () {
+                                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                                          turnstileTokenNotifier.value = false;
+                                          resetTimer = null;
+                                        });
+                                      }
+                                    );
+                                  }
+
+                                  return AnimatedSize(
+                                    duration: const Duration(milliseconds: 300),
+                                    child: SizedBox(
+                                      //300,65 为原来 turnstile 大小
+                                      height: isEffect ? 0 : (65 + 20),
+                                      width: 300 + 20,
+                                      child: isEffect ? const SizedBox.shrink() : webviewChild!
+                                    ),
+
                                   );
-                                }
-
-                                return AnimatedSize(
-                                  duration: const Duration(milliseconds: 300),
-                                  child: SizedBox(
-                                    //300,65 为原来 turnstile 大小
-                                    height: isEffect ? 0 : (65 + 20),
-                                    width: 300 + 20,
-                                    child: isEffect ? const SizedBox.shrink() : webviewChild!
+                                },
+                                child: InAppWebView(
+                                  webViewEnvironment: webviewModel.webViewEnvironment,
+                                  initialUrlRequest: URLRequest(url: WebUri(BangumiWebUrls.turnstileAuth())),
+                                  initialSettings: InAppWebViewSettings(
+                                    isInspectable: kDebugMode,
+                                    displayZoomControls: false,
+                                    useWideViewPort: true,
+                                    pageZoom: Platform.isWindows ? 2.0 : 1.0,
+                                    transparentBackground: true
                                   ),
 
-                                );
-                              },
-                              child: InAppWebView(
-                                webViewEnvironment: webviewModel.webViewEnvironment,
-                                initialUrlRequest: URLRequest(url: WebUri(BangumiWebUrls.turnstileAuth())),
-                                initialSettings: InAppWebViewSettings(
-                                  isInspectable: kDebugMode,
-                                  displayZoomControls: false,
-                                  useWideViewPort: true,
-                                  pageZoom: 2.0,
-                                  transparentBackground: true
-                                ),
+                                  shouldOverrideUrlLoading: (controller, navigationAction) async {
 
-                                shouldOverrideUrlLoading: (controller, navigationAction) async {
+                                    //似乎对Android 生效 对window难以拦截? window似乎并不会触发这个拦截
+                                    debugPrint("shouldOverrideUrlLoading url:${navigationAction.request.url}");
 
-                                  //似乎对Android 生效 对window难以拦截? window似乎并不会触发这个拦截
-                                  debugPrint("shouldOverrideUrlLoading url:${navigationAction.request.url}");
+                                    if (navigationAction.request.url.toString().startsWith(APPInformationRepository.bangumiTurnstileCallbackUri.toString())) {
 
-                                  if (navigationAction.request.url.toString().startsWith(APPInformationRepository.bangumiTurnstileCallbackUri.toString())) {
+                                      AccountModel.loginedUserInformations.turnstileToken = navigationAction.request.url?.queryParameters["token"];
 
-                                    AccountModel.loginedUserInformations.turnstileToken = navigationAction.request.url?.queryParameters["token"];
+                                      turnstileTokenNotifier.value = true;
 
-                                    turnstileTokenNotifier.value = true;
+                                      return NavigationActionPolicy.CANCEL;
+                                    }
+                                    return NavigationActionPolicy.ALLOW;
 
-                                    return NavigationActionPolicy.CANCEL;
-                                  }
-                                  return NavigationActionPolicy.ALLOW;
+                                  },
+                                  onWebViewCreated: (controller) {
+                                    AccountModel.loginedUserInformations.turnstileToken = null;
+                                  },
 
-                                },
-                                onWebViewCreated: (controller) {
-                                  AccountModel.loginedUserInformations.turnstileToken = null;
-                                },
+                                  onLoadStart: (controller, url) async {
+                                    if (url?.queryParameters["token"] != null) {
+                                      AccountModel.loginedUserInformations.turnstileToken = url?.queryParameters["token"];
+                                      turnstileTokenNotifier.value = true;
+                                    }
+                                  },
 
-                                onLoadStart: (controller, url) async {
-                                  if (url?.queryParameters["token"] != null) {
-                                    AccountModel.loginedUserInformations.turnstileToken = url?.queryParameters["token"];
-                                    turnstileTokenNotifier.value = true;
-                                  }
-                                },
-
-                                onLoadStop: (controller, url) async {
-                                  if (Platform.isAndroid) {
-                                    await controller.injectCSSCode(
-                                      source: """
+                                  onLoadStop: (controller, url) async {
+                                    if (Platform.isAndroid) {
+                                      await controller.injectCSSCode(
+                                        source: """
                                                                     body * { 
                                                                       font-size: 2em !important; 
                                                                       transform: scale(2);
@@ -410,23 +413,24 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                                                       color: #000 !important;
                                                                     }
                                                                     """
-                                    );
-                                  }
-                                },
+                                      );
+                                    }
+                                  },
 
-                                onReceivedError: (controller, request, error) {
-                                  if (request.url.toString().contains(APPInformationRepository.bangumiTurnstileCallbackUri.toString())) {
-                                    extractFallbackToken(controller).then((result) {
-                                      if (result != null) {
-                                        AccountModel.loginedUserInformations.turnstileToken = result;
-                                        turnstileTokenNotifier.value = true;
-                                      }
-                                    });
-                                  }
+                                  onReceivedError: (controller, request, error) {
+                                    if (request.url.toString().contains(APPInformationRepository.bangumiTurnstileCallbackUri.toString())) {
+                                      extractFallbackToken(controller).then((result) {
+                                        if (result != null) {
+                                          AccountModel.loginedUserInformations.turnstileToken = result;
+                                          turnstileTokenNotifier.value = true;
+                                        }
+                                      });
+                                    }
 
-                                }
+                                  }
+                                ),
+
                               ),
-
                             ),
                           ),
 

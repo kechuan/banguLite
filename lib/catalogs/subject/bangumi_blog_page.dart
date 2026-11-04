@@ -65,7 +65,7 @@ class _BangumiBlogPageState extends BangumiContentPageState
   BlogDetails createEmptyDetailData() => BlogDetails.empty();
 
   @override
-  Color? getcurrentSubjectThemeColor() => widget.themeColor;
+  Color? getcurrentSubjectThemeColor() => judgeIsFollowThemeColor(context) ? judgeCurrentThemeColor(context) : widget.themeColor;
 
   @override
   bool isContentLoading(int? blogID) {

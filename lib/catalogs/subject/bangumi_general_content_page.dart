@@ -55,6 +55,8 @@ abstract class BangumiContentPageState<
   int? getSubContentID() => null;
 
   int? getCommentCount(D? contentDetail, bool isLoading);
+
+  //附带主题色覆盖检测
   Color? getcurrentSubjectThemeColor();
 
   //可选的跳转ID
@@ -134,14 +136,21 @@ abstract class BangumiContentPageState<
     final contentModel = getContentModel();
     final contentInfo = getContentInfo();
 
-    readableThemeColor ??= 
-    !judgeDarknessMode(context) ?
-    getcurrentSubjectThemeColor()?.withValues(
-      red: 1 - getcurrentSubjectThemeColor()!.r,
-      green: 1 - getcurrentSubjectThemeColor()!.g,
-      blue: 1 - getcurrentSubjectThemeColor()!.b
-    ) : getcurrentSubjectThemeColor()
-    ;
+    readableThemeColor = convertFineTuneColor(
+
+      getcurrentSubjectThemeColor(),
+      darkMode: judgeDarknessMode(context),
+      lumiScaleType: ScaleType.min
+    );
+
+    //readableThemeColor ??= 
+    //judgeDarknessMode(context) ? 
+    //getcurrentSubjectThemeColor() :
+    //getcurrentSubjectThemeColor()?.withValues(
+    //  red: 1 - getcurrentSubjectThemeColor()!.r,
+    //  green: 1 - getcurrentSubjectThemeColor()!.g,
+    //  blue: 1 - getcurrentSubjectThemeColor()!.b
+    //);
 
     return ChangeNotifierProvider.value(
       //因为下方的 Selector 需求 使用 带有contentModel 的context环境
@@ -556,8 +565,11 @@ abstract class BangumiContentPageState<
     final currentEpCommentDetails = resultFilterCommentList[contentCommentIndex];
     //final ValueNotifier<int> commentUpdateFlag = ValueNotifier(0);
 
+    int uiFloorIndex = (contentCommentIndex + 1) + (getPostCommentType() == PostCommentType.replyEpComment ? 0 : 1);
+
     debugPrint(
-      "[Floor ${contentCommentIndex + 1}] "
+      "[postCommentType]: ${getPostCommentType()}"
+      "[Floor data:$contentCommentIndex ui:$uiFloorIndex] "
       "[commentID:${currentEpCommentDetails.commentID}] "
       "[state]: ${currentEpCommentDetails.state} "
       "[text length]: ${currentEpCommentDetails.comment?.length} "
@@ -571,7 +583,10 @@ abstract class BangumiContentPageState<
           //排序会用得上Key的
           key: ValueKey(currentEpCommentDetails.commentID),
           providers: [
-            Provider<EpCommentDetails>.value(value: currentEpCommentDetails),
+            Provider<EpCommentDetails>.value(
+              value: currentEpCommentDetails..epCommentIndex = "$uiFloorIndex"
+
+            ),
             Provider<EpCommentViewConfig>.value(value: EpCommentViewConfig(
               contentID: currentEpCommentDetails.contentID ?? getContentInfo().id ?? 0,
 
@@ -597,32 +612,14 @@ abstract class BangumiContentPageState<
           child: const EpCommentView(),
         ),
 
-        //BangumiGeneralContentComment(
-        //  key: ValueKey(currentEpCommentDetails.commentID),
-        //  currentEpCommentDetails: currentEpCommentDetails, 
-        //  postCommentType: getPostCommentType(),
-        //  contentID: currentEpCommentDetails.contentID ?? getContentInfo().id ?? 0,
-        //  authorID: contentDetail?.userInformation?.userID,
-        //  themeColor: readableThemeColor,
-        //  onUpdateComment: (content) {
-        //    if (content == null) {
-        //      removeCommentAction(contentCommentIndex, currentEpCommentDetails);
-        //    }
-
-        //    else {
-        //      userCommentMap[contentCommentIndex] = content;
-        //    }
-        //  },
-        //),
-
         if(contentCommentIndex < max(0, resultFilterCommentList.length) + userCommentMap.length - 1)
         Divider(
-          thickness: 0.5,
+          thickness: judgeDarknessMode(context) ? 0.5 : 0.75,
           height: 1,
           color: 
           judgeDarknessMode(context) ? 
           getcurrentSubjectThemeColor() : 
-          readableThemeColor
+          Colors.grey
         ),
 
       ],
@@ -690,7 +687,11 @@ abstract class BangumiContentPageState<
           ),
 
           if(contentCommentIndex != resultFilterCommentList.length + userCommentMap.length - 1)
-          Divider(color: getcurrentSubjectThemeColor())
+          Divider(
+            thickness: 0.25,
+            height: 1,
+            color: getcurrentSubjectThemeColor()
+          )
         ],
       )
 

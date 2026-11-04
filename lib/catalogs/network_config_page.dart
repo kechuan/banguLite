@@ -314,7 +314,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
 }
 
 Future<int> checkLatency({String targetUrl = "", String? proxyAddress}) async {
-  final stopwatch = Stopwatch()..start();
+  final stopwatch = Stopwatch();
 
   try {
 
@@ -322,6 +322,7 @@ Future<int> checkLatency({String targetUrl = "", String? proxyAddress}) async {
 
     dio.httpClientAdapter = HttpApiClient.configHTTPProxySetting(proxyAddress ?? "");
 
+    stopwatch.start();
     await dio.head(
       targetUrl,
     ).timeout(const Duration(seconds: 5));

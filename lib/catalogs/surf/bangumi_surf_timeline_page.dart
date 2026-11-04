@@ -59,15 +59,18 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
   @override
   Widget build(BuildContext context) {
 
+    final accountModel = context.read<AccountModel>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('浏览时间线'),
       ),
       floatingActionButton: 
+
+      accountModel.isLogined() ?
       FloatingActionButton.extended(
         onPressed: () {
 
-          final accountModel = context.read<AccountModel>();
           final indexModel = context.read<IndexModel>();
 
           invokeRequestSnackBar({String? message, bool? requestStatus}) => showRequestSnackBar(
@@ -133,8 +136,9 @@ class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage>
             Icon(Icons.edit, color: Colors.black),
             ScalableText("发帖", style: TextStyle(color: Colors.black)),
           ],
-        ),
-      ),
+        ) 
+      ) :
+      const SizedBox.shrink(),
 
       body: Column(
         children: [

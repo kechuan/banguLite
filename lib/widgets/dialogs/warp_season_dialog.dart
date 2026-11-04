@@ -4,6 +4,7 @@ import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
@@ -168,7 +169,20 @@ class SelectSeasonLandscape extends StatelessWidget {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       color: convertPassedSeason(year, currentMonth) < seasonTypeIndex ? Colors.grey : AppThemeColor.values[seasonTypeIndex].color, //unable will be grey.,,
-                      child: SizedBox(child: Center(child: Text(SeasonType.values[seasonTypeIndex].seasonText, style: const TextStyle(color: Colors.black)))),
+                      child: Stack(
+                        children: [
+                          SizedBox(child: Center(child: Text(SeasonType.values[seasonTypeIndex].seasonText, style: const TextStyle(color: Colors.black)))),
+
+                          Positioned(
+                            bottom: 3,
+                            left: 3,
+                            child: ScalableText(
+                              "${convertDigitNumString(SeasonType.values[seasonTypeIndex].month)}-${convertDigitNumString(SeasonType.values[(seasonTypeIndex + 1) % SeasonType.values.length].month - (seasonTypeIndex == SeasonType.autumn.index ? 1 - 12 : 1 - 0))}",
+                              style: TextStyle(fontSize: 10, color: (AppThemeColor.values[seasonTypeIndex].color).darken(amount: 0.5))
+                            )
+                          )
+                        ],
+                      ),
                     )
                   );
                 }
@@ -262,6 +276,15 @@ class SelectSeasonPortrait extends StatelessWidget {
                             );
 
                           }
+                        )
+                      ),
+
+                      Positioned(
+                        left: 3,
+                        bottom: 3,
+                        child: ScalableText(
+                          "${convertDigitNumString(SeasonType.values[seasonTypeIndex].month)}-${convertDigitNumString(SeasonType.values[(seasonTypeIndex + 1) % SeasonType.values.length].month - (seasonTypeIndex == SeasonType.autumn.index ? 1 - 12 : 1 - 0))}",
+                          style: TextStyle(fontSize: 10, color: AppThemeColor.values[seasonTypeIndex].color.darken(amount: 0.5))
                         )
                       ),
 

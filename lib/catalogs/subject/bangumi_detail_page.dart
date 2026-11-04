@@ -115,7 +115,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.6),
                 title: ValueListenableBuilder(
                   valueListenable: appbarTitleNotifier, 
-                  builder: (_, appbarTitle, __) => ScalableText(appbarTitle, style: const TextStyle(color: Colors.black, fontSize: 20))),
+                  builder: (_, appbarTitle, __) => ScalableText(appbarTitle, style: const TextStyle(fontSize: 20))),
                 leading: IconButton(
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.arrow_back)

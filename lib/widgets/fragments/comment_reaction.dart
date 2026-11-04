@@ -1,5 +1,6 @@
 
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
@@ -89,6 +90,8 @@ class _CommentReactionState extends State<CommentReaction> {
     final accountModel = context.read<AccountModel>();
     bool isAllowReact = accountModel.isLogined() && widget.commentID != null;
 
+    final ModalRoute<dynamic>? currentRoute = ModalRoute.of(context);
+
     if (localCommentReactions.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -158,7 +161,15 @@ class _CommentReactionState extends State<CommentReaction> {
                       backgroundColor: judgeCurrentThemeColor(context)
                     );
 
-                    debugPrint("widget.reactDataLikeNotifier.value:$widget.reactDataLikeNotifier.value, dataLikeIndex:$dataLikeIndex, subject:${widget.commentID}");
+                    invokeToaster({String? message}) => fadeToaster(context: context, message: message ?? "贴条失败");
+
+                    debugPrint("""
+                      [postCommentType]:${widget.postCommentType}
+                      [widget.reactDataLikeNotifier.value]:${widget.reactDataLikeNotifier.value}
+                      [dataLikeIndex]:$dataLikeIndex
+                      [commentID]:${widget.commentID}
+                      """
+                    );
 
                     //invokeRequestSnackBar(message: "UI贴条成功",requestStatus: true);
 
@@ -170,7 +181,15 @@ class _CommentReactionState extends State<CommentReaction> {
                       widget.postCommentType,
                       actionType: widget.reactDataLikeNotifier.value == dataLikeIndex ? UserContentActionType.delete : UserContentActionType.post,
                       fallbackAction: (message) {
-                        invokeRequestSnackBar(message: message, requestStatus: false);
+
+                        if (currentRoute is ModalBottomSheetRoute) {
+                          invokeToaster(message: message);
+                        }
+
+                        else {
+                          invokeRequestSnackBar(message: message, requestStatus: false);
+                        }  
+
                       }
                     ).then((result) {
                         if (result) {
@@ -183,7 +202,13 @@ class _CommentReactionState extends State<CommentReaction> {
                             widget.reactDataLikeNotifier.value = dataLikeIndex;
                           }
 
-                          invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
+                          if (currentRoute is ModalBottomSheetRoute) {
+                            invokeToaster(message: "贴条成功");
+                          }
+
+                          else {
+                            invokeRequestSnackBar(message: "贴条成功", requestStatus: true);
+                          }
 
                         }
 

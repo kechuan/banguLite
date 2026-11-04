@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
@@ -103,6 +104,8 @@ class _BangumiDetailTopicsState extends State<BangumiDetailTopics> with Automati
                     if (topicsList.isEmpty) return const SkeletonListTileTemplate();
                     if (topicsList.first.id == 0) return const Center(child: ScalableText("该番剧暂无讨论版..."));
 
+                    final cardThemeColor = judgeDetailRenderColor(context, bangumiModel.bangumiThemeColor);
+
                     return Theme(
                       data: ThemeData(
                         fontFamilyFallback: convertSystemFontFamily(),
@@ -117,26 +120,34 @@ class _BangumiDetailTopicsState extends State<BangumiDetailTopics> with Automati
                           final topicCreateTime = DateTime.fromMillisecondsSinceEpoch(topicsList[index].createdTime! * 1000);
 
                           return Card(
-                            color: judgeDetailRenderColor(context, bangumiModel.bangumiThemeColor),
-                            child: ListTile(
-                              title: ScalableText("${topicsList[index].contentTitle}"),
-                              trailing: ScalableText(convertDateTimeToString(topicCreateTime)),
-                              onTap: () {
+                            color: cardThemeColor,
+                            child: DefaultTextStyle(
+                              style: TextStyle(
+                                color: 
+                                cardThemeColor.computeLuminance() >= 0.4 ? 
+                                cardThemeColor.darken(amount: 0.25) : 
+                                null
+                              ),
+                              child: ListTile(
+                                title: ScalableText("${topicsList[index].contentTitle}"),
+                                trailing: ScalableText(convertDateTimeToString(topicCreateTime)),
+                                onTap: () {
 
-                                final topicModel = context.read<TopicModel>();
+                                  final topicModel = context.read<TopicModel>();
 
-                                Navigator.pushNamed(
-                                  context,
-                                  Routes.subjectTopic,
-                                  arguments: {
-                                    "topicModel":topicModel,
-                                    "topicInfo":topicModel.contentListData[index],
-                                    "themeColor":judgeDetailRenderColor(context, bangumiModel.bangumiThemeColor),
-                                    "sourceTitle":bangumiModel.bangumiDetails?.name
-                                  }
-                                );
+                                  Navigator.pushNamed(
+                                    context,
+                                    Routes.subjectTopic,
+                                    arguments: {
+                                      "topicModel":topicModel,
+                                      "topicInfo":topicModel.contentListData[index],
+                                      "themeColor":judgeDetailRenderColor(context, bangumiModel.bangumiThemeColor),
+                                      "sourceTitle":bangumiModel.bangumiDetails?.name
+                                    }
+                                  );
 
-                              },
+                                },
+                              ),
                             ),
                           );
 

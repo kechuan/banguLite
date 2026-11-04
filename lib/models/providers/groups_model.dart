@@ -13,7 +13,7 @@ import 'package:dio/dio.dart';
 //但适用规则 GroupDetails 基本等于 info 
 // 而对于 Detail 来说 其子信息应当是 
 
-class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
+class GroupsModel extends BaseModel<GroupTopicInfo, GroupTopicDetails>{
 
   //仅占位
   GroupsModel({
@@ -21,25 +21,25 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
     this.selectedGroupInfo
   }){
 
-    if(selectedGroupInfo?.groupName == null){
-       loadGroups();
+    if (selectedGroupInfo?.groupName == null) {
+      loadGroups();
     }
 
   }
 
   GroupInfo? selectedGroupInfo;
-  
-  final Map<BangumiSurfGroupType,List<GroupInfo>> groupsData = {
+
+  final Map<BangumiSurfGroupType, List<GroupInfo>> groupsData = {
     BangumiSurfGroupType.all: [],
     BangumiSurfGroupType.joined: [],
     BangumiSurfGroupType.created: [],
   };
-  
+
   Future<bool> loadGroups({ 
     BangumiSurfGroupType mode = BangumiSurfGroupType.all,
     int? limit,
     int? offset,
-    Map<String,String>? accessQuery,
+    Map<String, String>? accessQuery,
     Function(String)? fallbackAction
   }) async {
 
@@ -54,62 +54,59 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
           offset: offset,
         ),
         options: Options(headers: accessQuery),
-      ).then((response){
-        if(response.statusCode == HttpStatus.ok){
+      ).then((response) {
+          if (response.statusCode == HttpStatus.ok) {
 
-          if(offset == 0){
-            groupsData[mode] = loadGroupsInfo(response.data["data"]);  
+            if (offset == 0) {
+              groupsData[mode] = loadGroupsInfo(response.data["data"]);  
+            }
+
+            else {
+              groupsData[mode]!.addAll(loadGroupsInfo(response.data["data"]));
+            }
+
+            requestGroupsCompleter.complete(true);
+            notifyListeners();
           }
 
-          else{
-            groupsData[mode]!.addAll(loadGroupsInfo(response.data["data"]));
+          else {
+            requestGroupsCompleter.complete(false);
+            fallbackAction?.call('${response.statusCode} ${response.data["message"]}');
           }
 
-          requestGroupsCompleter.complete(true);
-          notifyListeners();
-        }
-
-        else{
-          requestGroupsCompleter.complete(false);
-          fallbackAction?.call('${response.statusCode} ${response.data["message"]}');
-        }
-
-
-      });
+        });
     }
 
     on DioException catch (e){
       fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
     }
 
-    
-
     return requestGroupsCompleter.future;
-    
-  }
 
+  }
 
   Future<bool> loadGroupTopics({
     int? offset = 0,
   }) async {
 
-    if(selectedGroupInfo == null) return false;
+    if (selectedGroupInfo == null) return false;
 
     return await loadSubjectContentList(
+      isReloaded: offset == 0,
       queryParameters: BangumiQuerys.topicsQuery
-        ..["offset"] = offset ?? 0
+      ..["offset"] = offset ?? 0
     );
   }
 
   @override
   List<GroupTopicInfo> createEmptyInfoList() => [GroupTopicInfo.empty()];
-  
+
   @override
   GroupTopicDetails createEmptyDetails() => GroupTopicDetails.empty();
 
   @override
   String getContentListUrl(dynamic subjectID) => BangumiAPIUrls.groupTopics(selectedGroupInfo?.groupName ?? '');
-  
+
   @override
   String getContentDetailUrl(int contentID) => BangumiAPIUrls.groupTopic(contentID);
 
@@ -120,7 +117,7 @@ class GroupsModel extends BaseModel<GroupTopicInfo,GroupTopicDetails>{
 
   );
   @override
-  GroupTopicDetails convertResponseToDetail(Map<String,dynamic> contentResponseData) => loadGroupTopicDetails(contentResponseData);
+  GroupTopicDetails convertResponseToDetail(Map<String, dynamic> contentResponseData) => loadGroupTopicDetails(contentResponseData);
 
   @override
   void notifyListeners() {

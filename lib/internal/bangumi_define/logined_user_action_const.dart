@@ -14,10 +14,10 @@ enum PostCommentType{
   //subject不会拥有回复评论的选项
   subjectComment("番剧吐槽"),
   replyEpComment("单集吐槽"),
-  
+
   postBlog("发布博客"),
   replyBlog("回复博客"),
-  
+
   postTopic("发布帖子"),
   replyTopic("回复帖子"),
 
@@ -30,9 +30,8 @@ enum PostCommentType{
   ;
 
   final String commentTypeString;
-  
-  const PostCommentType(this.commentTypeString);
 
+  const PostCommentType(this.commentTypeString);
   ///存在 extension [convertReportReason()]
 
 }
@@ -50,7 +49,6 @@ enum CommentActionType{
   ;
 
   final String actionTypeString;
-  
 
   const CommentActionType(this.actionTypeString);
 }
@@ -67,14 +65,13 @@ enum UserContentActionType{
 }
 
 enum UserRelationsActionType{
-    add("发送好友请求"),
-    remove("删除好友"),
-    block("拉黑该用户"),
-    removeBlock("解除拉黑该用户"),
+  add("发送好友请求"),
+  remove("删除好友"),
+  block("拉黑该用户"),
+  removeBlock("解除拉黑该用户"),
   ;
 
   final String relationTypeString;
-  
 
   const UserRelationsActionType(this.relationTypeString);
 }

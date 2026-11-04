@@ -56,7 +56,7 @@ class _BangumiTopicPageState extends BangumiContentPageState
   TopicModel getContentModel() => widget.topicModel;
 
   @override
-  Color? getcurrentSubjectThemeColor() => widget.themeColor;
+  Color? getcurrentSubjectThemeColor() => judgeIsFollowThemeColor(context) ? judgeCurrentThemeColor(context) : widget.themeColor;
 
   @override
   TopicDetails createEmptyDetailData() => TopicDetails.empty();

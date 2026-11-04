@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/eps_info.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +40,7 @@ String? convertAmpsSymbol(String? originalString) {
   return originalString;
 }
 
+// 2 => 02
 String convertDigitNumString(int originalNumber, {int numberBits = 2}) {
 
   String fillingContent = '';
@@ -55,6 +57,7 @@ String convertDigitNumString(int originalNumber, {int numberBits = 2}) {
 
 }
 
+// 2 => 2.00
 String convertDecimalDigitNumString(num originalNumber, {int numberBits = 2}) {
 
   String fillingContent = '.';
@@ -435,59 +438,82 @@ String convertProxyImageUri(String imageLink) {
 
 
 Color convertFineTuneColor(
-  Color originColor,
+  Color? originColor,
   {
     bool? darkMode,
-    ScaleType? lumiScaleType
+    bool? readableMode,
+    ScaleType lumiScaleType = ScaleType.max,
   }
 ) {
 
+  if (originColor == null) {
+    if (readableMode == true) return darkMode == true ? Colors.white : Colors.black;
+    return darkMode == true ? Colors.black : Colors.white;
+  }
+
   Color resultColor = originColor;
+  double originLumi = originColor.computeLuminance();
 
   double lumiScale;
 
   switch (lumiScaleType){
-    case ScaleType.min: {lumiScale = 0.1;
-      break;
-    }
-    case ScaleType.medium: {lumiScale = 0.2;
-      break;
-    }
-    case ScaleType.max: {lumiScale = 0.3;
-      break;
-    }
-    default: {lumiScale = 0.3;
-      break;
-    }
+    case ScaleType.min: lumiScale = 0.1;
+    case ScaleType.less: lumiScale = 0.2;
+    case ScaleType.medium: lumiScale = 0.25;
+    case ScaleType.more: lumiScale = 0.3;
+    case ScaleType.max: lumiScale = 0.4;
+  }
+
+  HSLColor hslColor = HSLColor.fromColor(resultColor);
+
+  lightup() {
+    double newLightness = (hslColor.lightness + lumiScale).clamp(lumiScale + 0.5, 1.0);
+
+    double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.4);
+    HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
+
+    resultColor = newHSLColor.toColor();
+  }
+
+  darken() {
+    double newLightness = (hslColor.lightness - lumiScale).clamp(0.5 - lumiScale, 0.5); // 确保不超过 1.0
+    double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.5); //偏透明色
+    HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
+
+    resultColor = newHSLColor.toColor();
   }
 
   if (darkMode == true) {
-    if (resultColor.computeLuminance() > 0.5) {
-      HSLColor hslColor = HSLColor.fromColor(resultColor); //亮度过低 转换HSL色度
-      double newLightness = (hslColor.lightness - lumiScale).clamp(0.5 - lumiScale, 0.5); // 确保不超过 1.0
-      double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.4); //偏透明色
-      HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
 
-      resultColor = newHSLColor.toColor();
-
+    if (readableMode == true) {
+      lightup();
     }
+
+    else {
+      if (originLumi > 0.5) darken();
+    }
+
   }
 
   else {
-    if (resultColor.computeLuminance() < 0.5) {
-      HSLColor hslColor = HSLColor.fromColor(resultColor);
-      double newLightness = (hslColor.lightness + lumiScale).clamp(lumiScale + 0.5, 1.0);
+    if (readableMode == true) {
+      darken();
+    }
 
-      double newSaturation = (hslColor.saturation - 0.1).clamp(0.2, 0.4);
-      HSLColor newHSLColor = hslColor.withLightness(newLightness).withSaturation(newSaturation);
-
-      resultColor = newHSLColor.toColor();
+    else {
+      if (originLumi < 0.3) lightup();
+      //太亮也不行 影响文字了
+      if (originLumi > 0.6) {
+        resultColor = resultColor.darken();
+      }
 
     }
+
   }
 
-  debugPrint("$resultColor, Lumi:${resultColor.computeLuminance()}");
+  debugPrint("readable: ${readableMode ?? "no"}[${(resultColor.r).toStringAsFixed(2)}/${(resultColor.g).toStringAsFixed(2)},${(resultColor.b).toStringAsFixed(2)}], Lumi:${originColor.computeLuminance().toStringAsFixed(2)}->${resultColor.computeLuminance().toStringAsFixed(2)}");
 
   return resultColor;
 
 }
+

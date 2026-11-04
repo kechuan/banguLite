@@ -218,9 +218,9 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                                   sliverAnimatedListKey: sliverAnimatedListKey, 
                                   expansibleController: expansibleController, 
                                   groupTitleNotifier: groupTitleNotifier,
-                                  loadGroupTopicCallback: (context) {
+                                  loadGroupTopicCallback: (context, lastGroupTitle) {
                                     expansibleController.collapse();
-                                    loadUIGroupTopics(context);
+                                    loadUIGroupTopics(context, isRefresh: groupTitleNotifier.value != lastGroupTitle);
                                   },
                                 )
 
@@ -287,7 +287,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 
   void loadUIGroupTopics(
     BuildContext context,
-
+    {bool isRefresh = false}
   ) {
 
     final timelineFlowModel = context.read<TimelineFlowModel>();
@@ -330,7 +330,11 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
     }
 
     else {
-      invokeRequest = () => groupsModel.loadGroupTopics(offset: initialLength);
+      invokeRequest = () {
+        //bool continueRequest = groupTitleNotifier.value == recordGroupTitle;
+        //recordGroupTitle = groupTitleNotifier.value;
+        return groupsModel.loadGroupTopics(offset: isRefresh ? 0 : initialLength);
+      };
     }
 
     invokeRequest().then((result) {

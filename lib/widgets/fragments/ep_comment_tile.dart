@@ -414,7 +414,12 @@ class _EpCommentTileState extends State<EpCommentTile> {
               // 回帖: 3-1(详情界面特供)
               ...?widget.epCommentData.epCommentIndex?.contains("-") ?? false ? 
               [
-                Divider(color: widget.readableThemeColor)
+
+                Divider(
+                  height: 1,
+                  thickness: 0.5,
+                  color: widget.readableThemeColor
+                )
               ] :
               null,
 

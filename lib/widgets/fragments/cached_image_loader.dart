@@ -2,6 +2,7 @@ import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/proxy_cache.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
+import 'package:bangu_lite/widgets/fragments/image_not_available.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -93,29 +94,3 @@ class CachedImageLoader extends StatelessWidget {
 }
 
 
-class ImageNotAvailable extends StatelessWidget {
-  const ImageNotAvailable({
-    super.key,
-    this.reason
-  });
-
-  final String? reason;
-
-  @override
-  Widget build(BuildContext context) {
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: Colors.grey.withValues(alpha: 0.5),
-      ),
-      child: Center(
-        child: ScalableText(
-          "Image Not Available \n $reason",
-          textAlign: TextAlign.center,
-        )
-      ),
-    );
-
-  }
-}

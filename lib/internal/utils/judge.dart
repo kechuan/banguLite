@@ -67,15 +67,18 @@ Color? judgeDarkContentSurfaceColor(
 
 }
 
-Color judgeDetailRenderColor(BuildContext context, Color? imageColor) {
-
+bool judgeIsFollowThemeColor(BuildContext context) {
   final IndexModel indexModel = context.read<IndexModel>();
+
+  return indexModel.userConfig.isFollowThemeColor == true;
+}
+
+Color judgeDetailRenderColor(BuildContext context, Color? imageColor) {
 
   Color renderColor;
 
-  if (indexModel.userConfig.isFollowThemeColor == true) {
+  if (judgeIsFollowThemeColor(context) == true) {
     renderColor = judgeCurrentThemeColor(context);
-
   }
 
   else {

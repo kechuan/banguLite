@@ -25,14 +25,14 @@ abstract class BaseComment {
   UserInformation? userInformation;
   String? comment;
   int? commentTimeStamp;
-  Map<int,Set<String>>? commentReactions;
+  Map<int, Set<String>>? commentReactions;
 
   factory BaseComment.empty(){
     throw UnimplementedError('factory should implemented in subclass');
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator==(Object other) {
     if (identical(this, other)) return true;
     return other is BaseComment && other.hashCode == hashCode;
   }
@@ -40,7 +40,7 @@ abstract class BaseComment {
   @override
   int get hashCode => commentID.hashCode;
 
-  
+
 
 }
 
@@ -71,20 +71,23 @@ class EpCommentDetails extends BaseComment{
 
   factory EpCommentDetails.empty() => EpCommentDetails(commentID: 0);
 
+  //也就是 authorContent 因为只有它才会用到这一层转换
   factory EpCommentDetails.fromContentDetail(
     ContentDetails? contentDetail,
     int? commentID
   ){
-      return EpCommentDetails()
-        ..comment = contentDetail?.content
-        ..commentReactions = contentDetail?.contentReactions
-        ..userInformation = contentDetail?.userInformation
-        ..commentID = commentID
-        ..commentTimeStamp = contentDetail?.createdTime
-      ;
+    return EpCommentDetails()
+      //亘古不变的first
+      ..epCommentIndex = "1"
+      ..comment = contentDetail?.content
+      ..commentReactions = contentDetail?.contentReactions
+      ..userInformation = contentDetail?.userInformation
+      ..commentID = commentID
+      ..commentTimeStamp = contentDetail?.createdTime
+    ;
   }
 
-  
+
 }
 
 
@@ -95,103 +98,101 @@ List<CommentDetails> loadCommentResponse(Response commentDetailResponse) {
 
   commentDetailResponse.requestOptions.path;
 
-    final List<CommentDetails> commentDetailsList = [];
+  final List<CommentDetails> commentDetailsList = [];
 
-    Map<String,dynamic> commentResponse = commentDetailResponse.data;
-    
+  Map<String, dynamic> commentResponse = commentDetailResponse.data;
 
-    List commentResponseList = commentResponse["data"]; //不要试图给请求假设类型 Map也不行!!
+  List commentResponseList = commentResponse["data"]; //不要试图给请求假设类型 Map也不行!!
 
+  for (Map currentComment in commentResponseList){
 
-    for(Map currentComment in commentResponseList){
+    //debugPrint("${currentComment.runtimeType}, $currentComment");
 
-      //debugPrint("${currentComment.runtimeType}, $currentComment");
+    final CommentDetails commentDetails = CommentDetails();
 
-      final CommentDetails commentDetails = CommentDetails();
-      
-        commentDetails
-          ..commentID = currentComment["id"]
-          ..userInformation = loadUserInformations(currentComment["user"])
-          ..rate = currentComment["rate"]
-          ..type = StarType.values.firstWhere(
-            (element) => element.starTypeIndex == currentComment["type"]
-          )
+    commentDetails
+      ..commentID = currentComment["id"]
+      ..userInformation = loadUserInformations(currentComment["user"])
+      ..rate = currentComment["rate"]
+      ..type = StarType.values.firstWhere(
+      (element) => element.starTypeIndex == currentComment["type"]
+    )
 
-          ..comment = currentComment["comment"]
-          ..commentTimeStamp = currentComment["updatedAt"]
-          ..commentReactions = loadReactionDetails(currentComment["reactions"])
+      ..comment = currentComment["comment"]
+      ..commentTimeStamp = currentComment["updatedAt"]
+      ..commentReactions = loadReactionDetails(currentComment["reactions"])
 
-        ;
-      
-      commentDetailsList.add(commentDetails);
+    ;
 
-    }
-
-    //debugPrint("comment parse done, commentStamp: ${DateTime.now()}");
-
-    return commentDetailsList;
+    commentDetailsList.add(commentDetails);
 
   }
+
+  //debugPrint("comment parse done, commentStamp: ${DateTime.now()}");
+
+  return commentDetailsList;
+
+}
 
 List<EpCommentDetails> loadEpCommentDetails(
   List epCommentListData,
   {int? repilyCommentIndex}
-){
+) {
 
-	final List<EpCommentDetails> currentEpCommentList = [];
+  final List<EpCommentDetails> currentEpCommentList = [];
 
-	int currentCommentIndex = 0;
+  int currentCommentIndex = 0;
 
-	for(Map currentEpCommentMap in epCommentListData){
-		EpCommentDetails currentEpComment = EpCommentDetails();
+  for (Map currentEpCommentMap in epCommentListData){
+    EpCommentDetails currentEpComment = EpCommentDetails();
     UserInformation currentUserInformation = loadUserInformations(currentEpCommentMap["user"] ?? currentEpCommentMap["creator"]);
 
-		currentCommentIndex+=1;
+    currentCommentIndex += 1;
 
-			currentEpComment
-        // not pass in GroupTopicDetails
-        ..contentID = currentEpCommentMap["mainID"]
-        ..commentID = currentEpCommentMap["id"]
-        ..comment = currentEpCommentMap["content"]
-        ..state = CommentState.values.firstWhere((currentState){
-          return currentState.index == currentEpCommentMap["state"];
-        }) 
-        ..commentTimeStamp = currentEpCommentMap["createdAt"]
+    currentEpComment
+      // not pass in GroupTopicDetails
+      ..contentID = currentEpCommentMap["mainID"]
+      ..commentID = currentEpCommentMap["id"]
+      ..comment = currentEpCommentMap["content"]
+      ..state = CommentState.values.firstWhere((currentState) {
+      return currentState.index == currentEpCommentMap["state"];
+    }) 
+      ..commentTimeStamp = currentEpCommentMap["createdAt"]
 
-        //user => epComment / creator => topicComment
-        ..userInformation = currentUserInformation
+      //user => epComment / creator => topicComment
+      ..userInformation = currentUserInformation
 
-        ..epCommentIndex = repilyCommentIndex != null ? "$repilyCommentIndex-$currentCommentIndex" : "$currentCommentIndex"
-        ..commentReactions = loadReactionDetails(currentEpCommentMap["reactions"])
-			;
+      ..epCommentIndex = repilyCommentIndex != null ? "$repilyCommentIndex-$currentCommentIndex" : "$currentCommentIndex"
+      ..commentReactions = loadReactionDetails(currentEpCommentMap["reactions"])
+    ;
 
-			if(
-        currentEpCommentMap["replies"]!=null &&
-        currentEpCommentMap["replies"].isNotEmpty 
-      ){
+    if (
+    currentEpCommentMap["replies"] != null &&
+      currentEpCommentMap["replies"].isNotEmpty 
+    ) {
 
-				List<EpCommentDetails> currentEpCommentRepliedList = loadEpCommentDetails(
-          currentEpCommentMap["replies"],
-          repilyCommentIndex: currentCommentIndex
-        );
+      List<EpCommentDetails> currentEpCommentRepliedList = loadEpCommentDetails(
+        currentEpCommentMap["replies"],
+        repilyCommentIndex: currentCommentIndex
+      );
 
-				currentEpComment.repliedComment = currentEpCommentRepliedList;
+      currentEpComment.repliedComment = currentEpCommentRepliedList;
 
-			}
+    }
 
-			currentEpCommentList.add(currentEpComment);
-	} 
+    currentEpCommentList.add(currentEpComment);
+  } 
 
-	 return currentEpCommentList;
+  return currentEpCommentList;
 
 }
 
-Map<int,Set<String>> loadReactionDetails(List? reactionListData){
-  Map<int,Set<String>> reactionCount = {};
+Map<int, Set<String>> loadReactionDetails(List? reactionListData) {
+  Map<int, Set<String>> reactionCount = {};
 
-  if(reactionListData == null) return reactionCount;
+  if (reactionListData == null) return reactionCount;
 
-  for(Map currentReaction in reactionListData){
+  for (Map currentReaction in reactionListData){
 
     reactionCount.addAll({
       currentReaction["value"] : 
@@ -199,7 +200,7 @@ Map<int,Set<String>> loadReactionDetails(List? reactionListData){
         (currentUser) => currentUser["nickname"].toString()
       ).toSet()
     });
-    
+
   }
 
   return reactionCount;

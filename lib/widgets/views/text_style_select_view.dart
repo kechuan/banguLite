@@ -70,17 +70,19 @@ class _TextStyleSelectViewState extends State<TextStyleSelectView> {
                               child: ScalableText('[${BBCodeTag.values[index].name}]',),
                             ),
                             child: Center(
-                              child: AdapterBBCodeText(
-                                data: '[${BBCodeTag.values[index].name}]${BBCodeTag.values[index].tagName}[/${BBCodeTag.values[index].name}]',
+                              child: IgnorePointer(
+                                child: AdapterBBCodeText(
+                                  data: '[${BBCodeTag.values[index].name}]${BBCodeTag.values[index].tagName}[/${BBCodeTag.values[index].name}]',
 
-                                stylesheet: BBStylesheet(
-                                  tags: allEffectTag.getRange(0, allEffectTag.length - 1).toList().also(
-                                    (it) => it.add(CodeTag(tagName: 'codeExample'))
+                                  stylesheet: BBStylesheet(
+                                    tags: allEffectTag.getRange(0, allEffectTag.length - 1).toList().also(
+                                      (it) => it.add(CodeTag(tagName: 'codeExample'))
+                                    ),
+                                    defaultText: TextStyle(
+                                      fontFamilyFallback: convertSystemFontFamily(),
+                                      color: judgeDarknessMode(context) ? Colors.white : Colors.black,
+                                    )
                                   ),
-                                  defaultText: TextStyle(
-                                    fontFamilyFallback: convertSystemFontFamily(),
-                                    color: judgeDarknessMode(context) ? Colors.white : Colors.black,
-                                  )
                                 ),
                               ),
                             )

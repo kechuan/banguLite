@@ -5,6 +5,7 @@ import 'package:bangu_lite/internal/proxy_cache.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
+import 'package:bangu_lite/widgets/fragments/image_not_available.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -81,7 +82,7 @@ class BuildDetailImages extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
             color: Colors.grey.withValues(alpha: 0.5),
           ),
-          child: const Center(child: ScalableText("Image Not Available")),
+          child: const Center(child: ImageNotAvailable())
         );
       },
 

@@ -19,89 +19,85 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
   });
 
   final int contentID;
-  
+
   final EpCommentDetails currentLevelComment;
   final int? commentIndex;
   final PostCommentType? postCommentType;
   final Color? readableThemeColor;
   final int? floorHostUserID;
 
-  
   @override
   Widget build(BuildContext context) {
 
-    
-
     ///暂时没有用到这个参数的地方
     debugPrint('${currentLevelComment.state}: $commentIndex');
-    if(commentIndex!=null) debugPrint("打开了第${commentIndex!+1}个评论");
+    if (commentIndex != null) debugPrint("打开了第${commentIndex! + 1}个评论");
 
     return ListView.builder(
-      itemCount: (currentLevelComment.repliedComment?.length ?? 1)+1,
-      
-      itemBuilder: (_,index){
-        
+      itemCount: (currentLevelComment.repliedComment?.length ?? 1) + 1,
+
+      itemBuilder: (_, index) {
+
         //和回帖评论的 Divider作区分 才这么写 
         //因为 其divider长度 受padding影响 不一致区分
-        if(index == 0){
+        if (index == 0) {
 
-            return Column(  
-              children: [
-            
-                EpCommentTile(
-                  contentID: contentID,
-                  postCommentType: postCommentType,
-                  epCommentData: currentLevelComment,
-                  readableThemeColor: readableThemeColor,
-                ),
+          return Column(  
+            children: [
 
-                Divider(height: 2,color: readableThemeColor),
-              ],
-            );
+              EpCommentTile(
+                contentID: contentID,
+                postCommentType: postCommentType,
+                epCommentData: currentLevelComment,
+                readableThemeColor: readableThemeColor,
+              ),
+
+              Divider(
+                height: 2,
+                thickness: 0.75,
+                color: readableThemeColor
+              ),
+            ],
+          );
         }
 
-        if(currentLevelComment.repliedComment!.isNotEmpty){
+        if (currentLevelComment.repliedComment!.isNotEmpty) {
 
           /// [BangumiCommentAuthorType] 楼中楼端
           BangumiCommentAuthorType? authorType;
-  
-          currentLevelComment.repliedComment?[index-1].let(
-            (it){
+
+          currentLevelComment.repliedComment?[index - 1].let(
+            (it) {
               //自身 大于 楼主 大于 层主
-              if(it.userInformation?.userID == floorHostUserID ){
+              if (it.userInformation?.userID == floorHostUserID) {
                 authorType = BangumiCommentAuthorType.author;
               }
 
-              if(it.userInformation?.userID == currentLevelComment.userInformation?.userID ){
+              if (it.userInformation?.userID == currentLevelComment.userInformation?.userID) {
                 authorType = BangumiCommentAuthorType.levelAuthor;
               }
 
-
-              if(it.userInformation?.userID == AccountModel.loginedUserInformations.userInformation?.userID ){
+              if (it.userInformation?.userID == AccountModel.loginedUserInformations.userInformation?.userID) {
                 authorType = BangumiCommentAuthorType.self;
               }
             }
           );
 
-          
-
           return EpCommentTile(
             contentID: contentID,
             postCommentType: postCommentType,
-            epCommentData: currentLevelComment.repliedComment![index-1],
+            epCommentData: currentLevelComment.repliedComment![index - 1],
             readableThemeColor: readableThemeColor,
             authorType: authorType
           );
         }
 
-        else{
+        else {
           return const SizedBox.shrink();
         }
 
-    
       }
     );
-
 
   }
 }

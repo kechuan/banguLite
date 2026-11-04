@@ -82,7 +82,8 @@ class EpRepliedTile extends ListTile {
                       .last
                       .replaceAll(bbcodeRegexp, '')
                       //正则会匹配到\n符号 额外剔除它
-                      .trimLeft()
+                      //.trimLeft()
+                      .trim()
                       ?? ""
                     ;
 

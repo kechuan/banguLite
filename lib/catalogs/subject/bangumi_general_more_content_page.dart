@@ -5,6 +5,7 @@ import 'package:bangu_lite/internal/custom_toaster.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/mdi_extendsion_icons.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
+import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
@@ -124,35 +125,63 @@ abstract class BangumiGeneralMoreContentPageState<
                           initialItemCount: contentListDataLength,
                           itemBuilder: (_, index, animation) {
 
+                            final cardThemeColor = judgeDetailRenderColor(context, bangumiThemeColor);
+
                             if (contentList.first.id == 0) return const SizedBox.shrink();
                             return Card(
-                              color: judgeDetailRenderColor(context, bangumiThemeColor),
+                              color: cardThemeColor,
                               child: ListTile(
                                 onTap: ()  {onTap?.call(index);},
-                                title: ScalableText("${contentList[index].contentTitle}", maxLines: 2, overflow: TextOverflow.ellipsis,),
+                                title: ScalableText(
+                                  "${contentList[index].contentTitle}", 
+                                  maxLines: 2, 
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: 
+                                    cardThemeColor.computeLuminance() >= 0.4 ? 
+                                    cardThemeColor.darken(amount: 0.5) : 
+                                    null
+                                  ),
+                                ),
                                 subtitle: Padding(
                                   padding: const EdgeInsets.only(top: 6),
                                   child: Row(
                                     children: [
 
-                                      ScalableText("${contentList[index].userInformation?.nickName}"),
+                                      ScalableText(
+                                        "${contentList[index].userInformation?.nickName}",
+                                        style: TextStyle(
+                                          color: 
+                                          cardThemeColor.computeLuminance() >= 0.4 ? 
+                                          cardThemeColor.darken(amount: 0.35) : 
+                                          null
+                                        ),
+                                      ),
 
                                       const Spacer(),
 
-                                      Wrap(
-                                        spacing: 6,
-                                        crossAxisAlignment: WrapCrossAlignment.center,
-                                        children: [
-                                          ScalableText(convertDateTimeToString(DateTime.fromMillisecondsSinceEpoch(contentList[index].createdTime! * 1000))),
-                                          Wrap(
-                                            crossAxisAlignment: WrapCrossAlignment.center,
-                                            spacing: 3,
-                                            children: [
-                                              const Icon(MdiExtendsionIcons.chat, size: 12),
-                                              ScalableText("${contentList[index].repliesCount}"),
-                                            ],
-                                          ),
-                                        ],
+                                      DefaultTextStyle(
+                                        style: TextStyle(
+                                          color: 
+                                          cardThemeColor.computeLuminance() >= 0.4 ? 
+                                          cardThemeColor.darken(amount: 0.35) : 
+                                          null
+                                        ),
+                                        child: Wrap(
+                                          spacing: 6,
+                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                          children: [
+                                            ScalableText(convertDateTimeToString(DateTime.fromMillisecondsSinceEpoch(contentList[index].createdTime! * 1000))),
+                                            Wrap(
+                                              crossAxisAlignment: WrapCrossAlignment.center,
+                                              spacing: 3,
+                                              children: [
+                                                const Icon(MdiExtendsionIcons.chat, size: 12),
+                                                ScalableText("${contentList[index].repliesCount}"),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       )
                                     ],
                                   ),
