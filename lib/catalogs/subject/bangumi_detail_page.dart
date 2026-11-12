@@ -31,6 +31,7 @@ import 'package:bangu_lite/widgets/fragments/toggle_theme_mode_button.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -229,7 +230,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                           },
 
                           child: CustomScrollView(
-                            cacheExtent: 1000,
+                            scrollCacheExtent: const ScrollCacheExtent.pixels(1000),
                             slivers: [
                               Skeletonizer.sliver(
                                 enabled: currentSubjectDetail?.summary == null,

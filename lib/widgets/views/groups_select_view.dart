@@ -119,7 +119,7 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
                         currentGroupCount,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: displayCrossAxisCount,
-                          crossAxisSpacing: 4,
+                          crossAxisSpacing: 0,
                           mainAxisSpacing: 4,
                           mainAxisExtent: 100
                         ),

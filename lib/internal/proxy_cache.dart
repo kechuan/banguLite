@@ -13,7 +13,6 @@ class ProxyCacheManager extends CacheManager with ImageCacheManager {
 
   static String currentProxyAddress = '';
 
-  @override
   ProxyCacheManager._(String proxyAddress) : super(
       proxyAddress.isEmpty
         ? Config(key)

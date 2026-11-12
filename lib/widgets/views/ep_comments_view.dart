@@ -53,10 +53,6 @@ class EpCommentView extends StatelessWidget {
           onUpdateComment: onUpdateComment,
           authorType: authorType,
           readableThemeColor: convertFineTuneColor(themeColor, darkMode: judgeDarknessMode(context), readableMode: true)
-          //readableThemeColor: 
-          //judgeDarknessMode(context) ? 
-          //convertFineTuneColor(themeColor, readableMode: true) : 
-          //themeColor,
         ),
         EpRepliedTile(
           contentID: contentID,

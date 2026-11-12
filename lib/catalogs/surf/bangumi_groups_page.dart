@@ -71,8 +71,10 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
       create: (_) => GroupsModel(subjectID: 'groupsTopic', selectedGroupInfo: widget.selectedGroupInfo),
       child: Builder(
         builder: (context) {
+          final accountModel = context.read<AccountModel>();
           return Scaffold(
             floatingActionButton: 
+            accountModel.isLogined() ?
             FloatingActionButton.extended(
               label: const Row(
                 spacing: 6,
@@ -125,6 +127,10 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                   fadeToaster(color: getCurrentThemeColor(context), context: context, message: "请先选择对应的小组");
                 }
 
+                else if (!accountModel.isLogined()) {
+                  fadeToaster(color: getCurrentThemeColor(context), context: context, message: "请先登录以发布内容");
+                }
+
                 //debugPrint("groupTitleNotifier.value: ${groupTitleNotifier.value} name:${groupsModel.selectedGroupInfo?.groupName} id:${groupsModel.selectedGroupInfo?.groupID}");
 
                 else {
@@ -154,11 +160,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
                           debugPrint("[PostContent] sendMessageResult:$result SendContent: $content");
                           //UI层 Callback
                           //这里与其添加 不如直接Refresh一遍timeline更好
-                          if (result != 0) {
-                            onPostContent(result, content);
-
-                          }
-
+                          if (result != 0) onPostContent(result, content);
                         });
 
                       }
@@ -168,7 +170,10 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
 
               },
 
-            ),
+            ) :
+            const SizedBox.shrink()
+            ,
+
             body: EasyRefresh(
               header: const TextHeader(),
               footer: const TextFooter(),

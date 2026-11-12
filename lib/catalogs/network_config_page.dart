@@ -120,7 +120,7 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                             color: 
                             (indexModel.userConfig.isProxyMode ?? false) ? 
                             getCurrentThemeColor(context).withValues(alpha: 0.3) : 
-                            Colors.grey.shade700
+                            (judgeDarknessMode(context) ? Colors.grey.shade700 : Colors.grey)
                           ),
 
                           child: Column(
