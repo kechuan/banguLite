@@ -227,7 +227,7 @@ class _BangumiNotificationsPageState extends State<BangumiNotificationsPage> {
                             NotificationType.unknown
                           ].contains(currentNotification.notificationType)
                           ) {
-                            bus.emit('AppRoute', referenceLink);
+                            bus.emitAppRoute(referenceLink);
 
                             if (currentNotification.isUnRead == true) {
                               accountModel.clearNotifications(notificationIDList: [currentNotification.notificationID ?? 0]).then((result) {

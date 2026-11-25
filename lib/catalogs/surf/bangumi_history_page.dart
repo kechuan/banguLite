@@ -36,7 +36,7 @@ class BangumiHistoryPage extends StatefulWidget {
 class BangumiHistoryPageState extends State<BangumiHistoryPage>
   with TickerProviderStateMixin {
 
-  final historyModel = HistoryModel.instance;
+  final HistoryModel historyModel = HistoryModel();
 
   @override
   void initState() {
@@ -55,13 +55,7 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
 
   @override
   void dispose() {
-    // 清理所有动画控制器
-    for (final controller in historyModel.deleteControllers.values) {
-      controller.dispose();
-    }
-
-    historyModel.bottomBarController.dispose();
-    historyModel.disposeData();
+    historyModel.dispose();
     super.dispose();
   }
 
@@ -138,7 +132,6 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
 
         for (final itemID in itemsToDelete) {
           MyHive.historySurfDataBase.delete(itemID);
-          historyModel.deleteControllers[itemID]?.dispose();
         }
 
         historyModel.clearAllSelectionData();
@@ -199,6 +192,7 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
         header: const TextHeader(),
 
         child: HistoryPageContent(
+          historyModel: historyModel,
           onDeleteSingleItem: deleteSingleItem,
         ),
 
@@ -387,9 +381,11 @@ class BangumiHistoryPageState extends State<BangumiHistoryPage>
 class HistoryPageContent extends StatefulWidget {
   const HistoryPageContent({
     super.key,
+    required this.historyModel,
     this.onDeleteSingleItem
   });
 
+  final HistoryModel historyModel;
   final Function(int)? onDeleteSingleItem;
 
   @override
@@ -399,7 +395,7 @@ class HistoryPageContent extends StatefulWidget {
 
 class _HistoryPageContentState extends State<HistoryPageContent> {
 
-  final historyModel = HistoryModel.instance;
+  HistoryModel get historyModel => widget.historyModel;
 
   //final PageController historyPageController = PageController();
 
@@ -758,7 +754,11 @@ class _HistoryPageContentState extends State<HistoryPageContent> {
                       child: IconButton(
                         onPressed: () {
                           if (historyModel.historyPageController.hasClients) {
-                            showHistoryDateRangeSelectDialog(context, historyModel.historyPageController.page!.toInt()).then((index) {
+                            showHistoryDateRangeSelectDialog(
+                              context,
+                              historyModel.historyPageController.page!.toInt(),
+                              historyModel: historyModel,
+                            ).then((index) {
                               if (index != null) {
                                 historyModel.historyPageController.jumpToPage(index);
                               }

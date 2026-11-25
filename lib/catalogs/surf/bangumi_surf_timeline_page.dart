@@ -25,7 +25,7 @@ class BangumiTimelinePage extends StatefulWidget {
   State<BangumiTimelinePage> createState() => _BangumiTimelinePageState();
 }
 
-class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage> with SingleTickerProviderStateMixin, RouteLifecycleMixin  {
+class _BangumiTimelinePageState extends LifecycleRouteState<BangumiTimelinePage> with SingleTickerProviderStateMixin {
 
   final ValueNotifier<BangumiSurfGroupType> groupTypeNotifier = ValueNotifier(BangumiSurfGroupType.all);
   final ValueNotifier<BangumiTimelineSortType> timelineSortTypeNotifier = ValueNotifier(BangumiTimelineSortType.all);

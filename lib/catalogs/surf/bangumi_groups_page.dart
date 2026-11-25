@@ -364,7 +364,7 @@ class _BangumiGroupsPageState extends State<BangumiGroupsPage>{
         animatedListController: animatedGroupTopicsListController
       );
 
-      groupsModel.notifyListeners();
+      groupsModel.notifyGroupDataChanged();
 
     });
 

@@ -97,6 +97,10 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
   @override
   void initState() {
+    if (widget.preservationContent != null) {
+      titleEditingController.text = widget.preservationContent!.$1;
+      contentEditingController.text = widget.preservationContent!.$2;
+    }
     textEditingFocus.requestFocus();
     super.initState();
   }
@@ -148,11 +152,6 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
     final webviewModel = context.read<WebViewModel>();
     final accountModel = context.read<AccountModel>();
 
-    if (widget.preservationContent != null && contentEditingController.text.isEmpty) {
-      titleEditingController.text = widget.preservationContent?.$1 ?? "";
-      contentEditingController.text = widget.preservationContent?.$2 ?? "";
-    }
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, __) {
@@ -170,7 +169,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
             icon: const Icon(Icons.arrow_back),
           ),
           backgroundColor: getCurrentThemeColor(context).withValues(alpha: 0.8),
-          title: ScalableText(widget.title ?? '吐槽 ${widget.title}', style: const TextStyle(fontSize: 18)),
+          title: ScalableText(widget.title ?? '吐槽', style: const TextStyle(fontSize: 18)),
           actions: [
 
             IconButton(

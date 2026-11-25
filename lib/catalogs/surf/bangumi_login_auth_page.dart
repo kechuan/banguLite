@@ -1,7 +1,6 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
-import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
@@ -14,7 +13,6 @@ import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bbcode/flutter_bbcode.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 
 @FFRoute(name: '/loginAuth')
@@ -174,11 +172,7 @@ class BangumiAuthPage extends StatelessWidget {
                   case LoginStatus.failed:{
                     resultText = '验证会话已过期 请再次重试';
                     resultIcon = IconButton(
-                      onPressed: () {
-                        launchUrlString(BangumiWebUrls.webAuthPage());
-                        accountModel.accountLoginStatus = LoginStatus.logining;
-                        accountModel.notifyListeners();
-                      }, 
+                      onPressed: () => accountModel.loginWebAuth(), 
                       icon: const Icon(Icons.refresh)
                     );
                   }
