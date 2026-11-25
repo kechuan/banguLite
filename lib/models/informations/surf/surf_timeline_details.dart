@@ -51,15 +51,14 @@ class SurfTimelineDetails extends BaseDetails {
 
   @override
   bool operator ==(Object other) =>
-      identical(this,other) ||
+      identical(this, other) ||
       other is SurfTimelineDetails &&
           runtimeType == other.runtimeType &&
-          detailID == other.detailID;
-
-
+          detailID == other.detailID &&
+          bangumiSurfTimelineType == other.bangumiSurfTimelineType;
 
   @override
-  int get hashCode => super.detailID ?? 0;
+  int get hashCode => Object.hash(super.detailID, bangumiSurfTimelineType);
 }
 
 

@@ -10,13 +10,12 @@ import 'package:flutter/widgets.dart';
 
 /// 对于番剧来说 是Review
 /// 而对于 用户个人来说 则是Blog
-class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
+class ReviewModel extends BaseModel<int, ReviewInfo, BlogDetails>{
 
   ReviewModel({
     required super.subjectID
   }){
-    if (subjectID == "blog") return;
-    loadSubjectReviews();
+    if (subjectID != 0) loadSubjectReviews();
   }
 
   Future<void> loadSubjectReviews({int? offset = 0}) async {
@@ -97,7 +96,7 @@ class ReviewModel extends BaseModel<ReviewInfo, BlogDetails>{
   @override
   BlogDetails createEmptyDetails() => BlogDetails.empty();
   @override
-  String getContentListUrl(dynamic subjectID) => BangumiAPIUrls.reviews(subjectID);
+  String getContentListUrl(int subjectID) => BangumiAPIUrls.reviews(subjectID);
   @override
   //String getContentDetailUrl(int contentID) => BangumiAPIUrls.userBlog(selectedBlogID);
   String getContentDetailUrl(int contentID) => BangumiAPIUrls.userBlog(contentID);

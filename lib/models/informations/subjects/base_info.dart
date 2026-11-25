@@ -6,17 +6,17 @@ abstract class BaseInfo {
   // 通用ID字段 因为需求被修改 因此不作final
   int? id; 
 
+
 }
 
 // Content: Topic/Blog 这种单人开题 ...肯定拥有的属性
-abstract class ContentInfo extends BaseInfo {
+class ContentInfo extends BaseInfo {
   ContentInfo({
     super.id,
-	  this.contentTitle
+    this.contentTitle
   });
 
   //Blog/Topic 应需求
-  //凭借Group的一己之力 更改为dynamic属性
   int? sourceID;
 
   //title
@@ -24,18 +24,28 @@ abstract class ContentInfo extends BaseInfo {
 
   int? createdTime;
   int? updatedTime;
-  
+
   int? repliesCount;
   String? lastRepliedNickName;
 
   //user
   UserInformation? userInformation;
 
-  // 工厂方法，创建空对象 需求交付给子类实现
-  factory ContentInfo.empty() {
-    throw UnimplementedError('ContentInfo.empty() must be implemented by subclasses');
+  /// 拦截注入
+  Function()? loadInterceptionCallback;
+
+  factory ContentInfo.empty() => ContentInfo(id: 0);
+
+  @override
+  bool operator==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ContentInfo && other.hashCode == hashCode;
+
   }
 
-  Function()? loadInterceptionCallback;
+  @override
+  int get hashCode => id.hashCode;
+
+
 
 }

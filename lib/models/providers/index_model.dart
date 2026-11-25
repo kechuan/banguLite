@@ -1,14 +1,10 @@
 
-import 'dart:async';
-
 import 'package:bangu_lite/hive/config_model.dart';
 import 'package:bangu_lite/internal/hive.dart';
-import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/services/star_sync_service.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
-import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/local/star_details.dart';
-import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -17,20 +13,7 @@ class IndexModel extends ChangeNotifier {
     initModel();
   }
 
-  DateTime dataTime = DateTime.now();
-  int selectedYear = DateTime.now().year;
-  int selectedWeekDay = DateTime.now().weekday;
-  SeasonType selectedSeason = getSeasonRange(DateTime.now().month, currentTime: true);
-
   int starUpdateFlag = 0;
-
-  Completer? loadFuture; //适用作用目标只有一个的对象里
-
-  //除了 星期一-日之外 还有一个 最热门 的属性存放评分7.0+的番剧
-  Map<String, List<BangumiDetails>> calendarBangumis = {
-    for (var weekday in WeekDay.values) '星期${weekday.dayText}' : [],
-    "最热门":[],
-  }; 
 
   AppConfig userConfig = defaultAPPConfig();
 
@@ -65,6 +48,7 @@ class IndexModel extends ChangeNotifier {
 
   void loadConfigData() {
     userConfig = MyHive.appConfigDataBase.get("currentTheme") ?? defaultAPPConfig();
+    AppFontSize.scale = userConfig.fontScale ?? ScaleType.medium;
   }
 
   void updateThemeMode(ThemeMode mode, {bool? config}) {
@@ -150,7 +134,7 @@ class IndexModel extends ChangeNotifier {
       ).map((e) => e.bangumiID!).toList()
     );
 
-    starsUpdateRating = await loadStarsDetail(starsList);
+    starsUpdateRating = await StarSyncService.fetchStarsRating(starsList);
 
     debugPrint("timestamp: ${DateTime.now()} update Star done");
 
@@ -187,54 +171,6 @@ class IndexModel extends ChangeNotifier {
 
   Future<void> updateCachedSize() async {
     cachedImageSize = await compute(getTotalSizeOfFilesInDir, MyHive.cachedImageDir);
-    notifyListeners();
-  }
-
-  Future<void> reloadCalendar({Future<List<BangumiDetails>> Function()? switchCalendar}) {
-    loadFuture = null;
-    return loadCalendar(switchCalendar: switchCalendar);
-  }
-
-  Future<void> loadCalendar({Future<List<BangumiDetails>> Function()? switchCalendar}) async {
-
-    if (loadFuture != null) return loadFuture!.future;
-
-    Completer loadCompleter = Completer();
-
-    debugPrint("timestamp: ${DateTime.now()} calendar start");
-    loadFuture = loadCompleter;
-
-    if (switchCalendar != null) {
-
-      await switchCalendar().then((detailsList) {
-        debugPrint("timestamp: ${DateTime.now()} calendar get");
-        calendarBangumis = searchDataAdapter(detailsList);
-      });
-
-    }
-
-    else {
-
-      await HttpApiClient.client.get(BangumiAPIUrls.calendar).then((response) {
-        debugPrint("timestamp: ${DateTime.now()} calendar get");
-        calendarBangumis = loadCalendarData(response, animeFilter: true);
-      });
-
-    }
-
-    dataTime = DateTime.now();
-    debugPrint("timestamp: $dataTime calendar done");
-
-    loadCompleter.complete();
-    notifyListeners();
-    //loadFuture = null;
-
-    return loadCompleter.future;
-
-  }
-
-  void updateSelectedWeekDay(int newWeekDay) {
-    selectedWeekDay = newWeekDay;
     notifyListeners();
   }
 

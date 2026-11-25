@@ -102,6 +102,7 @@ class CommentModel extends ChangeNotifier {
     }
 
     on DioException catch(e){
+      userCommentDetails = null;
       if(e.response?.statusCode == 404){
         debugPrint("用户未收藏该条目: $subjectID");
       }
@@ -207,12 +208,7 @@ class CommentModel extends ChangeNotifier {
       ..["offset"] =  isReverse ?
                       (currentRequestRange > commentLength ? commentLength - pageRange : currentRequestRange) :
                       pageRange > commentLength ? 0 : currentRequestRange
-
-                
-    ).catchError((error){
-        commentsData.remove(pageIndex);
-        return Response(requestOptions: RequestOptions());
-    });
+    );
 
       if(detailInformation.data!=null){
         commentsData[pageIndex] = loadCommentResponse(detailInformation);
@@ -234,17 +230,15 @@ class CommentModel extends ChangeNotifier {
     }
 
     on DioException catch(e){
+      commentsData.remove(pageIndex);
       debugPrint("Request Error:${e.toString()}");
       fallbackAction?.call("Request Error:${e.toString()}");
     }
 
   }
 
-  @override
-  void notifyListeners() {
-    //For exernal use with no warnning hint
-    super.notifyListeners();
-  }
+  /// 切换 最新/最早 排序且目标页数据已缓存时 仅需通知 UI 重新取用
+  void notifySortOrderChanged() => notifyListeners();
 
   @override
   void dispose() {

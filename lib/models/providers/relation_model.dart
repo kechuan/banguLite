@@ -5,7 +5,7 @@ import 'package:bangu_lite/models/informations/subjects/relation_details.dart';
 import 'package:dio/dio.dart';
 
 /// 相关条目 不存在后续的数据
-class RelationModel extends BaseModel<RelationDetails,Null>{
+class RelationModel extends BaseModel<int, RelationDetails, Null>{
 
   RelationModel({
     required super.subjectID
@@ -31,6 +31,6 @@ class RelationModel extends BaseModel<RelationDetails,Null>{
   List<RelationDetails> createEmptyInfoList() => [RelationDetails.empty()];
 
   @override
-  String getContentListUrl(dynamic subjectID) => BangumiAPIUrls.relations(subjectID);
+  String getContentListUrl(int subjectID) => BangumiAPIUrls.relations(subjectID);
   
 }

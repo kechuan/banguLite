@@ -1,8 +1,8 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/utils/template.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_details.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
@@ -13,7 +13,7 @@ import 'package:dio/dio.dart';
 //但适用规则 GroupDetails 基本等于 info 
 // 而对于 Detail 来说 其子信息应当是 
 
-class GroupsModel extends BaseModel<GroupTopicInfo, GroupTopicDetails>{
+class GroupsModel extends BaseModel<String?, GroupTopicInfo, GroupTopicDetails>{
 
   //仅占位
   GroupsModel({
@@ -43,10 +43,8 @@ class GroupsModel extends BaseModel<GroupTopicInfo, GroupTopicDetails>{
     Function(String)? fallbackAction
   }) async {
 
-    Completer<bool> requestGroupsCompleter = Completer();
-
     try {
-      await HttpApiClient.client.get(
+      final response = await HttpApiClient.client.get(
         BangumiAPIUrls.groups(),
         queryParameters: BangumiQuerys.groupsQuery(
           modeName: mode == BangumiSurfGroupType.created ? "managed" : mode.name,
@@ -54,35 +52,25 @@ class GroupsModel extends BaseModel<GroupTopicInfo, GroupTopicDetails>{
           offset: offset,
         ),
         options: Options(headers: accessQuery),
-      ).then((response) {
-          if (response.statusCode == HttpStatus.ok) {
+      );
 
-            if (offset == 0) {
-              groupsData[mode] = loadGroupsInfo(response.data["data"]);  
-            }
+      if (response.statusCode == HttpStatus.ok) {
+        if (offset == 0) {
+          groupsData[mode] = loadGroupsInfo(response.data["data"]);
+        } else {
+          groupsData[mode]!.addAll(loadGroupsInfo(response.data["data"]));
+        }
 
-            else {
-              groupsData[mode]!.addAll(loadGroupsInfo(response.data["data"]));
-            }
+        notifyListeners();
+        return true;
+      }
 
-            requestGroupsCompleter.complete(true);
-            notifyListeners();
-          }
-
-          else {
-            requestGroupsCompleter.complete(false);
-            fallbackAction?.call('${response.statusCode} ${response.data["message"]}');
-          }
-
-        });
+      fallbackAction?.call('${response.statusCode} ${response.data is Map ? response.data["message"] : response.statusMessage}');
+      return false;
+    } on DioException catch (e) {
+      fallbackAction?.call('${e.response?.statusCode} ${extractDioException(e)}');
+      return false;
     }
-
-    on DioException catch (e){
-      fallbackAction?.call('${e.response?.statusCode} ${e.response?.data["message"]}');
-    }
-
-    return requestGroupsCompleter.future;
-
   }
 
   Future<bool> loadGroupTopics({
@@ -105,7 +93,7 @@ class GroupsModel extends BaseModel<GroupTopicInfo, GroupTopicDetails>{
   GroupTopicDetails createEmptyDetails() => GroupTopicDetails.empty();
 
   @override
-  String getContentListUrl(dynamic subjectID) => BangumiAPIUrls.groupTopics(selectedGroupInfo?.groupName ?? '');
+  String getContentListUrl(String? subjectID) => BangumiAPIUrls.groupTopics(selectedGroupInfo?.groupName ?? subjectID ?? '');
 
   @override
   String getContentDetailUrl(int contentID) => BangumiAPIUrls.groupTopic(contentID);
@@ -119,9 +107,7 @@ class GroupsModel extends BaseModel<GroupTopicInfo, GroupTopicDetails>{
   @override
   GroupTopicDetails convertResponseToDetail(Map<String, dynamic> contentResponseData) => loadGroupTopicDetails(contentResponseData);
 
-  @override
-  void notifyListeners() {
-    super.notifyListeners();
-  }
+  /// 外部(列表追加动画完成后)需要让依赖 groupsData/contentListData 的组件刷新时调用
+  void notifyGroupDataChanged() => notifyListeners();
 
 }

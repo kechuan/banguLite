@@ -4,12 +4,11 @@ import 'package:bangu_lite/models/informations/subjects/topic_details.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:dio/dio.dart';
 
-class TopicModel extends BaseModel<TopicInfo, TopicDetails> {
+class TopicModel extends BaseModel<int, TopicInfo, TopicDetails> {
   TopicModel({
     required super.subjectID
   }){
-    if(subjectID == 'topic') return;
-    loadSubjectTopics();
+    if (subjectID != 0) loadSubjectTopics();
   }
 
   Future<void> loadSubjectTopics({int? offset = 0}) async {
@@ -24,7 +23,7 @@ class TopicModel extends BaseModel<TopicInfo, TopicDetails> {
   @override
   TopicDetails createEmptyDetails() => TopicDetails.empty();
   @override
-  String getContentListUrl(dynamic subjectID) => BangumiAPIUrls.topic(subjectID);
+  String getContentListUrl(int subjectID) => BangumiAPIUrls.topic(subjectID);
   @override
   String getContentDetailUrl(int contentID) => BangumiAPIUrls.topicComment(contentID);
   @override

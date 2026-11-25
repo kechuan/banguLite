@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bangu_lite/catalogs/subject/bangumi_ep_page.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
@@ -23,18 +21,17 @@ class UserModel extends ChangeNotifier{
     UserInformation? currentUserInformation
   ) async {
 
-    Completer userInfomationCompleter = Completer();
-
     if(userName == null) return;
     if(userData.containsKey(userName)) return;
 
     //初始化占位
-    userData.addAll({userName:UserDetails()});
+    userData[userName] = UserDetails();
 
-    await Future.wait([
-      HttpApiClient.client.get(BangumiAPIUrls.user(userName)),
-      loadUserTimeline(userName)
-    ]).then((responseList){
+    try {
+      final responseList = await Future.wait([
+        HttpApiClient.client.get(BangumiAPIUrls.user(userName)),
+        loadUserTimeline(userName)
+      ]);
 
       if(responseList[0].data != null && responseList[1].data != null){
 
@@ -51,22 +48,15 @@ class UserModel extends ChangeNotifier{
 
         );
 
-        userData.addAll({
-          userName:currentUserDetail
-        });
-
-        userInfomationCompleter.complete();
-
+        userData[userName] = currentUserDetail;
         notifyListeners();
-
-
+      } else {
+        userData.remove(userName);
       }
-
-     
-    });
-
-   
-    return userInfomationCompleter.future;
+    } on DioException catch (e) {
+      userData.remove(userName);
+      debugPrint("[UserModel] loadUserInfomation error: $e");
+    }
 
   }
 

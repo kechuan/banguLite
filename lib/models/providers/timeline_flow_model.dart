@@ -24,6 +24,7 @@ class TimelineFlowModel extends ChangeNotifier {
     if (requestTimelineFuture != null) return requestTimelineFuture!;
 
     late final Future<bool> requestFuture;
+
     requestFuture = loadSelectedTimeLineType(
       timelineType,
       queryParameters: queryParameters,
@@ -115,9 +116,7 @@ class TimelineFlowModel extends ChangeNotifier {
       final responseList = await timelineFuture();
       bool hasEmptyResponse = false;
 
-      for (int responseIndex = 0;
-      responseIndex < responseList.length;
-      responseIndex++) {
+      for (int responseIndex = 0; responseIndex < responseList.length; responseIndex++) {
         final response = responseList[responseIndex];
 
         if (response.statusCode != HttpStatus.ok) {
@@ -154,12 +153,15 @@ class TimelineFlowModel extends ChangeNotifier {
 
       notifyListeners();
       return true;
-    } on DioException catch (e) {
+    } 
+
+    on DioException catch (e) {
       fallbackAction?.call(
         'request timeline content failed ${e.type}',
       );
       return false;
     }
+
   }
 
   Future<bool> requestTrendTopicTimeline({
@@ -171,6 +173,7 @@ class TimelineFlowModel extends ChangeNotifier {
     }
 
     late final Future<bool> requestFuture;
+
     requestFuture = loadTrendTopicTimeline(
       queryParameters: queryParameters,
       fallbackAction: fallbackAction,

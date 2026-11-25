@@ -1,8 +1,6 @@
 
-import 'dart:async';
 import 'dart:math';
 
-import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
@@ -14,8 +12,39 @@ const excludeTagsList = [
   "日本", "TV", "WEB"
 ];
 
+class BangumiRating
+{
+  const BangumiRating({
+    this.total = 0,
+    this.score = 0.0,
+    this.rank = 0,
+    this.count = const {},
+  });
+
+  final int total;
+  final double score;
+  final int rank;
+  final Map<String, int> count;
+}
+
+class BangumiAirInfo
+{
+  const BangumiAirInfo({
+    this.airDate,
+    this.airWeekday,
+    this.eps,
+    this.alias,
+  });
+
+  final String? airDate;
+  final String? airWeekday;
+  final int? eps;
+  final String? alias;
+}
+
 ///打开 subjectID 之后对应的details信息返回
-class BangumiDetails {
+class BangumiDetails
+{
 
   int? id;
   int? type;
@@ -31,12 +60,54 @@ class BangumiDetails {
   Map<String, dynamic> informationList = {};
   Map<String, int> tagsList = {};
 
-  Map<String, dynamic> ratingList = {
-    "total": 0,
-    "score": 0.0,
-    "rank": 0.0,
-    "count":{}
-  };
+  Map<String, dynamic> ratingList = 
+    {
+      "total": 0,
+      "score": 0.0,
+      "rank": 0,
+      //""
+      "count": {},
+    };
+
+  /// 强类型评分视图，避免直接对弱类型 Map 做隐式类型假设
+  BangumiRating get rating 
+  {
+    final countData = ratingList["count"];
+    final Map<String, int> countMap;
+
+    if (countData is Map) {
+      countMap = {
+        for (final entry in countData.entries)
+          if (entry.value is num) entry.key.toString(): (entry.value as num).toInt(),
+      };
+    }
+
+    else if (countData is List) {
+      countMap = {
+        for (int index = 0; index < countData.length; index++)
+          if (countData[index] is num) '${index + 1}': (countData[index] as num).toInt(),
+      };
+    }
+
+    else {
+      countMap = const {};
+    }
+
+    return BangumiRating(
+      total: (ratingList["total"] as num?)?.toInt() ?? 0,
+      score: (ratingList["score"] as num?)?.toDouble() ?? 0.0,
+      rank: (ratingList["rank"] as num?)?.toInt() ?? 0,
+      count: countMap,
+    );
+  }
+
+  /// 强类型放送信息视图
+  BangumiAirInfo get airInfo => BangumiAirInfo(
+    airDate: informationList["air_date"]?.toString(),
+    airWeekday: informationList["air_weekday"]?.toString(),
+    eps: (informationList["eps"] as num?)?.toInt(),
+    alias: informationList["alias"]?.toString(),
+  );
 
 }
 
@@ -58,17 +129,19 @@ Map<String, List<BangumiDetails>> loadCalendarData(Response bangumiCalendarRespo
 
       for (Map<String, dynamic> currentBangumi in currentDayBangumiList){
 
-        BangumiDetails bangumiDetails = BangumiDetails();
-
         if (animeFilter == true) {
           if (!animationFilter(currentBangumi)) continue;
         }
 
-        bangumiDetails = loadDetailsData(currentBangumi);
+        final bangumiDetails = loadDetailsData(currentBangumi);
 
+        //本季热番判定标准
         if (
+        //应季
         judgeInSeasonBangumi(currentBangumi["air_date"]) &&
+          //高分
           bangumiDetails.ratingList["score"] > 7.0 && 
+          //样本量不必太低
           bangumiDetails.ratingList["total"] > (judgeTransitionalSeason() ? 10 : 25)
         ) {
           popularInSeasonBangumis.add(bangumiDetails);
@@ -102,10 +175,13 @@ List<BangumiDetails> loadSearchData(Map<String, dynamic> bangumiData, {bool? ani
 
   List<dynamic> bangumiList = bangumiData["data"];
 
-  for (Map currentBangumi in bangumiList){
+  for (Map currentBangumi in bangumiList)
+  {
 
-    if (animateFilter == true) {
-      if (!animationFilter(currentBangumi)) {
+    if (animateFilter == true) 
+    {
+      if (!animationFilter(currentBangumi)) 
+      {
         continue;
       }
     }
@@ -117,23 +193,30 @@ List<BangumiDetails> loadSearchData(Map<String, dynamic> bangumiData, {bool? ani
     bangumiDetail.coverUrl = currentBangumi["image"];
 
     //仅用于 搜索页面 的 tag 展现 
-    for (String currentTagName in currentBangumi["meta_tags"]){
-      if (!excludeTagsList.contains(currentTagName)) {
-        bangumiDetail.tagsList.addAll({
+    for (String currentTagName in currentBangumi["meta_tags"])
+    {
+      if (!excludeTagsList.contains(currentTagName)) 
+      {
+        bangumiDetail.tagsList.addAll(
+        {
           currentTagName : 0
-        });
+        }
+        );
       }
     }
 
-    bangumiDetail.informationList = {
+    bangumiDetail.informationList = 
+    {
       "air_date": currentBangumi["date"],
       "eps": currentBangumi["eps"]
     };
 
-    bangumiDetail.ratingList = {
+    bangumiDetail.ratingList = 
+    {
       "total": currentBangumi["rating"]["total"] ?? 0,
       "score": currentBangumi["rating"]["score"] ?? 0,
       "rank": currentBangumi["rating"]["rank"] ?? 0, //返回的是一个数值0
+      "count": <String, int>{},
     };
 
     searchResult.add(bangumiDetail);
@@ -147,22 +230,25 @@ Map<String, List<BangumiDetails>> searchDataAdapter(
   List<BangumiDetails> bangumiSearchDetailsList,
 ) {
 
-  final Map<String, List<BangumiDetails>> searchWeekList = {
-    "星期一":[],
-    "星期二":[],
-    "星期三":[],
-    "星期四":[],
-    "星期五":[],
-    "星期六":[],
-    "星期日":[],
-    "最热门":[]
-  };
+  final Map<String, List<BangumiDetails>> searchWeekList = 
+    {
+      "星期一":[],
+      "星期二":[],
+      "星期三":[],
+      "星期四":[],
+      "星期五":[],
+      "星期六":[],
+      "星期日":[],
+      "最热门":[]
+    };
 
-  for (BangumiDetails currentBangumi in bangumiSearchDetailsList){
+  for (BangumiDetails currentBangumi in bangumiSearchDetailsList)
+  {
 
     int weekday = DateTime.tryParse(currentBangumi.informationList["air_date"] ?? "")?.weekday ?? 0;
 
-    if (weekday != 0) {
+    if (weekday != 0) 
+    {
       searchWeekList.values.elementAt(weekday - 1).add(currentBangumi);
     }
 
@@ -196,7 +282,8 @@ BangumiDetails loadDetailsData(Map<String, dynamic> bangumiData, {bool detailFla
   bangumiDetails.id = bangumiData["id"];
   bangumiDetails.type = bangumiData["type"];
 
-  bangumiDetails.ratingList = {
+  bangumiDetails.ratingList = 
+  {
     "rank": bangumiData["rating"]?["rank"] ?? 0, //返回的是一个数值0
     "total": bangumiData["rating"]?["total"] ?? 0,
     "score": bangumiData["rating"]?["score"] ?? 0.0,
@@ -208,7 +295,8 @@ BangumiDetails loadDetailsData(Map<String, dynamic> bangumiData, {bool detailFla
 
   };
 
-  bangumiDetails.informationList = {
+  bangumiDetails.informationList = 
+  {
     "air_date":bangumiData["air_date"],
     "air_weekday":'星期${WeekDay.values.elementAtOrNull((bangumiData["air_weekday"] ?? 1) - 1)?.dayText}',
     "alias":bangumiData["name"],
@@ -216,29 +304,37 @@ BangumiDetails loadDetailsData(Map<String, dynamic> bangumiData, {bool detailFla
 
   //info collect
 
-  if (detailFlag) {
-    bangumiDetails.informationList = {
+  if (detailFlag) 
+  {
+    bangumiDetails.informationList = 
+    {
       //"eps":bangumiData["eps"] == 0 ? bangumiData["total_episodes"] : bangumiData["eps"],
       "eps":bangumiData["total_episodes"],
       "alias":bangumiData["name_cn"].isNotEmpty ? bangumiData["name"] : "",
       "air_date": bangumiData["date"].toString()
     };
 
-    for (Map currentInformation in bangumiData["infobox"]){
+    for (Map currentInformation in bangumiData["infobox"])
+    {
 
       if (
       currentInformation["key"] != "放送星期" &&
         currentInformation["key"] != "放送开始"
-      ) {
+      ) 
+      {
         continue;
       }
 
-      switch (currentInformation["key"]){
+      switch (currentInformation["key"])
+      {
 
-        case "放送星期": {
-          bangumiDetails.informationList.addAll({
+        case "放送星期":
+        {
+          bangumiDetails.informationList.addAll(
+          {
             "air_weekday": currentInformation["value"].toString()
-          });
+          }
+          );
 
           break;
         }
@@ -250,10 +346,13 @@ BangumiDetails loadDetailsData(Map<String, dynamic> bangumiData, {bool detailFla
 
     debugPrint("${bangumiData["name_cn"]} => ${bangumiData["name"]}");
 
-    for (int tagIndex = 0; tagIndex < min(8, bangumiData["tags"].length); tagIndex++){
-      bangumiDetails.tagsList.addAll({
+    for (int tagIndex = 0; tagIndex < min(8, bangumiData["tags"].length); tagIndex++)
+    {
+      bangumiDetails.tagsList.addAll(
+      {
         bangumiData["tags"][tagIndex]["name"].toString():bangumiData["tags"][tagIndex]["count"]
-      });
+      }
+      );
     }
   }
 
@@ -272,7 +371,8 @@ BangumiDetails loadRelationsData(Map<String, dynamic> bangumiData) {
   bangumiDetails.id = bangumiData["id"];
   bangumiDetails.type = bangumiData["type"];
 
-  bangumiDetails.ratingList = {
+  bangumiDetails.ratingList = 
+  {
     "total": bangumiData["rating"]?["total"] ?? 0,
     "score": bangumiData["rating"]?["score"] ?? 0.0,
     "rank": bangumiData["rating"]?["rank"] ?? 0, //返回的是一个数值0
@@ -292,14 +392,16 @@ BangumiDetails loadStarDetailsData(StarBangumiDetails starBangumiData) {
 
   ;
 
-  bangumiDetails.ratingList = {
+  bangumiDetails.ratingList = 
+  {
     "total": 0,
-    "score": starBangumiData.score,
-    "rank": starBangumiData.rank,
-    "count": 0
+    "score": starBangumiData.score ?? 0.0,
+    "rank": starBangumiData.rank ?? 0,
+    "count": <String, int>{},
   };
 
-  bangumiDetails.informationList = {
+  bangumiDetails.informationList = 
+  {
     "eps":starBangumiData.eps,
     "air_date": starBangumiData.airDate
   };
@@ -311,7 +413,8 @@ BangumiDetails loadStarDetailsData(StarBangumiDetails starBangumiData) {
 bool animationFilter(Map currentBangumi) {
 
   //calendar 数据不包含 ["tags"]
-  if (currentBangumi["tags"] == null) {
+  if (currentBangumi["tags"] == null) 
+  {
     return true;
   }
 
@@ -319,59 +422,18 @@ bool animationFilter(Map currentBangumi) {
   currentBangumi["name_cn"].isEmpty ||
     currentBangumi["tags"].any((currentTag) => notAnimeFilterTag.contains(currentTag["name"])) ||
     currentBangumi["tags"].length < 6
-  ) {
+  ) 
+  {
     //debugPrint("[Denied]: ${currentBangumi["name"]}");
     return false;
   }
 
-  else {
+  else 
+  {
     //debugPrint("[Allow]: ${currentBangumi["name"]}");
     return true;
   }
 
-
-}
-
-//获取 收藏 番剧的信息 以后可能需要分批次请求。。 以免出现429错误
-Future<Map<int, Map<String, num>>> loadStarsDetail(Iterable<int> starsIDList) async {
-
-  Completer<Map<int, Map<String, num>>> starUpdateCompleter = Completer();
-
-  int completeFlag = starsIDList.length;
-
-  final resultRating = {
-    for (int bangumiID in starsIDList)
-      bangumiID:{
-        "score":0.0,
-        "rank":0
-      }
-  };
-
-  try {
-    await Future.wait(
-      List.generate(
-        starsIDList.length,
-        (index) async {
-          await HttpApiClient.client.get("${BangumiAPIUrls.subject}/${starsIDList.elementAt(index)}").then((response) {
-            final ratingList = loadDetailsData(response.data).ratingList;
-
-            resultRating.values.elementAt(index)["score"] = ratingList["score"];
-            resultRating.values.elementAt(index)["rank"] = ratingList["rank"];
-
-            completeFlag -= 1;
-            if (completeFlag == 0) starUpdateCompleter.complete(resultRating);
-          });
-        }
-      )
-    );
-  }
-
-  on DioException catch(e){
-    debugPrint("[Error]: ${e.message}");
-    return {};
-  }
-
-  return starUpdateCompleter.future;
 
 }
 

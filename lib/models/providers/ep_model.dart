@@ -53,10 +53,7 @@ class EpModel extends ChangeNotifier{
 
 	Future<void> getEpsInformation({int? offset}) async {
 
-    if(getEpsInformationCompleter != null) return;
-
-    getEpsInformationCompleter ??= Completer();
-
+    if(getEpsInformationCompleter != null) return getEpsInformationCompleter!.future;
 
     int requestOffset = (offset ?? 0)*100;
     int requestLimit = 100;
@@ -84,112 +81,98 @@ class EpModel extends ChangeNotifier{
       debugPrint("loading Info ${requestOffset+1}~${requestOffset+100}");
       return;
     }
+
+    final completer = Completer<void>();
+    getEpsInformationCompleter = completer;
    
     //get Start. 占位符
     epsData[requestOffset+1] = EpsInfo.empty();
 
-		await HttpApiClient.client.get(
-      BangumiAPIUrls.eps,
-      queryParameters: 
-        BangumiQuerys.epQuery
-          ..["offset"] = requestOffset
-          ..["limit"] = requestLimit
-          ..["subject_id"] = subjectID
-          
-    ).then((response){
+    try {
+      final response = await HttpApiClient.client.get(
+        BangumiAPIUrls.eps,
+        queryParameters:
+          BangumiQuerys.epQuery
+            ..["offset"] = requestOffset
+            ..["limit"] = requestLimit
+            ..["subject_id"] = subjectID
+      );
 
-        if(response.data["data"] != null){
-        
-          List<EpsInfo> currentRangeEpsData = loadEpsData(response.data["data"]);
+      if(response.data["data"] != null){
+        List<EpsInfo> currentRangeEpsData = loadEpsData(response.data["data"]);
 
-          num? epOffset = currentRangeEpsData.isEmpty ? 0 : currentRangeEpsData[0].epIndex;
+        num? epOffset = currentRangeEpsData.isEmpty ? 0 : currentRangeEpsData[0].epIndex;
 
-          if(epOffset!=null){
-            for(int epInfoIndex = 0; epInfoIndex < currentRangeEpsData.length; epInfoIndex++){
-              epsData.addAll({
-                (epOffset+epInfoIndex) : currentRangeEpsData[epInfoIndex]
-              });
-            }
+        if(epOffset!=null){
+          for(int epInfoIndex = 0; epInfoIndex < currentRangeEpsData.length; epInfoIndex++){
+            epsData.addAll({
+              (epOffset+epInfoIndex) : currentRangeEpsData[epInfoIndex]
+            });
           }
-
-          debugPrint("currentEpsData Length:${epsData.length}");
-
-          
-
-          getEpsInformationCompleter?.complete();
-          getEpsInformationCompleter = null;
-
-          notifyListeners(); //完成
-
-
-          
-
         }
 
-        else{
-          debugPrint("getEpsInformation Error: ${response.statusCode} ${response.statusMessage}");
-          getEpsInformationCompleter?.complete();
-          getEpsInformationCompleter = null;
-        }
-
-
-
-    });
-
-    return getEpsInformationCompleter?.future;
-
+        debugPrint("currentEpsData Length:${epsData.length}");
+        notifyListeners(); //完成
+      } else {
+        epsData.remove(requestOffset + 1);
+        debugPrint("getEpsInformation Error: ${response.statusCode} ${response.statusMessage}");
+      }
+    } on DioException catch (e) {
+      epsData.remove(requestOffset + 1);
+      debugPrint("getEpsInformation DioException: $e");
+    } finally {
+      if (!completer.isCompleted) completer.complete();
+      if (identical(getEpsInformationCompleter, completer)) {
+        getEpsInformationCompleter = null;
+      }
+    }
 	}
 
   Future<bool> getSingleEPInformation() async {
-
-    Completer<bool> singleEPCompleter = Completer();
-
-    await HttpApiClient.client.get(BangumiAPIUrls.ep(injectEpID)).then((singleEPResponse){
+    try {
+      final singleEPResponse = await HttpApiClient.client.get(BangumiAPIUrls.ep(injectEpID));
       epsData[0] = loadEpsData([singleEPResponse.data]).first;
-      singleEPCompleter.complete(true);
-    });
-
-
-    return singleEPCompleter.future;
+      notifyListeners();
+      return true;
+    } on DioException catch (e) {
+      debugPrint("getSingleEPInformation Error: $e");
+      return false;
+    }
   }
 
 	Future<bool> loadEpComment() async {
-
-    Completer<bool> epCommentCompleter = Completer();
-
+    final num targetEp = selectedEp;
     int requestID = 0;
 
     if(injectEpID == 0){
 
       if(epsData.isEmpty){
-        await getEpsInformationCompleter?.future ?? await getEpsInformation();
+        await (getEpsInformationCompleter?.future ?? getEpsInformation());
         if(epsData.isEmpty) return false;
       }
 
       else{
-        if(epsData[selectedEp] == null){
+        if(epsData[targetEp] == null){
 
-          await getEpsInformationCompleter?.future ?? await getEpsInformation(offset: convertSegment(selectedEp.toInt(),100));
+          await (getEpsInformationCompleter?.future ?? getEpsInformation(offset: convertSegment(targetEp.toInt(),100)));
           if(epsData.isEmpty) return false;
         }
       }
 
-      if(epCommentData[selectedEp] != null){
+      if(epCommentData[targetEp] != null){
 
-        if(epCommentData[selectedEp]!.isEmpty){
-          debugPrint("$selectedEp in Progress");
+        if(epCommentData[targetEp]!.isEmpty){
+          debugPrint("$targetEp in Progress");
         }
 
         else{
-          debugPrint("$selectedEp already loaded");
+          debugPrint("$targetEp already loaded");
         }
 
-        
-        
         return false;
       }
 
-      requestID = epsData[selectedEp]?.epID ?? 0;
+      requestID = epsData[targetEp]?.epID ?? 0;
       if(requestID == 0) return false;
     }
 
@@ -197,19 +180,19 @@ class EpModel extends ChangeNotifier{
 
       requestID = injectEpID;
 
-      if(epCommentData[selectedEp] != null){
-        debugPrint("$selectedEp => injectEpID: $requestID already loaded");
+      if(epCommentData[targetEp] != null){
+        debugPrint("$targetEp => injectEpID: $requestID already loaded");
         return false;
       }
 
     }
 
 		//初始化占位
-		epCommentData[selectedEp] = [];
+		epCommentData[targetEp] = [];
 
 
     try{
-      await HttpApiClient.client.get(
+      final response = await HttpApiClient.client.get(
         BangumiAPIUrls.epComment(requestID),
       )
       .timeout(
@@ -220,46 +203,39 @@ class EpModel extends ChangeNotifier{
             error: TimeoutException("[Timeout] 加载时间超过10s, 请检查网络通畅状况,或可尝试重新加载"),
           );
         },
-      )
-      .then((response){
-        if(response.statusCode == HttpStatus.ok){
+      );
 
-          epCommentData[selectedEp] = loadEpCommentDetails(response.data);
+      if(response.statusCode == HttpStatus.ok){
 
-          //空处理 userName = 0 代表为空
-          if(epCommentData[selectedEp]!.isEmpty){
-            epCommentData[selectedEp] = [
-              EpCommentDetails.empty()
-            ];
+        epCommentData[targetEp] = loadEpCommentDetails(response.data);
 
-            debugPrint("$subjectID Ep.$selectedEp comment is Empty.");
-          }
+        //空处理 userName = 0 代表为空
+        if(epCommentData[targetEp]!.isEmpty){
+          epCommentData[targetEp] = [
+            EpCommentDetails.empty()
+          ];
 
-          epCommentCompleter.complete(true);
-          
-          debugPrint("$subjectID load Ep.$selectedEp detail done");
-
-          notifyListeners();
-
+          debugPrint("$subjectID Ep.$targetEp comment is Empty.");
         }
 
-        else{
-          debugPrint("$subjectID load Ep.$selectedEp detail error: ${response.data["message"]}");
-          epCommentCompleter.complete(false);
-        }
-        
-      });
+        debugPrint("$subjectID load Ep.$targetEp detail done");
+        notifyListeners();
+        return true;
+      }
+
+      else{
+        epCommentData.remove(targetEp);
+        debugPrint("$subjectID load Ep.$targetEp detail error: ${response.data is Map ? response.data["message"] : response.statusMessage}");
+        return false;
+      }
 
     }
 
     on DioException catch (e){
-      debugPrint("[EPComment Load] $selectedEp ${e.toString()}");
-      epCommentCompleter.completeError(e.error!);
+      epCommentData.remove(targetEp);
+      debugPrint("[EPComment Load] $targetEp ${e.toString()}");
+      throw e.error ?? e;
     }
-		
-
-
-    return epCommentCompleter.future;
 	}
 	
 }
