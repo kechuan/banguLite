@@ -9,25 +9,34 @@ import 'package:http/io_client.dart';
 /// managers.
 class ProxyCacheManager extends CacheManager with ImageCacheManager {
   static const key = 'libCachedImageData';
-  static ProxyCacheManager? _instance;
+  static ProxyCacheManager? instance;
 
   static String currentProxyAddress = '';
 
-  ProxyCacheManager._(String proxyAddress) : super(
-      proxyAddress.isEmpty
-        ? Config(key)
-        : Config(key, fileService: HttpFileService(
-          httpClient: buildProxyClient(proxyAddress),
-        )),
-    );
+  final http.Client? httpClient;
+
+  ProxyCacheManager.create(String proxyAddress, this.httpClient) : super(
+    proxyAddress.isEmpty || httpClient == null
+      ? Config(key)
+      : Config(
+        key,
+        fileService: HttpFileService(
+          httpClient: httpClient,
+        ),
+      ),
+  );
 
   factory ProxyCacheManager({String proxyAddress = ''}) {
-    if (_instance == null || currentProxyAddress != proxyAddress) {
-      //_instance?.emptyCache(); // 可选：切换代理时清缓存
-      _instance = ProxyCacheManager._(proxyAddress);
+    if (instance == null || currentProxyAddress != proxyAddress) {
+      instance?.httpClient?.close();
+
+      final http.Client? client = proxyAddress.isEmpty ? null : buildProxyClient(proxyAddress);
+
+      instance = ProxyCacheManager.create(proxyAddress, client);
       currentProxyAddress = proxyAddress;
     }
-    return _instance!;
+
+    return instance!;
   }
 
   static http.Client buildProxyClient(String proxyAddress) {

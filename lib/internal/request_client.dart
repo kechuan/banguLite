@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
-import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -25,14 +24,37 @@ class HttpApiClient{
     "User-Agent":'Mozilla/5.0 (Linux; Android 13; 23049RAD8C Build/TKQ1.221114.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/128.0.6613.146 Mobile Safari/537.36'
   };
 
+  static Interceptor? authInterceptor;
+
   static void init({String storageProxyAddress = ""}) {
     HttpApiClient.clientOption.baseUrl = BangumiAPIUrls.baseUrl;
-    HttpApiClient.clientOption.headers = HttpApiClient.browserHeader;
+    HttpApiClient.clientOption.headers = Map<String, dynamic>.from(HttpApiClient.browserHeader);
     HttpApiClient.client.options = HttpApiClient.clientOption;
 
     currentProxyAddress = storageProxyAddress;
 
     HttpApiClient.client.httpClientAdapter = configHTTPProxySetting(currentProxyAddress);
+
+    if (authInterceptor != null) {
+      HttpApiClient.client.interceptors.remove(authInterceptor);
+    }
+
+    authInterceptor = InterceptorsWrapper(
+      onRequest: (options, handler) {
+        final uri = options.uri;
+        final isBangumiApi = uri.host == 'api.bgm.tv' || uri.host == 'next.bgm.tv';
+        final token = AccountModel.loginedUserInformations.accessToken;
+
+        if (isBangumiApi && token != null && !options.headers.containsKey('Authorization')) {
+          options.headers['Authorization'] = 'Bearer $token';
+          options.headers.putIfAbsent('accept', () => 'application/json');
+        }
+
+        handler.next(options);
+      },
+    );
+
+    HttpApiClient.client.interceptors.add(authInterceptor!);
   }
 
   static String currentProxyAddress = '';
@@ -231,7 +253,7 @@ class BangumiWebUrls{
   ///relationsUser 只是一个摆设 实际上只要 timelineID 正确就行...
   static String timelineReplies(String relationsUser, int timelineID) => '${userTimeline(relationsUser)}/status/$timelineID';
 
-  //接受数字ID 与 name 作为参数
+  //web上支持接受数字ID 与 name 作为参数 然而api却不支持
   static String group(dynamic groupName) => '$baseUrl/group/$groupName';
   static String groupTopic(int postID) => '$baseUrl/group/topic/$postID';
 
@@ -358,19 +380,20 @@ class BangumiQuerys {
     BangumiTimelineSortType? mode
   }) {
 
-    Map<String, dynamic> defaultQuery = {
-      "limit":limit ?? 20,
-      "mode": mode ?? "all",
+    final Map<String, dynamic> defaultQuery = {
+      "limit": limit ?? 20,
+      "mode": mode?.name ?? "all",
     };
 
-    if (mode != null) {
-      defaultQuery["mode"] = mode.name;
+    if (until != null) {
+      defaultQuery["until"] = until;
     }
 
     return defaultQuery;
 
   }
 
+  //使用get来获取 防止串参数
   static Map<String, int> get commentAccessQuery => {"limit":10,"offset":0};
   static Map<String, int> get sortQuery => {"limit":10,"offset":0};
   static Map<String, int> get topicsQuery => {"limit":30,"offset":0};
@@ -391,7 +414,7 @@ class BangumiDatas {
     bool isPrivate = false,
     List<String>? tagList
   }) => {
-    "comment": "$content",
+    "comment": content ?? "",
     "type": starType.starTypeIndex,
     "rate": rate,
     "private": isPrivate,
@@ -487,74 +510,74 @@ class APPInformationRepository{
 
 
 
-void downloadSticker({bool isOldType = true}) async {
+//void downloadSticker({bool isOldType = true}) async {
 
-  if (isOldType) {
-    String authorPath = "";
+//  if (isOldType) {
+//    String authorPath = "";
 
-    await Future.wait(
-      List.generate(
-        126, (index) {
+//    await Future.wait(
+//      List.generate(
+//        126, (index) {
 
-          if (index == 0) return Future(()  {});
+//          if (index == 0) return Future(()  {});
 
-          String suffix = "gif"; 
+//          String suffix = "gif"; 
 
-          if (index < 24) {
-            authorPath = "01-23 dsm";
-            suffix = "png";
-            if (index == 11 || index == 23) suffix = "gif";
-          }
+//          if (index < 24) {
+//            authorPath = "01-23 dsm";
+//            suffix = "png";
+//            if (index == 11 || index == 23) suffix = "gif";
+//          }
 
-          authorPath = "24-125 Cinnamor";
+//          authorPath = "24-125 Cinnamor";
 
-          return HttpApiClient.client.download(
-            "https://bgm.tv/img/smiles/${index > 23 ? "tv" : "bgm"}/${convertDigitNumString(index > 23 ? index - 23 : index)}.$suffix",
-            './assets/bangumiSticker/$authorPath/bgm${convertDigitNumString(index)}.gif',
-          );
+//          return HttpApiClient.client.download(
+//            "https://bgm.tv/img/smiles/${index > 23 ? "tv" : "bgm"}/${convertDigitNumString(index > 23 ? index - 23 : index)}.$suffix",
+//            './assets/bangumiSticker/$authorPath/bgm${convertDigitNumString(index)}.gif',
+//          );
 
-        }
-      )
-    );
+//        }
+//      )
+//    );
 
-  }
+//  }
 
-  else {
-    await Future.wait(
-      List.generate(
-        39, (index) {
-          return HttpApiClient.client.download(
-            "https://bgm.tv/img/smiles/tv_vs/bgm_${convertDigitNumString(index + 200)}.png",
-            './assets/bangumiSticker/200-238 神戶小鳥/bgm${convertDigitNumString(index + 200)}.gif',
-          );
+//  else {
+//    await Future.wait(
+//      List.generate(
+//        39, (index) {
+//          return HttpApiClient.client.download(
+//            "https://bgm.tv/img/smiles/tv_vs/bgm_${convertDigitNumString(index + 200)}.png",
+//            './assets/bangumiSticker/200-238 神戶小鳥/bgm${convertDigitNumString(index + 200)}.gif',
+//          );
 
-        }
-      )
-    );
-  }
+//        }
+//      )
+//    );
+//  }
 
-}
-
-
-void downloadSticker2({bool pinkVersion = true}) async {
-
-  String typePath = pinkVersion ? "musume" : "blake";
-
-  String outputPath = pinkVersion ? "Bangumi娘 貓魚" : "Blake娘 貓魚";
-
-  await Future.wait(
-    List.generate(
-      97, (index) {
-        if (index == 96 && pinkVersion == true) return Future(()  {});
-
-        return HttpApiClient.client.download(
-          "https://lain.bgm.tv/img/smiles/$typePath/${typePath}_${convertDigitNumString(index + 1)}.gif",
-          './assets/bangumiSticker/$outputPath/${typePath}_${convertDigitNumString(index + 1)}.gif',
-        );
-
-      }
-    )
-  );
+//}
 
 
-}
+//void downloadSticker2({bool pinkVersion = true}) async {
+
+//  String typePath = pinkVersion ? "musume" : "blake";
+
+//  String outputPath = pinkVersion ? "Bangumi娘 貓魚" : "Blake娘 貓魚";
+
+//  await Future.wait(
+//    List.generate(
+//      97, (index) {
+//        if (index == 96 && pinkVersion == true) return Future(()  {});
+
+//        return HttpApiClient.client.download(
+//          "https://lain.bgm.tv/img/smiles/$typePath/${typePath}_${convertDigitNumString(index + 1)}.gif",
+//          './assets/bangumiSticker/$outputPath/${typePath}_${convertDigitNumString(index + 1)}.gif',
+//        );
+
+//      }
+//    )
+//  );
+
+
+//}

@@ -39,7 +39,7 @@ BBStylesheet appDefaultBBStyleSheet(
 }
 
 
-final allEffectTag = [
+final List<AbstractTag> richlessEffectTag = [
   BoldTag(),
   //ItalicTag(),
   PatchItalicTag(),
@@ -58,6 +58,10 @@ final allEffectTag = [
 
   AdapterUrlTag(tagName: "URL"),
   AdapterUrlTag(tagName: "url"),
+];
+
+final List<AbstractTag> allEffectTag = [
+  ...richlessEffectTag,
 
   //RichTag
   LateLoadImgTag(),
@@ -65,12 +69,10 @@ final allEffectTag = [
   LateLoadImgTag(tagName: "IMG"),
 
   CodeTag(),
-  UserTag()
+  UserTag(),
 ];
 
-final richlessEffectTag = allEffectTag.getRange(0, allEffectTag.length - 5);
-
-class MaskDisplay extends StatelessWidget {
+class MaskDisplay extends StatefulWidget {
   final String maskText;
   final List<InlineSpan> content;
   final bool selectable;
@@ -83,11 +85,22 @@ class MaskDisplay extends StatelessWidget {
   });
 
   @override
+  State<MaskDisplay> createState() => _MaskDisplayState();
+}
+
+class _MaskDisplayState extends State<MaskDisplay> {
+  final ValueNotifier<bool> activedNotifier = ValueNotifier<bool>(false);
+
+  @override
+  void dispose() {
+    activedNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     bool isDarkMode = judgeDarknessMode(context);
-
-    ValueNotifier<bool> activedNotifier = ValueNotifier<bool>(false);
 
     return MouseRegion(
       onEnter: (event) => activedNotifier.value = true,
@@ -125,7 +138,7 @@ class MaskDisplay extends StatelessWidget {
 
                 builder: (_, color, __) {
                   //MergeStyle
-                  List<InlineSpan> newInlineSpan = content.map(
+                  List<InlineSpan> newInlineSpan = widget.content.map(
                     (currentSpan) {
                       return TextSpan(
                         text: currentSpan.toPlainText(),
@@ -134,7 +147,7 @@ class MaskDisplay extends StatelessWidget {
                     }
                   ).toList();
 
-                  return selectable ? 
+                  return widget.selectable ? 
                   SelectableText.rich(TextSpan(children: newInlineSpan)) :
                   RichText(text: TextSpan(children: newInlineSpan));
 
@@ -249,7 +262,7 @@ class AdapterUrlTag extends StyleTag{
   }) : urlTag = UrlTag(onTap: onTap ?? (link) async {
           await canLaunchUrlString(link).then(
             (launchable) {
-              if (launchable) bus.emit('AppRoute', link);	
+              if (launchable) bus.emitAppRoute(link);
             }
           );
         }), super(tagName ?? "url");

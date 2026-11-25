@@ -248,10 +248,12 @@ int convertAiredEps(String? bangumiDate) {
 int convertPassedSeason(int year, int month) {
   DateTime currentTime = DateTime.now();
 
-  if (year < currentTime.year) {return 4;
+  if (year < currentTime.year) {
+    return 4;
   } 
 
-  else if (year > currentTime.year) {return 0;
+  else if (year > currentTime.year) {
+    return 0;
   }
 
   else {
@@ -267,16 +269,20 @@ String convertTypeSize(int totalLength, {StorageSize type = StorageSize.megabyte
   String suffix;
 
   switch (type){
-    case StorageSize.bytes: {suffix = StorageSize.bytes.suffix;
+    case StorageSize.bytes: {
+      suffix = StorageSize.bytes.suffix;
       break;
     }
-    case StorageSize.kilobytes: {suffix = StorageSize.kilobytes.suffix;
+    case StorageSize.kilobytes: {
+      suffix = StorageSize.kilobytes.suffix;
       break;
     }
-    case StorageSize.megabytes: {suffix = StorageSize.megabytes.suffix;
+    case StorageSize.megabytes: {
+      suffix = StorageSize.megabytes.suffix;
       break;
     }
-    case StorageSize.gigabytes: {suffix = StorageSize.gigabytes.suffix;
+    case StorageSize.gigabytes: {
+      suffix = StorageSize.gigabytes.suffix;
       break;
     }
   }
@@ -358,6 +364,8 @@ Future<int> getTotalSizeOfFilesInDir(final FileSystemEntity fileSystemEntity) as
 
 Map convertRankList(dynamic scoreCollection) {
   if (scoreCollection is Map) {
+    if (scoreCollection.isEmpty) return {};
+
     if (scoreCollection.keys.first == "1") {
       return scoreCollection;
     }
@@ -367,6 +375,8 @@ Map convertRankList(dynamic scoreCollection) {
         scoreCollection.entries.toList().reversed
       );
     }
+
+    return scoreCollection;
   }
 
   return Map.from({
@@ -486,7 +496,8 @@ Color convertFineTuneColor(
   if (darkMode == true) {
 
     if (readableMode == true) {
-      lightup();
+
+      if (originLumi < 0.2) lightup();
     }
 
     else {

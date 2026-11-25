@@ -6,105 +6,68 @@ import 'package:bangu_lite/internal/request_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
-Future<dynamic> generalRequest(
-  String requestUrl,
-  {
-    Map<String, dynamic>? queryParameters,
-    Map<String, dynamic>? data,
-    Options? options,
-    UserContentActionType? userContentActionType,
-
-    /// 依赖注入环节
-
-    /// CompleteAction
-    Function(Response response, Completer<dynamic> completer)? generalCompleteLoadAction,
-
-    /// FailedAction
-    Function(String response, Completer<dynamic> completer)? generalFallbackAction,
-
-  }
-
-) async {
-  Completer<dynamic> generalCompleter = Completer<dynamic>();
-
-  late Future<Response<dynamic>> Function() contentFuture;
-
-  switch (userContentActionType) {
-
-    case null:{
-      contentFuture = () => HttpApiClient.client.get(
+Future<T> generalRequest<T>(
+  String requestUrl, {
+  Map<String, dynamic>? queryParameters,
+  Map<String, dynamic>? data,
+  Options? options,
+  UserContentActionType? userContentActionType,
+  required FutureOr<T> Function(Response response) onSuccess,
+  required FutureOr<T> Function(String errorMessage) onError,
+}) async {
+  try {
+    final Response<dynamic> response = switch (userContentActionType) {
+      null => await HttpApiClient.client.get(
         requestUrl,
-        data: queryParameters,
+        queryParameters: queryParameters,
         options: options ?? BangumiAPIUrls.bangumiAccessOption(),
-      );
-    }
+      ),
 
-    case UserContentActionType.post:{
-      contentFuture = () => HttpApiClient.client.post(
+      UserContentActionType.post => await HttpApiClient.client.post(
         requestUrl,
         queryParameters: queryParameters,
         data: data,
         options: options ?? BangumiAPIUrls.bangumiAccessOption(),
-      );
-    }
+      ),
 
-    case UserContentActionType.delete:{
-      contentFuture = () => HttpApiClient.client.delete(
+      UserContentActionType.delete => await HttpApiClient.client.delete(
         requestUrl,
-        data: queryParameters,
+        queryParameters: queryParameters,
+        data: data,
         options: options ?? BangumiAPIUrls.bangumiAccessOption(),
-      );
-    }
+      ),
 
-    case UserContentActionType.edit:{
-      contentFuture = () => HttpApiClient.client.put(
+      UserContentActionType.edit => await HttpApiClient.client.put(
         requestUrl,
-        data: queryParameters,
+        queryParameters: queryParameters,
+        data: data,
         options: options ?? BangumiAPIUrls.bangumiAccessOption(),
-      );
+      ),
+    };
+
+    final statusCode = response.statusCode;
+
+    if (statusCode != null && statusCode >= 200 && statusCode < 300) {
+      return await onSuccess(response);
     }
 
+    return await onError('$statusCode ${response.statusMessage}');
   }
 
-  /// 由外部控制 completer 的返回数据 与 时机
-  try{
-    //try 无法处理 异步的错误
-    await contentFuture().then((response) {
-
-      final statusCode = response.statusCode;
-
-      if (statusCode != null && statusCode >= 200 && statusCode < 300) {
-        //若一切正常 此处应视作 .complete 并结束这段 completer.future
-        generalCompleteLoadAction?.call(response, generalCompleter);
-      }
-
-      else {
-        generalFallbackAction?.call('$statusCode ${response.statusMessage}', generalCompleter);
-      }
-
-    });
-
-  }
-
-  on DioException catch (e){
+  on DioException catch (e) {
     debugPrint('[generalRequest - $requestUrl]: request error: $e');
 
     if (e.response?.statusCode == BangumiResponseStatusCode.unauthorized.code) {
-      generalFallbackAction?.call('${e.response?.statusCode} 登录会话已过期 请重新登录', generalCompleter);
+      return await onError('${e.response?.statusCode} 登录会话已过期 请重新登录');
     }
 
-    else {
-      generalFallbackAction?.call('${e.response?.statusCode} ${extractDioException(e)}', generalCompleter);
-    }
-
+    return await onError('${e.response?.statusCode} ${extractDioException(e)}');
   }
 
-  catch (e){
+  catch (e) {
     debugPrint('[generalRequest - $requestUrl]: unexpected error: $e');
-    generalFallbackAction?.call('请求处理异常: $e', generalCompleter);
+    return await onError('请求处理异常: $e');
   }
-
-  return generalCompleter.future;
 }
 
 //尽可能的从 DioException 中拉取有用的信息

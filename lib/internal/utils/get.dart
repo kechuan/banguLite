@@ -7,36 +7,31 @@ import 'package:provider/provider.dart';
 Color getCurrentThemeColor(BuildContext context) {
   final IndexModel indexModel = context.read<IndexModel>();
 
-  if (indexModel.userConfig.isSelectedCustomColor == true) {
+  if (indexModel.userConfig.isSelectedCustomColor == true && indexModel.userConfig.customColor != null) {
     return indexModel.userConfig.customColor!;
   }
 
-  return indexModel.userConfig.currentThemeColor!.color;
+  return (indexModel.userConfig.currentThemeColor ?? AppThemeColor.ruby).color;
 
 }
 
-Color? getDarkContentSurfaceColor(
-  BuildContext context,
-) {
-  final indexModel = context.watch<IndexModel>();
-
-  if (indexModel.userConfig.isPureDarkMode == false) {
-
-    //debugPrint("lumi: ${Colors.grey.withValues(alpha: 0.1).computeLuminance()} / ${Color(0xFF2C2C2C).computeLuminance()}");
-
-    //更浅
-    //return Colors.grey.withValues(alpha: 0.15);
-
-    //更深
+Color? getDarkSurfaceColorByMode(bool? isPureDarkMode) {
+  if (isPureDarkMode == false) {
     return const Color(0xFF2C2C2C);
-
-    //[DEBUG]
-    //return Colors.grey.withValues(alpha: 0.5);
   }
 
   return null;
+}
 
+Color? getDarkContentSurfaceColor(
+  BuildContext context, {
+  bool listen = true,
+}) {
+  final bool? isPureDarkMode = listen
+    ? context.select<IndexModel, bool?>((model) => model.userConfig.isPureDarkMode)
+    : context.read<IndexModel>().userConfig.isPureDarkMode;
 
+  return getDarkSurfaceColorByMode(isPureDarkMode);
 }
 
 Color getDetailRenderColor(BuildContext context, Color? imageColor) {
@@ -56,34 +51,22 @@ Color getDetailRenderColor(BuildContext context, Color? imageColor) {
 }
 
 SeasonType getSeasonRange(int currentMonth, {bool? currentTime}) {
-
   SeasonType currentSeasonType = SeasonType.winter;
 
-  // 5
-  // 1 4 7 10
-
-  SeasonType.values.any((currentSeason) {
-
+  for (final currentSeason in SeasonType.values) {
     if (currentTime == true) {
       if (currentMonth >= currentSeason.month) {
         currentSeasonType = currentSeason;
-        return false;
+      } else {
+        break;
       }
-
-      return true;
-    }
-
-    else {
-      if (currentMonth > currentSeason.month) {
-        return false;
+    } else {
+      if (currentMonth <= currentSeason.month) {
+        currentSeasonType = currentSeason;
+        break;
       }
-
-      currentSeasonType = currentSeason;
-      return true;
-
     }
-
-  });
+  }
 
   return currentSeasonType;
 }

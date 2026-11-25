@@ -15,7 +15,10 @@ abstract class LifecycleState<T extends StatefulWidget> extends State<T>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Lifecycle.lifecycleRouteObserver.subscribe(this, ModalRoute.of(context)!);
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      Lifecycle.lifecycleRouteObserver.subscribe(this, route);
+    }
   }
 
   @override
@@ -86,7 +89,10 @@ abstract class LifecycleRouteState<T extends StatefulWidget> extends State<T>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Lifecycle.lifecycleRouteObserver.subscribe(this, ModalRoute.of(context)!);
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      Lifecycle.lifecycleRouteObserver.subscribe(this, route);
+    }
   }
 
   @override
@@ -164,33 +170,6 @@ abstract class LifecycleAppState<T extends StatefulWidget> extends State<T>
 
   void onResume() {}
 }
-
-mixin RouteLifecycleMixin<T extends StatefulWidget> on LifecycleRouteState<T> {
-
-  // 在极端状况之下 说不定会出现 多个 route 同时的监听一起被响应
-  // 比如 (BangumiDetailPageA)EpPage => BangumiDetailPageB => EpPageB...
-  // 此时 整个路由链存活的 EpPageState 都会触发这个 AppRoute  
-  // 那就麻烦了, 因此需要加以管控 加个状态量
-
-  // 而且需要多个State 都能被统一封装
-  // 那就只能是 mixin 引入了
-
-  //bool isActived = true;
-
-  //@override
-  //void initState() {
-  //  bus.on('AppRoute', (link) {
-  //    if (!isActived) return;
-  //    if (!mounted) return;
-  //    appRouteMethodListener(context, link);
-  //  });
-  //  super.initState();
-  //}
-
- 
-
-}
-
 
 Future<void> exitApp() async {
   await SystemNavigator.pop(animated: true);

@@ -4,6 +4,7 @@ import 'package:bangu_lite/hive/config_model.dart';
 import 'package:bangu_lite/models/informations/local/star_details.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/informations/surf/user_details.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -36,6 +37,9 @@ class MyHive {
       //指向 /data/data/<package_name>/files
       filesDir = await getApplicationDocumentsDirectory();
       downloadDir = await getDownloadsDirectory();
+      downloadImageDir = downloadDir != null
+          ? Directory('${downloadDir!.path}${Platform.pathSeparator}images')
+          : null;
 
       //指向 /data/data/<package_name>/cache
       await getApplicationCacheDirectory().then((directory){
@@ -46,8 +50,10 @@ class MyHive {
     
     else{
 
-      //指向 exe运行同目录
-      filesDir = Directory('.${Platform.pathSeparator}');
+      // Debug 模式保留工作目录以便本地开发；Release 模式固定指向 exe 所在目录，避免深链接唤起时工作目录漂移
+      filesDir = kDebugMode
+          ? Directory('.${Platform.pathSeparator}')
+          : File(Platform.resolvedExecutable).parent;
 
       //指向 X:\Users\<user_name>\AppData\Local\Temp\libCachedImageData
       await getTemporaryDirectory().then((directory){

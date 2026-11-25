@@ -11,20 +11,11 @@ Future<void> registerWindowDeepLink(String scheme) async {
 
   String protocolRegKey = 'Software\\Classes\\$scheme';
 
-  //old format
-  //RegistryValue protocolRegValue = const RegistryValue(
-  //  'URL Protocol',
-  //  RegistryValueType.string,
-  //  '',
-  //);
-
   RegistryValue protocolRegValue = const RegistryValue.string(
     'URL Protocol',
     '',
   );
 
-
-  //old format
   String protocolCmdRegKey = 'shell\\open\\command';
   RegistryValue protocolCmdRegValue = RegistryValue.string(
     '',
@@ -32,67 +23,51 @@ Future<void> registerWindowDeepLink(String scheme) async {
   );
 
   final regKey = Registry.currentUser.createKey(protocolRegKey);
-  regKey.createValue(protocolRegValue);
-  regKey.createKey(protocolCmdRegKey).createValue(protocolCmdRegValue);
+  final cmdKey = regKey.createKey(protocolCmdRegKey);
+  try {
+    regKey.createValue(protocolRegValue);
+    cmdKey.createValue(protocolCmdRegValue);
+  } finally {
+    cmdKey.close();
+    regKey.close();
+  }
 }
 
 Future<void> registerBGMLoginDeepLink() async {
   try {
-    //疑问 注册了之后 是不是会让。。整个域名都能被响应???
-    //await registerWindowDeepLink("bgm.tv");
     await registerWindowDeepLink("bangulite");
-  } 
-  
-  catch (e) {
+  } catch (e) {
     // 注册失败会导致登录不可用
     debugPrint("register window deep link error:$e");
-    
   }
 
   debugPrint("register windows bgm.tv deepLink success");
 }
 
-Future<String> listenAPPLink() async {
-
-  String listenUri = "";
-
-  if(Platform.isWindows){
+Future<void> listenAPPLink() async {
+  if (Platform.isWindows) {
     await registerBGMLoginDeepLink();
   }
 
-
-  AppLinks().uriLinkStream.listen((uri){
-    listenUri = uri.toString();
-    handleLink(uri); //开启监听
-
+  AppLinks().uriLinkStream.listen((uri) {
+    handleLink(uri);
   });
-
-  return listenUri;
 }
 
 bool handleLink(Uri uri) {
-
   debugPrint("listenAPPLink: $uri");
 
-  if (
-    uri.host == APPInformationRepository.bangumiOAuthCallbackUri.host && 
-    uri.path == APPInformationRepository.bangumiOAuthCallbackUri.path
-  ) {
-
-    if(uri.queryParameters["client_id"] == APPInformationRepository.bangumiAPPID){
-      bus.emit('LoginRoute', uri.toString());
+  if (uri.host == APPInformationRepository.bangumiOAuthCallbackUri.host &&
+      uri.path == APPInformationRepository.bangumiOAuthCallbackUri.path) {
+    if (uri.queryParameters["client_id"] == APPInformationRepository.bangumiAPPID) {
+      bus.emitLoginRoute(uri.toString());
       return true;
     }
-
   }
 
-  if(
-    uri.scheme == "bangulite" &&
-    uri.host.startsWith('turnstile')
-  ){
+  if (uri.scheme == "bangulite" && uri.host.startsWith('turnstile')) {
     AccountModel.loginedUserInformations.turnstileToken = uri.queryParameters["token"];
   }
 
   return false;
 }
-

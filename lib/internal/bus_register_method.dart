@@ -45,7 +45,6 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
     ;
 
     final int? postReferID = int.tryParse(anchorRegExp.firstMatch(link)?.group(1) ?? "");
-    postReferID;
 
     if (
     link == BangumiWebUrls.subject(resID) ||
@@ -129,7 +128,9 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
           context, 
           Routes.groupTopic,
           arguments: {
-            "groupsModel":GroupsModel(subjectID: appRouteUri.queryParameters['sorceID']),
+            "groupsModel": GroupsModel(
+              subjectID: appRouteUri.queryParameters['sourceID'] ?? appRouteUri.queryParameters['sorceID'],
+            ),
             "groupTopicInfo":
             GroupTopicInfo(id: resID)
               ..contentTitle = appRouteUri.queryParameters['groupTopicTitle']
@@ -168,11 +169,17 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
       link.startsWith(BangumiWebUrls.relativeGroup(matchLink?.split(RegExp('/')).last)) 
     ) {
 
-      final groupNameRegexp = RegExp('group/([^&]+)');
+      final groupSegments = appRouteUri.pathSegments;
+      final groupIdx = groupSegments.indexOf('group');
+      final String? parsedGroupName =
+          (groupIdx != -1 && groupIdx + 1 < groupSegments.length)
+              ? groupSegments[groupIdx + 1]
+              : RegExp('group/([^&?]+)').firstMatch(link)?.group(1);
+      final String? parsedGroupTitle = appRouteUri.queryParameters['groupTitle'];
 
       debugPrint(
-        "groupName:${groupNameRegexp.firstMatch(link)?.group(1)}"
-        "groupTitle:${link.split('groupTitle=').last}"
+        "groupName:$parsedGroupName "
+        "groupTitle:$parsedGroupTitle "
         "referPostContentID: $postReferID"
       );
 
@@ -183,8 +190,8 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
           Routes.groups,
           arguments: {
             "selectedGroupInfo": GroupInfo()
-              ..groupName = groupNameRegexp.firstMatch(link)?.group(1)
-              ..groupTitle = link.split('groupTitle=').last
+              ..groupName = parsedGroupName
+              ..groupTitle = parsedGroupTitle
             ,
             "referPostContentID": postReferID,
           }
@@ -194,7 +201,7 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
 
     else if (
     //特殊状况
-    link.startsWith(BangumiAPIUrls.timelineReply(int.parse(appRouteUri.queryParameters['timelineID'] ?? '0'))) 
+    link.startsWith(BangumiAPIUrls.timelineReply(int.tryParse(appRouteUri.queryParameters['timelineID'] ?? '') ?? 0)) 
     //不启用这个分支
     //|| RegExp(r'https://bangumi.tv/user/\w+:?/timeline/status').hasMatch(link)
     ) {
@@ -202,13 +209,14 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
       /// 因为跳转的时候 一般会拥有 用户信息 那么传个userName什么的也没有问题
 
       if (context.mounted) {
+        final int parsedTimelineID = int.tryParse(appRouteUri.queryParameters['timelineID'] ?? '') ?? resID;
 
         //stupid way. but general...
         Navigator.pushNamed(
           context,
           Routes.timelineChat,
           arguments: {
-            'timelineID':appRouteUri.queryParameters['timelineID'] ?? resID,
+            'timelineID': parsedTimelineID,
             'onDeleteAction':(int resultID) {
 
               if (resultID != 0) {
@@ -242,7 +250,7 @@ void appLoginMethodListener(BuildContext context, String link) {
   debugPrint("detected BangumiLogin: $link");
 
   if (link.startsWith(APPInformationRepository.bangumiOAuthCallbackUri.scheme)) {
-    final code = link.split("code=").last;
+    final code = Uri.tryParse(link)?.queryParameters["code"] ?? link.split("code=").last;
     accountModel.getAccessToken(
       code,
       fallbackAction: (message) {

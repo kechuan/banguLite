@@ -1,61 +1,60 @@
-//订阅者回调签名
-//typedef void EventCallback(arg);
-//typedef EventCallback = Function(dynamic arg1);
-//typedef EventCallback = Function({dynamic arg1,dynamic arg2});
-//typedef EventCallback = Function({dynamic arg,dynamic arg2});
-typedef EventCallback = Function;
+import 'dart:async';
 
+class AppRouteEvent {
+  const AppRouteEvent(this.link, {this.data});
+
+  final String link;
+  final Object? data;
+}
 
 class EventBus {
-  //私有构造函数
-  EventBus._internal();
+  EventBus.internal();
 
-  //保存单例
-  static final EventBus _singleton = EventBus._internal();
+  static final EventBus singleton = EventBus.internal();
 
-  //工厂构造函数
-  factory EventBus()=> _singleton;
+  factory EventBus() => singleton;
 
-  //保存事件订阅者队列，key:事件名(id)，value: 对应事件的订阅者队列
-  final _emap = <Object, List<EventCallback>?>{};
+  final StreamController<AppRouteEvent> appRouteController =
+    StreamController<AppRouteEvent>.broadcast();
 
-  //添加订阅者
-  void on(dynamic eventName, EventCallback f) {
-    _emap[eventName] ??= <EventCallback>[];
-    _emap[eventName]!.add(f);
+  final StreamController<String> loginRouteController =
+    StreamController<String>.broadcast();
+
+  String? cachedLoginLink;
+
+  StreamSubscription<AppRouteEvent> onAppRoute(
+    void Function(AppRouteEvent event) listener,
+  ) {
+    return appRouteController.stream.listen(listener);
   }
 
-  //移除订阅者
-  void off(dynamic eventName, [EventCallback? f]) {
-    List? list = _emap[eventName];
-    if (eventName == null || list == null) return;
-    if (f == null) {
-      _emap[eventName] = null;
-    } else {
-      list.remove(f);
+  void emitAppRoute(String link, {Object? data}) {
+    appRouteController.add(AppRouteEvent(link, data: data));
+  }
+
+  StreamSubscription<String> onLoginRoute(
+    void Function(String link) listener,
+  ) {
+    final subscription = loginRouteController.stream.listen(listener);
+    final pendingLink = cachedLoginLink;
+
+    if (pendingLink != null) {
+      cachedLoginLink = null;
+      scheduleMicrotask(() => listener(pendingLink));
     }
+
+    return subscription;
   }
 
-  //触发事件，事件触发后该事件所有订阅者会被调用
-  void emit(dynamic eventName, dynamic arg1,{dynamic arg2}) {
-    List? list = _emap[eventName];
-    if (list == null) return;
-    int len = list.length - 1;
-    //反向遍历，防止订阅者在回调中移除自身带来的下标错位
-    for (int i = len; i > -1; --i) {
-      //list[i](arg1,arg2:arg2);
-      if(arg2 == null){
-        list[i](arg1);
-      }
-      
-      else{
-        list[i](arg1,arg2:arg2);
-      }
+  void emitLoginRoute(String link) {
+    if (loginRouteController.hasListener) {
+      loginRouteController.add(link);
+    }
 
+    else {
+      cachedLoginLink = link;
     }
   }
 }
 
-
-//定义一个top-level（全局）变量，页面引入该文件后可以直接使用bus
-EventBus bus = EventBus();
+final EventBus bus = EventBus();
