@@ -91,12 +91,13 @@ class SettingsPage extends StatelessWidget {
               ),
             ),
             child: ListView(
+
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    color: getCurrentThemeColor(context).withValues(alpha: 0.2)
-                  ),
+                //[外观] 区域
+                Material(
+                  borderRadius: BorderRadius.circular(24),
+                  clipBehavior: Clip.antiAlias,
+                  color: getCurrentThemeColor(context).withValues(alpha: 0.2),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -131,11 +132,11 @@ class SettingsPage extends StatelessWidget {
 
                 const Padding(padding: PaddingV16),
 
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    color: getCurrentThemeColor(context).withValues(alpha: 0.2)
-                  ),
+                //[功能设置] 区域
+                Material(
+                  borderRadius: BorderRadius.circular(24),
+                  clipBehavior: Clip.antiAlias,
+                  color: getCurrentThemeColor(context).withValues(alpha: 0.2),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -180,7 +181,7 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-class FontSizeTile extends ListTile {
+class FontSizeTile extends StatelessWidget {
   const FontSizeTile({super.key});
 
   @override
@@ -189,7 +190,7 @@ class FontSizeTile extends ListTile {
     final indexModel = context.read<IndexModel>();
 
     return Selector<IndexModel, ScaleType>(
-      selector: (_, indexModel) => indexModel.userConfig.fontScale!,
+      selector: (_, indexModel) => indexModel.userConfig.fontScale ?? ScaleType.medium,
       builder: (_, fontScale, child) {
         return ListTile(
           title: Row(
@@ -216,24 +217,13 @@ class FontSizeTile extends ListTile {
                       color: Colors.grey.withValues(alpha: 0.2)
                     ),
                     child: DefaultTabController(
+                      key: ValueKey(fontScale),
                       initialIndex: fontScale.index,
                       length: ScaleType.values.length,
                       child: TabBar(
                         labelPadding: EdgeInsets.zero,
                         onTap: (value) {
-                          switch (value){
-                            case 0: indexModel.updateFontSize(ScaleType.min);
-                              break;
-                            case 1: indexModel.updateFontSize(ScaleType.less);
-                              break;
-                            case 2: indexModel.updateFontSize(ScaleType.medium);
-                              break;
-                            case 3: indexModel.updateFontSize(ScaleType.more);
-                              break;
-                            case 4: indexModel.updateFontSize(ScaleType.max);
-                              break;
-                          }
-
+                          indexModel.updateFontSize(ScaleType.values[value]);
                         },
                         dividerColor: Colors.transparent,
                         indicatorSize: TabBarIndicatorSize.label,
@@ -253,7 +243,7 @@ class FontSizeTile extends ListTile {
   }
 }
 
-class ColorThemeTile extends ListTile{
+class ColorThemeTile extends StatelessWidget {
   const ColorThemeTile({super.key});
 
   @override
@@ -414,7 +404,7 @@ class ColorThemeTile extends ListTile{
 
 }
 
-class ThemeModeTile extends ListTile{
+class ThemeModeTile extends StatelessWidget {
   const ThemeModeTile({super.key});
 
   @override
@@ -445,30 +435,28 @@ class ThemeModeTile extends ListTile{
                   borderRadius: BorderRadius.circular(16),
                   color: Colors.grey.withValues(alpha: 0.2)
                 ),
-                child: DefaultTabController(
-                  initialIndex: indexModel.userConfig.themeMode!.index,
-                  length: ThemeMode.values.length,
-                  child: TabBar(
-                    labelPadding: const EdgeInsets.all(0),
-                    onTap: (value) {
-                      switch (value){
-                        case 0: indexModel.updateThemeMode(ThemeMode.system, config: true);
-                          break;
-                        case 1: indexModel.updateThemeMode(ThemeMode.light, config: true);
-                          break;
-                        case 2: indexModel.updateThemeMode(ThemeMode.dark, config: true);
-                          break;
-                      }
-
-                    },
-                    dividerColor: Colors.transparent,
-                    indicatorSize: TabBarIndicatorSize.label,
-                    tabs: const[
-                      Center(child: Text("系统")),
-                      Center(child: Text("明亮")),
-                      Center(child: Text("黑暗")),
-                    ]
-                  ),
+                child: Selector<IndexModel, ThemeMode>(
+                  selector: (_, model) => model.userConfig.themeMode ?? ThemeMode.system,
+                  builder: (_, themeMode, __) {
+                    return DefaultTabController(
+                      key: ValueKey(themeMode),
+                      initialIndex: themeMode.index,
+                      length: ThemeMode.values.length,
+                      child: TabBar(
+                        labelPadding: const EdgeInsets.all(0),
+                        onTap: (value) {
+                          indexModel.updateThemeMode(ThemeMode.values[value], config: true);
+                        },
+                        dividerColor: Colors.transparent,
+                        indicatorSize: TabBarIndicatorSize.label,
+                        tabs: const[
+                          Center(child: Text("系统")),
+                          Center(child: Text("明亮")),
+                          Center(child: Text("黑暗")),
+                        ]
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -486,7 +474,7 @@ class ThemeModeTile extends ListTile{
             children: [
               const Text("纯黑的深色模式背景 (OLED屏幕省电)"),
               Switch(
-                value: context.watch<IndexModel>().userConfig.isPureDarkMode ?? true, 
+                value: context.select<IndexModel, bool>((m) => m.userConfig.isPureDarkMode ?? true), 
                 onChanged: (value) {
                   indexModel.updatePureDarkMode(value);
                 }
@@ -504,7 +492,7 @@ class ThemeModeTile extends ListTile{
 
 }
 
-class CommentImageLoadModeTile extends ListTile{
+class CommentImageLoadModeTile extends StatelessWidget {
   const CommentImageLoadModeTile({super.key});
 
   @override
@@ -546,13 +534,24 @@ class CommentImageLoadModeTile extends ListTile{
 
 }
 
-class ClearCacheTile extends ListTile{
+class ClearCacheTile extends StatefulWidget {
   const ClearCacheTile({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<ClearCacheTile> createState() => _ClearCacheTileState();
+}
 
-    ValueNotifier<bool> computingStatusNotifier = ValueNotifier<bool>(false);
+class _ClearCacheTileState extends State<ClearCacheTile> {
+  final ValueNotifier<bool> computingStatusNotifier = ValueNotifier<bool>(false);
+
+  @override
+  void dispose() {
+    computingStatusNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     return Selector<IndexModel, int>(
       selector: (_, indexModel) => indexModel.cachedImageSize,
@@ -564,7 +563,11 @@ class ClearCacheTile extends ListTile{
               onTap: () async {
 
                 computingStatusNotifier.value = true;
-                context.read<IndexModel>().updateCachedSize().then((_) => computingStatusNotifier.value = false);
+                try {
+                  await context.read<IndexModel>().updateCachedSize();
+                } finally {
+                  if (mounted) computingStatusNotifier.value = false;
+                }
 
               },
               title: Row(
@@ -586,12 +589,13 @@ class ClearCacheTile extends ListTile{
 
                           final indexModel = context.read<IndexModel>();
 
-                          if (MyHive.cachedImageDir.existsSync()) {
-                            await MyHive.cachedImageDir.delete(recursive: true).then((_) {
-                              indexModel.updateCachedSize().then(
-                                (_) => computingStatusNotifier.value = false
-                              );
-                            });
+                          try {
+                            if (MyHive.cachedImageDir.existsSync()) {
+                              await MyHive.cachedImageDir.delete(recursive: true);
+                            }
+                            await indexModel.updateCachedSize();
+                          } finally {
+                            if (mounted) computingStatusNotifier.value = false;
                           }
 
                         },
@@ -618,7 +622,7 @@ class ClearCacheTile extends ListTile{
 
 }
 
-class UpdateAlertToggleTile extends ListTile{
+class UpdateAlertToggleTile extends StatelessWidget {
   const UpdateAlertToggleTile({super.key});
 
   @override
@@ -659,7 +663,7 @@ class UpdateAlertToggleTile extends ListTile{
 
 }
 
-class AboutTile extends ListTile{
+class AboutTile extends StatelessWidget {
   const AboutTile({super.key});
 
   @override
@@ -669,13 +673,13 @@ class AboutTile extends ListTile{
       height: 80,
       child: Center(
         child: ListTile(
-          onTap: () {
-            removeAsyncContextPush() => Navigator.pushNamed(context, Routes.about);
-            precacheImage(
+          onTap: () async {
+            await precacheImage(
               const AssetImage('assets/icons/icon.png'),
               context
-            ).then((_) => removeAsyncContextPush());
-
+            );
+            if (!context.mounted) return;
+            Navigator.pushNamed(context, Routes.about);
           },
           title: Row(
             spacing: 12,
@@ -692,15 +696,31 @@ class AboutTile extends ListTile{
 
 }
 
-class ImageStorageManageTile extends ListTile{
+class ImageStorageManageTile extends StatefulWidget {
   const ImageStorageManageTile({super.key});
 
   @override
+  State<ImageStorageManageTile> createState() => _ImageStorageManageTileState();
+}
+
+class _ImageStorageManageTileState extends State<ImageStorageManageTile> {
+  final ValueNotifier<int> updateStorageNotifier = ValueNotifier(0);
+  late Future<String> imageStoragePath;
+
+  @override
+  void initState() {
+    super.initState();
+    imageStoragePath = getImageStoragePath();
+  }
+
+  @override
+  void dispose() {
+    updateStorageNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-
-    final ValueNotifier<int> updateStorageNotifier = ValueNotifier(0);
-
-    Future<String> imageStoragePath = getImageStoragePath();
 
     return Center(
       child: ListTile(
@@ -724,7 +744,7 @@ class ImageStorageManageTile extends ListTile{
 
                     if (Platform.isAndroid) {
                       initialImageStorageDialog(context).then((result) {
-                        if (result != null) {
+                        if (result != null && mounted) {
                           imageStoragePath = getImageStoragePath();
                           updateStorageNotifier.value += 1;
                         }
@@ -732,11 +752,13 @@ class ImageStorageManageTile extends ListTile{
                     }
 
                     else {
-
-                      launchUrlString(
-                        MyHive.downloadImageDir!.path,
-                        mode: LaunchMode.externalApplication,
-                      );
+                      final dirPath = MyHive.downloadImageDir?.path;
+                      if (dirPath != null) {
+                        launchUrlString(
+                          dirPath,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      }
 
                     }
 
@@ -817,13 +839,24 @@ class ImageStorageManageTile extends ListTile{
 
 }
 
-class TestTile extends ListTile{
+class TestTile extends StatefulWidget {
   const TestTile({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<TestTile> createState() => _TestTileState();
+}
 
-    final TextEditingController urlController = TextEditingController();
+class _TestTileState extends State<TestTile> {
+  final TextEditingController urlController = TextEditingController();
+
+  @override
+  void dispose() {
+    urlController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     List<Widget> testWidgets = [
 
@@ -849,7 +882,7 @@ class TestTile extends ListTile{
                 if (urlController.text.isEmpty) return;
                 if (await canLaunchUrlString(urlController.text) != true) return;
 
-                bus.emit('AppRoute', urlController.text);
+                bus.emitAppRoute(urlController.text);
               },
               child: const ScalableText("跳转")
             ),
@@ -889,7 +922,7 @@ class TestTile extends ListTile{
 
 }
 
-class NetWorkConfigTile extends ListTile{
+class NetWorkConfigTile extends StatelessWidget {
   const NetWorkConfigTile({super.key});
 
   @override

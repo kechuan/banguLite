@@ -34,14 +34,26 @@ List<Icon> iconList = const [
   Icon(Icons.leaderboard_outlined),
 ];
 
-class BangumiStarPage extends StatelessWidget {
+class BangumiStarPage extends StatefulWidget {
   const BangumiStarPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<BangumiStarPage> createState() => _BangumiStarPageState();
+}
 
-    final ValueNotifier<SortType> sortTypeNotifier = ValueNotifier<SortType>(SortType.joinTime);
-    final ValueNotifier<bool> reversedSortNotifier = ValueNotifier<bool>(false);
+class _BangumiStarPageState extends State<BangumiStarPage> {
+  final ValueNotifier<SortType> sortTypeNotifier = ValueNotifier<SortType>(SortType.joinTime);
+  final ValueNotifier<bool> reversedSortNotifier = ValueNotifier<bool>(false);
+
+  @override
+  void dispose() {
+    sortTypeNotifier.dispose();
+    reversedSortNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     //final ValueNotifier<StarNetworkType> starNetworkTypeNotifier = ValueNotifier(StarNetworkType.local);
 

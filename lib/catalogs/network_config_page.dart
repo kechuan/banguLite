@@ -57,7 +57,9 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
   @override
   void dispose() {
     httpProxyAddressEditingController.dispose();
-    latencyResultNotifierList.map((latencyNotifier) => latencyNotifier.dispose());
+    for (final latencyNotifier in latencyResultNotifierList) {
+      latencyNotifier.dispose();
+    }
 
     super.dispose();
   }
@@ -81,113 +83,127 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
               child: Column(
                 children: [
 
-                  ListTile(
-                    leading: const Icon(Icons.terminal),
-                    title: const ScalableText('代理设置'),
-                    subtitle: ScalableText('默认直连 保存后生效', style: TextStyle(color: Colors.grey, fontSize: AppFontSize.s14)),
-                    trailing: SizedBox(
-                      width: 50,
-                      child: Switch(
-                        value: indexModel.userConfig.isProxyMode ?? false,
-                        onChanged: (value) {
-                          //确保输入框跟随保存内容
-                          httpProxyAddressEditingController.text = HttpApiClient.currentProxyAddress;
-                          indexModel.updateProxyMode(value);
-
-                          if (value) {
-                            HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting(HttpApiClient.currentProxyAddress);
-                          }
-
-                          else {
-                            HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting("");
-                          }
-                        }
-                      )
+                  Selector<IndexModel, (bool, bool)>(
+                    selector: (_, model) => (
+                      model.userConfig.isProxyMode ?? false,
+                      model.userConfig.isImgTagProxy ?? true,
                     ),
-                  ),
+                    builder: (_, proxyConfig, textFieldChild) {
+                      final (isProxyMode, isImgTagProxy) = proxyConfig;
 
-                  IgnorePointer(
-                    ignoring: !(indexModel.userConfig.isProxyMode ?? false),
-                    child: ValueListenableBuilder(
-                      valueListenable: httpProxyAddressEditingController,
-                      builder: (_, textContent, textFieldChild) {
-                        return AnimatedContainer(
-                          height: textContent.text.isEmpty ? 80 : 135,
-                          padding: Padding6,
-                          duration: const Duration(milliseconds: 300),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: 
-                            (indexModel.userConfig.isProxyMode ?? false) ? 
-                            getCurrentThemeColor(context).withValues(alpha: 0.3) : 
-                            (judgeDarknessMode(context) ? Colors.grey.shade700 : Colors.grey)
-                          ),
-
-                          child: Column(
-                            spacing: 6,
-                            children: [
-
-                              Expanded(child: textFieldChild!),
-
-                              textContent.text.isEmpty ? 
-                              const SizedBox.shrink() :
-                              Row(
-                                spacing: 12,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  const Text("使外链(img标签)图片加载也使用代理流量"),
-                                  Switch(
-                                    value: indexModel.userConfig.isImgTagProxy ?? true,
-                                    onChanged: (value) {
-                                      indexModel.updateImageTagProxyMode(value);
-                                    }
-                                  )
-                                ],
-                              ),
-
-                            ],
-                          )
-                        );
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        spacing: 12,
-
+                      return Column(
                         children: [
-                          const SizedBox.shrink(),
+                          ListTile(
+                            leading: const Icon(Icons.terminal),
+                            title: const ScalableText('代理设置'),
+                            subtitle: ScalableText('默认直连 保存后生效', style: TextStyle(color: Colors.grey, fontSize: AppFontSize.s14)),
+                            trailing: SizedBox(
+                              width: 50,
+                              child: Switch(
+                                value: isProxyMode,
+                                onChanged: (value) {
+                                  //确保输入框跟随保存内容
+                                  httpProxyAddressEditingController.text = HttpApiClient.currentProxyAddress;
+                                  indexModel.updateProxyMode(value);
 
-                          Flexible(
-                            child: SizedBox(
-                              height: 50,
-                              child: ScrollConfiguration(
-                                //隔离EasyRefresh所带来的滚动影响 只给TextField传递 scrollPhysics 是不能完全抵消这种影响的
-                                behavior: ScrollConfiguration.of(context).copyWith(physics: const ClampingScrollPhysics()),
-                                child: TextField(
-                                  controller: httpProxyAddressEditingController,
-                                  decoration: const InputDecoration(
-                                    hintText: '格式 [IP]:[(HTTP)Port]',
-                                    hintStyle: TextStyle(color: Colors.grey),
-                                    border: OutlineInputBorder(),
+                                  if (value) {
+                                    HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting(HttpApiClient.currentProxyAddress);
+                                  }
 
-                                  ),
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.deny(RegExp(r'\\|\/|http|socks')),
-                                  ],
-                                ),
-                              ),  
+                                  else {
+                                    HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting("");
+                                  }
+                                }
+                              )
                             ),
                           ),
 
-                          TextButton(
-                            onPressed: () async {
-                              HttpApiClient.currentProxyAddress = httpProxyAddressEditingController.text;
-                              HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting(httpProxyAddressEditingController.text);
-                              context.read<IndexModel>().updateCurrentProxyAddress(HttpApiClient.currentProxyAddress);
-                            },
-                            child: const ScalableText('保存'),
+                          IgnorePointer(
+                            ignoring: !isProxyMode,
+                            child: ValueListenableBuilder(
+                              valueListenable: httpProxyAddressEditingController,
+                              builder: (_, textContent, __) {
+                                return AnimatedContainer(
+                                  height: textContent.text.isEmpty ? 80 : 135,
+                                  padding: Padding6,
+                                  duration: const Duration(milliseconds: 300),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color:
+                                    isProxyMode ?
+                                    getCurrentThemeColor(context).withValues(alpha: 0.3) :
+                                    (judgeDarknessMode(context) ? Colors.grey.shade700 : Colors.grey)
+                                  ),
+
+                                  child: Column(
+                                    spacing: 6,
+                                    children: [
+
+                                      Expanded(child: textFieldChild!),
+
+                                      textContent.text.isEmpty ?
+                                      const SizedBox.shrink() :
+                                      Row(
+                                        spacing: 12,
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          const Text("使外链(img标签)图片加载也使用代理流量"),
+                                          Switch(
+                                            value: isImgTagProxy,
+                                            onChanged: (value) {
+                                              indexModel.updateImageTagProxyMode(value);
+                                            }
+                                          )
+                                        ],
+                                      ),
+
+                                    ],
+                                  )
+                                );
+                              },
+                            ),
                           ),
                         ],
-                      ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      spacing: 12,
+
+                      children: [
+                        const SizedBox.shrink(),
+
+                        Flexible(
+                          child: SizedBox(
+                            height: 50,
+                            child: ScrollConfiguration(
+                              //隔离EasyRefresh所带来的滚动影响 只给TextField传递 scrollPhysics 是不能完全抵消这种影响的
+                              behavior: ScrollConfiguration.of(context).copyWith(physics: const ClampingScrollPhysics()),
+                              child: TextField(
+                                controller: httpProxyAddressEditingController,
+                                decoration: const InputDecoration(
+                                  hintText: '格式 [IP]:[(HTTP)Port]',
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: OutlineInputBorder(),
+
+                                ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.deny(RegExp(r'\\|\/|http|socks')),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        TextButton(
+                          onPressed: () async {
+                            HttpApiClient.currentProxyAddress = httpProxyAddressEditingController.text;
+                            HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting(httpProxyAddressEditingController.text);
+                            context.read<IndexModel>().updateCurrentProxyAddress(HttpApiClient.currentProxyAddress);
+                          },
+                          child: const ScalableText('保存'),
+                        ),
+                      ],
                     ),
                   ),
 
@@ -220,87 +236,88 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
 
                   ),
 
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: getCurrentThemeColor(context).withValues(alpha: 0.15),
-                    ),
-                    padding: PaddingV6,
-                    child: ListView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemExtent: kToolbarHeight,
-                      shrinkWrap: true,
-                      children: List.generate(
-                        connectionTestUrlMap.length, (index) {
+                  Material(
+                    borderRadius: BorderRadius.circular(12),
+                    clipBehavior: Clip.antiAlias,
+                    color: getCurrentThemeColor(context).withValues(alpha: 0.15),
+                    child: Padding(
+                      padding: PaddingV6,
+                      child: ListView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemExtent: kToolbarHeight,
+                        shrinkWrap: true,
+                        children: List.generate(
+                          connectionTestUrlMap.length, (index) {
 
-                          return ListTile(
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                ScalableText(connectionTestUrlMap.keys.elementAt(index)),
-                                ValueListenableBuilder(
-                                  valueListenable: latencyResultNotifierList[index],
-                                  builder: (_, resultText, child) {
-                                    switch (resultText) {
-                                      case "":
-                                        return const SizedBox.shrink();
-                                      case "loading":
-                                        return const SizedBox(
-                                          height: 25,
-                                          width: 25,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 3,
-                                          ),
-                                        );
-                                      default:
-                                        return Builder(builder: (_) {
-
-                                          int latency = int.tryParse(resultText) ?? 0;
-                                          Color currentLatencyLevel = Colors.green;
-
-                                          if (latency > 500) {
-                                            currentLatencyLevel = Colors.orange;
-                                          }
-
-                                          if (latency == -1 || latency >= 2000) {
-                                            currentLatencyLevel = Colors.red;
-                                          }
-
-                                          return ScalableText(
-                                            latency == -1 ? "TimeOut" : "$latency ms", 
-                                            style: TextStyle(color: currentLatencyLevel, fontSize: AppFontSize.s12)
+                            return ListTile(
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  ScalableText(connectionTestUrlMap.keys.elementAt(index)),
+                                  ValueListenableBuilder(
+                                    valueListenable: latencyResultNotifierList[index],
+                                    builder: (_, resultText, child) {
+                                      switch (resultText) {
+                                        case "":
+                                          return const SizedBox.shrink();
+                                        case "loading":
+                                          return const SizedBox(
+                                            height: 25,
+                                            width: 25,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 3,
+                                            ),
                                           );
+                                        default:
+                                          return Builder(builder: (_) {
 
-                                        });
+                                            int latency = int.tryParse(resultText) ?? 0;
+                                            Color currentLatencyLevel = Colors.green;
+
+                                            if (latency > 500) {
+                                              currentLatencyLevel = Colors.orange;
+                                            }
+
+                                            if (latency == -1 || latency >= 2000) {
+                                              currentLatencyLevel = Colors.red;
+                                            }
+
+                                            return ScalableText(
+                                              latency == -1 ? "TimeOut" : "$latency ms",
+                                              style: TextStyle(color: currentLatencyLevel, fontSize: AppFontSize.s12)
+                                            );
+
+                                          });
+                                      }
                                     }
-                                  }
-                                )
+                                  )
 
-                              ],
-                            ),
-                            subtitle: ScalableText(
-                              connectionTestUrlMap.values.elementAt(index),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: Colors.grey, fontSize: AppFontSize.s12)
-                            ),
-                            onTap: () {
+                                ],
+                              ),
+                              subtitle: ScalableText(
+                                connectionTestUrlMap.values.elementAt(index),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: Colors.grey, fontSize: AppFontSize.s12)
+                              ),
+                              onTap: () {
 
-                              latencyResultNotifierList[index].value = "loading";
+                                latencyResultNotifierList[index].value = "loading";
 
-                              checkLatency(
-                                targetUrl: connectionTestUrlMap.values.elementAt(index),
-                                proxyAddress: judgeIsProxyMode(context) ? httpProxyAddressEditingController.text : null
-                              ).then((value) {
-                                  debugPrint("[Network Latency] ${connectionTestUrlMap.values.elementAt(index)} $value ms");
-                                  latencyResultNotifierList[index].value = "$value";
-                                });
+                                checkLatency(
+                                  targetUrl: connectionTestUrlMap.values.elementAt(index),
+                                  proxyAddress: judgeIsProxyMode(context) ? httpProxyAddressEditingController.text : null
+                                ).then((value) {
+                                    debugPrint("[Network Latency] ${connectionTestUrlMap.values.elementAt(index)} $value ms");
+                                    latencyResultNotifierList[index].value = "$value";
+                                  });
 
-                            },
-                          );
-                        }
-                      )
+                              },
+                            );
+                          }
+                        )
 
+                      ),
                     ),
                   ),
                 ],

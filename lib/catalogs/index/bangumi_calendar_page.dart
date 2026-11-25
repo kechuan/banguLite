@@ -1,26 +1,19 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:bangu_lite/catalogs/about_page.dart';
 import 'package:bangu_lite/catalogs/subject/bangumi_detail_page.dart';
-import 'package:bangu_lite/internal/bus_register_method.dart';
-import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
-import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
-import 'package:bangu_lite/models/providers/account_model.dart';
-import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/models/providers/calendar_model.dart';
 import 'package:bangu_lite/widgets/components/bangumi_tab_content_select.dart';
 import 'package:bangu_lite/widgets/components/transition_container.dart';
-import 'package:bangu_lite/widgets/dialogs/new_update_dialog.dart';
 import 'package:bangu_lite/widgets/dialogs/warp_season_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/cached_image_loader.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
-import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:bangu_lite/widgets/views/bangumi_grid_tile_view.dart';
@@ -48,10 +41,6 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
   final ValueNotifier<bool> weekdaySelectOffstageNotifier = ValueNotifier<bool>(true);
   final ValueNotifier<bool> weekdaySelectOffstageAnimatedNotifier = ValueNotifier<bool>(false);
 
-  //[eventBus] 具名行为的注册与注销
-  late final Function appRouteListener;
-  late final void Function(dynamic) loginRouteListener;
-
   Timer generateScrollList() {
     return Timer.periodic(const Duration(milliseconds: 3600), (timer) {
 
@@ -76,61 +65,8 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
 
   @override
   void initState() {
-
-    invokeShowUpdateDialog(latestRelease) => showUpdateDialog(context, latestRelease);
-
-    //延时context获取
-    getContext() => context;
-
     carouselSpinTimer();
-    calendarLoadFuture = context.read<IndexModel>().loadCalendar();
-
-    //real init For provider context
-    context.read<AccountModel>().initModel(context);
-
-    //由 轮换页进行 监听 AppRoute
-    appRouteListener = (link, {data}) {
-      if (!mounted) return;
-      appRouteMethodListener(context, link, data: data);
-    };
-
-    loginRouteListener = (link) {
-      if (!mounted) return;
-      appLoginMethodListener(context, link);
-    };
-
-    bus.on('AppRoute', appRouteListener);
-    bus.on('LoginRoute', loginRouteListener);
-
-    //更新检查逻辑
-    cleanInstalledPackageCache(APPInformationRepository.version);
-
-    if (context.read<IndexModel>().userConfig.isUpdateAlert != false) {
-      pullLatestRelease().then((latestRelease) {
-
-        if (latestRelease == null || latestRelease.hasErrors) return;
-        if (APPInformationRepository.version == latestRelease.tagName) {
-          return;
-        }
-
-        Future.delayed(
-          const Duration(seconds: 3), 
-          () => showRequestSnackBar(
-            message: "检测到新版本",
-            trailingWidget: TextButton(
-              onPressed: () => invokeShowUpdateDialog(latestRelease),
-              child: const Text('去更新', style: TextStyle(color: Colors.black))
-
-            ),
-
-            backgroundColor: getCurrentThemeColor(getContext())
-          )
-        );
-
-      });
-
-    }
-
+    calendarLoadFuture = context.read<CalendarModel>().loadCalendar();
     super.initState();
   }
 
@@ -154,9 +90,6 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
 
   @override
   void dispose() {
-    bus.off('AppRoute', appRouteListener);
-    bus.off('LoginRoute', loginRouteListener);
-
     carouselTimer?.cancel();
     infiniteScrollController.dispose();
 
@@ -171,17 +104,18 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
   Widget build(BuildContext context) {
     super.build(context);
 
-    final indexModel = context.read<IndexModel>();
+    final calendarModel = context.read<CalendarModel>();
 
     return EasyRefresh.builder(
       header: const TextHeader(),
-      onRefresh: () {
+      onRefresh: () async {
 
         if (
-        indexModel.selectedYear == DateTime.now().year &&
-          indexModel.selectedSeason.seasonText == getSeasonRange(DateTime.now().month).seasonText
+        calendarModel.selectedYear == DateTime.now().year &&
+          calendarModel.selectedSeason.seasonText == getSeasonRange(DateTime.now().month).seasonText
         ) {
-          calendarLoadFuture = indexModel.reloadCalendar();
+          calendarLoadFuture = calendarModel.reloadCalendar();
+          await calendarLoadFuture;
         }
 
       },
@@ -195,15 +129,15 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
         }
 
         return Scaffold(
-          body: Selector<IndexModel, DateTime>(
-            selector: (_, indexModel) => indexModel.dataTime,
+          body: Selector<CalendarModel, DateTime>(
+            selector: (_, model) => model.dataTime,
             builder: (_, updateTime, child) {
               return FutureBuilder(
                 future: calendarLoadFuture,
                 builder: (_, snapshot) {
 
                   //debugPrint("index rebuild: screenWidth:${MediaQuery.sizeOf(context).width}");
-                  final calendarBangumis = indexModel.calendarBangumis;
+                  final hotBangumis = calendarModel.hotBangumis;
 
                   return CustomScrollView(
                     physics: const ClampingScrollPhysics(),
@@ -247,9 +181,9 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                                         child: Row(
                                           children: [
                                             //重建代价低
-                                            Consumer<IndexModel>(
-                                              builder: (_, indexModel, child) {
-                                                return ScalableText("${indexModel.selectedYear} ${indexModel.selectedSeason.seasonText}", style: const TextStyle(fontSize: 24));
+                                            Consumer<CalendarModel>(
+                                              builder: (_, model, child) {
+                                                return ScalableText("${model.selectedYear} ${model.selectedSeason.seasonText}", style: const TextStyle(fontSize: 24));
                                               }
                                             ),
                                             const Icon(Icons.arrow_drop_down)
@@ -278,15 +212,15 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                                         child: InfiniteCarousel.builder(
                                           center: false,
                                           loop: true,
-                                          itemCount: calendarBangumis["最热门"]!.isEmpty ? 1 : calendarBangumis["最热门"]!.length,
+                                          itemCount: hotBangumis.isEmpty ? 1 : hotBangumis.length,
                                           itemExtent: measureCarouselItemExtent(),
                                           velocityFactor: 0.8, //滚动速度
                                           controller: infiniteScrollController,
                                           itemBuilder: (_, currentIndex, itemCount) {
 
-                                            List<BangumiDetails>? weeklyBangumisRecommend = calendarBangumis["最热门"];
+                                            final List<BangumiDetails> weeklyBangumisRecommend = hotBangumis;
 
-                                            if (weeklyBangumisRecommend!.isEmpty) {
+                                            if (weeklyBangumisRecommend.isEmpty) {
                                               return const Center(
                                                 child: ScalableText("暂无热门番剧"),
                                               );
@@ -426,15 +360,15 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                         ]
                       ),
 
-                      Selector<IndexModel, int>(
-                        selector: (_, indexModel) => indexModel.selectedWeekDay,
+                      Selector<CalendarModel, int>(
+                        selector: (_, model) => model.selectedWeekDay,
                         shouldRebuild: (previous, next) {
                           debugPrint("receive rebuild day:$previous => $next");
                           return previous != next;
                         },
                         builder: (_, weekday, selectChild) {
 
-                          final selectedDay = indexModel.selectedWeekDay;
+                          final selectedDay = calendarModel.selectedWeekDay;
 
                           return MultiSliver(
                             pushPinnedChildren: true,
@@ -507,9 +441,9 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                                           selectOffstageNotifier: weekdaySelectOffstageNotifier,
                                           selectOffstageAnimatedNotifier: weekdaySelectOffstageAnimatedNotifier,
                                           selectedList: WeekDay.values,
-                                          initialIndex: indexModel.selectedWeekDay - 1,
+                                          initialIndex: calendarModel.selectedWeekDay - 1,
                                           onTap: (selectedIndex) {
-                                            indexModel.updateSelectedWeekDay(selectedIndex + 1);
+                                            calendarModel.updateSelectedWeekDay(selectedIndex + 1);
                                           },
 
                                         ),
@@ -524,7 +458,7 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
                               ),
 
                               Provider<List<BangumiDetails>>.value(
-                                value: calendarBangumis.values.elementAtOrNull(selectedDay - 1) ?? [],
+                                value: calendarModel.getWeekdayBangumis(selectedDay),
                                 child: const SliverToBoxAdapter(
                                   child: BangumiGridTileView(),
                                 ),
@@ -555,9 +489,9 @@ class _BangumiCalendarPageState extends LifecycleState<BangumiCalendarPage> with
 
   double measureCarouselItemExtent() {
 
-    final calendarBangumis = context.read<IndexModel>().calendarBangumis;
+    final hotBangumis = context.read<CalendarModel>().hotBangumis;
 
-    if (calendarBangumis["最热门"]!.isEmpty) return MediaQuery.sizeOf(context).width;
+    if (hotBangumis.isEmpty) return MediaQuery.sizeOf(context).width;
     if (MediaQuery.orientationOf(context) == Orientation.portrait) return ((MediaQuery.sizeOf(context).width) - (12 / 2)) / 2;
     //if(MediaQuery.orientationOf(context) == Orientation.portrait) return 160;
 

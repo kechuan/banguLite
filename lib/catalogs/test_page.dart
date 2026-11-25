@@ -1,4 +1,6 @@
 import 'package:bangu_lite/internal/custom_bbcode_tag.dart';
+import 'package:bangu_lite/models/informations/surf/user_details.dart';
+import 'package:bangu_lite/widgets/dialogs/user_information_dialog.dart';
 import 'package:bangu_lite/widgets/fragments/refresh_indicator.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -30,7 +32,7 @@ class _TestPageState extends State<TestPage> {
 
   @override
   Widget build(BuildContext context) {
-  
+
     return EasyRefresh(
       footer: const TextFooter(),
       child: Scaffold(
@@ -52,11 +54,23 @@ class _TestPageState extends State<TestPage> {
               gridDelegate: const SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 1
               ),
+            ),
+
+            SliverToBoxAdapter(
+              child: ListTile(
+                onTap: () {
+                  showUserInfomationDialog(
+                    context,
+                    //AccountModel.loginedUserInformations.userInformation!..userName = "shironegi"
+                    UserInformation()..userName = "shironegi"
+                  );
+                }, 
+                title: const Text("打开所属id的个人信息")
+              ),
             )
           ],
         ),
 
-        
       ),
     );
   }
@@ -64,7 +78,7 @@ class _TestPageState extends State<TestPage> {
 
 
 class SliverWaterfallFlowDelegateWithMinCrossAxisExtent
-    extends SliverWaterfallFlowDelegate {
+  extends SliverWaterfallFlowDelegate {
   const SliverWaterfallFlowDelegateWithMinCrossAxisExtent({
     required this.minCrossAxisExtent,
     super.mainAxisSpacing,
@@ -80,8 +94,8 @@ class SliverWaterfallFlowDelegateWithMinCrossAxisExtent
   @override
   int getCrossAxisCount(SliverConstraints constraints) {
     final int val =
-        (constraints.crossAxisExtent / (minCrossAxisExtent + crossAxisSpacing))
-            .floor();
+      (constraints.crossAxisExtent / (minCrossAxisExtent + crossAxisSpacing))
+        .floor();
     return val < 1 ? 1 : val;
   }
 
@@ -92,7 +106,7 @@ class SliverWaterfallFlowDelegateWithMinCrossAxisExtent
     }
 
     return oldDelegate is SliverWaterfallFlowDelegateWithMaxCrossAxisExtent &&
-        (oldDelegate.maxCrossAxisExtent != minCrossAxisExtent ||
-            super.shouldRelayout(oldDelegate));
+      (oldDelegate.maxCrossAxisExtent != minCrossAxisExtent ||
+        super.shouldRelayout(oldDelegate));
   }
 }

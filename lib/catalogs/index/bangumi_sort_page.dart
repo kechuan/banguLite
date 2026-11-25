@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:bangu_lite/bangu_lite_routes.dart';
 import 'package:bangu_lite/catalogs/subject/bangumi_detail_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
-import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/search_handler.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
@@ -48,30 +47,8 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
   final List<BangumiDetails> messageList = [];
   final Map currentSearchConfig = {};
 
-  late final void Function(dynamic) sortSubmitListener;
-
-  @override
-  void initState() {
-
-    ///[Claude]原先直接注册匿名闭包且本 State 没有 dispose, 每进一次排序页就多一个监听器,
-    ///实际上因为使用这个页面是 IndexedStack/首页PageView+const实现 一般来说并不会出现什么进一次排序页就多一个的情况
-    ///不过既然前面的可重复进页面都这么写了 就那样吧
-    sortSubmitListener = (arg) {
-      if (!mounted) return;
-      assert(arg is Map<String, dynamic>);
-      debugPrint("received sortSubmit: $arg");
-      loadNewData(arg);
-    };
-
-    bus.on('sortSubmit', sortSubmitListener);
-    super.initState();
-
-  }
-
   @override
   void dispose() {
-    bus.off('sortSubmit', sortSubmitListener);
-
     sortScrollController.dispose();
     viewTypeNotifier.dispose();
     browserSortTypeNotifier.dispose();
@@ -246,7 +223,9 @@ class _BangumiSortPageState extends State<BangumiSortPage>{
                               child: child,
                             );
                           },
-                          child: filterShow ? const Searchfilter() : const SizedBox.shrink()
+                          child: filterShow
+                              ? Searchfilter(onSubmit: loadNewData)
+                              : const SizedBox.shrink()
 
                         ),
                       ),
