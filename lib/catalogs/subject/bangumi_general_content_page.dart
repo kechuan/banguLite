@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
-import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/proxy_cache.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/services/history_recorder.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
@@ -13,12 +13,10 @@ import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/base_details.dart';
 import 'package:bangu_lite/models/informations/subjects/base_info.dart';
 import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
-import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/base_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/widgets/components/general_replied_line.dart';
-//import 'package:bangu_lite/widgets/components/bangumi_general_content_comment.dart';
 import 'package:bangu_lite/widgets/fragments/animated/animated_transition.dart';
 import 'package:bangu_lite/widgets/fragments/bangumi_content_appbar.dart';
 import 'package:bangu_lite/widgets/fragments/comment_filter.dart';
@@ -35,52 +33,55 @@ import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
-abstract class BangumiContentPageState<
-    W extends StatefulWidget,
+/// 组合式帖子/日志详情通用视图，替代原先 4 泛型 14 钩子的 `BangumiContentPageState` 继承体系。
+class BangumiGeneralContentView<
     M extends BaseModel,
     I extends ContentInfo,
-    D extends ContentDetails
-  > extends LifecycleRouteState<W> {
+    D extends ContentDetails> extends StatefulWidget {
+  const BangumiGeneralContentView({
+    super.key,
+    required this.contentModel,
+    required this.contentInfo,
+    required this.createEmptyDetailData,
+    required this.getWebUrl,
+    required this.postCommentType,
+    required this.loadContent,
+    this.themeColor,
+    this.subContentID,
+    this.sourceTitle,
+    this.referPostContentID,
+    this.isContentLoading,
+    this.getCommentCount,
+    this.getTrailingPhotosUri,
+  });
 
-  //widget.*信息获取
-  M getContentModel();
-  I getContentInfo();
-  D createEmptyDetailData();
+  final M contentModel;
+  final I contentInfo;
+  final D Function() createEmptyDetailData;
+  final String Function(int? contentID) getWebUrl;
+  final PostCommentType postCommentType;
+  final Future<void> Function(int contentID, {bool isRefresh}) loadContent;
 
-  String getWebUrl(int? contentID);
+  final Color? themeColor;
+  final int? subContentID;
+  final String? sourceTitle;
+  final int? referPostContentID;
 
-  String? sourceTitle() => null;
-  PostCommentType? getPostCommentType();
+  final bool Function(M model, int? contentID)? isContentLoading;
+  final int? Function(D? contentDetail, bool isLoading)? getCommentCount;
+  final List<String>? Function(M model)? getTrailingPhotosUri;
 
-  //因为 reviewID 不与 blogID 相匹配 需要额外适配
-  int? getSubContentID() => null;
+  @override
+  State<BangumiGeneralContentView<M, I, D>> createState() =>
+  _BangumiGeneralContentViewState<M, I, D>();
+}
 
-  int? getCommentCount(D? contentDetail, bool isLoading);
-
-  //附带主题色覆盖检测
-  Color? getcurrentSubjectThemeColor();
-
-  //可选的跳转ID
-  int? getReferPostContentID();
-
-  Future<void> loadContent(int contentID, {bool isRefresh = false});
-
-  //blog 与 其他的 commentLoading 与 CommentCount 判定标注不一样 需要针对重写
-  bool isContentLoading(int? contentID) {
-    //return getContentModel().contentDetailData[contentID] == null || 
-    //getContentModel().contentDetailData[contentID]?.detailID == 0;
-
-    final contentModel = getContentModel();
-
-    return contentModel.contentDetailData[contentID] == null || 
-      contentModel.contentDetailData[contentID]?.detailID == 0;
-  }
-
-  List<String>? getTrailingPhotosUri() => null;
+class _BangumiGeneralContentViewState<
+    M extends BaseModel,
+    I extends ContentInfo,
+    D extends ContentDetails> extends LifecycleRouteState<BangumiGeneralContentView<M, I, D>> {
 
   bool isContentInitialed = false;
-
-  //子内容加载(评论)
   Future? contentFuture;
 
   final scrollController = ScrollController();
@@ -89,34 +90,50 @@ abstract class BangumiContentPageState<
 
   final refreshNotifier = ValueNotifier(0);
 
-  //推迟执行以允许在函数作用域之外执行 非const输入
   late final commentFilterTypeNotifier = ValueNotifier(
-    getReferPostContentID() != null ? 
-    BangumiCommentRelatedType.id :
-    BangumiCommentRelatedType.normal
+    widget.referPostContentID != null
+      ? BangumiCommentRelatedType.id
+      : BangumiCommentRelatedType.normal,
   );
 
-  /// [Local Record] will be refreshed by selectedEP Toggle
-  // For Record Comment Type List
   List<EpCommentDetails> resultFilterCommentList = [];
 
-  // For record Local comment Change.
-  //final Map<int, String> userCommentMap = {};
+  // 仅记录本页面新发布的评论，避免与全局 IndexModel.userCommentMap 串扰
+  final Map<int, String> userCommentMap = {};
 
   Color? readableThemeColor;
 
-  late final Map<int, String> userCommentMap;
+  int? get targetContentID => widget.subContentID ?? widget.contentInfo.id;
+
+  bool checkContentLoading(int? contentID) {
+    if (widget.isContentLoading != null) {
+      return widget.isContentLoading!(widget.contentModel, contentID);
+    }
+
+    return widget.contentModel.isDetailLoading(contentID);
+  }
+
+  int? readCommentCount(D? contentDetail, bool isLoading) {
+    if (widget.getCommentCount != null) {
+      return widget.getCommentCount!(contentDetail, isLoading);
+    }
+
+    if (isLoading || contentDetail == null) return null;
+
+    return contentDetail.contentRepliedComment?.length ?? 0;
+  }
+
+  Color getSubjectThemeColor(BuildContext context) =>
+    getDetailRenderColor(context, widget.themeColor);
 
   @override
   void initState() {
-    final contentInfo = getContentInfo();
+    debugPrint(
+      '[GeneralContent] ${widget.contentInfo.runtimeType} ID / subContentID: ${widget.contentInfo.id} / ${widget.subContentID}',
+    );
 
-    debugPrint('[GenernalContent] ${contentInfo.runtimeType} ID / subContentID: ${contentInfo.id} / ${getSubContentID()}');
-
-    /// loadInterceptionCallback 拦截注入
-    contentFuture = contentInfo.loadInterceptionCallback?.call() ?? loadContent(getSubContentID() ?? getContentInfo().id ?? 0);
-
-    userCommentMap = context.read<IndexModel>().userCommentMap;
+    contentFuture = widget.contentInfo.loadInterceptionCallback?.call() ??
+      widget.loadContent(targetContentID ?? 0);
 
     super.initState();
   }
@@ -132,46 +149,39 @@ abstract class BangumiContentPageState<
 
   @override
   Widget build(BuildContext context) {
+    final contentModel = widget.contentModel;
+    final contentInfo = widget.contentInfo;
 
-    //widget.获取
-    final contentModel = getContentModel();
-    final contentInfo = getContentInfo();
+    final bool isDarkMode = judgeDarknessMode(context);
+    final Color? darkSurfaceColor = isDarkMode ? getDarkContentSurfaceColor(context) : null;
+    final Color subjectThemeColor = getSubjectThemeColor(context);
 
     readableThemeColor = convertFineTuneColor(
-
-      getcurrentSubjectThemeColor(),
-      darkMode: judgeDarknessMode(context),
-      lumiScaleType: ScaleType.min
+      subjectThemeColor,
+      darkMode: isDarkMode,
+      lumiScaleType: ScaleType.min,
     );
 
-    //readableThemeColor ??= 
-    //judgeDarknessMode(context) ? 
-    //getcurrentSubjectThemeColor() :
-    //getcurrentSubjectThemeColor()?.withValues(
-    //  red: 1 - getcurrentSubjectThemeColor()!.r,
-    //  green: 1 - getcurrentSubjectThemeColor()!.g,
-    //  blue: 1 - getcurrentSubjectThemeColor()!.b
-    //);
-
-    return ChangeNotifierProvider.value(
-      //因为下方的 Selector 需求 使用 带有contentModel 的context环境
+    return ChangeNotifierProvider<M>.value(
       value: contentModel,
-      builder: (context, _) {
-
+      builder: (_, __) {
         return EasyRefresh.builder(
-          childBuilder: (_, physic) {
+          //跨越这个context读取 ChangeNotifierProvider<M>.value 之内的 context
+          childBuilder: (context, physic) {
             return Theme(
               data: Theme.of(context).copyWith(
-                scaffoldBackgroundColor: 
-                judgeDarknessMode(context) ? 
-                getDarkContentSurfaceColor(context) :
-                convertFineTuneColor(getcurrentSubjectThemeColor() ?? getCurrentThemeColor(context), lumiScaleType: ScaleType.min)
-                ,
-
+                scaffoldBackgroundColor: isDarkMode
+                  ? darkSurfaceColor
+                  : convertFineTuneColor(
+                    subjectThemeColor,
+                    lumiScaleType: ScaleType.min,
+                  ),
               ),
               child: Scaffold(
                 body: Selector<M, D>(
-                  selector: (_, model) => (getContentModel().contentDetailData[getSubContentID() ?? contentInfo.id] as D?) ?? createEmptyDetailData(),
+                  selector: (_, model) =>
+                    (model.contentDetailData[targetContentID] as D?) ??
+                    widget.createEmptyDetailData(),
                   shouldRebuild: (previous, next) => previous != next,
                   builder: (_, contentDetailData, contentComment) => Scrollbar(
                     thumbVisibility: true,
@@ -185,36 +195,33 @@ abstract class BangumiContentPageState<
                         slivers: [
                           MultiSliver(
                             children: [
-
                               SliverPinnedHeader(
                                 child: SafeArea(
                                   bottom: false,
                                   child: BangumiContentAppbar(
-                                    contentID: getSubContentID() ?? contentInfo.id,
+                                    contentID: targetContentID,
                                     titleText: contentDetailData.contentTitle ?? contentInfo.contentTitle,
-                                    webUrl: getWebUrl(getSubContentID() ?? contentInfo.id),
-                                    postCommentType: getPostCommentType(),
+                                    webUrl: widget.getWebUrl(targetContentID),
+                                    postCommentType: widget.postCommentType,
                                     surfaceColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
                                     onSendMessage: (content) {
-
-                                      userCommentMap.addAll({content.$1 ?? 0:content.$2 as String});
+                                      userCommentMap.addAll({content.$1 ?? 0: content.$2 as String});
+                                      final insertIndex = max(0, resultFilterCommentList.length + userCommentMap.length - 1);
 
                                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                                        animatedSliverListKey.currentState?.insertItem(0);
+                                        animatedSliverListKey.currentState?.insertItem(insertIndex);
                                       });
-
                                     },
                                   ),
-                                )
+                                ),
                               ),
 
                               FutureBuilder(
                                 future: contentFuture,
                                 builder: (_, snapshot) {
+                                  final bool isCommentLoading =
+                                    checkContentLoading(targetContentID) && contentInfo.id != unExistID;
 
-                                  final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != unExistID;
-
-                                  /// 载入失败
                                   if (snapshot.hasError) {
                                     return SizedBox(
                                       height: MediaQuery.sizeOf(context).height,
@@ -222,47 +229,40 @@ abstract class BangumiContentPageState<
                                       child: ErrorLoadPrompt(
                                         message: snapshot.error,
                                         onRetryAction: () {
-                                          contentFuture = loadContent(getSubContentID() ?? contentInfo.id ?? 0, isRefresh: true).then((_) {
-                                            initCotent();
-                                          });
+                                          contentFuture = widget
+                                            .loadContent(targetContentID ?? 0, isRefresh: true)
+                                            .then((_) => initContent());
                                           refreshNotifier.value += 1;
-
                                         },
                                       ),
-
                                     );
                                   }
 
-                                  // 初始化载入内容
-                                  if (!isContentInitialed) initCotent();
+                                  if (!isContentInitialed) initContent();
 
-                                  return isCommentLoading ?
-                                  Skeletonizer.sliver(
-                                    enabled: true,
-                                    child: SliverList(
-                                      delegate: SliverChildBuilderDelegate(
-                                        (_, index) {
+                                  return isCommentLoading
+                                    ? Skeletonizer.sliver(
+                                      enabled: true,
+                                      child: SliverList(
+                                        delegate: SliverChildBuilderDelegate((_, index) {
                                           if (index == 0) {
                                             return const Padding(
                                               padding: EdgeInsetsGeometry.only(top: 50, bottom: 125),
                                               child: SkeletonListTileTemplate(scaleType: ScaleType.medium),
                                             );
                                           }
+
                                           return const SkeletonListTileTemplate(scaleType: ScaleType.min);
-                                        }
+                                        }),
                                       ),
-
-                                    ),
-                                  ) :
-                                  authorContent(contentInfo, contentDetailData);
-
-                                }
+                                    )
+                                    : authorContent(contentInfo, contentDetailData);
+                                },
                               ),
 
-                              contentComment!
-
-                            ]
-                          )
+                              contentComment!,
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -274,20 +274,17 @@ abstract class BangumiContentPageState<
                       return FutureBuilder(
                         future: contentFuture,
                         builder: (_, snapshot) {
+                          final bool isCommentLoading =
+                            checkContentLoading(targetContentID) && contentInfo.id != unExistID;
+                          final D? contentDetail = contentModel.contentDetailData[targetContentID] as D?;
 
-                          final bool isCommentLoading = isContentLoading(getSubContentID() ?? contentInfo.id) && contentInfo.id != unExistID;
-                          final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
-
-                          /// 载入失败
                           if (snapshot.data == false && contentDetail?.detailID == 0) {
-                            return const Center(
-                              child: SizedBox.shrink()
-                            );
+                            return const Center(child: SizedBox.shrink());
                           }
 
                           if (isCommentLoading) return const SizedBox.shrink();
 
-                          int resultCommentCount = resultFilterCommentList.length;
+                          final int resultCommentCount = resultFilterCommentList.length;
 
                           return SliverSafeArea(
                             top: false,
@@ -296,21 +293,12 @@ abstract class BangumiContentPageState<
                               sliver: ValueListenableBuilder(
                                 valueListenable: commentFilterTypeNotifier,
                                 builder: (_, commentFilterType, __) {
-
                                   return SliverAnimatedList(
                                     key: animatedSliverListKey,
-                                    //rebuild不会影响内部 initialItemCount 只能分离逻辑了
-                                    initialItemCount: contentDetail!.contentRepliedComment!.length,
+                                    initialItemCount: contentDetail?.contentRepliedComment?.length ?? 0,
                                     itemBuilder: (_, contentCommentIndex, animation) {
-
-                                      /// 用户添加回复时:
                                       if (contentCommentIndex >= resultCommentCount) {
-
-                                        // 但因为 animatedList 的 特质 
-                                        // 会出现 相等甚至是超越 initialItemCount 的 index(明明没insert)
-                                        if (
-                                        contentCommentIndex >= resultCommentCount + userCommentMap.length
-                                        ) {
+                                        if (contentCommentIndex >= resultCommentCount + userCommentMap.length) {
                                           return const SizedBox.shrink();
                                         }
 
@@ -319,211 +307,123 @@ abstract class BangumiContentPageState<
                                         return newRepliedContent(
                                           contentCommentIndex,
                                           contentInfo,
-                                          animation
+                                          animation,
                                         );
-
                                       }
 
-                                      /// 常规内容
                                       return RepaintBoundary(
-                                        child: repliedContent(contentCommentIndex, contentDetail)
+                                        child: repliedContent(contentCommentIndex, contentDetail),
                                       );
-
                                     },
-
                                   );
-                                }
+                                },
                               ),
                             ),
                           );
-
-                        }
+                        },
                       );
-                    }
+                    },
                   ),
-                )
+                ),
               ),
             );
-
-          }
-
+          },
         );
       },
     );
   }
 
-  void initCotent() {
-
-    final contentModel = getContentModel();
-    final contentInfo = getContentInfo();
-
-    final D? contentDetail = contentModel.contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
-
+  void initContent() {
+    final contentModel = widget.contentModel;
+    final contentInfo = widget.contentInfo;
+    final D? contentDetail = contentModel.contentDetailData[targetContentID] as D?;
     final currentEpCommentDetails = contentDetail?.contentRepliedComment;
 
-    debugPrint("contentDetail?.detailID: ${contentDetail?.detailID} currentEpCommentDetails:${currentEpCommentDetails?.length} ");
+    debugPrint(
+      "contentDetail?.detailID: ${contentDetail?.detailID} currentEpCommentDetails:${currentEpCommentDetails?.length} ",
+    );
 
     if (currentEpCommentDetails != null) {
-      resultFilterCommentList = [...currentEpCommentDetails];                                               
+      resultFilterCommentList = [...currentEpCommentDetails];
 
-      recordHistorySurf(contentInfo, contentDetail);
+      HistoryRecorder.recordContentVisit(
+        contentInfo: contentInfo,
+        contentDetail: contentDetail,
+        postCommentType: widget.postCommentType,
+        subContentID: widget.subContentID,
+        sourceTitle: widget.sourceTitle,
+        modelSubjectID: contentModel.subjectID,
+      );
+
       isContentInitialed = true;
 
       if (commentFilterTypeNotifier.value == BangumiCommentRelatedType.id) {
-
-        debugPrint("trigged referContentID: ${getReferPostContentID()}");
+        debugPrint("trigged referContentID: ${widget.referPostContentID}");
 
         resultFilterCommentList = filterCommentList(
           commentFilterTypeNotifier.value,
           resultFilterCommentList,
-          referID: getReferPostContentID()
+          referID: widget.referPostContentID,
         );
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          debugPrint("measure height:${authorContentKey.currentContext?.size?.height},result:${(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - scrollController.offset}");
+          if (!mounted || !scrollController.hasClients) return;
+
+          debugPrint(
+            "measure height:${authorContentKey.currentContext?.size?.height},result:${(authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - scrollController.offset}",
+          );
+
           scrollController.animateTo(
             max(0, (authorContentKey.currentContext?.size?.height ?? 300) - kToolbarHeight - MediaQuery.sizeOf(context).height / 3),
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeOut,
           );
-
         });
-
       }
-
     }
-
-  }
-
-  void recordHistorySurf(I contentInfo, D? contentDetail) {
-
-    fullyRecordAction(int accessID, {String? subjectTitle, dynamic sourceID}) {
-      MyHive.historySurfDataBase.put(
-        accessID,
-        SurfTimelineDetails(
-          detailID: getSubContentID() ?? contentInfo.id ?? 0,
-        )
-          ..updatedAt = DateTime.now().millisecondsSinceEpoch
-          ..title = contentDetail?.contentTitle ?? contentInfo.contentTitle
-          ..sourceTitle = subjectTitle
-          ..sourceID = sourceID ?? contentInfo.sourceID
-          ..bangumiSurfTimelineType = BangumiSurfTimelineType.fromPostCommentType(getPostCommentType())
-          ..replies = contentDetail?.contentRepliedComment?.length ?? 0
-          ..commentDetails = (
-        CommentDetails()
-          ..userInformation = contentDetail?.userInformation ?? contentInfo.userInformation
-        )
-      );
-    }
-
-    updateRecordAction(int accessID) {
-      MyHive.historySurfDataBase.put(
-        accessID,
-        MyHive.historySurfDataBase.get(accessID)!
-          //..sourceTitle = subjectTitle
-          ..updatedAt = DateTime.now().millisecondsSinceEpoch
-          ..replies = contentDetail?.contentRepliedComment?.length ?? 0
-      );
-    }
-
-    if (contentDetail?.detailID != 0) {
-
-      String? subjectTitle = sourceTitle();
-
-      final postCommentType = getPostCommentType();
-
-      if (postCommentType == PostCommentType.replyBlog) {
-        if (sourceTitle() != null) {
-          subjectTitle = sourceTitle()!.contains('[日志]') ? sourceTitle() : '[日志] ${sourceTitle()}';
-        }
-
-        else {
-          subjectTitle = '[日志]';
-        }
-      }
-
-      final accessID = getSubContentID() ?? contentInfo.id ?? 0;
-
-      switch (postCommentType){
-
-        case PostCommentType.replyTopic:
-        case PostCommentType.replyBlog:
-        {
-
-          if (accessID == 0) break;
-
-          if (MyHive.historySurfDataBase.keys.contains(accessID)) {
-            updateRecordAction(accessID);
-          }
-
-          else {
-            fullyRecordAction(accessID, subjectTitle: subjectTitle);
-          }
-
-        }
-
-        case PostCommentType.replyGroupTopic:{
-          if (accessID == 0) break;
-
-          if (MyHive.historySurfDataBase.keys.contains(accessID)) {
-            updateRecordAction(accessID);
-          }
-
-          else {
-            fullyRecordAction(
-              accessID,
-              subjectTitle: subjectTitle,
-              sourceID: getContentModel().subjectID
-            );
-          }
-        }
-
-        default:{}
-
-      }
-
-    }
-
   }
 
   Widget authorContent(I contentInfo, D? contentDetail) {
+    final trailingPhotos = widget.getTrailingPhotosUri?.call(widget.contentModel);
 
     return Column(
       key: authorContentKey,
       spacing: 12,
       children: [
-
         MultiProvider(
           providers: [
             Provider<EpCommentDetails>.value(
               value: EpCommentDetails.fromContentDetail(
                 contentDetail,
-                getSubContentID() ?? contentInfo.id
-              )
+                targetContentID,
+              ),
             ),
             Provider<EpCommentViewConfig>.value(
               value: EpCommentViewConfig(
                 contentID: contentInfo.id ?? 0,
-                postCommentType: getPostCommentType(),
+                postCommentType: widget.postCommentType,
                 authorID: contentDetail?.userInformation?.userID,
                 themeColor: readableThemeColor,
-              )),
+              ),
+            ),
           ],
           child: const EpCommentView(),
         ),
 
         ...List.generate(
-          getTrailingPhotosUri()?.length ?? 0,
+          trailingPhotos?.length ?? 0,
           (index) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: CachedNetworkImage(
-                imageUrl: getTrailingPhotosUri()![index],
+                imageUrl: trailingPhotos![index],
                 httpHeaders: HttpApiClient.browserHeader,
-                cacheManager: judgeIsProxyMode(context) ? ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress) : null,
+                cacheManager: judgeIsProxyMode(context)
+                  ? ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress)
+                  : null,
               ),
             );
-          }
+          },
         ),
 
         GeneralRepliedLine(
@@ -535,121 +435,106 @@ abstract class BangumiContentPageState<
             resultFilterCommentList = filterCommentList(
               filterCommentType,
               contentDetail!.contentRepliedComment!,
-              referID: contentDetail.userInformation?.userID
+              referID: contentDetail.userInformation?.userID,
             );
 
             debugPrint("filter content resultFilterCommentList: ${resultFilterCommentList.length}");
-
           },
         ),
 
         Divider(color: Colors.grey.withValues(alpha: 0.8)),
 
-        //无评论的显示状态
-        if(resultFilterCommentList.isEmpty && userCommentMap.isEmpty)
+        if (resultFilterCommentList.isEmpty && userCommentMap.isEmpty)
         const SizedBox(
           height: 64,
           child: Center(
             child: ScalableText("暂无评论..."),
           ),
-        )
-
+        ),
       ],
     );
-
   }
 
-  Widget repliedContent(
-    int contentCommentIndex, D? contentDetail
-  ) {
-
+  Widget repliedContent(int contentCommentIndex, D? contentDetail) {
     final currentEpCommentDetails = resultFilterCommentList[contentCommentIndex];
-    //final ValueNotifier<int> commentUpdateFlag = ValueNotifier(0);
-
-    int uiFloorIndex = (contentCommentIndex + 1) + (getPostCommentType() == PostCommentType.replyEpComment ? 0 : 1);
+    final int uiFloorIndex =
+      (contentCommentIndex + 1) + (widget.postCommentType == PostCommentType.replyEpComment ? 0 : 1);
+    final subjectThemeColor = getSubjectThemeColor(context);
 
     debugPrint(
-      "[postCommentType]: ${getPostCommentType()}"
+      "[postCommentType]: ${widget.postCommentType}"
       "[Floor data:$contentCommentIndex ui:$uiFloorIndex] "
       "[commentID:${currentEpCommentDetails.commentID}] "
       "[state]: ${currentEpCommentDetails.state} "
-      "[text length]: ${currentEpCommentDetails.comment?.length} "
-      //"content: ${currentEpCommentDetails.comment}"
+      "[text length]: ${currentEpCommentDetails.comment?.length} ",
     );
 
     return Column(
       children: [
-
         MultiProvider(
-          //排序会用得上Key的
           key: ValueKey(currentEpCommentDetails.commentID),
           providers: [
             Provider<EpCommentDetails>.value(
-              value: currentEpCommentDetails..epCommentIndex = "$uiFloorIndex"
-
+              value: currentEpCommentDetails..epCommentIndex = "$uiFloorIndex",
             ),
-            Provider<EpCommentViewConfig>.value(value: EpCommentViewConfig(
-              contentID: currentEpCommentDetails.contentID ?? getContentInfo().id ?? 0,
+            Provider<EpCommentViewConfig>.value(
+              value: EpCommentViewConfig(
+                contentID: currentEpCommentDetails.contentID ?? widget.contentInfo.id ?? 0,
+                postCommentType: widget.postCommentType,
+                onUpdateComment: (content) {
+                  if (content != null) {
+                    context.read<IndexModel>().updateUserCommentMap(
+                      currentEpCommentDetails.commentID ?? 0,
+                      content,
+                    );
+                  }
 
-              postCommentType: getPostCommentType(),
-              /// 用户更改拥有的内容时
-              onUpdateComment: (content) {
-                if (content != null) {
-                  context.read<IndexModel>().updateUserCommentMap(
-                    currentEpCommentDetails.commentID ?? 0,
-                    content
-                  );
-                }
-
-                else {
-                  removeCommentAction(contentCommentIndex, currentEpCommentDetails);
-                }
-              },
-
-              authorID: contentDetail?.userInformation?.userID,
-              themeColor: readableThemeColor,
-            )),
+                  else {
+                    removeCommentAction(contentCommentIndex, currentEpCommentDetails);
+                  }
+                },
+                authorID: contentDetail?.userInformation?.userID,
+                themeColor: readableThemeColor,
+              ),
+            ),
           ],
           child: const EpCommentView(),
         ),
 
-        if(contentCommentIndex < max(0, resultFilterCommentList.length) + userCommentMap.length - 1)
+        if (contentCommentIndex < max(0, resultFilterCommentList.length) + userCommentMap.length - 1)
         Divider(
           thickness: judgeDarknessMode(context) ? 0.5 : 0.75,
           height: 1,
-          color: 
-          judgeDarknessMode(context) ? 
-          getcurrentSubjectThemeColor() : 
-          Colors.grey
+          color: judgeDarknessMode(context) ? subjectThemeColor : Colors.grey,
         ),
-
       ],
     );
-
   }
 
   Widget newRepliedContent(
     int contentCommentIndex,
     I contentInfo,
-    Animation<double> animation
+    Animation<double> animation,
   ) {
-
     bool isFiltered = false;
 
-    final D? contentDetail = getContentModel().contentDetailData[getSubContentID() ?? contentInfo.id] as D?;
-    int commentListCount = (getCommentCount(contentDetail, false) ?? 0);
+    final D? contentDetail = widget.contentModel.contentDetailData[targetContentID] as D?;
+    final int commentListCount = readCommentCount(contentDetail, false) ?? 0;
 
     if (resultFilterCommentList.length != commentListCount) isFiltered = true;
 
-    int newFloor = isFiltered ? 
-    commentListCount + contentCommentIndex + 1 :
-    contentCommentIndex + 1
-    ;
+    final int localIndex = contentCommentIndex - resultFilterCommentList.length;
 
-    int newCommentID = isFiltered ?
-    userCommentMap.keys.elementAt(newFloor - (commentListCount + contentCommentIndex + 1)) :
-    userCommentMap.keys.elementAt(newFloor - (contentCommentIndex + 1))
-    ;
+    if (localIndex < 0 || localIndex >= userCommentMap.length) {
+      return const SizedBox.shrink();
+    }
+
+    final int newFloor = isFiltered
+      ? commentListCount + localIndex + 1
+      : contentCommentIndex + 1;
+
+    final int newCommentID = userCommentMap.keys.elementAt(localIndex);
+    final subjectThemeColor = getSubjectThemeColor(context);
 
     final currentEpCommentDetails = EpCommentDetails()
       ..userInformation = AccountModel.loginedUserInformations.userInformation
@@ -657,45 +542,49 @@ abstract class BangumiContentPageState<
       ..commentID = newCommentID
       ..comment = userCommentMap[newCommentID]
       ..epCommentIndex = "$newFloor"
-      ..commentTimeStamp = DateTime.now().millisecondsSinceEpoch ~/ 1000
-    ;
+      ..commentTimeStamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
     return fadeSizeTransition(
       animation: animation,
       child: Column(
         children: [
-
           MultiProvider(
             providers: [
-              Provider<EpCommentDetails>.value(value: currentEpCommentDetails),
-              Provider<EpCommentViewConfig>.value(value: EpCommentViewConfig(
-                contentID: contentInfo.id ?? 0,
-                postCommentType: getPostCommentType(),
-                onUpdateComment: (content) {
-                  if (content == null) {
-                    userCommentMap.remove(currentEpCommentDetails.commentID);
-                    removeCommentAction(contentCommentIndex, currentEpCommentDetails);
-                  }
 
-                  else {
-                    userCommentMap[currentEpCommentDetails.commentID ?? 0] = content;
-                  }      
-                },
-                themeColor: getcurrentSubjectThemeColor(),
-              )),
+              Provider<EpCommentDetails>.value(value: currentEpCommentDetails),
+              Provider<EpCommentViewConfig>.value(
+                value: EpCommentViewConfig(
+                  contentID: contentInfo.id ?? 0,
+                  postCommentType: widget.postCommentType,
+                  onUpdateComment: (content) {
+                    if (content == null) {
+                      userCommentMap.remove(currentEpCommentDetails.commentID);
+                      removeCommentAction(contentCommentIndex, currentEpCommentDetails);
+                    }
+
+                    else {
+                      final targetCommentID = currentEpCommentDetails.commentID ?? 0;
+                      userCommentMap[targetCommentID] = content;
+                      context.read<IndexModel>().updateUserCommentMap(targetCommentID, content);
+                    }
+                  },
+                  themeColor: subjectThemeColor,
+                ),
+              ),
+
             ],
             child: const EpCommentView(),
           ),
 
-          if(contentCommentIndex != resultFilterCommentList.length + userCommentMap.length - 1)
+          if (contentCommentIndex != resultFilterCommentList.length + userCommentMap.length - 1)
+
           Divider(
             thickness: 0.25,
             height: 1,
-            color: getcurrentSubjectThemeColor()
-          )
+            color: subjectThemeColor,
+          ),
         ],
-      )
-
+      ),
     );
   }
 
@@ -705,43 +594,49 @@ abstract class BangumiContentPageState<
   ) {
 
     final accountModel = context.read<AccountModel>();
+    final subjectThemeColor = getSubjectThemeColor(context);
 
     accountModel.toggleComment(
       contentID: currentEpCommentDetails.contentID,
       commentID: currentEpCommentDetails.commentID,
       actionType: UserContentActionType.delete,
-      postCommentType: getPostCommentType(),
+      postCommentType: widget.postCommentType,
       fallbackAction: (message) {
-        showRequestSnackBar(requestStatus: false, message: message, backgroundColor: getCurrentThemeColor(context));
+
+        showRequestSnackBar(
+          requestStatus: false,
+          message: message,
+          backgroundColor: getCurrentThemeColor(context),
+        );
+
       },
     ).then((resultID) {
         if (resultID != 0) {
+
           animatedSliverListKey.currentState?.removeItem(
             contentCommentIndex,
             duration: const Duration(milliseconds: 300),
-            (_, animation) {            
+            (_, animation) {
               return fadeSizeTransition(
                 animation: animation,
                 child: MultiProvider(
                   providers: [
                     Provider<EpCommentDetails>.value(value: currentEpCommentDetails),
-                    Provider<EpCommentViewConfig>.value(value: EpCommentViewConfig(
-                      contentID: getContentInfo().id ?? 0,
-                      postCommentType: getPostCommentType(),
-                      themeColor: getcurrentSubjectThemeColor(),
-                    )),
-
+                    Provider<EpCommentViewConfig>.value(
+                      value: EpCommentViewConfig(
+                        contentID: widget.contentInfo.id ?? 0,
+                        postCommentType: widget.postCommentType,
+                        themeColor: subjectThemeColor,
+                      ),
+                    ),
                   ],
                   child: const EpCommentView(),
                 ),
               );
-            }
+            },
           );
+
         }
       });
-
   }
-
 }
-
-

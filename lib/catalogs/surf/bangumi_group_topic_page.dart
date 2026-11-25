@@ -2,7 +2,6 @@ import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/group_topic_details.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/informations/subjects/group_topic_info.dart';
@@ -13,77 +12,49 @@ import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 
 @FFRoute(name: '/groupTopic')
-class BangumiGroupTopicPage extends StatefulWidget {
+class BangumiGroupTopicPage extends StatelessWidget {
   const BangumiGroupTopicPage({
     super.key,
     required this.groupsModel,
     required this.groupTopicInfo,
-
     this.themeColor,
     this.referPostContentID,
-    this.sourceTitle
+    this.sourceTitle,
   });
 
   final GroupsModel groupsModel;
   final GroupTopicInfo groupTopicInfo;
-  final Color? themeColor;
 
+  final Color? themeColor;
   final int? referPostContentID;
   final String? sourceTitle;
 
   @override
-  State<BangumiGroupTopicPage> createState() => _BangumiGroupTopicPageState();
-}
+  Widget build(BuildContext context) {
 
-class _BangumiGroupTopicPageState extends BangumiContentPageState 
-  <
-    BangumiGroupTopicPage,
-    GroupsModel,
-    GroupTopicInfo,
-    GroupTopicDetails
-  >{
+    return BangumiGeneralContentView<GroupsModel, GroupTopicInfo, GroupTopicDetails>(
+      contentModel: groupsModel,
+      contentInfo: groupTopicInfo,
+      createEmptyDetailData: GroupTopicDetails.empty,
+      getWebUrl: (groupTopicID) => BangumiWebUrls.groupTopic(groupTopicID ?? 0),
+      postCommentType: PostCommentType.replyGroupTopic,
 
-  @override
-  GroupTopicInfo getContentInfo() => widget.groupTopicInfo;
+      themeColor: themeColor,
+      sourceTitle: sourceTitle,
+      referPostContentID: referPostContentID,
 
-  @override
-  GroupsModel getContentModel() => widget.groupsModel;
-
-  @override
-  Color? getcurrentSubjectThemeColor() => judgeIsFollowThemeColor(context) ? getCurrentThemeColor(context) : widget.themeColor;
-
-  @override
-  GroupTopicDetails createEmptyDetailData() => GroupTopicDetails.empty();
-
-  @override
-  PostCommentType? getPostCommentType() => PostCommentType.replyGroupTopic;
-
-  @override
-  String? sourceTitle() => widget.sourceTitle;
-
-  @override
-  int? getCommentCount(GroupTopicDetails? contentDetail, bool isLoading) {
-    if (!isContentLoading(contentDetail?.groupTopicID)) {
-      if (contentDetail?.groupTopicID != null) {
-        return contentDetail!.contentRepliedComment?.length ?? 0;
-      }
-    }
-    return null;
-  }
-
-  @override
-  String getWebUrl(int? groupTopicID) => BangumiWebUrls.groupTopic(groupTopicID ?? 0);
-
-  @override
-  Future<void> loadContent(int groupTopicID, {bool isRefresh = false}) {
-    return getContentModel().loadContentDetail(
-      groupTopicID, 
-      isRefresh: isRefresh,
-      fallbackAction: (message) => showRequestSnackBar(message: message, requestStatus: false, backgroundColor: getCurrentThemeColor(context)),
+      loadContent: (groupTopicID, {bool isRefresh = false}) {
+        return groupsModel.loadContentDetail(
+          groupTopicID,
+          isRefresh: isRefresh,
+          fallbackAction: (message) => showRequestSnackBar(
+            message: message,
+            requestStatus: false,
+            backgroundColor: getCurrentThemeColor(context),
+          ),
+        );
+      },
     );
+
   }
-
-  @override
-  int? getReferPostContentID() => widget.referPostContentID;
-
 }

@@ -50,7 +50,7 @@ class BangumiEpPage extends StatefulWidget {
   State<BangumiEpPage> createState() => _BangumiEpPageState();
 }
 
-class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> with RouteLifecycleMixin {
+class _BangumiEpPageState extends LifecycleRouteState<BangumiEpPage> {
 
   Future<void>? epsInformationFuture;
   ValueNotifier<double> offsetNotifier = ValueNotifier<double>(0);
@@ -371,6 +371,12 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
   }
 
   @override
+  void dispose() {
+    commentSurfTypeNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Selector<EpModel, List?>(
       selector: (_, epModel) => epModel.epCommentData[epModel.selectedEp],
@@ -400,7 +406,9 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                 child: ErrorLoadPrompt(
                   message: snapshot.error,
                   onRetryAction: () {
-                    epCommentFuture = epModel.loadEpComment();
+                    setState(() {
+                      epCommentFuture = epModel.loadEpComment();
+                    });
                   },
                 ),
               );

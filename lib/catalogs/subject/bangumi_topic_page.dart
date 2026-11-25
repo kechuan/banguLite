@@ -2,7 +2,6 @@ import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_details.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 @FFAutoImport()
@@ -12,93 +11,56 @@ import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 
 @FFRoute(name: '/subjectTopic')
-class BangumiTopicPage extends StatefulWidget {
+class BangumiTopicPage extends StatelessWidget {
   const BangumiTopicPage({
     super.key,
     required this.topicModel,
 
-    ///为什么我不直接传递Index过来?
-    ///因为也有透过urlLink直接打开单个Info的时候 这样的话Index就是一个无意义的值了
-    ///但你却不能反过来说 TopicModel 没用 毕竟你把加载Detail的方法都写进去了(
+    /// 为什么不直接传递 Index：
+    /// 因为也有透过 urlLink 直接打开单个 Info 的情况，此时 Index 无意义。
     required this.topicInfo,
     this.themeColor,
     this.referPostContentID,
 
-    //因为API数据返回 Topic/Blog 的时候并没有携带这种数据 只能自己手动传过来了..
-    this.sourceTitle
+    // 因为 API 返回 Topic/Blog 时未携带来源标题，由上游传入
+    this.sourceTitle,
   });
 
   final TopicModel topicModel;
   final TopicInfo topicInfo;
+
   final Color? themeColor;
   final int? referPostContentID;
-
   final String? sourceTitle;
 
   @override
-  State<BangumiTopicPage> createState() => _BangumiTopicPageState();
-}
+  Widget build(BuildContext context) {
 
-class _BangumiTopicPageState extends BangumiContentPageState 
-  <
-    BangumiTopicPage,
-    TopicModel,
-    TopicInfo,
-    TopicDetails
-  >{
+    return BangumiGeneralContentView<TopicModel, TopicInfo, TopicDetails>(
+      contentModel: topicModel,
+      contentInfo: topicInfo,
+      createEmptyDetailData: TopicDetails.empty,
+      getWebUrl: (topicID) => BangumiWebUrls.subjectTopic(topicID ?? 0),
+      postCommentType: PostCommentType.replyTopic,
 
-  @override
-  String? sourceTitle() => widget.sourceTitle;
+      themeColor: themeColor,
+      sourceTitle: sourceTitle,
+      referPostContentID: referPostContentID,
 
-  @override
-  TopicInfo getContentInfo() => widget.topicInfo;
-
-  @override
-  TopicModel getContentModel() => widget.topicModel;
-
-  @override
-  Color? getcurrentSubjectThemeColor() => judgeIsFollowThemeColor(context) ? getCurrentThemeColor(context) : widget.themeColor;
-
-  @override
-  TopicDetails createEmptyDetailData() => TopicDetails.empty();
-
-  @override
-  PostCommentType? getPostCommentType() => PostCommentType.replyTopic;
-
-  /// API 把 主楼信息的 content 也归类为 Replies内 也就是 Replies.first
-  /// 按道理来说 是不可能会出现 .isEmpty 的情况的
-  /// 隔壁的 GroupTopic 的数据也是如此
-  @override
-  int? getCommentCount(TopicDetails? contentDetail, bool isLoading) {
-
-    if (!isContentLoading(contentDetail?.topicID)) {
-      if (contentDetail?.topicID != null) {
-        return contentDetail!.topicRepliedComment?.length ?? 0;
-      }
-    }
-
-    return null;
-  }
-
-  @override
-  String getWebUrl(int? topicID) => BangumiWebUrls.subjectTopic(topicID ?? 0);
-
-  @override
-  Future<void> loadContent(int topicID, {bool isRefresh = false}) {
-    return getContentModel().loadContentDetail(
-      topicID,
-      isRefresh: isRefresh,
-      fallbackAction: (message) {
-        showRequestSnackBar(
-          message: message,
-          requestStatus: false,
-          backgroundColor: getCurrentThemeColor(context)
+      loadContent: (topicID, {bool isRefresh = false}) {
+        return topicModel.loadContentDetail(
+          topicID,
+          isRefresh: isRefresh,
+          fallbackAction: (message) {
+            showRequestSnackBar(
+              message: message,
+              requestStatus: false,
+              backgroundColor: getCurrentThemeColor(context),
+            );
+          },
         );
       },
     );
+
   }
-
-  @override
-  int? getReferPostContentID() => widget.referPostContentID;
-
 }

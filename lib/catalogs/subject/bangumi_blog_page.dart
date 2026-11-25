@@ -2,7 +2,6 @@ import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
-import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/informations/subjects/blog_details.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/informations/subjects/review_details.dart';
@@ -13,7 +12,7 @@ import 'package:ff_annotation_route_core/ff_annotation_route_core.dart';
 import 'package:flutter/material.dart';
 
 @FFRoute(name: '/Blog')
-class BangumiBlogPage extends StatefulWidget {
+class BangumiBlogPage extends StatelessWidget {
   const BangumiBlogPage({
     super.key,
     required this.reviewModel,
@@ -21,8 +20,7 @@ class BangumiBlogPage extends StatefulWidget {
 
     this.themeColor,
     this.referPostContentID,
-
-    this.sourceTitle
+    this.sourceTitle,
   });
 
   final ReviewModel reviewModel;
@@ -30,75 +28,50 @@ class BangumiBlogPage extends StatefulWidget {
 
   final Color? themeColor;
   final int? referPostContentID;
-
   final String? sourceTitle;
 
-  @override
-  State<BangumiBlogPage> createState() => _BangumiBlogPageState();
-}
-
-
-class _BangumiBlogPageState extends BangumiContentPageState
-  <
-    BangumiBlogPage,
-    ReviewModel,
-    ReviewInfo,
-    BlogDetails
-  >{
+  int? get targetBlogID => reviewInfo.blogID ?? reviewInfo.id;
 
   @override
-  String? sourceTitle() => widget.sourceTitle;
+  Widget build(BuildContext context) {
 
-  @override
-  ReviewModel getContentModel() => widget.reviewModel;
+    return BangumiGeneralContentView<ReviewModel, ReviewInfo, BlogDetails>(
+      contentModel: reviewModel,
+      contentInfo: reviewInfo,
+      subContentID: targetBlogID,
+      createEmptyDetailData: BlogDetails.empty,
+      getWebUrl: (blogID) => BangumiWebUrls.userBlog(blogID ?? 0),
+      postCommentType: PostCommentType.replyBlog,
 
-  @override
-  ReviewInfo getContentInfo() => widget.reviewInfo;
+      themeColor: themeColor,
+      sourceTitle: sourceTitle,
+      referPostContentID: referPostContentID,
 
-  @override 
-  int? getSubContentID() => getContentInfo().blogID ?? getContentInfo().id;
+      isContentLoading: (model, blogID) =>
+        model.contentDetailData[blogID]?.blogID == null ||
+        model.contentDetailData[blogID]?.blogReplies == null,
 
-  //日志所关联的图片
-  @override
-  List<String>? getTrailingPhotosUri() => widget.reviewModel.contentDetailData[getSubContentID()]?.trailingPhotosUri;
+      getCommentCount: (blogDetails, isLoading) {
+        if (isLoading) return null;
 
-  @override
-  BlogDetails createEmptyDetailData() => BlogDetails.empty();
+        return blogDetails?.blogReplies?.length ?? 0;
+      },
 
-  @override
-  Color? getcurrentSubjectThemeColor() => judgeIsFollowThemeColor(context) ? getCurrentThemeColor(context) : widget.themeColor;
+      getTrailingPhotosUri: (model) =>
+        model.contentDetailData[targetBlogID]?.trailingPhotosUri,
 
-  @override
-  bool isContentLoading(int? blogID) {
-    return 
-    getContentModel().contentDetailData[blogID]?.blogID == null ||
-      getContentModel().contentDetailData[blogID]?.blogReplies == null
-    ;
-  }
-
-  @override
-  int? getCommentCount(BlogDetails? blogDetails, bool isLoading) {
-    if (isLoading) return null;
-    return blogDetails!.blogReplies?.length ?? 0;
+      loadContent: (blogID, {bool isRefresh = false}) {
+        return reviewModel.loadBlog(
+          blogID,
+          isRefresh: isRefresh,
+          fallbackAction: (message) => showRequestSnackBar(
+            message: message,
+            requestStatus: false,
+            backgroundColor: getCurrentThemeColor(context),
+          ),
+        );
+      },
+    );
 
   }
-
-  @override
-  PostCommentType? getPostCommentType() => PostCommentType.replyBlog;
-
-  @override
-  String getWebUrl(int? blogID) => BangumiWebUrls.userBlog(blogID ?? 0);
-
-  @override
-  Future<void> loadContent(int blogID, {bool isRefresh = false}) {
-    return getContentModel().loadBlog(
-      blogID,
-      isRefresh: isRefresh,
-      fallbackAction: (message) => showRequestSnackBar(message: message, requestStatus: false, backgroundColor: getCurrentThemeColor(context)));
-  }
-
-  @override
-  int? getReferPostContentID() => widget.referPostContentID;
-
-
 }

@@ -20,7 +20,7 @@ abstract class BangumiGeneralMoreContentPageState<
     T extends StatefulWidget,
     M extends BaseModel,
     I extends ContentInfo
-  > extends LifecycleRouteState<T> with RouteLifecycleMixin {
+  > extends LifecycleRouteState<T> {
 
   M getContentModel();
 

@@ -1,17 +1,13 @@
 
-import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/custom_toaster.dart';
-import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/services/history_recorder.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 @FFAutoImport()
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
-import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
-import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
-import 'package:bangu_lite/models/informations/surf/user_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:bangu_lite/models/providers/bangumi_model.dart';
 import 'package:bangu_lite/models/providers/comment_model.dart';
@@ -56,11 +52,28 @@ class BangumiDetailPage extends StatefulWidget {
 }
 
 
-class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> with RouteLifecycleMixin  {
+class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
 
   final ValueNotifier<String> appbarTitleNotifier = ValueNotifier<String>("");
-  final ValueNotifier<bool> reviewsCollapseStatusNotifier = ValueNotifier(false);
-  final ValueNotifier<bool> topicsCollapseStatusNotifier = ValueNotifier(false);
+  bool hasRecordedHistory = false;
+
+  @override
+  void dispose() {
+    appbarTitleNotifier.dispose();
+
+    super.dispose();
+  }
+
+  void recordSubjectHistory(BangumiDetails? details) {
+    if (hasRecordedHistory || details == null) return;
+
+    hasRecordedHistory = true;
+
+    HistoryRecorder.recordSubjectVisit(
+      subjectID: widget.subjectID,
+      details: details,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,8 +166,12 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
 
               body: NotificationListener<ScrollNotification>(
                 onNotification: (notification) {
+                  // 仅响应最外层 CustomScrollView 的纵向滚动，忽略内部横向列表
+                  if (notification.depth != 0 || notification.metrics.axis != Axis.vertical) {
+                    return false;
+                  }
 
-                  final double offset = notification.metrics.pixels; //scrollview 的 offset : 注意不要让更内层的scrollView影响到它监听
+                  final double offset = notification.metrics.pixels;
 
                   if (offset >= 60) { 
 
@@ -195,24 +212,7 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
 
                         if (snapshot.connectionState == ConnectionState.done) {
                           debugPrint("parse ${widget.subjectID} done ,builderStamp: ${DateTime.now()}");
-
-                          MyHive.historySurfDataBase.put(
-                            widget.subjectID,
-                            SurfTimelineDetails(
-                              detailID: widget.subjectID
-                            )
-                              ..updatedAt = DateTime.now().millisecondsSinceEpoch
-                              ..title = bangumiModel.bangumiDetails?.name ?? ""
-                              ..bangumiSurfTimelineType = BangumiSurfTimelineType.subject
-                              ..commentDetails = (
-                            CommentDetails()
-                              ..userInformation = (
-                            UserInformation()
-                              ..avatarUrl = bangumiModel.bangumiDetails?.coverUrl
-                            )
-                            )
-
-                          );
+                          recordSubjectHistory(bangumiModel.bangumiDetails);
                         }
 
                         /// 预先信息注入(假设有) 可以获取少量信息进入布局页面
@@ -222,11 +222,13 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> wit
                         return EasyRefresh(
                           header: const TextHeader(),
                           footer: const TextFooter(),
-                          onRefresh: () {
-                            bangumiModel.loadDetails(isRefresh: true);
-                            context.read<CommentModel>().loadComments(isReloaded: true);
-                            context.read<TopicModel>().loadSubjectContentList(isReloaded: true);
-                            context.read<ReviewModel>().loadSubjectContentList(isReloaded: true);
+                          onRefresh: () async {
+                            await Future.wait([
+                              bangumiModel.loadDetails(isRefresh: true),
+                              innerContext.read<CommentModel>().loadComments(isReloaded: true),
+                              innerContext.read<TopicModel>().loadSubjectContentList(isReloaded: true),
+                              innerContext.read<ReviewModel>().loadSubjectContentList(isReloaded: true),
+                            ]);
                           },
 
                           child: CustomScrollView(
