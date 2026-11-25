@@ -128,8 +128,8 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
                           int currentRow = (index / displayCrossAxisCount).floor();
                           int currentColumn = index % displayCrossAxisCount;
 
-                          return Container(
-                            color: (currentRow + currentColumn) % 2 == 0 ? Colors.grey.withValues(alpha: 0.3) : null,
+                          return Material(
+                            color: (currentRow + currentColumn) % 2 == 0 ? Colors.grey.withValues(alpha: 0.3) : Colors.transparent,
                             child: Column(
 
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -244,7 +244,7 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
           animatedListController: animatedGroupListController
         );
 
-        groupsModel.notifyListeners();
+        groupsModel.notifyGroupDataChanged();
 
       });
 

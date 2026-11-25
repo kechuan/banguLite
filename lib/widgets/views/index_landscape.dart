@@ -13,7 +13,7 @@ import 'package:bangu_lite/catalogs/index/bangumi_sort_page.dart';
 import 'package:bangu_lite/delegates/search_delegates.dart';
 import 'package:provider/provider.dart';
 
-class IndexLandscape extends StatelessWidget {
+class IndexLandscape extends StatefulWidget {
   const IndexLandscape({
     super.key,
     required this.selectedPageIndexNotifier,
@@ -22,13 +22,25 @@ class IndexLandscape extends StatelessWidget {
   final ValueNotifier<int> selectedPageIndexNotifier;
 
   @override
+  State<IndexLandscape> createState() => _IndexLandscapeState();
+}
+
+class _IndexLandscapeState extends State<IndexLandscape> {
+  final ValueNotifier<bool> expandedMenuNotifier = ValueNotifier(false);
+
+  @override
+  void dispose() {
+    expandedMenuNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
-    final ValueNotifier<bool> expandedMenuNotifier = ValueNotifier(false);
     final indexModel = context.read<IndexModel>();
     
     return ValueListenableBuilder(
-      valueListenable: selectedPageIndexNotifier,
+      valueListenable: widget.selectedPageIndexNotifier,
       builder: (_,currentPageIndex,railLeading) {
 
         expandedMenuNotifier.value = false;
@@ -75,7 +87,7 @@ class IndexLandscape extends StatelessWidget {
                       ],
                       onDestinationSelected: (newIndex){
                         FocusScope.of(context).unfocus();
-                        selectedPageIndexNotifier.value = newIndex;
+                        widget.selectedPageIndexNotifier.value = newIndex;
                       }
                     ),
                   ),

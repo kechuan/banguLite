@@ -11,7 +11,7 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
     super.key,
     required this.contentID,
     required this.currentLevelComment,
-    this.commentIndex,
+    this.onClickCommentIndex,
     this.postCommentType,
     this.readableThemeColor,
     this.floorHostUserID,
@@ -21,7 +21,7 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
   final int contentID;
 
   final EpCommentDetails currentLevelComment;
-  final int? commentIndex;
+  final int? onClickCommentIndex;
   final PostCommentType? postCommentType;
   final Color? readableThemeColor;
   final int? floorHostUserID;
@@ -30,8 +30,8 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
 
     ///暂时没有用到这个参数的地方
-    debugPrint('${currentLevelComment.state}: $commentIndex');
-    if (commentIndex != null) debugPrint("打开了第${commentIndex! + 1}个评论");
+    debugPrint('${currentLevelComment.state}: Floor $onClickCommentIndex');
+    if (onClickCommentIndex != null) debugPrint("打开了第${onClickCommentIndex! + 1}个评论");
 
     return ListView.builder(
       itemCount: (currentLevelComment.repliedComment?.length ?? 1) + 1,
@@ -68,7 +68,8 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
 
           currentLevelComment.repliedComment?[index - 1].let(
             (it) {
-              //自身 大于 楼主 大于 层主
+
+              //自身 大于 层主 大于 楼主
               if (it.userInformation?.userID == floorHostUserID) {
                 authorType = BangumiCommentAuthorType.author;
               }
@@ -86,7 +87,7 @@ class EpRepliedCommentBottomSheet extends StatelessWidget {
           return EpCommentTile(
             contentID: contentID,
             postCommentType: postCommentType,
-            epCommentData: currentLevelComment.repliedComment![index - 1],
+            epCommentData: currentLevelComment.repliedComment![index - 1]..epCommentIndex = "${currentLevelComment.epCommentIndex}-$index",
             readableThemeColor: readableThemeColor,
             authorType: authorType
           );

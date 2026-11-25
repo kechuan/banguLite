@@ -196,7 +196,7 @@ class _BangumiHotCommentState extends State<BangumiHotComment> with AutomaticKee
                               10
                             ))
                           ) {
-                            commentModel.notifyListeners();
+                            commentModel.notifySortOrderChanged();
                           }
 
                           else {

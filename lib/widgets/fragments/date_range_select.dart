@@ -2,18 +2,19 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/dialogs/warp_season_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/max_number_input_formatter.dart';
 
 class DateRangeSelect extends StatelessWidget {
   const DateRangeSelect({
     super.key,
     required this.dateRangeEditingController,
-    this.initMonth
+    this.initMonth,
+    this.onMonthChanged,
   });
 
   final TextEditingController dateRangeEditingController;
   final int? initMonth;
+  final ValueChanged<int?>? onMonthChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -53,12 +54,14 @@ class DateRangeSelect extends StatelessWidget {
             constraints: const BoxConstraints(maxHeight: 200),
 
             itemBuilder: (_){
+              final currentYear = DateTime.now().year;
+              final yearCount = (currentYear - bangumiBaseYear + 1).clamp(1, 100);
               return List.generate(
-                (bangumiBaseYear%2000), (index){
+                yearCount, (index){
                   return PopupMenuItem(
                       height: 50,
-                      value: DateTime.now().year - (index),
-                      child: ScalableText("${ DateTime.now().year - (index) }"),
+                      value: currentYear - index,
+                      child: ScalableText("${currentYear - index}"),
                     );
                 }
               );
@@ -88,7 +91,7 @@ class DateRangeSelect extends StatelessWidget {
                 }
               )
             ], 
-            onChanged: (item) => bus.emit(key,item),
+            onChanged: onMonthChanged,
           ),
         ),
 

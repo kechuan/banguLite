@@ -44,8 +44,11 @@ void showRequestSnackBar(
         backgroundColor:backgroundColor,
         content: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: 8,
           children: [
-            ScalableText(message,style: const TextStyle(color: Colors.black),),
+            Expanded(
+              child: ScalableText(message, style: const TextStyle(color: Colors.black)),
+            ),
             trailingWidget,
           ],
         ),

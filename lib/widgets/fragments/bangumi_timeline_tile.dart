@@ -66,8 +66,7 @@ class BangumiTimelineTile extends StatelessWidget{
                 if (surfTimelineDetails.sourceTitle?.contains("[日志]") == true) {
 
                   //目前唯一从这个渠道(timeline)打开 博客 的地方 只有历史记录了
-                  bus.emit(
-                    "AppRoute",
+                  bus.emitAppRoute(
                     '${BangumiWebUrls.userBlog(surfTimelineDetails.detailID ?? 0)}'
                     '?sourceID=${surfTimelineDetails.sourceID}' 
                     '${surfTimelineDetails.sourceTitle != null ? "&sourceTitle=${surfTimelineDetails.sourceTitle}" : ""}'
@@ -75,13 +74,11 @@ class BangumiTimelineTile extends StatelessWidget{
                 }
 
                 else {
-                  bus.emit(
-                    "AppRoute",
+                  bus.emitAppRoute(
                     '${BangumiWebUrls.subjectTopic(surfTimelineDetails.detailID ?? 0)}'
                     '?sourceID=${surfTimelineDetails.sourceID}'
                     '&topicTitle=${surfTimelineDetails.title}'
                     '${surfTimelineDetails.sourceTitle != null ? "&sourceTitle=${surfTimelineDetails.sourceTitle}" : ""}'
-
                   );
                 }
 
@@ -103,7 +100,7 @@ class BangumiTimelineTile extends StatelessWidget{
                   context, 
                   Routes.groupTopic,
                   arguments: {
-                    "groupsModel":GroupsModel(subjectID: surfTimelineDetails.sourceID),
+                    "groupsModel": GroupsModel(subjectID: surfTimelineDetails.sourceID?.toString()),
                     "groupTopicInfo":
                     GroupTopicInfo(id: surfTimelineDetails.detailID)
                       ..contentTitle = surfTimelineDetails.title

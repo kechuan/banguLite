@@ -28,7 +28,7 @@ class CommentView extends StatefulWidget {
   State<CommentView> createState() => _CommentViewState();
 }
 
-class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTickerProviderStateMixin,  RouteLifecycleMixin  {
+class _CommentViewState extends LifecycleRouteState<CommentView> with SingleTickerProviderStateMixin {
 
   late TabController commentTabController;
 

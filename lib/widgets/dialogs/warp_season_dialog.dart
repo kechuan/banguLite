@@ -6,7 +6,7 @@ import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extension.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
-import 'package:bangu_lite/models/providers/index_model.dart';
+import 'package:bangu_lite/models/providers/calendar_model.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:easy_refresh/easy_refresh.dart';
@@ -15,7 +15,7 @@ import 'package:provider/provider.dart';
 
 const int bangumiBaseYear = 2013;
 
-class WarpSeasonDialog extends StatelessWidget {
+class WarpSeasonDialog extends StatefulWidget {
   const WarpSeasonDialog({
     super.key,
     required this.selectedYear,
@@ -26,12 +26,32 @@ class WarpSeasonDialog extends StatelessWidget {
   final SeasonType selectedSeasonType;
 
   @override
+  State<WarpSeasonDialog> createState() => _WarpSeasonDialogState();
+}
+
+class _WarpSeasonDialogState extends State<WarpSeasonDialog> {
+  late final FixedExtentScrollController yearSelectorController;
+  late final ValueNotifier<int> yearNotifier;
+  late final ValueNotifier<SeasonType> seasonTypeNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    yearSelectorController = FixedExtentScrollController(initialItem: widget.selectedYear - bangumiBaseYear);
+    yearNotifier = ValueNotifier<int>(widget.selectedYear);
+    seasonTypeNotifier = ValueNotifier<SeasonType>(widget.selectedSeasonType);
+  }
+
+  @override
+  void dispose() {
+    yearSelectorController.dispose();
+    yearNotifier.dispose();
+    seasonTypeNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-
-    final FixedExtentScrollController yearSelectorController = FixedExtentScrollController(initialItem: (selectedYear - bangumiBaseYear));  
-
-    final ValueNotifier<int> yearNotifier = ValueNotifier<int>(selectedYear);
-    final ValueNotifier<SeasonType> seasonTypeNotifier = ValueNotifier<SeasonType>(selectedSeasonType);
 
     DateTime currentTime = DateTime.now();
     int currentYear = currentTime.year;
@@ -79,8 +99,8 @@ class WarpSeasonDialog extends StatelessWidget {
                     ),
 
                     MediaQuery.orientationOf(context) == Orientation.landscape ?
-                    SelectSeasonLandscape(yearNotifier: yearNotifier, seasonTypeNotifier: seasonTypeNotifier, selectedYear: selectedYear, currentMonth: currentMonth) :
-                    SelectSeasonPortrait(yearNotifier: yearNotifier, seasonTypeNotifier: seasonTypeNotifier, selectedYear: selectedYear, currentMonth: currentMonth)
+                    SelectSeasonLandscape(yearNotifier: yearNotifier, seasonTypeNotifier: seasonTypeNotifier, selectedYear: widget.selectedYear, currentMonth: currentMonth) :
+                    SelectSeasonPortrait(yearNotifier: yearNotifier, seasonTypeNotifier: seasonTypeNotifier, selectedYear: widget.selectedYear, currentMonth: currentMonth)
 
                   ],
                 ),
@@ -308,15 +328,15 @@ void showSeasonDialog(
 
   invokeAsyncToasterExec() => fadeToaster(color: getCurrentThemeColor(context), context: context, message: "正在切换季节番剧信息");
 
-  final indexModel = context.read<IndexModel>();
+  final calendarModel = context.read<CalendarModel>();
 
   showGeneralDialog(
     barrierDismissible: true,
     barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
     context: context,
     pageBuilder: (_, inAnimation, outAnimation) => WarpSeasonDialog(
-      selectedYear: indexModel.selectedYear,
-      selectedSeasonType: indexModel.selectedSeason
+      selectedYear: calendarModel.selectedYear,
+      selectedSeasonType: calendarModel.selectedSeason
     ),
     transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
     transitionDuration: const Duration(milliseconds: 300)
@@ -332,7 +352,7 @@ void showSeasonDialog(
       selectSeason.year == currentTime.year &&
         getSeasonRange(selectSeason.month) == getSeasonRange(currentTime.month)
       ) {
-        calendarLoadFuture = indexModel.reloadCalendar();
+        calendarLoadFuture = calendarModel.reloadCalendar();
       }
 
       else {
@@ -356,7 +376,7 @@ void showSeasonDialog(
             if (response.data != null) {
               int totalBangumiLength = response.data["total"];
 
-              calendarLoadFuture = indexModel.reloadCalendar(
+              calendarLoadFuture = calendarModel.reloadCalendar(
                 switchCalendar: (() => bangumiTimeRangeSearch(
                   totalBangumiLength: totalBangumiLength,
                   airDateRange: requestDateRange,
@@ -367,8 +387,10 @@ void showSeasonDialog(
           });
       }
 
-      indexModel.selectedYear = selectSeason.year;
-      indexModel.selectedSeason = getSeasonRange(selectSeason.month, currentTime: true);
+      calendarModel.updateSeason(
+        selectSeason.year,
+        getSeasonRange(selectSeason.month, currentTime: true),
+      );
 
     });
 

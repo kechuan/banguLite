@@ -3,19 +3,18 @@ import 'package:flutter/material.dart';
 
 class ScalableText extends Text {
   const ScalableText(
-    this.text,{
-    super.key,
-    super.maxLines,
-    super.overflow,
-    super.style,
-    super.textAlign,
-    super.strutStyle,
-    this.selectable = false
-  }) : super('');
+    this.text, {
+      super.key,
+      super.maxLines,
+      super.overflow,
+      super.style,
+      super.textAlign,
+      super.strutStyle,
+      this.selectable = false
+    }) : super('');
 
   final String text;
   final bool selectable;
-
 
   @override
   Widget build(BuildContext context) {
@@ -24,21 +23,20 @@ class ScalableText extends Text {
     double? originalSize = currentStyle.fontSize;
 
     final resultStyle = currentStyle.copyWith(
-        fontSize: originalSize != null ? 
-          AppFontSize.getScaledSize(originalSize) : 
-          AppFontSize.getScaledSize(AppFontSize.s16)
-        ,
-        overflow: overflow
-      );
+      fontSize: originalSize != null ? 
+      AppFontSize.getScaledSize(originalSize) : 
+      AppFontSize.getScaledSize(AppFontSize.s16)
+      ,
+      overflow: overflow
+    );
 
     return selectable ?
     SelectableText(
       text,
       style: resultStyle,
-      textAlign:textAlign,
+      textAlign: textAlign,
       maxLines: maxLines,
       strutStyle: strutStyle,
-      
     ) :
     Text(
       text,
@@ -46,7 +44,6 @@ class ScalableText extends Text {
       textAlign: textAlign,
       maxLines: maxLines,
       strutStyle: strutStyle,
-
     );
   }
 }

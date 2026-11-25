@@ -5,7 +5,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class BangumiSummary extends StatelessWidget {
+class BangumiSummary extends StatefulWidget {
   const BangumiSummary({
     super.key,
     //this.summary
@@ -14,9 +14,20 @@ class BangumiSummary extends StatelessWidget {
   //final String? summary;
 
   @override
-  Widget build(BuildContext context) {
+  State<BangumiSummary> createState() => _BangumiSummaryState();
+}
 
-    final ValueNotifier<bool> expandedSummaryNotifier = ValueNotifier<bool>(false);
+class _BangumiSummaryState extends State<BangumiSummary> {
+  final ValueNotifier<bool> expandedSummaryNotifier = ValueNotifier<bool>(false);
+
+  @override
+  void dispose() {
+    expandedSummaryNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     //功能等待实现: 1初始时固定size 用户展开时 变成滚动组件 也可以恢复成原来的样子
 

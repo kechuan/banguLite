@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
@@ -14,7 +13,7 @@ import 'package:bangu_lite/widgets/fragments/star_slider_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class StarSubjectDialog extends StatelessWidget {
+class StarSubjectDialog extends StatefulWidget {
   const StarSubjectDialog({
     super.key,
     required this.subjectID,
@@ -34,16 +33,39 @@ class StarSubjectDialog extends StatelessWidget {
   final Color? themeColor;
 
   @override
+  State<StarSubjectDialog> createState() => _StarSubjectDialogState();
+}
+
+class _StarSubjectDialogState extends State<StarSubjectDialog> {
+  late final ValueNotifier<bool> commentExpandedStatusNotifier;
+  late final ValueNotifier<double> commentRankNotifier;
+  late final ValueNotifier<StarType> starTypeNotifier;
+  late final TextEditingController contentEditingController;
+  final ExpansibleController commentExpansibleController = ExpansibleController();
+
+  @override
+  void initState() {
+    super.initState();
+    commentExpandedStatusNotifier = ValueNotifier(widget.commentDetails?.comment != null);
+    commentRankNotifier = ValueNotifier((widget.commentDetails?.rate ?? 0).toDouble());
+    starTypeNotifier = ValueNotifier<StarType>(widget.commentDetails?.type ?? StarType.none);
+    contentEditingController = TextEditingController(text: widget.commentDetails?.comment);
+  }
+
+  @override
+  void dispose() {
+    commentExpandedStatusNotifier.dispose();
+    commentRankNotifier.dispose();
+    starTypeNotifier.dispose();
+    contentEditingController.dispose();
+    commentExpansibleController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
 	  final accountModel = context.read<AccountModel>();
-
-    final ValueNotifier<bool> commentExpandedStatusNotifier = ValueNotifier(commentDetails?.comment != null);
-    final ValueNotifier<double> commentRankNotifier = ValueNotifier((commentDetails?.rate ?? 0).toDouble());
-    final ValueNotifier<StarType> starTypeNotifier = ValueNotifier<StarType>(commentDetails?.type ?? StarType.none);
-
-    final TextEditingController contentEditingController = TextEditingController(text: commentDetails?.comment);
-    final ExpansibleController commentExpansibleController = ExpansibleController();
 
     return Dialog(
       child: ValueListenableBuilder(
@@ -140,7 +162,7 @@ class StarSubjectDialog extends StatelessWidget {
                             child: StarSliderPanel(
                               valueNotifier: commentRankNotifier,
                               onChanged: (value) => commentRankNotifier.value = value,
-                              themeColor:themeColor
+                              themeColor: widget.themeColor
                             ),
                           ),
                 
@@ -168,7 +190,7 @@ class StarSubjectDialog extends StatelessWidget {
                     
                     TextButton(
                       onPressed: (){
-                        onUpdateLocalStar?.call();
+                        widget.onUpdateLocalStar?.call();
                         Navigator.of(context).pop();
                         },
                       child: const ScalableText("仅本地收藏")
@@ -186,18 +208,16 @@ class StarSubjectDialog extends StatelessWidget {
 								child: const ScalableText("取消")
 								),
 								TextButton(
-									onPressed: (){
+									onPressed: () async {
 
-										invokeAsyncPop(StarType status)=> Navigator.of(context).pop(status);
-
-										if(!MyHive.starBangumisDataBase.containsKey(subjectID)){
-											onUpdateLocalStar?.call();
+										if(!MyHive.starBangumisDataBase.containsKey(widget.subjectID)){
+											widget.onUpdateLocalStar?.call();
 										}
 
-                    onUpdateBangumiStar?.call();
+                    widget.onUpdateBangumiStar?.call();
 
-										accountModel.postContent(
-											subjectID:subjectID.toString(),
+										final status = await accountModel.postContent(
+											subjectID: widget.subjectID.toString(),
 											postContentType:PostCommentType.subjectComment,
 											actionType: UserContentActionType.edit,
 											subjectCommentData:BangumiDatas.subjectCommentData(
@@ -205,12 +225,16 @@ class StarSubjectDialog extends StatelessWidget {
 												isPrivate: false,
 												starType:starTypeNotifier.value,
 											),
-											fallbackAction: (errorMessage) => onUpdateBangumiStar?.call(message: errorMessage,requestStatus: false),
-										).then((status){
+											fallbackAction: (errorMessage) => widget.onUpdateBangumiStar?.call(message: errorMessage,requestStatus: false),
+										);
 
-                      status!= 0 ? onUpdateBangumiStar?.call(message: "收藏成功",requestStatus:true) : null;
-                      status!= 0 ? invokeAsyncPop(starTypeNotifier.value) : invokeAsyncPop(commentDetails?.type ?? StarType.none);
-										});
+                    if (status != 0) {
+                      widget.onUpdateBangumiStar?.call(message: "收藏成功", requestStatus: true);
+                    }
+                    if (!context.mounted) return;
+                    Navigator.of(context).pop(
+                      status != 0 ? starTypeNotifier.value : (widget.commentDetails?.type ?? StarType.none),
+                    );
 
 									}, 
 									child: const ScalableText("确定")
@@ -241,11 +265,8 @@ Future<StarType?> showStarSubjectDialog(
     String? comment,
     Color? themeColor
   }
-){
-  
-  Completer<StarType?> starTypeCompleter = Completer();
-
-	showGeneralDialog(
+) async {
+	final result = await showGeneralDialog(
 		barrierDismissible: true,
 		barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
 		context: context,
@@ -262,9 +283,7 @@ Future<StarType?> showStarSubjectDialog(
 		},
 		transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child),
 		transitionDuration: const Duration(milliseconds: 300)
-	).then((result){
-		if(result is StarType?) starTypeCompleter.complete(result);
-	});
+	);
 
-	return starTypeCompleter.future;
+	return result is StarType ? result : null;
 }

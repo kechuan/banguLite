@@ -36,7 +36,13 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
 
   Future? loadInformationFuture;
   RequestByteInformation pictureRequestInformation = RequestByteInformation();
-  ValueNotifier<bool> imageLoadNotifier = ValueNotifier(false);
+  final ValueNotifier<bool> imageLoadNotifier = ValueNotifier(false);
+
+  @override
+  void dispose() {
+    imageLoadNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

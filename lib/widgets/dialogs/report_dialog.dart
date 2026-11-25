@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
@@ -12,7 +11,7 @@ import 'package:bangu_lite/widgets/fragments/unvisible_response.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ReportDialog extends StatelessWidget {
+class ReportDialog extends StatefulWidget {
     const ReportDialog({
         super.key,
         required this.reportSubjectType,
@@ -33,17 +32,30 @@ class ReportDialog extends StatelessWidget {
     final Color? themeColor;
 
     @override
+    State<ReportDialog> createState() => _ReportDialogState();
+}
+
+class _ReportDialogState extends State<ReportDialog> {
+    final reportTypeNotifier = ValueNotifier<ReportReasonType>(ReportReasonType.abuse);
+    final commentExpandedStatusNotifier = ValueNotifier<bool>(false);
+    final contentEditingController = TextEditingController();
+    final commentExpansibleController = ExpansibleController();
+
+    @override
+    void dispose() {
+      reportTypeNotifier.dispose();
+      commentExpandedStatusNotifier.dispose();
+      contentEditingController.dispose();
+      commentExpansibleController.dispose();
+      super.dispose();
+    }
+
+    @override
     Widget build(BuildContext context) {
 
         final accountModel = context.read<AccountModel>();
 
-        final reportTypeNotifier = ValueNotifier<ReportReasonType>(ReportReasonType.abuse);
-        final commentExpandedStatusNotifier = ValueNotifier(false);
-
-        final contentEditingController = TextEditingController();
-        final commentExpansibleController = ExpansibleController();
-
-		    debugPrint("[reportDialog] contentType: $reportSubjectType contentID: $contentID type:${reportTypeNotifier.value}");
+		    debugPrint("[reportDialog] contentType: ${widget.reportSubjectType} contentID: ${widget.contentID} type:${reportTypeNotifier.value}");
 
         return Dialog(
             child: ValueListenableBuilder(
@@ -158,14 +170,14 @@ class ReportDialog extends StatelessWidget {
                                             invokeRequestSnackBar({String? message,bool? requestStatus}) => showRequestSnackBar(
                                               message: message,
                                               requestStatus: requestStatus,
-                                              backgroundColor: themeColor
+                                              backgroundColor: widget.themeColor
                                             );
 
 
 
                                             accountModel.reportContent(
-                                              contentID, 
-                                              reportSubjectType.typeIndex, 
+                                              widget.contentID, 
+                                              widget.reportSubjectType.typeIndex, 
                                               reportTypeNotifier.value.reasonIndex,
                                               comment: contentEditingController.text,
                                               fallbackAction: (message) => invokeRequestSnackBar(message: message,requestStatus: false),
@@ -199,11 +211,8 @@ Future<StarType?> showReportDialog(
         required int contentID,
         Color? themeColor
     }
-) {
-
-    Completer<StarType?> starTypeCompleter = Completer();
-
-    showGeneralDialog(
+) async {
+    final result = await showGeneralDialog(
         barrierDismissible: true,
         barrierLabel: "'!barrierDismissible || barrierLabel != null' is not true",
         context: context,
@@ -216,9 +225,7 @@ Future<StarType?> showReportDialog(
         },
         transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
         transitionDuration: const Duration(milliseconds: 300)
-    ).then((result) {
-        if (result is StarType?) starTypeCompleter.complete(result);
-    });
+    );
 
-    return starTypeCompleter.future;
+    return result is StarType ? result : null;
 }

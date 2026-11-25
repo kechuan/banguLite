@@ -1,7 +1,6 @@
 
 
 import 'package:bangu_lite/internal/custom_toaster.dart';
-import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
@@ -13,7 +12,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Searchfilter extends StatefulWidget {
-  const Searchfilter({super.key});
+  const Searchfilter({
+    super.key,
+    this.onSubmit,
+  });
+
+  final ValueChanged<Map<String, dynamic>>? onSubmit;
 
   @override
   State<Searchfilter> createState() => _SearchfilterState();
@@ -34,41 +38,16 @@ class _SearchfilterState extends State<Searchfilter> {
   final GlobalKey<AnimatedListState> animatedTagsListKey = GlobalKey<AnimatedListState>();
 
   Map<String, dynamic> searchFilter = BangumiDatas.sortData;
-  Map<int, int> monthSelect = {};
+  int startMonth = 1;
+  int endMonth = DateTime.now().month;
   final List<String> tagsList = [];
 
   bool inputBorderShow = false;
 
   final ValueNotifier<bool> tagsListEmptyNotifier = ValueNotifier<bool>(false);
 
-  //event的具象 方便后续拔除事件
-  late final void Function(dynamic) monthStartListener;
-  late final void Function(dynamic) monthEndListener;
-
-  @override
-  void initState() {
-
-    monthStartListener = (arg) {
-      debugPrint("received start arg:$arg");
-      monthSelect[0] = arg;
-    };
-
-    monthEndListener = (arg) {
-      debugPrint("received end arg:$arg");
-      monthSelect[1] = arg;
-    };
-
-    bus.on(const ValueKey("monthStartSelect"), monthStartListener);
-    bus.on(const ValueKey("monthEndSelect"), monthEndListener);
-
-    super.initState();
-  }
-
   @override
   void dispose() {
-    bus.off(const ValueKey("monthStartSelect"), monthStartListener);
-    bus.off(const ValueKey("monthEndSelect"), monthEndListener);
-
     yearEditingControllerStart.dispose();
     yearEditingControllerEnd.dispose();
     tagsEditingController.dispose();
@@ -108,9 +87,12 @@ class _SearchfilterState extends State<Searchfilter> {
               children: [
 
                 DateRangeSelect(
-                  initMonth: 1,
+                  initMonth: startMonth,
                   key: const ValueKey("monthStartSelect"),
-                  dateRangeEditingController: yearEditingControllerStart
+                  dateRangeEditingController: yearEditingControllerStart,
+                  onMonthChanged: (month) {
+                    if (month != null) startMonth = month;
+                  },
                 ),
 
                 const Padding(
@@ -119,9 +101,12 @@ class _SearchfilterState extends State<Searchfilter> {
                 ),
 
                 DateRangeSelect(
-                  initMonth: DateTime.now().month,
+                  initMonth: endMonth,
                   key: const ValueKey("monthEndSelect"),
-                  dateRangeEditingController: yearEditingControllerEnd
+                  dateRangeEditingController: yearEditingControllerEnd,
+                  onMonthChanged: (month) {
+                    if (month != null) endMonth = month;
+                  },
                 ),
 
               ],
@@ -343,40 +328,26 @@ class _SearchfilterState extends State<Searchfilter> {
 
                     fadeToaster(color: getCurrentThemeColor(context), context: context, message: "开始搜索");
 
-                    bus.emit('sortSubmit',
-                      searchFilter['filter'] = {
-                        "rank": [
-                          ">=${int.tryParse(rankEditingControllerStart.text) ?? 2}",
-                          "<${int.tryParse(rankEditingControllerEnd.text) ?? 99999}"
-                        ],
-                        "rating":[
-                          ">=${ratingRange.start * 10}",
-                          "<${ratingRange.end * 10}"
-                        ],
-                        "air_date": [ //服务器倒是会自动屏蔽无效的air_date 帮大忙了倒是
-                          ">=${yearEditingControllerStart.text}-${ monthSelect[0] != null ? convertDigitNumString(monthSelect.values.first) : '01'}-01",
-                          "<=${yearEditingControllerEnd.text}-${monthSelect[0] != null ? convertDigitNumString(monthSelect.values.last) : '12'}-01",
-                        ],
-                        "tag": tagsList
-                      }
-                    );
+                    final Map<String, dynamic> filterData = {
+                      "rank": [
+                        ">=${int.tryParse(rankEditingControllerStart.text) ?? 2}",
+                        "<${int.tryParse(rankEditingControllerEnd.text) ?? 99999}"
+                      ],
+                      "rating": [
+                        ">=${ratingRange.start * 10}",
+                        "<${ratingRange.end * 10}"
+                      ],
+                      "air_date": [ //服务器倒是会自动屏蔽无效的air_date 帮大忙了倒是
+                        ">=${yearEditingControllerStart.text}-${convertDigitNumString(startMonth)}-01",
+                        "<=${yearEditingControllerEnd.text}-${convertDigitNumString(endMonth)}-01",
+                      ],
+                      "tag": List<String>.from(tagsList)
+                    };
+
+                    widget.onSubmit?.call(filterData);
 
                     setState(() {
-                      searchFilter['filter'] = {
-                        "rank": [
-                          ">=${int.tryParse(rankEditingControllerStart.text) ?? 2}",
-                          "<${int.tryParse(rankEditingControllerEnd.text) ?? 99999}"
-                        ],
-                        "rating":[
-                          ">=${ratingRange.start * 10}",
-                          "<${ratingRange.end * 10}"
-                        ],
-                        "air_date": [ //服务器倒是会自动屏蔽无效的air_date 帮大忙了倒是
-                          ">=${yearEditingControllerStart.text}-${ monthSelect[0] != null ? convertDigitNumString(monthSelect.values.first) : '01'}-01",
-                          "<=${yearEditingControllerEnd.text}-${monthSelect[0] != null ? convertDigitNumString(monthSelect.values.last) : '12'}-01",
-                        ],
-                        "tag": tagsList
-                      };
+                      searchFilter['filter'] = filterData;
                     });
 
                   }, child: const ScalableText("搜索")

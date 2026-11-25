@@ -27,6 +27,7 @@ class EpCommentTile extends StatefulWidget {
     required this.contentID,
     required this.epCommentData,
     required this.postCommentType,
+    this.themeColor,
     this.readableThemeColor, 
     this.onUpdateComment,
     this.authorType,
@@ -37,6 +38,8 @@ class EpCommentTile extends StatefulWidget {
   final EpCommentDetails epCommentData;
   final PostCommentType? postCommentType;
   final BangumiCommentAuthorType? authorType;
+
+  final Color? themeColor;
   final Color? readableThemeColor;
 
   final Function(String?)? onUpdateComment;
@@ -123,9 +126,10 @@ class _EpCommentTileState extends State<EpCommentTile> {
                                   ScalableText(
                                     widget.epCommentData.userInformation?.nickName ?? widget.epCommentData.userInformation?.userName ?? "no data",
                                     style: TextStyle(
-                                      color: widget.epCommentData.userInformation?.getName() == AccountModel.loginedUserInformations.userInformation?.getName()
+                                      color: 
+                                      widget.themeColor == null ? null :
+                                      widget.epCommentData.userInformation?.getName() == AccountModel.loginedUserInformations.userInformation?.getName()
                                         ? getCurrentThemeColor(context)
-                                        //: Colors.blue,
                                         : widget.readableThemeColor,
                                       fontSize: AppFontSize.s14
 
@@ -176,14 +180,18 @@ class _EpCommentTileState extends State<EpCommentTile> {
                       ScalableText(
                         widget.epCommentData.epCommentIndex == null ? "" : "#${widget.epCommentData.epCommentIndex}",
                         style: TextStyle(
-                          color: widget.readableThemeColor,
+                          //color: widget.readableThemeColor,
+                          color: widget.themeColor == null ? null : widget.readableThemeColor,
                           fontSize: AppFontSize.s14
                         ),
                       ),
 
                       ScalableText(
                         covertDisplayRecordTime(commentStamp.millisecondsSinceEpoch ~/ 1000),
-                        style: TextStyle(fontSize: AppFontSize.s12, color: widget.readableThemeColor?.withValues(alpha: 0.5))
+                        style: TextStyle(
+                          fontSize: AppFontSize.s12,
+                          color: widget.themeColor == null ? null : widget.readableThemeColor?.withValues(alpha: 0.5)
+                        )
                       ),
                     ],
                   ),
@@ -270,7 +278,13 @@ class _EpCommentTileState extends State<EpCommentTile> {
                 }
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: ScalableText("(${widget.epCommentData.userInformation?.sign})", style: TextStyle(color: widget.readableThemeColor?.withValues(alpha: 0.8), fontSize: AppFontSize.s14)),
+                  child: ScalableText(
+                    "(${widget.epCommentData.userInformation?.sign})",
+                    style: TextStyle(
+                      color: widget.themeColor == null ? null : widget.readableThemeColor?.withValues(alpha: 0.8),
+                      fontSize: AppFontSize.s14
+                    )
+                  ),
                 );
               }),
 

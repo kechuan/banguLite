@@ -29,6 +29,12 @@ class _BangumiDetailRecentReviewState extends State<BangumiDetailRecentReview> w
   final ValueNotifier<bool> collapseStatusNotifier = ValueNotifier(false);
 
   @override
+  void dispose() {
+    collapseStatusNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
 

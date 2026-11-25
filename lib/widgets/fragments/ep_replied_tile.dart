@@ -12,7 +12,7 @@ import 'package:bangu_lite/widgets/dialogs/comment_replied_sheet.dart';
 import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flutter/material.dart';
 
-class EpRepliedTile extends ListTile {
+class EpRepliedTile extends StatelessWidget {
   const EpRepliedTile({
     super.key,
     required this.contentID,
@@ -93,7 +93,7 @@ class EpRepliedTile extends ListTile {
                         contentID: contentID,
                         postCommentType: postCommentType,
                         epCommentData: epCommentData,
-                        commentIndex: index,
+                        onClickCommentIndex: (index + 1),
                         themeColor: themeColor,
                         readableThemeColor: readableThemeColor,
                         floorHostUserID: floorHostUserID,
@@ -203,13 +203,13 @@ class EpRepliedTile extends ListTile {
 
 }
 
-class ShowCommentTap extends InkResponse{
+class ShowCommentTap extends StatelessWidget {
   const ShowCommentTap({
     super.key,
-    super.child,
+    this.child,
     required this.contentID,
     required this.epCommentData,
-    this.commentIndex,
+    this.onClickCommentIndex,
     this.postCommentType,
     this.themeColor, 
     this.readableThemeColor,
@@ -217,10 +217,12 @@ class ShowCommentTap extends InkResponse{
 
   });
 
+  final Widget? child;
+
   final int contentID;
 
   final EpCommentDetails epCommentData;
-  final int? commentIndex;
+  final int? onClickCommentIndex;
   final PostCommentType? postCommentType;
 
   final int? floorHostUserID;
@@ -246,7 +248,7 @@ class ShowCommentTap extends InkResponse{
             return EpRepliedCommentBottomSheet(
               contentID: contentID,
               currentLevelComment: epCommentData,
-              commentIndex: commentIndex,
+              onClickCommentIndex: onClickCommentIndex,
               floorHostUserID: floorHostUserID,
               postCommentType: postCommentType,
               readableThemeColor: readableThemeColor,

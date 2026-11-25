@@ -7,10 +7,12 @@ import 'package:flutter/material.dart';
 class HistoryRangeSelectDialog extends StatefulWidget {
   const HistoryRangeSelectDialog({
     super.key,
-    required this.currentPageIndex
+    required this.currentPageIndex,
+    required this.historyModel,
   });
 
   final int currentPageIndex;
+  final HistoryModel historyModel;
 
   @override
   State<HistoryRangeSelectDialog> createState() => _HistoryRangeSelectDialogState();
@@ -18,15 +20,22 @@ class HistoryRangeSelectDialog extends StatefulWidget {
 
 class _HistoryRangeSelectDialogState extends State<HistoryRangeSelectDialog> {
 
-  final historyModel = HistoryModel();
+  HistoryModel get historyModel => widget.historyModel;
   late final FixedExtentScrollController historyPageSelectorController;
 
-  int selectedPageIndex = 0;
+  late int selectedPageIndex;
 
   @override
   void initState() {
+    selectedPageIndex = widget.currentPageIndex;
     historyPageSelectorController = FixedExtentScrollController(initialItem: widget.currentPageIndex);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    historyPageSelectorController.dispose();
+    super.dispose();
   }
 
 
@@ -105,8 +114,9 @@ class _HistoryRangeSelectDialogState extends State<HistoryRangeSelectDialog> {
 
 Future<int?> showHistoryDateRangeSelectDialog (
   BuildContext context,
-  int currentPageIndex,
-) async {
+  int currentPageIndex, {
+  required HistoryModel historyModel,
+}) async {
 
     return showGeneralDialog<int?>(
       barrierDismissible: true,
@@ -114,6 +124,7 @@ Future<int?> showHistoryDateRangeSelectDialog (
       context: context,
       pageBuilder: (_,inAnimation,outAnimation)=> HistoryRangeSelectDialog(
         currentPageIndex: currentPageIndex,
+        historyModel: historyModel,
       ),
       transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child),
       transitionDuration: const Duration(milliseconds: 300)

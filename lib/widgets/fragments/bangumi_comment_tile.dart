@@ -11,7 +11,7 @@ import 'package:bangu_lite/widgets/fragments/star_score_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class BangumiCommentTile extends StatelessWidget {
+class BangumiCommentTile extends StatefulWidget {
   const BangumiCommentTile({
     super.key,
     //required this.contentID,
@@ -24,6 +24,18 @@ class BangumiCommentTile extends StatelessWidget {
   //final CommentDetails commentData;
   //final Color? themeColor;
 
+  @override
+  State<BangumiCommentTile> createState() => _BangumiCommentTileState();
+}
+
+class _BangumiCommentTileState extends State<BangumiCommentTile> {
+  final ValueNotifier<int> reactDataLikeNotifier = ValueNotifier(-1);
+
+  @override
+  void dispose() {
+    reactDataLikeNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +45,6 @@ class BangumiCommentTile extends StatelessWidget {
 
     final int contentID = context.read<BangumiCommentTileConfig?>()?.contentID ?? 0;
     final Color? themeColor = context.read<BangumiCommentTileConfig?>()?.themeColor;
-
-    final ValueNotifier<int> reactDataLikeNotifier = ValueNotifier(-1);
 
     final int ratingScore = commentData.rate ?? 0;
     DateTime commentStamp = DateTime.fromMillisecondsSinceEpoch((commentData.commentTimeStamp ?? 0)*1000);

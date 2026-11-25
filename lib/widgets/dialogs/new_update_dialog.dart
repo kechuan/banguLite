@@ -33,7 +33,6 @@ class NewUpdateDialog extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final UpdateClient updateClient = UpdateClient.updateClient;
-    final ValueNotifier<bool> expandedStatusNotifier = ValueNotifier<bool>(false);
 
     return Padding(
       padding: Padding16,
@@ -120,7 +119,6 @@ class NewUpdateDialog extends StatelessWidget {
               tilePadding: const EdgeInsets.all(0),
               title: const ScalableText("更新说明:"),
               shape: const Border(),
-              onExpansionChanged: (infoCollapseStatus) => expandedStatusNotifier.value = infoCollapseStatus,
               children: [
                 SizedBox(
                   height: 200,

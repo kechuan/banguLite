@@ -14,15 +14,27 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
+
+  @override
+  State<AppDrawer> createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  final ValueNotifier<bool> isExpandedNotifier = ValueNotifier(true);
+
+  @override
+  void dispose() {
+    isExpandedNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
 
     final accountModel = context.read<AccountModel>();
     final indexModel = context.read<IndexModel>();
-    ValueNotifier<bool> isExpandedNotifier = ValueNotifier(true);
 
     return Padding(
       padding: Padding12 + PaddingV16,
@@ -43,11 +55,9 @@ class AppDrawer extends StatelessWidget {
 
                     ListTile(
 
-                      onTap: () {
+                      onTap: () async {
 
-                        invokePushLogin() => Navigator.pushNamed(context, Routes.loginAuth, arguments: {'key':const Key('loginAuth')});
-
-                        Future.wait(
+                        await Future.wait(
                           [
                             precacheImage(
                               const AssetImage('assets/icons/icon.png'),
@@ -59,9 +69,10 @@ class AppDrawer extends StatelessWidget {
                               context
                             ),
                           ]
-                        ).then(
-                            (_) => invokePushLogin()
-                          );
+                        );
+
+                        if (!context.mounted) return;
+                        Navigator.pushNamed(context, Routes.loginAuth, arguments: {'key': const Key('loginAuth')});
 
                       },
                       title: Row(

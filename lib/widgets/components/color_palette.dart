@@ -3,7 +3,7 @@ import 'package:bangu_lite/widgets/fragments/scalable_text.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 
-class HSLColorPicker extends StatelessWidget {
+class HSLColorPicker extends StatefulWidget {
   const HSLColorPicker({
     super.key,
     required this.selectedColor
@@ -12,10 +12,26 @@ class HSLColorPicker extends StatelessWidget {
   final Color selectedColor;
 
   @override
+  State<HSLColorPicker> createState() => _HSLColorPickerState();
+}
+
+class _HSLColorPickerState extends State<HSLColorPicker> {
+  late final ValueNotifier<Color> currentColorNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    currentColorNotifier = ValueNotifier<Color>(widget.selectedColor);
+  }
+
+  @override
+  void dispose() {
+    currentColorNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-
-    ValueNotifier<Color> currentColorNotifier = ValueNotifier<Color>(selectedColor);
-
 
       return ValueListenableBuilder(
         valueListenable: currentColorNotifier,
@@ -79,7 +95,7 @@ class HSLColorPicker extends StatelessWidget {
               Flexible(
                 child: SingleChildScrollView(
                   child: ColorPicker(
-                        color: selectedColor,
+                        color: widget.selectedColor,
                         padding: Padding12,
                         
                         pickerTypeLabels: const {
@@ -96,7 +112,7 @@ class HSLColorPicker extends StatelessWidget {
                         },
                         enableShadesSelection: false,
                         onColorChanged: (newColor) {
-                          if (newColor == selectedColor) return;
+                          if (newColor == widget.selectedColor) return;
                           currentColorNotifier.value = newColor;
                         },
                     ),

@@ -25,6 +25,8 @@ class EpCommentView extends StatelessWidget {
     final PostCommentType? postCommentType = context.read<EpCommentViewConfig>().postCommentType;
     final Function(String?)? onUpdateComment = context.read<EpCommentViewConfig>().onUpdateComment;
     final int? authorID = context.read<EpCommentViewConfig>().authorID;
+
+    ///[EP Page]不传入 themeColor 由上面的ThemeData自行传入来调色
     final Color? themeColor = context.read<EpCommentViewConfig>().themeColor;
 
     /// [BangumiCommentAuthorType] 楼顶端
@@ -52,6 +54,8 @@ class EpCommentView extends StatelessWidget {
           postCommentType: postCommentType,
           onUpdateComment: onUpdateComment,
           authorType: authorType,
+          ///那要如何区分Ep Page与其他Page呢? 那就多传一个 themeColor 进行判断 为null则由themeData进行染色
+          themeColor: themeColor,
           readableThemeColor: convertFineTuneColor(themeColor, darkMode: judgeDarknessMode(context), readableMode: true)
         ),
         EpRepliedTile(

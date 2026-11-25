@@ -7,18 +7,31 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 
-class StickerSelectView extends StatelessWidget {
-  StickerSelectView({
+class StickerSelectView extends StatefulWidget {
+  const StickerSelectView({
     super.key,
     required this.contentEditingController,
   });
 
   final TextEditingController contentEditingController;
-  final PageController stickerPageController = PageController();
 
-  final ValueNotifier stickerSelectNotifier = ValueNotifier(0);
+  @override
+  State<StickerSelectView> createState() => _StickerSelectViewState();
+}
+
+class _StickerSelectViewState extends State<StickerSelectView> {
+  final PageController stickerPageController = PageController();
+  final ValueNotifier<int> stickerSelectNotifier = ValueNotifier<int>(0);
+
+  @override
+  void dispose() {
+    stickerPageController.dispose();
+    stickerSelectNotifier.dispose();
+    super.dispose();
+  }
 
   void insertBgmSticker(int index, {bool? isMusume}) {
+    final contentEditingController = widget.contentEditingController;
     int currentPostion = contentEditingController.selection.start;
 
     String prefix = switch (isMusume){
