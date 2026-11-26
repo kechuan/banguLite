@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
+import 'package:bangu_lite/internal/bangumi_mirror.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -17,7 +18,7 @@ class HttpApiClient{
   );
 
   static Map<String, String> browserHeader = {
-    "User-Agent":'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0',
+    "User-Agent":'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36',
   };
 
   static Map<String, String> nonWebviewHeader = {
@@ -42,7 +43,7 @@ class HttpApiClient{
     authInterceptor = InterceptorsWrapper(
       onRequest: (options, handler) {
         final uri = options.uri;
-        final isBangumiApi = uri.host == 'api.bgm.tv' || uri.host == 'next.bgm.tv';
+        final isBangumiApi = BangumiHostConfig.isBangumiApiHost(uri.host);
         final token = AccountModel.loginedUserInformations.accessToken;
 
         if (isBangumiApi && token != null && !options.headers.containsKey('Authorization')) {
@@ -87,18 +88,18 @@ class BangumiAPIUrls {
     null
   );
 
-  static const String baseUrl = "https://api.bgm.tv";
-  static const String newUrl = "https://next.bgm.tv/p1";
-  static const String baseResourceUrl = "https://lain.bgm.tv";
+  static String get baseUrl => BangumiHostConfig.apiBaseUrl;
+  static String get newUrl => '${BangumiHostConfig.nextBaseUrl}/p1';
+  static String get baseResourceUrl => BangumiHostConfig.resourceBaseUrl;
 
   //static const String calendar = '$baseUrl/calendar';
-  static const String calendar = '$baseUrl/calendar';
+  static String get calendar => '$baseUrl/calendar';
 
-  static const String subject = '$baseUrl/v0/subjects';
-  static const String eps = '$baseUrl/v0/episodes';
-  static const String search = '$baseUrl/v0/search/subject';
+  static String get subject => '$baseUrl/v0/subjects';
+  static String get eps => '$baseUrl/v0/episodes';
+  static String get search => '$baseUrl/v0/search/subject';
 
-  static const String bangumiSubjectSort = '$baseUrl/v0/search/subjects';
+  static String get bangumiSubjectSort => '$baseUrl/v0/search/subjects';
 
   //以v1为代表的新api
 
@@ -148,10 +149,10 @@ class BangumiAPIUrls {
   static String trendTopics() => '$newUrl/trending/subjects/topics';
 
   //user
-  static String me = '$newUrl/me';
+  static String get me => '$newUrl/me';
 
-  static String notify = '$newUrl/notify';
-  static String clearNotify = '$newUrl/clear-notify';
+  static String get notify => '$newUrl/notify';
+  static String get clearNotify => '$newUrl/clear-notify';
 
   static String user(String username) => '$newUrl/users/$username';
   static String userSubjectComment(String username, int subjectID) => '$baseUrl/v0/users/$username/collections/$subjectID';
@@ -229,10 +230,10 @@ class BangumiAPIUrls {
 }
 
 class BangumiWebUrls{
-  static const String baseUrl = "https://bangumi.tv";
-  static const String relativeUrl = "https://bgm.tv";
+  static String get baseUrl => BangumiHostConfig.webBaseUrl;
+  static String get relativeUrl => BangumiHostConfig.webRelativeUrl;
 
-  static const String nextUrl = "https://next.bgm.tv";
+  static String get nextUrl => BangumiHostConfig.nextBaseUrl;
 
   static String login() => '$baseUrl/login';
 
@@ -286,8 +287,8 @@ class BangumiWebUrls{
     return '${BangumiWebUrls.oAuth}?$authParams';
   }
 
-  static const String oAuth = '$relativeUrl/oauth/authorize';
-  static const String oAuthToken = '$relativeUrl/oauth/access_token';
+  static String get oAuth => '$relativeUrl/oauth/authorize';
+  static String get oAuthToken => '$relativeUrl/oauth/access_token';
 
   static String turnstileAuth() => '$nextUrl/p1/turnstile?redirect_uri=${APPInformationRepository.bangumiTurnstileCallbackUri.toString()}';
 
@@ -484,8 +485,19 @@ class APPInformationRepository{
   projectName = "banguLite",
   packageName = "io.flutter.banguLite",
   version = "0.12.5",
-  author = "kechuan"
+  author = "kechuan",
+  githubMirrorPrefix = "https://gh-proxy.org/",
+  githubLatestReleaseApi = "https://api.github.com/repos/$author/$projectName/releases/latest"
   ;
+
+  static String toGithubMirrorUrl(String targetUrl) {
+    final cleanedUrl = targetUrl.trim();
+    if (cleanedUrl.isEmpty) return '';
+
+    if (cleanedUrl.startsWith(githubMirrorPrefix)) return cleanedUrl;
+
+    return '$githubMirrorPrefix$cleanedUrl';
+  }
 
   //纯本地应用  
   static const String bangumiAPPID = 'bgm369067d8f39dea8d4';
@@ -505,6 +517,7 @@ class APPInformationRepository{
   ///(wordpress i0~3节点 目前感觉i1节点最友好) https://i1.wp.com/[Domain]
   ///(广西龙讯) https://collect34.longsunhd.com/source/plugin/yzs1013_pldr/getimg.php?url=(scheme://[Domain]/[Path])
   static const String banguLiteImageForwardUri = 'https://i1.wp.com/';
+  static const String banguLiteWsrvImageForwardUri = 'https://wsrv.nl/?url=';
 
 }
 

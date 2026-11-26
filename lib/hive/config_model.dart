@@ -19,6 +19,10 @@ class AppConfig extends HiveObject{
   String? currentProxyAddress = '';
   bool? isImgTagProxy = true;
 
+  bool? isMirrorMode = false;
+  String? bangumiMirrorMode = '';
+  String? customMirrorDomain = '';
+
   //登入凭证
 
   @override
@@ -37,6 +41,9 @@ class AppConfig extends HiveObject{
       isProxyMode:$isProxyMode
       currentProxyAddress:$currentProxyAddress
       isImgProxy:$isImgTagProxy
+      isMirrorMode:$isMirrorMode
+      bangumiMirrorMode:$bangumiMirrorMode
+      customMirrorDomain:$customMirrorDomain
       
     ]""";
   }

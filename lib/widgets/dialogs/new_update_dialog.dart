@@ -49,7 +49,7 @@ class NewUpdateDialog extends StatelessWidget {
               ],
             ),
 
-            const ScalableText("GitHub源,下载前请确认当前网络状况通畅"),
+            const ScalableText("gh-proxy镜像源,下载前请确认当前网络状况通畅"),
 
             ValueListenableBuilder(
               valueListenable: updateClient.progressNotifier,
@@ -138,7 +138,11 @@ class NewUpdateDialog extends StatelessWidget {
                   return ListTile(
 
                     onLongPress: () async {
-                      Clipboard.setData(ClipboardData(text: latestRelease.assets![index].browserDownloadUrl ?? ""));
+                      final mirrorDownloadUrl = APPInformationRepository.toGithubMirrorUrl(
+                        latestRelease.assets![index].browserDownloadUrl ?? "",
+                      );
+
+                      Clipboard.setData(ClipboardData(text: mirrorDownloadUrl));
                       fadeToaster(color: getCurrentThemeColor(context), context: context, message: "下载链接已复制剪切板");
                     },
 
@@ -238,6 +242,7 @@ class NewUpdateDialog extends StatelessWidget {
       confirmAction: () async => await checkInstallPermission()
     );
 
+    final String mirrorAssetUrl = APPInformationRepository.toGithubMirrorUrl(assestUrl);
     String storagePath = "${MyHive.downloadDir!.path}${Platform.pathSeparator}${assestUrl.split('/').last}";
     File downloadedFile = File(storagePath);
     bool fileExist = false;
@@ -253,9 +258,13 @@ class NewUpdateDialog extends StatelessWidget {
       UpdateClient.getInstance().startDownloadTimer();
 
       await HttpApiClient.client.download(
-        assestUrl,
+        mirrorAssetUrl,
         storagePath,
-        onReceiveProgress: (count, total) => progressNotifier.value = (count / total)
+        onReceiveProgress: (count, total) {
+          if (total > 0) {
+            progressNotifier.value = count / total;
+          }
+        },
       ).then((_) async {
 
           UpdateClient.getInstance().finishDownload();
@@ -274,18 +283,22 @@ class NewUpdateDialog extends StatelessWidget {
           }
 
         }).catchError((dioException) {
-          //debugPrint(dioException);
+          UpdateClient.getInstance().finishDownload();
 
-          switch (dioException.type) {
-            case DioExceptionType.badResponse: {
-              debugPrint('链接不存在或拒绝访问'); 
-              break;
-            }
-            case DioExceptionType.connectionTimeout:
-            case DioExceptionType.sendTimeout:
-            case DioExceptionType.receiveTimeout: {
-              debugPrint('请求超时');
-              break;
+          if (dioException is DioException) {
+            switch (dioException.type) {
+              case DioExceptionType.badResponse: {
+                debugPrint('链接不存在或拒绝访问');
+                break;
+              }
+              case DioExceptionType.connectionTimeout:
+              case DioExceptionType.sendTimeout:
+              case DioExceptionType.receiveTimeout: {
+                debugPrint('请求超时');
+                break;
+              }
+              default:
+                debugPrint('下载异常: ${dioException.message}');
             }
           }
         });
@@ -298,23 +311,33 @@ class NewUpdateDialog extends StatelessWidget {
 
 Future<Release?> pullLatestRelease() async {
 
-  final github = GitHub();
   Release? latestRelease;
 
   try {
+    final requestUrl = APPInformationRepository.toGithubMirrorUrl(
+      APPInformationRepository.githubLatestReleaseApi,
+    );
 
-    await github.repositories.getLatestRelease(RepositorySlug(APPInformationRepository.author, APPInformationRepository.projectName)).then((release) {
-      latestRelease = release;
-    });
+    final response = await HttpApiClient.client.get(
+      requestUrl,
+      options: Options(
+        headers: {
+          'Accept': 'application/vnd.github+json',
+        },
+      ),
+    );
 
-  } 
+    if (response.data is Map) {
+      latestRelease = Release.fromJson(Map<String, dynamic>.from(response.data));
+    }
+  }
 
   catch (e) {
     debugPrint('获取 tags 时出错: $e');
     showRequestSnackBar(message: "$e");
   }
 
-  return latestRelease; 
+  return latestRelease;
 
 }
 

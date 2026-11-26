@@ -1,4 +1,5 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/bangumi_mirror.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/subjects/group_details.dart';
@@ -22,18 +23,19 @@ final anchorRegExp = RegExp(r'#post_(\d+)');
 
 void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
 
-  final appRouteUri = Uri.parse(link);
+  final routeLink = BangumiHostConfig.convertToActiveWebLink(link);
+  final appRouteUri = Uri.parse(routeLink);
 
   if (
-  link.startsWith(BangumiWebUrls.baseUrl) || 
-    link.startsWith(BangumiWebUrls.relativeUrl) ||
-    link.startsWith(BangumiAPIUrls.newUrl)
+    routeLink.startsWith(BangumiWebUrls.baseUrl) ||
+    routeLink.startsWith(BangumiWebUrls.relativeUrl) ||
+    routeLink.startsWith(BangumiAPIUrls.newUrl)
   ) {
 
-    debugPrint("detected BangumiUrls: $link");
+    debugPrint("detected BangumiUrls: $routeLink");
 
     //example: https://bangumi.tv/ep/1471078?subjectID=1471078&selectedEp=2
-    String? matchLink = pathRegExp.firstMatch(link)?.group(0);
+    String? matchLink = pathRegExp.firstMatch(routeLink)?.group(0);
     String? matchPath = matchLink?.split(RegExp('/')).last ?? "";
 
     final matchResult = RegExp(r'\d+').allMatches(matchPath);
@@ -44,24 +46,24 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
     ) ?? 0
     ;
 
-    final int? postReferID = int.tryParse(anchorRegExp.firstMatch(link)?.group(1) ?? "");
+    final int? postReferID = int.tryParse(anchorRegExp.firstMatch(routeLink)?.group(1) ?? "");
 
     if (
-    link == BangumiWebUrls.subject(resID) ||
-      link == BangumiWebUrls.relativeSubject(resID)
+      routeLink == BangumiWebUrls.subject(resID) ||
+      routeLink == BangumiWebUrls.relativeSubject(resID)
     ) {
       if (context.mounted) Navigator.pushNamed(context, Routes.subjectDetail, arguments: {"subjectID":resID});
     }
 
     else if (
-    link.startsWith(BangumiWebUrls.ep(resID)) ||
-      link.startsWith(BangumiWebUrls.relativeEp(resID)) 
+      routeLink.startsWith(BangumiWebUrls.ep(resID)) ||
+      routeLink.startsWith(BangumiWebUrls.relativeEp(resID))
     ) {
       if (context.mounted) {
         //EpModel(subjectID: widget.subjectID,selectedEp: 1)
         //难点在于怎么传递 subjectID 信息 答案: Params传递  
 
-        debugPrint("ep link: $link");
+        debugPrint("ep link: $routeLink");
 
         int subjectID = int.tryParse(appRouteUri.queryParameters['subjectID'] ?? "") ?? 0;
         num selectedEp = num.tryParse(appRouteUri.queryParameters['selectedEp'] ?? "") ?? 0;
@@ -90,12 +92,12 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
     }
 
     else if (
-    link.startsWith(BangumiWebUrls.subjectTopic(resID)) ||
-      link.startsWith(BangumiWebUrls.relativeSubjectTopic(resID)) 
+      routeLink.startsWith(BangumiWebUrls.subjectTopic(resID)) ||
+      routeLink.startsWith(BangumiWebUrls.relativeSubjectTopic(resID))
     ) {
       if (context.mounted) {
 
-        debugPrint("topic link: $link");
+        debugPrint("topic link: $routeLink");
 
         Navigator.pushNamed(
           context, 
@@ -114,15 +116,15 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
     }
 
     else if (
-    link.startsWith(BangumiWebUrls.groupTopic(resID)) ||
-      link.startsWith(BangumiWebUrls.relativeGroupTopic(resID)) 
+      routeLink.startsWith(BangumiWebUrls.groupTopic(resID)) ||
+      routeLink.startsWith(BangumiWebUrls.relativeGroupTopic(resID))
     ) {
       if (context.mounted) {
 
         //那topic呢。。 一般的topic链接是不会拥有 subject/group 这种信息的
         //只有单独的 topic/postID
 
-        debugPrint("groupTopic link: $link,refer: $postReferID");
+        debugPrint("groupTopic link: $routeLink,refer: $postReferID");
 
         Navigator.pushNamed(
           context, 
@@ -146,8 +148,8 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
     }
 
     else if (
-    link.startsWith(BangumiWebUrls.userBlog(resID)) ||
-      link.startsWith(BangumiWebUrls.relativeBlog(resID)) 
+      routeLink.startsWith(BangumiWebUrls.userBlog(resID)) ||
+      routeLink.startsWith(BangumiWebUrls.relativeBlog(resID))
     ) {
       if (context.mounted) {
         Navigator.pushNamed(
@@ -165,8 +167,8 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
     }
 
     else if (
-    link.startsWith(BangumiWebUrls.group(matchLink?.split(RegExp('/')).last)) ||
-      link.startsWith(BangumiWebUrls.relativeGroup(matchLink?.split(RegExp('/')).last)) 
+      routeLink.startsWith(BangumiWebUrls.group(matchLink?.split(RegExp('/')).last)) ||
+      routeLink.startsWith(BangumiWebUrls.relativeGroup(matchLink?.split(RegExp('/')).last))
     ) {
 
       final groupSegments = appRouteUri.pathSegments;
@@ -174,7 +176,7 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
       final String? parsedGroupName =
           (groupIdx != -1 && groupIdx + 1 < groupSegments.length)
               ? groupSegments[groupIdx + 1]
-              : RegExp('group/([^&?]+)').firstMatch(link)?.group(1);
+              : RegExp('group/([^&?]+)').firstMatch(routeLink)?.group(1);
       final String? parsedGroupTitle = appRouteUri.queryParameters['groupTitle'];
 
       debugPrint(
@@ -201,9 +203,9 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
 
     else if (
     //特殊状况
-    link.startsWith(BangumiAPIUrls.timelineReply(int.tryParse(appRouteUri.queryParameters['timelineID'] ?? '') ?? 0)) 
+      routeLink.startsWith(BangumiAPIUrls.timelineReply(int.tryParse(appRouteUri.queryParameters['timelineID'] ?? '') ?? 0))
     //不启用这个分支
-    //|| RegExp(r'https://bangumi.tv/user/\w+:?/timeline/status').hasMatch(link)
+    //|| RegExp(r'https://bangumi.tv/user/\w+:?/timeline/status').hasMatch(routeLink)
     ) {
 
       /// 因为跳转的时候 一般会拥有 用户信息 那么传个userName什么的也没有问题
@@ -234,7 +236,7 @@ void appRouteMethodListener(BuildContext context, String link, {dynamic data}) {
     }
 
     else {
-      launchUrlString(link);
+      launchUrlString(routeLink);
     }
 
   }

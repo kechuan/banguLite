@@ -1,4 +1,5 @@
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/bangumi_mirror.dart';
 import 'package:bangu_lite/internal/proxy_cache.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
@@ -38,7 +39,7 @@ class CachedImageLoader extends StatelessWidget {
             return CachedNetworkImage(
               httpHeaders: HttpApiClient.browserHeader,
               cacheManager: judgeIsProxyMode(context) ? ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress) : null,
-              imageUrl: imageUrl!,
+              imageUrl: BangumiHostConfig.rewriteResourceUrl(imageUrl!),
               imageBuilder: (_, imageProvider) {
                 return DecoratedBox(
                   decoration: BoxDecoration(

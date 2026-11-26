@@ -1,5 +1,6 @@
 
 import 'package:bangu_lite/hive/config_model.dart';
+import 'package:bangu_lite/internal/bangumi_mirror.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/services/star_sync_service.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
@@ -49,6 +50,11 @@ class IndexModel extends ChangeNotifier {
   void loadConfigData() {
     userConfig = MyHive.appConfigDataBase.get("currentTheme") ?? defaultAPPConfig();
     AppFontSize.scale = userConfig.fontScale ?? ScaleType.medium;
+    BangumiHostConfig.applyConfig(
+      isMirrorMode: userConfig.isMirrorMode,
+      mirrorMode: userConfig.bangumiMirrorMode,
+      customDomain: userConfig.customMirrorDomain,
+    );
   }
 
   void updateThemeMode(ThemeMode mode, {bool? config}) {
@@ -110,6 +116,52 @@ class IndexModel extends ChangeNotifier {
     updateConfig();
   }
 
+  void updateMirrorMode(
+    bool mirrorEnabled, {
+    List<BangumiMirrorOption> availableMirrors = const [],
+  }) {
+    userConfig.isMirrorMode = mirrorEnabled;
+
+    if (mirrorEnabled && (userConfig.bangumiMirrorMode ?? '').isEmpty) {
+      final completeMirrors = availableMirrors.where((item) => item.isApiComplete);
+
+      userConfig.bangumiMirrorMode = completeMirrors.isNotEmpty
+        ? completeMirrors.first.baseDomain
+        : BangumiMirrorOption.defaultMirrors.first.baseDomain;
+    }
+
+    BangumiHostConfig.applyConfig(
+      isMirrorMode: userConfig.isMirrorMode,
+      mirrorMode: userConfig.bangumiMirrorMode,
+      customDomain: userConfig.customMirrorDomain,
+      availableMirrors: availableMirrors,
+    );
+
+    updateConfig();
+  }
+
+  void updateBangumiMirror({
+    required String mirrorMode,
+    String? customDomain,
+    List<BangumiMirrorOption> availableMirrors = const [],
+  }) {
+    userConfig.isMirrorMode = true;
+    userConfig.bangumiMirrorMode = mirrorMode;
+
+    if (customDomain != null) {
+      userConfig.customMirrorDomain = BangumiMirrorOption.cleanMirrorDomain(customDomain);
+    }
+
+    BangumiHostConfig.applyConfig(
+      isMirrorMode: userConfig.isMirrorMode,
+      mirrorMode: userConfig.bangumiMirrorMode,
+      customDomain: userConfig.customMirrorDomain,
+      availableMirrors: availableMirrors,
+    );
+
+    updateConfig();
+  }
+
   //更新所有收藏的番剧未免不现实 更改一下逻辑
   //变成只更新目前还未完结的番剧吧。。
   Future<void> updateStarDetail() async {
@@ -161,6 +213,7 @@ class IndexModel extends ChangeNotifier {
     MyHive.appConfigDataBase.clear();
     userConfig = defaultAPPConfig();
     AppFontSize.scale = ScaleType.medium;
+    BangumiHostConfig.applyConfig(isMirrorMode: false);
     notifyListeners();
   }
 

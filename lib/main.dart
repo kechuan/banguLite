@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/bangumi_mirror.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/platforms/register_windows_applink.dart';
@@ -36,12 +37,20 @@ void main() async {
 
   await MyHive.init();
 
+  final savedAppConfig = MyHive.appConfigDataBase.get('currentTheme');
+
+  BangumiHostConfig.applyConfig(
+    isMirrorMode: savedAppConfig?.isMirrorMode,
+    mirrorMode: savedAppConfig?.bangumiMirrorMode,
+    customDomain: savedAppConfig?.customMirrorDomain,
+  );
+
   //兼容性调整 只要不明确为false 即可采用 即使是空的也是默认DIRECT
   HttpApiClient.init(
-    storageProxyAddress: 
-    MyHive.appConfigDataBase.get('currentTheme')?.isProxyMode != false ? 
-    MyHive.appConfigDataBase.get('currentTheme')?.currentProxyAddress ?? '' :
-    ''
+    storageProxyAddress:
+      savedAppConfig?.isProxyMode != false
+        ? savedAppConfig?.currentProxyAddress ?? ''
+        : ''
   );
 
   if (Platform.isAndroid) {

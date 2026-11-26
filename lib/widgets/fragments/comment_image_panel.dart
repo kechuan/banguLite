@@ -1,5 +1,6 @@
 
 import 'package:bangu_lite/bangu_lite_routes.dart';
+import 'package:bangu_lite/internal/bangumi_mirror.dart';
 import 'package:bangu_lite/internal/proxy_cache.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 import 'package:bangu_lite/internal/request_task_information.dart';
@@ -48,8 +49,9 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
   Widget build(BuildContext context) {
 
     final indexModel = context.read<IndexModel>();
+    final targetImageUrl = BangumiHostConfig.rewriteResourceUrl(widget.imageUrl);
 
-    loadInformationFuture ??= loadByteInformation(widget.imageUrl);
+    loadInformationFuture ??= loadByteInformation(targetImageUrl);
 
     RequestByteInformation? pictureRequestInformation;
 
@@ -87,7 +89,7 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
 
                     launchUrlString(
                       //mode: LaunchMode.inAppWebView,
-                      widget.imageUrl
+                      targetImageUrl
                     );
                   }
 
@@ -148,15 +150,21 @@ class _CommentImagePanelState extends State<CommentImagePanel> {
                       );
                     }
 
-                    debugPrint("[CommentImage Link]: ${pictureRequestInformation?.contentLink}");
+                    final activeImageUrl = BangumiHostConfig.rewriteResourceUrl(
+                      pictureRequestInformation?.contentLink ?? targetImageUrl,
+                    );
+
+                    debugPrint("[CommentImage Link]: $activeImageUrl");
 
                     return CachedNetworkImage(
-                      imageUrl: pictureRequestInformation?.contentLink ?? widget.imageUrl,
+                      imageUrl: activeImageUrl,
                       httpHeaders: HttpApiClient.browserHeader,
-                      cacheManager: 
-                      (pictureRequestInformation?.contentLink ?? widget.imageUrl).contains("lain.bgm.tv") ? 
-                      ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress) : 
-                      judgeIsProxyMode(context, isOuterImageProxy: indexModel.userConfig.isImgTagProxy) ? ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress) : null,
+                      cacheManager:
+                        BangumiHostConfig.isBangumiResourceUrl(activeImageUrl)
+                          ? ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress)
+                          : (judgeIsProxyMode(context, isOuterImageProxy: indexModel.userConfig.isImgTagProxy)
+                            ? ProxyCacheManager(proxyAddress: HttpApiClient.currentProxyAddress)
+                            : null),
 
                       progressIndicatorBuilder: (context, url, progress) { 
 

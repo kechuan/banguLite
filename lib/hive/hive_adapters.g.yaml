@@ -5,7 +5,7 @@ nextTypeId: 14
 types:
   AppConfig:
     typeId: 0
-    nextIndex: 14
+    nextIndex: 17
     fields:
       currentThemeColor:
         index: 0
@@ -31,6 +31,12 @@ types:
         index: 12
       isProxyMode:
         index: 13
+      bangumiMirrorMode:
+        index: 14
+      customMirrorDomain:
+        index: 15
+      isMirrorMode:
+        index: 16
   AppThemeColor:
     typeId: 1
     nextIndex: 4
