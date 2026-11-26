@@ -27,9 +27,9 @@ jobs:
         #v2.x
         uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e
         with:
-          flutter-version: "3.38.x"
+          flutter-version: "3.47.x"
           cache: true
-          pub-cache-key: "flutter-pub-change"
+          pub-cache-key: "flutter-pub-3.47"
           pub-cache-path: "D:/flutter-pub" 
 
       - name: Set PUB_CACHE Environment Variable
@@ -89,7 +89,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           # 保持版本一致性
-          flutter-version: "3.38.x" 
+          flutter-version: "3.47.x" 
           cache: true
           
       - name: Setup JAVA (for Android)
