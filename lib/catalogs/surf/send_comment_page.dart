@@ -322,6 +322,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                   style: TextStyle(
                                     fontFamilyFallback: convertSystemFontFamily(),
                                     fontSize: AppFontSize.s14,
+                                    color: judgeDarknessMode(context) ? Colors.white : Colors.black
                                   ),
 
                                   children: const[
@@ -329,6 +330,7 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
 
                                     WidgetSpan(
                                       child: Tooltip(
+                                        triggerMode: TooltipTriggerMode.tap,
                                         message: '镜像站是无法加速turnstile的,需要自行代理通过验证',
                                         child: Icon(Icons.help_outline, size: 20),
                                       ),
