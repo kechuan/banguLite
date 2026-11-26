@@ -111,7 +111,8 @@ class EpRepliedTile extends StatelessWidget {
                             epCommentData.repliedComment![index].state?.isContentNerf() == true ?
                             ScalableText("发言已隐藏", style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppFontSize.s14)) :
                             Expanded(
-                              child: RichText(  // 使用 RichText 合并文本
+                              // 使用 RichText 合并文本
+                              child: RichText(  
                                 text: TextSpan(
                                   style: TextStyle(
                                     fontFamilyFallback: convertSystemFontFamily(),

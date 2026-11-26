@@ -11,10 +11,12 @@ import 'package:bangu_lite/internal/lifecycle.dart';
 import 'package:bangu_lite/internal/request_client.dart';
 @FFAutoImport()
 import 'package:bangu_lite/internal/utils/const.dart';
+import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/extract.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/internal/utils/judge.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/webview_model.dart';
 import 'package:bangu_lite/widgets/components/custom_bbcode_text.dart';
 import 'package:bangu_lite/widgets/dialogs/draft_content_preserve_dialog.dart';
@@ -312,22 +314,48 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                           ),
 
                           Row(
-                            spacing: 12,
+                            spacing: 6,
                             children: [
-                              const ScalableText("请通过发帖验证:"),
 
-                              SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: ValueListenableBuilder(
-                                  valueListenable: turnstileTokenNotifier,
-                                  builder: (_, isEffect, child) {
-                                    if (isEffect) return const Icon(Icons.done);
+                              RichText(
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    fontFamilyFallback: convertSystemFontFamily(),
+                                    fontSize: AppFontSize.s14,
+                                  ),
 
-                                    return const CircularProgressIndicator(
-                                      strokeWidth: 4,
-                                    );
-                                  }
+                                  children: const[
+                                    TextSpan(text: "请通过发帖验证", style: TextStyle()),
+
+                                    WidgetSpan(
+                                      child: Tooltip(
+                                        message: '镜像站是无法加速turnstile的,需要自行代理通过验证',
+                                        child: Icon(Icons.help_outline, size: 20),
+                                      ),
+                                    ),
+
+                                    TextSpan(text: ":"),
+
+                                  ]
+
+                                )
+                              ),
+
+                              Padding(
+                                padding: PaddingH6,
+                                child: SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: ValueListenableBuilder(
+                                    valueListenable: turnstileTokenNotifier,
+                                    builder: (_, isEffect, child) {
+                                      if (isEffect) return const Icon(Icons.done);
+
+                                      return const CircularProgressIndicator(
+                                        strokeWidth: 4,
+                                      );
+                                    }
+                                  ),
                                 ),
                               )
                             ],
@@ -369,9 +397,12 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                   initialUrlRequest: URLRequest(url: WebUri(BangumiWebUrls.turnstileAuth())),
                                   initialSettings: InAppWebViewSettings(
                                     isInspectable: kDebugMode,
-                                    displayZoomControls: false,
-                                    useWideViewPort: Platform.isAndroid ? false : true,
+
+                                    //Android Webview调整
                                     loadWithOverviewMode: false,
+                                    useWideViewPort: Platform.isAndroid ? false : true,
+
+                                    displayZoomControls: false,
                                     pageZoom: Platform.isWindows ? 2.0 : 1.0,
                                     transparentBackground: true
                                   ),
