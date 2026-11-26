@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:bangu_lite/catalogs/index/settings_page.dart';
@@ -7,9 +8,11 @@ import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/hive/hive_registrar.g.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
+import 'package:bangu_lite/internal/bangumi_mirror.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
 import 'package:bangu_lite/internal/hive.dart';
 import 'package:bangu_lite/internal/request_client.dart';
+import 'package:bangu_lite/internal/request_task_information.dart';
 import 'package:bangu_lite/internal/utils/const.dart';
 import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
@@ -38,6 +41,8 @@ class TestIndexModel extends IndexModel {
     notifyListeners();
   }
 }
+
+class DirectHttpOverrides extends HttpOverrides {}
 
 
 void main() {
@@ -231,6 +236,244 @@ void main() {
       final data = BangumiDatas.subjectCommentData(content: null);
       expect(data['comment'], '');
     });
+
+    test('toGithubMirrorUrl prefixes GitHub release API and asset URLs with gh-proxy.org', () {
+      const apkUrl = 'https://github.com/kechuan/banguLite/releases/download/0.12.5/banguLite-0.12.5-arm64-v8a.apk';
+
+      expect(
+        APPInformationRepository.toGithubMirrorUrl(apkUrl),
+        'https://gh-proxy.org/$apkUrl',
+      );
+
+      expect(
+        APPInformationRepository.toGithubMirrorUrl('https://gh-proxy.org/$apkUrl'),
+        'https://gh-proxy.org/$apkUrl',
+      );
+
+      expect(
+        APPInformationRepository.toGithubMirrorUrl(APPInformationRepository.githubLatestReleaseApi),
+        'https://gh-proxy.org/https://api.github.com/repos/kechuan/banguLite/releases/latest',
+      );
+
+      expect(APPInformationRepository.toGithubMirrorUrl('   '), '');
+    });
+
+    test('checkLatency warms up connection, skips redirects, and reuses connection pool', () async {
+      await HttpOverrides.runWithHttpOverrides(() async {
+        int headCount = 0;
+        final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+
+        server.listen((request) async {
+          if (request.method == 'HEAD') {
+            headCount += 1;
+          }
+
+          request.response.statusCode = HttpStatus.found;
+          request.response.headers.set(HttpHeaders.locationHeader, 'https://example.invalid/redirect');
+          await request.response.close();
+        });
+
+        try {
+          final targetUrl = 'http://${server.address.address}:${server.port}/ping';
+
+          final firstLatency = await checkLatency(targetUrl: targetUrl);
+          expect(firstLatency, greaterThanOrEqualTo(0));
+          expect(headCount, 2);
+
+          final secondLatency = await checkLatency(targetUrl: targetUrl);
+          expect(secondLatency, greaterThanOrEqualTo(0));
+          expect(headCount, 3);
+
+          expect(await checkLatency(targetUrl: ''), -1);
+        }
+
+        finally {
+          latencyTestClient?.close(force: true);
+          latencyTestClient = null;
+          warmedHostTimestamps.clear();
+          await server.close(force: true);
+        }
+      }, DirectHttpOverrides());
+    });
+
+    test('external image proxy URLs preserve query and loadByteInformation falls back to Range GET', () async {
+      const sampleUrl = 'https://pbs.twimg.com/media/demo?format=jpg&name=large';
+
+      expect(
+        convertProxyImageUri(sampleUrl),
+        'https://i1.wp.com/pbs.twimg.com/media/demo?format=jpg&name=large',
+      );
+
+      expect(
+        convertWsrvImageUri(sampleUrl),
+        'https://wsrv.nl/?url=${Uri.encodeComponent(sampleUrl)}&n=-1',
+      );
+
+      expect(contentRangeByteParse('bytes 0-0/98765'), 98765);
+      expect(contentRangeByteParse('bytes 0-0/*'), isNull);
+      expect(contentRangeByteParse(null), isNull);
+
+      await HttpOverrides.runWithHttpOverrides(() async {
+        int headRequests = 0;
+        int rangeGetRequests = 0;
+
+        final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+
+        server.listen((request) async {
+          if (request.method == 'HEAD') {
+            headRequests += 1;
+            request.response.statusCode = HttpStatus.methodNotAllowed;
+            await request.response.close();
+            return;
+          }
+
+          if (request.method == 'GET' && request.headers.value(HttpHeaders.rangeHeader) == 'bytes=0-0') {
+            rangeGetRequests += 1;
+            request.response.statusCode = HttpStatus.partialContent;
+            request.response.headers.set(HttpHeaders.contentTypeHeader, 'image/png');
+            request.response.headers.set(HttpHeaders.contentRangeHeader, 'bytes 0-0/98765');
+            request.response.headers.set(HttpHeaders.contentLengthHeader, '1');
+            request.response.add([0x89]);
+            await request.response.close();
+            return;
+          }
+
+          request.response.statusCode = HttpStatus.badRequest;
+          await request.response.close();
+        });
+
+        try {
+          HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting('');
+
+          final targetUrl = 'http://${server.address.address}:${server.port}/img';
+          final result = await loadByteInformation(targetUrl);
+
+          expect(headRequests, 1);
+          expect(rangeGetRequests, 1);
+          expect(result.contentLink, targetUrl);
+          expect(result.contentLength, 98765);
+          expect(result.contentType, 'image/png');
+        }
+
+        finally {
+          await server.close(force: true);
+        }
+      }, DirectHttpOverrides());
+
+      HttpApiClient.client.httpClientAdapter = HttpApiClient.configHTTPProxySetting('');
+    });
+  });
+
+  group('Bangumi mirror host config', () {
+    tearDown(() {
+      BangumiHostConfig.applyConfig(isMirrorMode: false);
+    });
+
+    test('cleanMirrorDomain extracts clean root domain from URLs and subdomains', () {
+      expect(BangumiMirrorOption.cleanMirrorDomain('https://bgm.lat/subject/1'), 'bgm.lat');
+      expect(BangumiMirrorOption.cleanMirrorDomain('API.BGM.LAT'), 'bgm.lat');
+      expect(BangumiMirrorOption.cleanMirrorDomain('next.example.org/p1'), 'example.org');
+      expect(BangumiMirrorOption.cleanMirrorDomain('lain.mirror.test'), 'mirror.test');
+      expect(BangumiMirrorOption.cleanMirrorDomain('  '), '');
+    });
+
+    test('parseWikiMirrors keeps both complete and incomplete mirrors with isApiComplete flag', () {
+      final parsed = BangumiMirrorOption.parseWikiMirrors({
+        'mirrors': [
+          {
+            'name': 'bgm.lat',
+            'base': 'bgm.lat',
+            'recommended': true,
+            'note': 'full mirror',
+            'services': [
+              {'id': 'main', 'hosts': ['bgm.lat']},
+              {'id': 'api', 'hosts': ['api.bgm.lat']},
+              {'id': 'next', 'hosts': ['next.bgm.lat']},
+              {'id': 'lain', 'hosts': ['lain.bgm.lat']},
+            ],
+          },
+          {
+            'name': 'fxbgm.tv',
+            'base': 'fxbgm.tv',
+            'note': '个人维护的 Bangumi 前端，不是完整镜像。',
+            'services': [
+              {'id': 'main', 'hosts': ['fxbgm.tv']},
+            ],
+          },
+        ],
+      });
+
+      expect(parsed.length, 2);
+      expect(parsed[0].baseDomain, 'bgm.lat');
+      expect(parsed[0].apiHost, 'api.bgm.lat');
+      expect(parsed[0].recommended, isTrue);
+      expect(parsed[0].isApiComplete, isTrue);
+
+      expect(parsed[1].baseDomain, 'fxbgm.tv');
+      expect(parsed[1].isApiComplete, isFalse);
+      expect(parsed[1].apiHost, isEmpty);
+
+      expect(BangumiMirrorOption.parseWikiMirrors(null).first.baseDomain, 'bgm.lat');
+    });
+
+    test('applyConfig dynamically switches BangumiAPIUrls, BangumiWebUrls, images and routes', () {
+      BangumiHostConfig.applyConfig(isMirrorMode: false);
+      expect(BangumiAPIUrls.baseUrl, 'https://api.bgm.tv');
+      expect(BangumiAPIUrls.newUrl, 'https://next.bgm.tv/p1');
+      expect(BangumiAPIUrls.baseResourceUrl, 'https://lain.bgm.tv');
+      expect(BangumiWebUrls.baseUrl, 'https://bangumi.tv');
+      expect(BangumiWebUrls.relativeUrl, 'https://bgm.tv');
+
+      BangumiHostConfig.applyConfig(isMirrorMode: true, mirrorMode: 'bgm.lat');
+      expect(BangumiHostConfig.isUsingMirror, isTrue);
+      expect(BangumiAPIUrls.baseUrl, 'https://api.bgm.lat');
+      expect(BangumiAPIUrls.calendar, 'https://api.bgm.lat/calendar');
+      expect(BangumiAPIUrls.newUrl, 'https://next.bgm.lat/p1');
+      expect(BangumiAPIUrls.baseResourceUrl, 'https://lain.bgm.lat');
+      expect(BangumiWebUrls.baseUrl, 'https://bgm.lat');
+      expect(BangumiWebUrls.relativeUrl, 'https://bgm.lat');
+      expect(BangumiWebUrls.oAuth, 'https://bgm.lat/oauth/authorize');
+      expect(BangumiHostConfig.isBangumiApiHost('api.bgm.lat'), isTrue);
+      expect(BangumiHostConfig.isBangumiApiHost('next.bgm.lat'), isTrue);
+      expect(
+        BangumiHostConfig.rewriteResourceUrl('https://lain.bgm.tv/pic/cover/l/demo.jpg'),
+        'https://lain.bgm.lat/pic/cover/l/demo.jpg',
+      );
+      expect(
+        BangumiHostConfig.convertToActiveWebLink('https://bangumi.tv/subject/123'),
+        'https://bgm.lat/subject/123',
+      );
+      expect(
+        convertBangumiNetworkGirlStickerPath(1),
+        'https://lain.bgm.lat/img/smiles/musume/musume_01.gif',
+      );
+
+      BangumiHostConfig.applyConfig(
+        isMirrorMode: true,
+        mirrorMode: BangumiHostConfig.customMode,
+        customDomain: 'https://api.my-bgm.example/v0',
+      );
+      expect(BangumiAPIUrls.baseUrl, 'https://api.my-bgm.example');
+      expect(BangumiWebUrls.baseUrl, 'https://my-bgm.example');
+      expect(BangumiAPIUrls.newUrl, 'https://next.my-bgm.example/p1');
+      expect(BangumiAPIUrls.baseResourceUrl, 'https://lain.my-bgm.example');
+
+      BangumiHostConfig.applyConfig(
+        isMirrorMode: false,
+        mirrorMode: BangumiHostConfig.customMode,
+        customDomain: 'my-bgm.example',
+      );
+      expect(BangumiHostConfig.isUsingMirror, isFalse);
+      expect(BangumiAPIUrls.baseUrl, 'https://api.bgm.tv');
+      expect(
+        BangumiHostConfig.convertToActiveWebLink('https://bgm.lat/subject/123'),
+        'https://bangumi.tv/subject/123',
+      );
+      expect(
+        BangumiHostConfig.rewriteResourceUrl('https://lain.bgm.lat/pic/cover/l/demo.jpg'),
+        'https://lain.bgm.tv/pic/cover/l/demo.jpg',
+      );
+    });
   });
 
   group('UI regression checks', () {
@@ -291,7 +534,13 @@ void main() {
       expect(indexModel.userConfig.isProxyMode, isTrue);
       expect(tester.widget<Switch>(proxySwitchFinder).value, isTrue);
 
-      final imgProxySwitchFinder = find.byType(Switch).last;
+      final imgProxySwitchFinder = find.descendant(
+        of: find.ancestor(
+          of: find.text("使外链(img标签)图片加载也使用代理流量"),
+          matching: find.byType(Row),
+        ),
+        matching: find.byType(Switch),
+      );
       expect(tester.widget<Switch>(imgProxySwitchFinder).value, isTrue);
 
       await tester.tap(imgProxySwitchFinder);
@@ -299,6 +548,110 @@ void main() {
 
       expect(indexModel.userConfig.isImgTagProxy, isFalse);
       expect(tester.widget<Switch>(imgProxySwitchFinder).value, isFalse);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('NetworkConfigPage supports mirror switch, custom input, and security dialog', (tester) async {
+      addTearDown(() {
+        BangumiHostConfig.applyConfig(isMirrorMode: false);
+      });
+
+      BangumiHostConfig.applyConfig(isMirrorMode: false);
+
+      final indexModel = TestIndexModel();
+
+      await tester.pumpWidget(
+        ChangeNotifierProvider<IndexModel>.value(
+          value: indexModel,
+          child: const MaterialApp(
+            home: NetworkConfigPage(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('镜像站设置'), findsOneWidget);
+      expect(find.text('fxbgm.tv'), findsOneWidget);
+      expect(find.text('api不完整'), findsOneWidget);
+      expect(find.text('非完整api镜像支持'), findsOneWidget);
+      expect(find.text('应用'), findsNothing);
+      expect(find.byType(CheckboxListTile), findsNWidgets(2));
+      final incompleteTile = find.ancestor(
+        of: find.text('fxbgm.tv'),
+        matching: find.byType(ListTile),
+      );
+      final incompleteCheckbox = tester.widget<Checkbox>(
+        find.descendant(of: incompleteTile, matching: find.byType(Checkbox)),
+      );
+      expect(incompleteCheckbox.value, isFalse);
+      expect(incompleteCheckbox.onChanged, isNull);
+      expect(find.text('https://api.bgm.tv'), findsOneWidget);
+
+      final mirrorSwitchFinder = find.descendant(
+        of: find.ancestor(
+          of: find.text('镜像站设置'),
+          matching: find.byType(ListTile),
+        ),
+        matching: find.byType(Switch),
+      );
+      expect(tester.widget<Switch>(mirrorSwitchFinder).value, isFalse);
+
+      await tester.ensureVisible(mirrorSwitchFinder);
+      await tester.tap(mirrorSwitchFinder);
+      await tester.pumpAndSettle();
+
+      expect(indexModel.userConfig.isMirrorMode, isTrue);
+      expect(indexModel.userConfig.bangumiMirrorMode, 'bgm.lat');
+      expect(BangumiAPIUrls.baseUrl, 'https://api.bgm.lat');
+      expect(find.text('https://api.bgm.lat'), findsOneWidget);
+
+      final customTextField = find.byWidgetPredicate(
+        (widget) =>
+          widget is TextField &&
+          widget.decoration?.hintText == '输入镜像根域名，如 bgm.lat',
+      );
+
+      await tester.ensureVisible(customTextField);
+      await tester.pumpAndSettle();
+      await tester.enterText(customTextField, 'https://custom-bgm.test/v0');
+      await tester.pumpAndSettle();
+
+      final customTileTitle = find.text('自定义镜像域名');
+      await tester.ensureVisible(customTileTitle);
+      await tester.pumpAndSettle();
+      await tester.tap(customTileTitle);
+      await tester.pumpAndSettle();
+
+      expect(indexModel.userConfig.bangumiMirrorMode, BangumiHostConfig.customMode);
+      expect(indexModel.userConfig.customMirrorDomain, 'custom-bgm.test');
+      expect(BangumiAPIUrls.baseUrl, 'https://api.custom-bgm.test');
+      expect(find.text('https://api.custom-bgm.test'), findsOneWidget);
+
+      await tester.ensureVisible(mirrorSwitchFinder);
+      await tester.tap(mirrorSwitchFinder);
+      await tester.pumpAndSettle();
+
+      expect(indexModel.userConfig.isMirrorMode, isFalse);
+      expect(indexModel.userConfig.customMirrorDomain, 'custom-bgm.test');
+      expect(BangumiAPIUrls.baseUrl, 'https://api.bgm.tv');
+      expect(find.text('https://api.bgm.tv'), findsOneWidget);
+
+      final helpIcon = find.byIcon(Icons.help_outline);
+      await tester.ensureVisible(helpIcon);
+      await tester.tap(helpIcon);
+      await tester.pumpAndSettle();
+
+      expect(find.text('安全提醒'), findsOneWidget);
+      final dialogTitleText = tester.widget<Text>(find.text('安全提醒'));
+      expect(dialogTitleText.style?.fontWeight, FontWeight.bold);
+      expect(find.text('只有官方域名才算安全：bangumi.tv、bgm.tv、chii.in。'), findsOneWidget);
+      expect(find.text('其他域名，包括 bgm.lat，登不登录取决于你是否信任这个站。'), findsOneWidget);
+      expect(find.text('镜像站可以获得你在该站的全部信息，包括账号和密码。'), findsOneWidget);
+
+      await tester.tap(find.text('我知道了'));
+      await tester.pumpAndSettle();
+
       expect(tester.takeException(), isNull);
     });
 
