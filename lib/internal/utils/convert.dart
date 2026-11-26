@@ -144,7 +144,7 @@ String convertBangumiNetworkGirlStickerPath(int stickerIndex, {bool pinkVersion 
 
   String typePath = pinkVersion ? "musume" : "blake";
 
-  return "https://lain.bgm.tv/img/smiles/$typePath/${typePath}_${convertDigitNumString(stickerIndex)}.gif";
+  return "${BangumiAPIUrls.baseResourceUrl}/img/smiles/$typePath/${typePath}_${convertDigitNumString(stickerIndex)}.gif";
 
 }
 
@@ -441,9 +441,19 @@ String convertInsertContent({String originalText = '', String insertText = '', i
   return buffer.toString();
 }
 
-String convertProxyImageUri(String imageLink) { 
-  Uri imageUri = Uri.parse(imageLink);
-  return "${APPInformationRepository.banguLiteImageForwardUri}${imageUri.host}${imageUri.path}";
+String convertProxyImageUri(String imageLink) {
+  final imageUri = Uri.tryParse(imageLink);
+  if (imageUri == null || imageUri.host.isEmpty) return imageLink;
+
+  final querySuffix = imageUri.hasQuery ? '?${imageUri.query}' : '';
+  return "${APPInformationRepository.banguLiteImageForwardUri}${imageUri.host}${imageUri.path}$querySuffix";
+}
+
+String convertWsrvImageUri(String imageLink) {
+  final cleanedLink = imageLink.trim();
+  if (cleanedLink.isEmpty) return cleanedLink;
+
+  return "${APPInformationRepository.banguLiteWsrvImageForwardUri}${Uri.encodeComponent(cleanedLink)}&n=-1";
 }
 
 

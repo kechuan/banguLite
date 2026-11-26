@@ -168,11 +168,17 @@ Future<String?> extractFallbackToken(InAppWebViewController webViewController) a
 }
 
 RequestByteInformation extractPictureRequest(Response response, String imageUrl) {
+  final contentRangeHeader = response.headers.value(HttpHeaders.contentRangeHeader);
+  final parsedRangeLength = contentRangeByteParse(contentRangeHeader);
+  final parsedContentLength = int.tryParse(
+    response.headers.value(HttpHeaders.contentLengthHeader) ?? '',
+  );
+
   return RequestByteInformation()
     ..contentLink = imageUrl
     ..fileName = response.headers.value("name")
     ..contentType = response.headers.value(HttpHeaders.contentTypeHeader)
-    ..contentLength = int.parse(response.headers.value(HttpHeaders.contentLengthHeader) ?? "0")
+    ..contentLength = parsedRangeLength ?? parsedContentLength ?? 0
     ..statusMessage = response.statusMessage
   ;
 }

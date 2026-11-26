@@ -487,6 +487,7 @@ class _EpCommentPageDetailsState extends State<EpCommentPageDetails> {
                             Provider<EpCommentViewConfig>.value(value: EpCommentViewConfig(
                               contentID: epModel.injectEpID != 0 ? epModel.injectEpID : (epModel.epsData[epModel.selectedEp]?.epID ?? 0),
                               postCommentType: PostCommentType.replyEpComment,
+                              /// 这里不用传themeColor 由上面的 ThemeData 接管子内容的染色
                             )),
                           ],
                           child: const EpCommentView(),
