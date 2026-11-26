@@ -290,7 +290,9 @@ class BangumiWebUrls{
   static String get oAuth => '$relativeUrl/oauth/authorize';
   static String get oAuthToken => '$relativeUrl/oauth/access_token';
 
-  static String turnstileAuth() => '$nextUrl/p1/turnstile?redirect_uri=${APPInformationRepository.bangumiTurnstileCallbackUri.toString()}';
+  // Cloudflare Turnstile sitekey 绑定官方域名，且镜像站反代脚本/Rocket Loader 会导致验证框白屏，因此固定走官方 next 域名
+  static String turnstileAuth() =>
+    '${BangumiHostConfig.officialNextUrl}/p1/turnstile?redirect_uri=${APPInformationRepository.bangumiTurnstileCallbackUri.toString()}';
 
 }
 

@@ -370,7 +370,8 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                   initialSettings: InAppWebViewSettings(
                                     isInspectable: kDebugMode,
                                     displayZoomControls: false,
-                                    useWideViewPort: true,
+                                    useWideViewPort: Platform.isAndroid ? false : true,
+                                    loadWithOverviewMode: false,
                                     pageZoom: Platform.isWindows ? 2.0 : 1.0,
                                     transparentBackground: true
                                   ),
@@ -406,13 +407,12 @@ class _SendCommentPageState extends LifecycleState<SendCommentPage> {
                                     if (Platform.isAndroid) {
                                       await controller.injectCSSCode(
                                         source: """
-                                                                    body * { 
-                                                                      font-size: 2em !important; 
-                                                                      transform: scale(2);
-                                                                      transform-origin: top left;
-                                                                      color: #000 !important;
-                                                                    }
-                                                                    """
+                                          html, body {
+                                            margin: 0 !important;
+                                            padding: 0 !important;
+                                            overflow: hidden !important;
+                                          }
+                                        """
                                       );
                                     }
                                   },

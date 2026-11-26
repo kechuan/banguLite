@@ -433,6 +433,10 @@ void main() {
       expect(BangumiWebUrls.baseUrl, 'https://bgm.lat');
       expect(BangumiWebUrls.relativeUrl, 'https://bgm.lat');
       expect(BangumiWebUrls.oAuth, 'https://bgm.lat/oauth/authorize');
+      expect(
+        BangumiWebUrls.turnstileAuth(),
+        'https://next.bgm.tv/p1/turnstile?redirect_uri=bangulite://turnstile/callback',
+      );
       expect(BangumiHostConfig.isBangumiApiHost('api.bgm.lat'), isTrue);
       expect(BangumiHostConfig.isBangumiApiHost('next.bgm.lat'), isTrue);
       expect(

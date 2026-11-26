@@ -20,7 +20,7 @@ Map<String, String> buildConnectionTestUrlMap() => {
   'API v0 测试': BangumiAPIUrls.baseUrl,
   'API next 测试': BangumiAPIUrls.newUrl,
   'OAuth登录测试': BangumiWebUrls.oAuth,
-  'turnstile回帖验证测试': "${BangumiWebUrls.nextUrl}/p1/turnstile?redirect_uri=bangulite://turnstile/callback",
+  'turnstile回帖验证测试': BangumiWebUrls.turnstileAuth(),
   'bgm内置图片源测试': '${BangumiAPIUrls.baseResourceUrl}/img/smiles/blake/blake_01.gif',
 
   // 不规范实现的图片源 只有path 靠浏览器自动推断返回内容 结果也没有head请求 导致直接请求失败
@@ -165,6 +165,10 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                 ScalableText('其他域名，包括 bgm.lat，登不登录取决于你是否信任这个站。'),
 
                 ScalableText('镜像站可以获得你在该站的全部信息，包括账号和密码。'),
+
+                Divider(height: 8),
+
+                ScalableText('发帖提示：发帖/回帖的 Cloudflare Turnstile 验证受官方域名绑定限制，开启镜像后仍会请求官方 next.bgm.tv；若无法加载验证框，请配合代理使用。'),
               ],
             ),
           ),
@@ -594,6 +598,27 @@ class _NetworkConfigPageState extends State<NetworkConfigPage> {
                                               ),
                                             ),
                                             onChanged: (_) => applyCustomMirror(),
+                                          ),
+
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                                            child: Row(
+                                              spacing: 6,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 2),
+                                                  child: Icon(Icons.info_outline, size: 15, color: subtitleHintColor),
+                                                ),
+
+                                                Expanded(
+                                                  child: ScalableText(
+                                                    '注意：发帖/回帖的 Turnstile 验证受官方域名绑定限制仍走官方 next.bgm.tv，若验证框无法加载需配合代理。',
+                                                    style: TextStyle(color: subtitleHintColor, fontSize: AppFontSize.s12),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
 
                                         ],
