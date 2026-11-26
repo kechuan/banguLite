@@ -128,64 +128,71 @@ class _GroupsSelectViewState extends State<GroupsSelectView> with SingleTickerPr
                           int currentRow = (index / displayCrossAxisCount).floor();
                           int currentColumn = index % displayCrossAxisCount;
 
-                          return Material(
-                            color: (currentRow + currentColumn) % 2 == 0 ? Colors.grey.withValues(alpha: 0.3) : Colors.transparent,
-                            child: Column(
+                          return InkResponse(
+                            containedInkWell: true,
+                            focusColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            onTap: () {
+                              String recordGroupTitle = widget.groupTitleNotifier.value ?? "";
 
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
+                              widget.groupTitleNotifier.value = groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].groupTitle;
+                              groupsModel.selectedGroupInfo = groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index];
+                              widget.loadGroupTopicCallback?.call(context, recordGroupTitle);
+                            },
+                            child: Material(
+                              color: (currentRow + currentColumn) % 2 == 0 ? Colors.grey.withValues(alpha: 0.3) : Colors.transparent,
+                              child: Column(
 
-                                ListTile(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
 
-                                  onTap: () {
+                                  ListTile(
 
-                                    String recordGroupTitle = widget.groupTitleNotifier.value ?? "";
-
-                                    widget.groupTitleNotifier.value = groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].groupTitle;
-                                    groupsModel.selectedGroupInfo = groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index];
-                                    widget.loadGroupTopicCallback?.call(context, recordGroupTitle);
-                                  },
-
-                                  leading: SizedBox(
-                                    width: 50,
-                                    height: 50,
-                                    child: CachedImageLoader(
-                                      imageUrl: groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].groupAvatar,
-                                      borderDecoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+                                    leading: SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: CachedImageLoader(
+                                        imageUrl: groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].groupAvatar,
+                                        borderDecoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+                                      ),
                                     ),
+
+                                    title: Row(
+                                      spacing: 6,
+                                      children: [
+
+                                        Flexible(
+                                          child: ScalableText(
+                                            "${groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].groupTitle}",
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
                                   ),
 
-                                  title: Row(
-                                    spacing: 6,
-                                    children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 6),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      spacing: 3,
+                                      children: [
+                                        const Icon(Icons.people, size: 16, color: Colors.grey),
 
-                                      Flexible(
-                                        child: ScalableText(
-                                          "${groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].groupTitle}",
-                                          maxLines: 2,
+                                        Text(
+                                          "${groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].membersCount}",
+
+                                          maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-
-                                ),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  spacing: 3,
-                                  children: [
-                                    const Icon(Icons.people, size: 16, color: Colors.grey),
-
-                                    Text(
-                                      "${groupsModel.groupsData[BangumiSurfGroupType.values[tabController.index]]?[index].membersCount}",
-
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                ],
+                              ),
                             ),
                           );
 

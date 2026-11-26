@@ -44,12 +44,12 @@ class NewUpdateDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const ScalableText("New Version"),
+                ScalableText("New Version", style: TextStyle(color: getCurrentThemeColor(context))),
                 ScalableText("Tag v${APPInformationRepository.version} => v${latestRelease.tagName}"),
               ],
             ),
 
-            const ScalableText("gh-proxy镜像源,下载前请确认当前网络状况通畅"),
+            const ScalableText("即将使用gh-proxy镜像源进行下载"),
 
             ValueListenableBuilder(
               valueListenable: updateClient.progressNotifier,
