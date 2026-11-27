@@ -23,21 +23,27 @@ class GroupTopicDetails extends ContentDetails {
   factory GroupTopicDetails.empty() => GroupTopicDetails(detailID: 0);
 }
 
-GroupTopicDetails loadGroupTopicDetails(Map<String,dynamic> bangumiGroupTopicData){
+GroupTopicDetails loadGroupTopicDetails(Map<String, dynamic> bangumiGroupTopicData) {
+  final List replies = bangumiGroupTopicData["replies"] is List
+    ? bangumiGroupTopicData["replies"]
+    : const [];
 
-  GroupTopicDetails currentGroupTopicDetails = GroupTopicDetails(
+  final GroupTopicDetails currentGroupTopicDetails = GroupTopicDetails(
     detailID: bangumiGroupTopicData['id'],
   );
-    currentGroupTopicDetails
-      ..groupInfo = loadGroupsInfo([bangumiGroupTopicData["group"]]).first
-      ..userInformation = loadUserInformations(bangumiGroupTopicData['creator'])
-      ..createdTime = bangumiGroupTopicData['createdAt']
-      ..updatedTime = bangumiGroupTopicData['updatedAt']
-      ..groupTopicTitle = bangumiGroupTopicData['title']
-      ..content = bangumiGroupTopicData["replies"].isEmpty ? "" : bangumiGroupTopicData["replies"]?.first["content"] ?? ""
-      ..topicReplyCount = bangumiGroupTopicData['replyCount']
-      ..contentRepliedComment = loadEpCommentDetails(bangumiGroupTopicData['replies'].skip(1).toList())
-    ;
+
+  currentGroupTopicDetails
+    ..groupInfo = loadGroupsInfo([bangumiGroupTopicData["group"]]).first
+    ..userInformation = loadUserInformations(bangumiGroupTopicData['creator'])
+    ..createdTime = bangumiGroupTopicData['createdAt']
+    ..updatedTime = bangumiGroupTopicData['updatedAt']
+    ..groupTopicTitle = bangumiGroupTopicData['title']
+    ..firstPostID = replies.isEmpty ? null : replies.first["id"]
+    ..content = replies.isEmpty ? "" : replies.first["content"] ?? ""
+    ..contentReactions = replies.isEmpty ? {} : loadReactionDetails(replies.first["reactions"])
+    ..topicReplyCount = bangumiGroupTopicData['replyCount']
+    ..contentRepliedComment = loadEpCommentDetails(replies.skip(1).toList())
+  ;
 
   return currentGroupTopicDetails;
 }

@@ -395,7 +395,7 @@ class _BangumiGeneralContentViewState<
             Provider<EpCommentDetails>.value(
               value: EpCommentDetails.fromContentDetail(
                 contentDetail,
-                targetContentID,
+                contentDetail?.firstPostID ?? targetContentID,
               ),
             ),
             Provider<EpCommentViewConfig>.value(

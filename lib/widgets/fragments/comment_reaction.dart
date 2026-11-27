@@ -49,15 +49,20 @@ class CommentReaction extends StatefulWidget {
 
 class _CommentReactionState extends State<CommentReaction> {
 
-  late final Map<int, Set<String>> localCommentReactions;
+  Map<int, Set<String>> localCommentReactions = {};
 
   int selectedRecordDataLike = unExistID;
 
   int reactionStickerGroupCount = 0;
 
-  @override
-  void initState() {
+  void handleReactionChanged() {
+    updateReactionList();
+    reactionStickerGroupCount = localCommentReactions.length;
+  }
+
+  void syncLocalCommentReactions() {
     localCommentReactions = widget.commentReactions ?? {};
+    selectedRecordDataLike = unExistID;
 
     localCommentReactions.entries.any((userList) {
       if (userList.value.contains(AccountModel.loginedUserInformations.userInformation?.getName())) {
@@ -70,19 +75,33 @@ class _CommentReactionState extends State<CommentReaction> {
     });
 
     reactionStickerGroupCount = localCommentReactions.length;
+  }
 
-    widget.reactDataLikeNotifier.addListener(() {
-      updateReactionList();
-      reactionStickerGroupCount = localCommentReactions.length;
-    });
+  @override
+  void initState() {
+    syncLocalCommentReactions();
+    widget.reactDataLikeNotifier.addListener(handleReactionChanged);
 
-    //reactDataLikeNotifiers
     super.initState();
   }
 
   @override
+  void didUpdateWidget(covariant CommentReaction oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.reactDataLikeNotifier != widget.reactDataLikeNotifier) {
+      oldWidget.reactDataLikeNotifier.removeListener(handleReactionChanged);
+      widget.reactDataLikeNotifier.addListener(handleReactionChanged);
+    }
+
+    if (oldWidget.commentReactions != widget.commentReactions) {
+      syncLocalCommentReactions();
+    }
+  }
+
+  @override
   void dispose() {
-    widget.reactDataLikeNotifier.removeListener(updateReactionList);
+    widget.reactDataLikeNotifier.removeListener(handleReactionChanged);
     super.dispose();
   }
 

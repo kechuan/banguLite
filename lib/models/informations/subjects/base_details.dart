@@ -17,6 +17,7 @@ abstract class BaseDetails {
 class ContentDetails extends BaseDetails {
   ContentDetails({
     super.detailID,
+    this.firstPostID,
     this.contentTitle,
     this.content,
     this.createdTime,
@@ -26,6 +27,7 @@ class ContentDetails extends BaseDetails {
     this.contentRepliedComment,
   });
 
+  int? firstPostID;
   String? contentTitle;
   String? content;
   int? createdTime;

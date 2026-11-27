@@ -24,24 +24,25 @@ class TopicDetails extends ContentDetails{
 
 }
 
-TopicDetails loadTopicDetails(Map<String,dynamic> topicData){
+TopicDetails loadTopicDetails(Map<String, dynamic> topicData) {
+  final List replies = topicData["replies"] is List
+    ? topicData["replies"]
+    : const [];
 
-	final currentTopic = TopicDetails(
-    detailID: topicData["id"]
+  final currentTopic = TopicDetails(
+    detailID: topicData["id"],
   );
 
-	currentTopic
-		..topicTitle = topicData["title"]
-		..content = topicData["replies"].isEmpty ? "" : topicData["replies"]?.first["content"] ?? ""
-    ..contentReactions = topicData["replies"].isEmpty ? {} : loadReactionDetails(topicData["replies"]?.first["reactions"])
-		..state = topicData["state"]
-		..createdTime = topicData["createdAt"]
-		..topicRepliedComment = loadEpCommentDetails(topicData["replies"]).skip(1).toList()
+  currentTopic
+    ..topicTitle = topicData["title"]
+    ..firstPostID = replies.isEmpty ? null : replies.first["id"]
+    ..content = replies.isEmpty ? "" : replies.first["content"] ?? ""
+    ..contentReactions = replies.isEmpty ? {} : loadReactionDetails(replies.first["reactions"])
+    ..state = topicData["state"]
+    ..createdTime = topicData["createdAt"]
+    ..topicRepliedComment = loadEpCommentDetails(replies).skip(1).toList()
     ..userInformation = loadUserInformations(topicData["creator"])
-	;
+  ;
 
-
-
-	return currentTopic;
-
+  return currentTopic;
 }

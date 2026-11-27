@@ -33,8 +33,7 @@ class BlogDetails extends ContentDetails{
 
 }
 
-BlogDetails loadBlogDetails(Map<String,dynamic> blogData){
-
+BlogDetails loadBlogDetails(Map<String, dynamic> blogData) {
   final currentBlog = BlogDetails(
     detailID: blogData["id"],
     content: blogData["content"],
@@ -42,6 +41,9 @@ BlogDetails loadBlogDetails(Map<String,dynamic> blogData){
     ..contentTitle = blogData["title"]
     ..userInformation = loadUserInformations(blogData["user"])
     ..createdTime = blogData["createdAt"]
+    ..contentReactions = blogData["reactions"] is List
+      ? loadReactionDetails(blogData["reactions"])
+      : {}
   ;
 
   return currentBlog;
