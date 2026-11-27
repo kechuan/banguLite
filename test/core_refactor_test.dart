@@ -7,6 +7,7 @@ import 'package:bangu_lite/catalogs/network_config_page.dart';
 import 'package:bangu_lite/catalogs/subject/bangumi_general_content_page.dart';
 import 'package:bangu_lite/hive/hive_registrar.g.dart';
 import 'package:bangu_lite/internal/bangumi_define/bangumi_social_hub.dart';
+import 'package:bangu_lite/internal/bangumi_define/content_status_const.dart';
 import 'package:bangu_lite/internal/bangumi_define/logined_user_action_const.dart';
 import 'package:bangu_lite/internal/bangumi_mirror.dart';
 import 'package:bangu_lite/internal/event_bus.dart';
@@ -18,15 +19,22 @@ import 'package:bangu_lite/internal/utils/convert.dart';
 import 'package:bangu_lite/internal/utils/get.dart';
 import 'package:bangu_lite/models/informations/local/star_details.dart';
 import 'package:bangu_lite/models/informations/subjects/bangumi_details.dart';
+import 'package:bangu_lite/models/informations/subjects/blog_details.dart';
+import 'package:bangu_lite/models/informations/subjects/comment_details.dart';
+import 'package:bangu_lite/models/informations/subjects/group_topic_details.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_details.dart';
 import 'package:bangu_lite/models/informations/subjects/topic_info.dart';
 import 'package:bangu_lite/models/informations/surf/surf_timeline_details.dart';
 import 'package:bangu_lite/models/providers/account_model.dart';
+import 'package:bangu_lite/models/providers/bangumi_model.dart';
+import 'package:bangu_lite/models/providers/comment_model.dart';
+import 'package:bangu_lite/models/providers/ep_model.dart';
 import 'package:bangu_lite/models/providers/history_model.dart';
 import 'package:bangu_lite/models/providers/index_model.dart';
 import 'package:bangu_lite/models/providers/topic_model.dart';
 import 'package:bangu_lite/models/state/async_state.dart';
 import 'package:bangu_lite/widgets/fragments/request_snack_bar.dart';
+import 'package:bangu_lite/widgets/fragments/star_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive.dart';
@@ -213,6 +221,95 @@ void main() {
 
       expect(convertRankList({}), isEmpty);
       expect(convertRankList({'10': 5, '1': 1}).keys.first, '1');
+    });
+
+    test('CommentDetails with null commentID are not treated as equal', () {
+      final placeholder = CommentDetails();
+      final loaded = CommentDetails()
+        ..type = StarType.deprecated
+        ..rate = 3
+        ..comment = '弃坑原因';
+
+      expect(placeholder == loaded, isFalse);
+      expect(CommentDetails(commentID: 42) == CommentDetails(commentID: 42), isTrue);
+      expect(CommentDetails.empty() == CommentDetails.empty(), isTrue);
+    });
+
+    test('loadGroupTopicDetails, loadTopicDetails and loadBlogDetails parse OP reactions and firstPostID', () {
+      final sampleUser = {
+        'id': 1,
+        'username': 'alice',
+        'nickname': 'Alice',
+        'avatar': {'large': ''},
+      };
+
+      final groupTopic = loadGroupTopicDetails({
+        'id': 476537,
+        'title': 'Group Topic',
+        'createdAt': 1700000000,
+        'updatedAt': 1700000100,
+        'replyCount': 1,
+        'group': {'name': 'boring', 'title': 'Boring', 'icon': {'large': ''}},
+        'creator': sampleUser,
+        'replies': [
+          {
+            'id': 4124007,
+            'content': 'OP body',
+            'state': 0,
+            'createdAt': 1700000000,
+            'creator': sampleUser,
+            'reactions': [
+              {
+                'value': 88,
+                'users': [
+                  {'nickname': 'Bob'},
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      expect(groupTopic.firstPostID, 4124007);
+      expect(groupTopic.contentReactions, {88: {'Bob'}});
+
+      final subjectTopic = loadTopicDetails({
+        'id': 41729,
+        'title': 'Subject Topic',
+        'state': 0,
+        'createdAt': 1700000000,
+        'creator': sampleUser,
+        'replies': [
+          {
+            'id': 415240,
+            'content': 'OP body',
+            'state': 0,
+            'createdAt': 1700000000,
+            'creator': sampleUser,
+            'reactions': [
+              {
+                'value': 54,
+                'users': [
+                  {'nickname': 'Carol'},
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      expect(subjectTopic.firstPostID, 415240);
+      expect(subjectTopic.contentReactions, {54: {'Carol'}});
+
+      final blogWithoutReactions = loadBlogDetails({
+        'id': 371652,
+        'title': 'Blog Title',
+        'content': 'Blog body',
+        'createdAt': 1700000000,
+        'user': sampleUser,
+      });
+
+      expect(blogWithoutReactions.contentReactions, isEmpty);
     });
   });
 
@@ -487,10 +584,15 @@ void main() {
         HiveBoxKey.historySurfDataBase,
         bytes: Uint8List(0),
       );
+      MyHive.starBangumisDataBase = await Hive.openBox<StarBangumiDetails>(
+        HiveBoxKey.starBangumisDataBase,
+        bytes: Uint8List(0),
+      );
     });
 
     tearDownAll(() async {
       await MyHive.historySurfDataBase.close();
+      await MyHive.starBangumisDataBase.close();
     });
 
     testWidgets('SettingsPage renders without ListTile hidden-background error', (tester) async {
@@ -756,6 +858,59 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('StarButton reacts to CommentModel userCommentDetails and prefills StarSubjectDialog', (tester) async {
+      final indexModel = TestIndexModel();
+      final accountModel = AccountModel();
+      final bangumiModel = BangumiModel(subjectID: 606716);
+      final epModel = EpModel(subjectID: 606716, selectedEp: 1);
+      final commentModel = CommentModel(subjectID: 606716);
+      final bangumiDetails = BangumiDetails()
+        ..id = 606716
+        ..name = 'Test Subject';
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<IndexModel>.value(value: indexModel),
+            ChangeNotifierProvider<AccountModel>.value(value: accountModel),
+            ChangeNotifierProvider<BangumiModel>.value(value: bangumiModel),
+            ChangeNotifierProvider<EpModel>.value(value: epModel),
+            ChangeNotifierProvider<CommentModel>.value(value: commentModel),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: StarButton(bangumiDetails: bangumiDetails),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('加入收藏'), findsOneWidget);
+      expect(find.byIcon(Icons.star_outline), findsOneWidget);
+
+      commentModel.updateUserCommentDetails(
+        CommentDetails()
+          ..type = StarType.deprecated
+          ..rate = 3
+          ..comment = '弃坑原因',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('抛弃'), findsOneWidget);
+      expect(find.byIcon(Icons.star), findsOneWidget);
+
+      await tester.tap(find.byType(StarButton));
+      await tester.pumpAndSettle();
+
+      expect(find.text('修改该番剧的收藏状态'), findsOneWidget);
+      expect(find.text('抛弃'), findsWidgets);
+      expect(find.text('弃坑原因'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
