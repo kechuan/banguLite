@@ -124,7 +124,7 @@ class _BangumiGeneralContentViewState<
   }
 
   Color getSubjectThemeColor(BuildContext context) =>
-    getDetailRenderColor(context, widget.themeColor);
+  getDetailRenderColor(context, widget.themeColor);
 
   @override
   void initState() {
@@ -180,7 +180,7 @@ class _BangumiGeneralContentViewState<
               child: Scaffold(
                 body: Selector<M, D>(
                   selector: (_, model) =>
-                    (model.contentDetailData[targetContentID] as D?) ??
+                  (model.contentDetailData[targetContentID] as D?) ??
                     widget.createEmptyDetailData(),
                   shouldRebuild: (previous, next) => previous != next,
                   builder: (_, contentDetailData, contentComment) => Scrollbar(
@@ -424,6 +424,17 @@ class _BangumiGeneralContentViewState<
               ),
             );
           },
+        ),
+
+        if(widget.postCommentType == PostCommentType.replyBlog)
+        Padding(
+          padding: const EdgeInsetsGeometry.only(right: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ScalableText("*Blog页面 API暂不支持贴条数据", style: TextStyle(color: Colors.grey, fontSize: AppFontSize.s13)),
+            ],
+          ),
         ),
 
         GeneralRepliedLine(
