@@ -225,6 +225,10 @@ class _BangumiDetailPageState extends LifecycleRouteState<BangumiDetailPage> {
                           onRefresh: () async {
                             await Future.wait([
                               bangumiModel.loadDetails(isRefresh: true),
+                              innerContext.read<CommentModel>().loadUserComment(
+                                currentUserInformation: AccountModel.loginedUserInformations.userInformation,
+                                isReloaded: true,
+                              ),
                               innerContext.read<CommentModel>().loadComments(isReloaded: true),
                               innerContext.read<TopicModel>().loadSubjectContentList(isReloaded: true),
                               innerContext.read<ReviewModel>().loadSubjectContentList(isReloaded: true),

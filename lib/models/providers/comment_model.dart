@@ -42,6 +42,8 @@ class CommentModel extends ChangeNotifier {
 
   //APP用户自己发的评论
   CommentDetails? userCommentDetails;
+  bool isLoadingUserComment = false;
+  bool hasLoadedUserComment = false;
 
   int commentLength = 0;
   int currentPageIndex = 1;
@@ -70,51 +72,68 @@ class CommentModel extends ChangeNotifier {
   //筛选 用途?
   Future<void> loadUserComment({
     UserInformation? currentUserInformation,
+    bool isReloaded = false,
     Function(String)? fallbackAction
   }) async {
-    if(subjectID == 0 || currentUserInformation == null) return;
-    if(userCommentDetails != null) return; 
+    if (subjectID == 0 || currentUserInformation?.userName == null) return;
+    if (isLoadingUserComment) return;
+    if (hasLoadedUserComment && !isReloaded) return;
 
-    //占位符
-    userCommentDetails = CommentDetails();
+    isLoadingUserComment = true;
 
-    try{
+    try {
       final userStarInformation = await HttpApiClient.client.get(
-        BangumiAPIUrls.userSubjectComment(currentUserInformation.userName!,subjectID)
+        BangumiAPIUrls.userSubjectComment(currentUserInformation!.userName!, subjectID)
       );
 
-      if(userStarInformation.data != null){
+      if (userStarInformation.data != null) {
+        final rawData = userStarInformation.data;
+
         userCommentDetails = CommentDetails()
           ..userInformation = currentUserInformation
-          ..commentTimeStamp = DateTime.parse(userStarInformation.data["updated_at"]).toLocal().millisecondsSinceEpoch
-          ..comment = userStarInformation.data["comment"]
-          ..rate = userStarInformation.data["rate"]
+          ..commentTimeStamp = DateTime.tryParse(rawData["updated_at"]?.toString() ?? "")?.toLocal().millisecondsSinceEpoch
+          ..comment = rawData["comment"]
+          ..rate = rawData["rate"]
           ..type = StarType.values.firstWhere(
-            (element) => element.starTypeIndex == userStarInformation.data["type"]
+            (element) => element.starTypeIndex == rawData["type"],
+            orElse: () => StarType.none,
           )
         ;
+
+        hasLoadedUserComment = true;
 
         debugPrint("用户收藏了该条目: $subjectID, ${userCommentDetails?.type?.starTypeName}");
 
         notifyListeners();
       }
-    
     }
 
-    on DioException catch(e){
-      userCommentDetails = null;
-      if(e.response?.statusCode == 404){
+    on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        final hadComment = userCommentDetails != null;
+        userCommentDetails = null;
+        hasLoadedUserComment = true;
+
         debugPrint("用户未收藏该条目: $subjectID");
+
+        if (hadComment) notifyListeners();
       }
 
-      else{
+      else {
         fallbackAction?.call("Request Error:${e.toString()}");
         debugPrint("Request Error:${e.toString()}");
       }
-        
     }
 
-    
+    finally {
+      isLoadingUserComment = false;
+    }
+  }
+
+  void updateUserCommentDetails(CommentDetails? updatedDetails) {
+    userCommentDetails = updatedDetails;
+    hasLoadedUserComment = true;
+    notifyListeners();
   }
   
   Future<void> loadComments(

@@ -121,7 +121,9 @@ class BangumiContentService {
         ),
       };
 
-      if (response.statusCode == HttpStatus.ok) {
+      final statusCode = response.statusCode ?? 0;
+
+      if (statusCode >= HttpStatus.ok && statusCode < HttpStatus.multipleChoices) {
         return (response.data is Map ? response.data["id"] : null) ?? 1;
       }
 

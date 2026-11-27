@@ -32,13 +32,20 @@ abstract class BaseComment {
   }
 
   @override
-  bool operator==(Object other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is BaseComment && other.hashCode == hashCode;
+
+    if (other.runtimeType != runtimeType) return false;
+
+    if (other is BaseComment && commentID != null && other.commentID != null) {
+      return other.commentID == commentID;
+    }
+
+    return false;
   }
 
   @override
-  int get hashCode => commentID.hashCode;
+  int get hashCode => commentID?.hashCode ?? identityHashCode(this);
 
 
 

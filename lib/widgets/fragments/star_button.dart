@@ -35,6 +35,12 @@ class _StarButtonState extends State<StarButton> {
   final ValueNotifier<int> starInformationNotifier = ValueNotifier(0);
 
   @override
+  void dispose() {
+    starInformationNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     return Selector<CommentModel, CommentDetails?>(
@@ -50,6 +56,7 @@ class _StarButtonState extends State<StarButton> {
           onPressed: () {
 
             final bangumiModel = context.read<BangumiModel>();
+            final commentModel = context.read<CommentModel>();
 
             /// context 环节迁移到 button 区域 而非 Dialog区域(特指)
             /// 以免造成 deactive Context use.
@@ -71,17 +78,24 @@ class _StarButtonState extends State<StarButton> {
               bangumiDetails: widget.bangumiDetails,
               onUpdateLocalStar: invokeLocalUpdateStaredBangumi,
               onUpdateBangumiStar: invokeRequestSnackBar,
+              onSaveCommentDetails: (updatedDetails) {
+                commentModel.updateUserCommentDetails(updatedDetails);
+              },
 
               commentDetails:
-              userCommentDetails?..type = 
-              localStarType ?? userCommentDetails.type
-              ,
+              userCommentDetails == null
+                ? null
+                : (userCommentDetails..type = localStarType ?? userCommentDetails.type),
               themeColor: getDetailRenderColor(context, bangumiModel.imageColor)
             ).then((result) {
+              if (!mounted) return;
 
-                starInformationNotifier.value += 1;
+              if (result != null) {
                 localStarType = result;
-              });
+              }
+
+              starInformationNotifier.value += 1;
+            });
 
           },
           child: Container(
@@ -97,21 +111,20 @@ class _StarButtonState extends State<StarButton> {
 
                 //会出现 账号收藏 本地未收藏的状态...
                 final isStared = MyHive.starBangumisDataBase.containsKey(widget.bangumiDetails.id);
+                final activeStarType = localStarType ?? userCommentDetails?.type;
+                final isOnlineStared = activeStarType != null && activeStarType != StarType.none;
 
-                String starText = "已收藏";
+                String starText = isStared ? "已收藏" : "加入收藏";
 
-                if (!isStared) {starText = "加入收藏";
-                }
-
-                if (userCommentDetails != null) {
-                  starText = (localStarType ?? userCommentDetails.type ?? StarType.none).starTypeName;
+                if (isOnlineStared) {
+                  starText = activeStarType.starTypeName;
                 }
 
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 6,
                   children: [
-                    isStared ? const Icon(Icons.star) : const Icon(Icons.star_outline),
+                    (isStared || isOnlineStared) ? const Icon(Icons.star) : const Icon(Icons.star_outline),
                     ScalableText(starText),
                   ],
                 );
