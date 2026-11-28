@@ -486,7 +486,7 @@ class APPInformationRepository{
   static const String link = "https://github.com/kechuan/banguLite/releases",
   projectName = "banguLite",
   packageName = "io.flutter.banguLite",
-  version = "0.13.0",
+  version = "0.13.1",
   author = "kechuan",
   githubMirrorPrefix = "https://gh-proxy.org/",
   githubLatestReleaseApi = "https://api.github.com/repos/$author/$projectName/releases/latest"
